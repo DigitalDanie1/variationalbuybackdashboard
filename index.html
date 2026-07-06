@@ -1,0 +1,1024 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Variational $$ Buyback — Live USDC Treasury Tracker</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Crect width='200' height='200' rx='44' fill='%230a0e1a'/%3E%3Cg fill='none' stroke='%234d90ff' stroke-width='26' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M40 166 L100 46 L160 166'/%3E%3Cpath d='M67 120 L133 120'/%3E%3C/g%3E%3C/svg%3E">
+
+<!-- ============================================================
+     TWITTER / LINK PREVIEW  —  ⚠️ AFTER YOU HOST THIS, replace
+     every "https://REPLACE-WITH-YOUR-URL" below with your real
+     public URL (e.g. https://variational-buyback.netlify.app).
+     Keep og-card.png sitting next to this file on the host.
+     ============================================================ -->
+<meta name="description" content="Variational's protocol treasury takes 20% of every spread paid to OLP. Watch that USDC stack up live, on-chain — daily, weekly, 2-week & monthly growth.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="KoreanDaniel · On-chain Radar">
+<meta property="og:title" content="Variational $$ Buyback — $4.4M+ USDC and counting">
+<meta property="og:description" content="20% of every spread paid to OLP flows into Variational's treasury. Tracking it live on-chain — day / week / 2-week / month growth.">
+<meta property="og:url" content="https://REPLACE-WITH-YOUR-URL/">
+<meta property="og:image" content="https://REPLACE-WITH-YOUR-URL/assets/heaven.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@0xdefidaniel">
+<meta name="twitter:creator" content="@0xdefidaniel">
+<meta name="twitter:title" content="Variational $$ Buyback — $4.4M+ USDC and counting">
+<meta name="twitter:description" content="20% of every spread paid to OLP flows into Variational's treasury. Tracking it live on-chain.">
+<meta name="twitter:image" content="https://REPLACE-WITH-YOUR-URL/assets/heaven.png">
+<style>
+  :root{
+    --bg:#05070d; --panel:#0b1018; --panel2:#0e1521; --line:#1b2536;
+    --ink:#eaf1ff; --sub:#7d8aa5; --dim:#4a5674;
+    --grn:#22e6a0; --grn2:#12b981; --cyan:#38e1ff; --vio:#8b6cff; --amber:#ffb547; --red:#ff5d6c;
+    --mono:"SF Mono",ui-monospace,"JetBrains Mono",Menlo,Consolas,monospace;
+    --sans:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:
+     radial-gradient(1200px 700px at 82% -12%, rgba(34,230,160,.10), transparent 60%),
+     radial-gradient(1000px 600px at 8% 8%, rgba(139,108,255,.10), transparent 55%),
+     var(--bg);
+    color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased;min-height:100vh}
+  body{padding:26px clamp(14px,3vw,40px) 60px;position:relative;overflow-x:hidden}
+  .wm{position:fixed;right:-10px;bottom:-14px;font:700 88px/1 var(--sans);
+      color:transparent;-webkit-text-stroke:1px rgba(139,108,255,.08);pointer-events:none;user-select:none;letter-spacing:-2px}
+  a{color:inherit;text-decoration:none}
+
+  /* ---- header ---- */
+  header{display:flex;flex-wrap:wrap;align-items:flex-end;gap:20px;justify-content:space-between;
+    padding-bottom:20px;margin-bottom:22px;border-bottom:1px solid var(--line)}
+  .brand{display:flex;flex-direction:column;gap:8px}
+  .kd{display:flex;align-items:center;gap:8px;font:600 12px var(--mono);letter-spacing:2px;color:var(--vio);text-transform:uppercase}
+  .kd .dot{width:7px;height:7px;border-radius:50%;background:var(--vio);box-shadow:0 0 10px var(--vio)}
+  h1{font-size:clamp(24px,3.4vw,38px);font-weight:800;letter-spacing:-.5px;line-height:1.02}
+  h1 .money{background:linear-gradient(92deg,var(--grn),var(--cyan));-webkit-background-clip:text;background-clip:text;color:transparent;
+    filter:drop-shadow(0 0 14px rgba(34,230,160,.35))}
+  .contract{font:11px/1.4 var(--mono);color:var(--sub);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .contract a{color:var(--cyan);border-bottom:1px dashed rgba(56,225,255,.4)}
+  .badge{font:10px var(--mono);letter-spacing:.5px;padding:2px 7px;border:1px solid var(--line);border-radius:20px;color:var(--sub)}
+
+  .hero-total{text-align:right}
+  .hero-total .lbl{font:600 11px var(--mono);letter-spacing:2px;color:var(--sub);text-transform:uppercase}
+  .hero-total .val{font:800 clamp(30px,4.6vw,52px)/1 var(--mono);letter-spacing:-1px;margin-top:6px;
+    background:linear-gradient(92deg,#eafff6,var(--grn));-webkit-background-clip:text;background-clip:text;color:transparent;
+    filter:drop-shadow(0 0 20px rgba(34,230,160,.28))}
+  .hero-total .sub{margin-top:8px;font:11px var(--mono);color:var(--sub);display:flex;gap:10px;justify-content:flex-end;align-items:center}
+  #refresh{cursor:pointer;font:600 11px var(--mono);letter-spacing:.5px;color:var(--grn);background:rgba(34,230,160,.08);
+    border:1px solid rgba(34,230,160,.3);padding:5px 11px;border-radius:8px;transition:.15s}
+  #refresh:hover{background:rgba(34,230,160,.16);box-shadow:0 0 16px rgba(34,230,160,.25)}
+  #refresh.busy{opacity:.5;pointer-events:none}
+  .kd{cursor:pointer;transition:.15s}
+  .kd:hover{color:#b7a6ff;filter:drop-shadow(0 0 8px rgba(139,108,255,.5))}
+  #tweet{cursor:pointer;font:700 11px var(--mono);letter-spacing:.3px;color:#04120c;
+    background:linear-gradient(92deg,var(--grn),var(--cyan));border:0;padding:6px 13px;border-radius:8px;transition:.15s;
+    box-shadow:0 0 16px rgba(34,230,160,.3)}
+  #tweet:hover{filter:brightness(1.08);box-shadow:0 0 22px rgba(34,230,160,.5)}
+
+  /* how-it-fills flow strip */
+  .flow{display:flex;align-items:stretch;gap:0;flex-wrap:wrap;margin-bottom:22px;
+    background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:14px;overflow:hidden}
+  .flow .step{flex:1;min-width:150px;padding:14px 16px;display:flex;flex-direction:column;gap:5px;position:relative}
+  .flow .step:not(:last-child)::after{content:"→";position:absolute;right:-9px;top:50%;transform:translateY(-50%);
+    color:var(--grn);font:700 16px var(--mono);z-index:2;text-shadow:0 0 8px rgba(34,230,160,.6)}
+  .flow .step+.step{border-left:1px solid var(--line)}
+  .flow .s-top{font:600 10px var(--mono);letter-spacing:1px;color:var(--sub);text-transform:uppercase}
+  .flow .s-mid{font:700 15px var(--sans)}
+  .flow .s-mid b{color:var(--grn)}
+  .flow .s-sub{font:11px var(--mono);color:var(--dim)}
+  .flow .hi .s-mid b{background:linear-gradient(92deg,var(--grn),var(--cyan));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .flow-note{font:10.5px var(--mono);color:var(--amber);opacity:.85;margin:-14px 2px 22px;display:flex;gap:6px;align-items:center}
+
+  /* forecast */
+  .fc-body{display:grid;grid-template-columns:1fr 1.15fr;gap:22px;margin-top:6px}
+  @media(max-width:820px){.fc-body{grid-template-columns:1fr}}
+  .fc-controls{display:flex;flex-direction:column;gap:18px}
+  .ctl{display:flex;flex-direction:column;gap:9px}
+  .ctl>span{font:600 12px var(--mono);color:var(--sub);letter-spacing:.3px}
+  .ctl>span em{color:var(--grn);font-style:normal;font-weight:700}
+  .ctl input[type=range]{-webkit-appearance:none;appearance:none;height:6px;border-radius:6px;
+     background:linear-gradient(90deg,var(--grn),var(--cyan));outline:none;cursor:pointer}
+  .ctl input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;
+     background:#eafff6;border:3px solid var(--grn);box-shadow:0 0 12px rgba(34,230,160,.6);cursor:pointer}
+  .ctl input[type=date]{background:var(--panel);color:var(--ink);border:1px solid var(--line);border-radius:8px;
+     padding:8px 11px;font:13px var(--mono);color-scheme:dark;width:fit-content}
+  .ticks{display:flex;justify-content:space-between;font:9.5px var(--mono);color:var(--dim)}
+  .preset-row{display:flex;flex-wrap:wrap;gap:7px;margin-top:2px}
+  .preset{cursor:pointer;font:600 11px var(--mono);color:var(--sub);background:var(--panel);border:1px solid var(--line);
+     padding:6px 11px;border-radius:8px;transition:.15s}
+  .preset:hover{color:var(--ink);border-color:var(--grn)}
+  .preset.on{color:#04120c;background:linear-gradient(92deg,var(--grn),var(--cyan));border-color:transparent}
+
+  .fc-out{display:flex;flex-direction:column;gap:14px}
+  .fc-hero{background:radial-gradient(400px 200px at 80% 0,rgba(34,230,160,.12),transparent 60%),var(--panel);
+     border:1px solid var(--line);border-radius:14px;padding:18px 20px}
+  .fc-hero .k{font:600 11px var(--mono);letter-spacing:1.5px;color:var(--sub);text-transform:uppercase}
+  .fc-hero .v{font:800 clamp(34px,5vw,52px)/1 var(--mono);letter-spacing:-1.5px;margin-top:8px;
+     background:linear-gradient(92deg,#eafff6,var(--grn));-webkit-background-clip:text;background-clip:text;color:transparent;
+     filter:drop-shadow(0 0 20px rgba(34,230,160,.3))}
+  .fc-hero .d{font:13px var(--mono);color:var(--grn);margin-top:8px;font-weight:700}
+  .fc-hero .range{font:11px var(--mono);color:var(--sub);margin-top:5px}
+  .fc-burn{background:radial-gradient(400px 200px at 80% 0,rgba(139,108,255,.12),transparent 60%),var(--panel);
+     border:1px solid var(--line);border-radius:14px;padding:16px 20px}
+  .fc-burn .k{font:600 11px var(--mono);letter-spacing:1px;color:var(--sub);text-transform:uppercase;display:flex;align-items:center;gap:6px}
+  .fc-burn .q{cursor:help;color:var(--vio);border:1px solid var(--vio);border-radius:50%;width:15px;height:15px;
+     display:inline-flex;align-items:center;justify-content:center;font-size:9px;font-weight:700}
+  .burn-row{display:flex;justify-content:space-between;align-items:baseline;margin-top:12px;
+     font:12px var(--mono);color:var(--sub);border-top:1px solid rgba(27,37,54,.6);padding-top:11px}
+  .burn-row b{font:800 22px var(--mono);color:var(--ink);letter-spacing:-.5px}
+  .burn-row b.hi{background:linear-gradient(92deg,var(--vio),var(--cyan));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .burn-note{font:10.5px var(--mono);color:var(--dim);margin-top:11px;line-height:1.5}
+  .live-dot{width:7px;height:7px;border-radius:50%;background:var(--grn);box-shadow:0 0 9px var(--grn);animation:pulse 1.8s infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+
+  /* ---- kpi strip ---- */
+  .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:22px}
+  .kpi{background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:14px;padding:15px 16px;position:relative;overflow:hidden}
+  .kpi::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--accent,var(--grn));box-shadow:0 0 14px var(--accent,var(--grn))}
+  .kpi .k{font:600 10px var(--mono);letter-spacing:1.5px;color:var(--sub);text-transform:uppercase}
+  .kpi .v{font:800 24px/1.05 var(--mono);letter-spacing:-.5px;margin-top:9px}
+  .kpi .d{font:11px var(--mono);color:var(--sub);margin-top:6px}
+
+  /* ---- layout grid ---- */
+  .grid{display:grid;grid-template-columns:1.55fr 1fr;gap:16px}
+  @media(max-width:940px){.grid{grid-template-columns:1fr}}
+  .card{background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:16px;padding:18px 18px 12px}
+  .card h2{font:700 13px var(--sans);letter-spacing:.3px;display:flex;align-items:center;gap:9px;margin-bottom:2px}
+  .card h2 .tag{font:600 10px var(--mono);letter-spacing:1px;color:var(--sub);padding:2px 8px;border:1px solid var(--line);border-radius:20px}
+  .card .cap{font:11px var(--mono);color:var(--dim);margin-bottom:14px}
+
+  /* segmented control */
+  .seg{display:inline-flex;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:3px;gap:2px;margin:2px 0 4px}
+  .seg button{cursor:pointer;border:0;background:transparent;color:var(--sub);font:600 12px var(--mono);letter-spacing:.5px;
+    padding:7px 14px;border-radius:7px;transition:.15s}
+  .seg button.on{color:#04120c;background:linear-gradient(92deg,var(--grn),var(--cyan));box-shadow:0 0 16px rgba(34,230,160,.3)}
+
+  /* svg chart shells */
+  .chart{width:100%;display:block}
+  .tt{position:fixed;pointer-events:none;z-index:20;background:rgba(8,12,20,.96);border:1px solid var(--line);
+     border-radius:9px;padding:8px 11px;font:11px/1.5 var(--mono);color:var(--ink);opacity:0;transition:opacity .1s;box-shadow:0 8px 30px rgba(0,0,0,.5)}
+  .tt b{color:var(--grn)}
+
+  /* table */
+  .tbl-wrap{max-height:360px;overflow:auto;margin:0 -4px}
+  table{width:100%;border-collapse:collapse;font:12px var(--mono)}
+  th{position:sticky;top:0;background:var(--panel);text-align:right;color:var(--sub);font-weight:600;letter-spacing:.5px;
+     padding:8px 10px;border-bottom:1px solid var(--line);font-size:10px;text-transform:uppercase;z-index:2}
+  th:first-child,td:first-child{text-align:left}
+  td{padding:9px 10px;border-bottom:1px solid rgba(27,37,54,.6);text-align:right}
+  tr:hover td{background:rgba(56,225,255,.04)}
+  .pos{color:var(--grn)} .neg{color:var(--red)} .muted{color:var(--dim)}
+  .barcell{position:relative}
+  .barcell .bar{position:absolute;left:0;top:50%;transform:translateY(-50%);height:60%;border-radius:3px;
+     background:linear-gradient(90deg,rgba(34,230,160,.25),rgba(56,225,255,.35));z-index:0}
+  .barcell span{position:relative;z-index:1}
+
+  footer{margin-top:26px;font:11px var(--mono);color:var(--dim);display:flex;flex-wrap:wrap;gap:14px;justify-content:space-between}
+  .note{background:rgba(255,181,71,.07);border:1px solid rgba(255,181,71,.25);color:#ffcf8a;border-radius:8px;
+     padding:6px 10px;font:11px var(--mono);display:none}
+  .note.show{display:block}
+
+  /* velocity stat strip */
+  .velo-stats{display:flex;flex-wrap:wrap;gap:12px 26px;margin:4px 2px 12px}
+  .velo-stats .vs{display:flex;flex-direction:column;gap:3px}
+  .velo-stats .vs .n{font:800 23px var(--mono);letter-spacing:-.5px;color:var(--ink);line-height:1}
+  .velo-stats .vs .n.hi{background:linear-gradient(92deg,var(--grn),var(--amber));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .velo-stats .vs .l{font:10px var(--mono);letter-spacing:1px;color:var(--sub);text-transform:uppercase}
+
+  /* milestone ladder */
+  .ladder{display:flex;flex-wrap:wrap;margin-top:8px;border:1px solid var(--line);border-radius:12px;overflow:hidden;
+    background:linear-gradient(180deg,var(--panel2),var(--panel))}
+  .ladder .ms{flex:1;min-width:118px;padding:15px 14px;display:flex;flex-direction:column;gap:6px;position:relative}
+  .ladder .ms:not(:last-child)::after{content:"→";position:absolute;right:-8px;top:26px;color:var(--dim);font:700 14px var(--mono);z-index:2}
+  .ladder .ms+.ms{border-left:1px solid var(--line)}
+  .ladder .ms .mv{font:800 23px var(--mono);letter-spacing:-1px;color:var(--ink);line-height:1}
+  .ladder .ms .md{font:700 13px var(--mono)}
+  .ladder .ms .mg{font:10.5px var(--mono);color:var(--sub)}
+  .ladder .ms.proj{background:radial-gradient(200px 120px at 50% 0,rgba(139,108,255,.14),transparent 70%)}
+  .ladder .ms.proj .mv{background:linear-gradient(92deg,var(--vio),var(--cyan));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .ladder .ms.proj::after{content:""}
+
+  /* chart legend */
+  .legend{display:flex;flex-wrap:wrap;gap:8px 16px;margin:-4px 2px 12px;font:10.5px var(--mono);color:var(--sub)}
+  .legend b{display:inline-flex;align-items:center;gap:7px;font-weight:400}
+  .legend .sw{width:16px;height:9px;border-radius:2px;flex:none}
+  .sw.act{background:linear-gradient(90deg,var(--grn),var(--cyan))}
+  .sw.fc{height:0;border-top:2px dashed var(--vio);border-radius:0}
+  .sw.cone{background:rgba(139,108,255,.22);border:1px solid rgba(139,108,255,.4)}
+
+  /* mobile header */
+  @media(max-width:640px){
+    header{gap:14px}
+    .hero-total{text-align:left}
+    .hero-total .sub{justify-content:flex-start;flex-wrap:wrap}
+  }
+
+  /* respect reduced-motion */
+  @media(prefers-reduced-motion:reduce){
+    .live-dot{animation:none}
+    html{scroll-behavior:auto}
+    .sand-stream,.hg-flip,.money-rain i{animation:none!important}
+  }
+
+  /* ---- logo ---- */
+  .brandwrap{display:flex;align-items:center;gap:14px}
+  .logo{width:46px;height:46px;flex:none;border-radius:12px;filter:drop-shadow(0 0 14px rgba(77,144,255,.4))}
+
+  /* ---- live accrual + hourglass ---- */
+  .live-card{display:grid;grid-template-columns:auto 1fr;gap:22px;align-items:center;margin-bottom:22px;
+    background:radial-gradient(600px 200px at 20% 0,rgba(56,225,255,.10),transparent 60%),linear-gradient(180deg,var(--panel2),var(--panel));
+    border:1px solid var(--line);border-radius:16px;padding:20px 22px;position:relative;overflow:hidden}
+  @media(max-width:680px){.live-card{grid-template-columns:1fr;justify-items:center;text-align:center}}
+  .hg{position:relative;width:96px;height:120px;flex:none}
+  .hg svg{width:100%;height:100%;overflow:visible}
+  .sand-stream{transform-origin:center;animation:sandpulse 1s ease-in-out infinite}
+  @keyframes sandpulse{0%,100%{opacity:.9;transform:scaleY(1)}50%{opacity:.5;transform:scaleY(.82)}}
+  .hg-flip{transform-origin:50% 50%;animation:flip 8s linear infinite}
+  @keyframes flip{0%,88%{transform:rotate(0)}94%,100%{transform:rotate(180deg)}}
+  .live-body{min-width:0}
+  .live-body .k{font:600 11px var(--mono);letter-spacing:2px;color:var(--cyan);text-transform:uppercase;display:flex;align-items:center;gap:8px}
+  .ticker{font:800 clamp(30px,5vw,46px)/1 var(--mono);letter-spacing:-1px;margin:9px 0 4px;
+    background:linear-gradient(92deg,#dffff4,var(--grn),var(--cyan));-webkit-background-clip:text;background-clip:text;color:transparent;
+    filter:drop-shadow(0 0 18px rgba(34,230,160,.3))}
+  .ticker .cents{font-size:.5em;color:var(--sub);-webkit-text-fill-color:var(--sub)}
+  .live-body .sub{font:11.5px var(--mono);color:var(--dim)}
+  .twap-row{display:flex;flex-wrap:wrap;gap:26px;margin-top:14px}
+  .twap{display:flex;flex-direction:column;gap:3px}
+  .twap .n{font:800 20px var(--mono);color:var(--grn);letter-spacing:-.5px}
+  .twap .l{font:10px var(--mono);letter-spacing:1px;color:var(--sub);text-transform:uppercase}
+  .money-rain{position:absolute;inset:0;pointer-events:none;overflow:hidden;opacity:.5}
+  .money-rain i{position:absolute;top:-20px;font-size:12px;font-style:normal;animation:fall linear infinite}
+  @keyframes fall{to{transform:translateY(160px);opacity:0}}
+
+  /* ---- earnings calendar heatmap ---- */
+  .cal-scroll{overflow-x:auto;padding-bottom:6px}
+  .cal-grid{display:grid;grid-template-rows:repeat(7,14px);grid-auto-flow:column;grid-auto-columns:14px;gap:3px;width:max-content}
+  .cal-cell{width:14px;height:14px;border-radius:3px;background:var(--c,#0f1826);cursor:pointer;transition:transform .1s,box-shadow .1s;outline:1px solid rgba(255,255,255,.02)}
+  .cal-cell.empty{background:transparent;cursor:default;outline:none}
+  .cal-cell:hover{transform:scale(1.35);box-shadow:0 0 0 1px var(--grn),0 0 12px rgba(34,230,160,.5);z-index:3}
+  .cal-cell.sel{box-shadow:0 0 0 2px var(--cyan),0 0 14px rgba(56,225,255,.7);transform:scale(1.2)}
+  .cal-months{display:grid;grid-auto-flow:column;gap:3px;margin-left:2px;margin-bottom:6px;font:9.5px var(--mono);color:var(--dim);height:12px}
+  .cal-legend{display:flex;align-items:center;gap:6px;margin-top:12px;font:10px var(--mono);color:var(--sub)}
+  .cal-legend .sc{width:14px;height:14px;border-radius:3px}
+  .cal-sel{display:flex;flex-wrap:wrap;align-items:center;gap:12px 18px;margin-top:16px;padding-top:15px;border-top:1px solid var(--line)}
+  .cal-sel .amt{font:800 26px var(--mono);letter-spacing:-.5px}
+  .cal-sel .amt.pos{background:linear-gradient(92deg,var(--grn),var(--cyan));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .cal-sel .lab{font:11px var(--mono);color:var(--sub)}
+  .cal-sel .lab b{color:var(--ink);font-weight:700}
+  .share-btn{cursor:pointer;font:700 11px var(--mono);letter-spacing:.3px;color:#04120c;
+    background:linear-gradient(92deg,var(--grn),var(--cyan));border:0;padding:7px 14px;border-radius:8px;transition:.15s;
+    box-shadow:0 0 14px rgba(34,230,160,.3);display:inline-flex;align-items:center;gap:6px}
+  .share-btn:hover{filter:brightness(1.08);box-shadow:0 0 20px rgba(34,230,160,.5)}
+  .share-btn.ghost{color:var(--sub);background:var(--panel);border:1px solid var(--line);box-shadow:none}
+  .share-btn.ghost:hover{color:var(--ink);border-color:var(--grn);filter:none}
+
+  /* ---- heaven easter-egg ---- */
+  .heaven-wrap{position:relative;margin-top:14px;border-radius:12px;overflow:hidden;border:1px solid var(--line);max-width:340px}
+  .heaven-wrap img{display:block;width:100%;height:auto}
+  .heaven-wrap .cap2{position:absolute;left:0;right:0;bottom:0;padding:10px 12px;font:700 12px var(--mono);color:#fff;
+    background:linear-gradient(0deg,rgba(3,6,12,.9),transparent);text-shadow:0 1px 6px rgba(0,0,0,.8)}
+  .heaven-wrap.noimg{display:none}
+</style>
+</head>
+<body>
+<div class="wm">KoreanDaniel</div>
+
+<header>
+  <div class="brandwrap">
+  <svg class="logo" viewBox="0 0 200 200" aria-label="Variational logo">
+    <rect width="200" height="200" rx="44" fill="#0a0e1a"/>
+    <g fill="none" stroke="#4d90ff" stroke-width="26" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M40 166 L100 46 L160 166"/>
+      <path d="M67 120 L133 120"/>
+    </g>
+  </svg>
+  <div class="brand">
+    <a class="kd" href="https://x.com/0xdefidaniel" target="_blank" rel="noopener"><span class="dot"></span> Built by @0xdefidaniel · Follow ↗</a>
+    <h1>Variational <span class="money">$$ Buyback</span></h1>
+    <div class="contract">
+      <span class="badge">Arbitrum · USDC</span>
+      <a href="https://arbiscan.io/address/0x5e91b40467fb8902c46a7b6cb90482363188d645#tokentxns" target="_blank">0x5e91…d645 ↗</a>
+      <span class="badge" id="rangeBadge">—</span>
+    </div>
+  </div>
+  </div>
+  <div class="hero-total">
+    <div class="lbl">Total USDC Accumulated</div>
+    <div class="val" id="totalVal">—</div>
+    <div class="sub">
+      <span class="live-dot"></span>
+      <span id="stamp">snapshot</span>
+      <button id="tweet">𝕏 Tweet this</button>
+      <button id="refresh">↻ Refresh live</button>
+    </div>
+  </div>
+</header>
+
+<div class="flow">
+  <div class="step"><div class="s-top">Traders pay</div><div class="s-mid">Spreads on every trade</div><div class="s-sub">cost baked into fills</div></div>
+  <div class="step"><div class="s-top">Spreads go to</div><div class="s-mid">OLP liquidity providers</div><div class="s-sub">who back the order book</div></div>
+  <div class="step hi"><div class="s-top">Protocol skims</div><div class="s-mid"><b>20% of spreads</b> → treasury</div><div class="s-sub">this on-chain wallet</div></div>
+  <div class="step"><div class="s-top">You watch it</div><div class="s-mid"><b>Stack live</b> on-chain</div><div class="s-sub">provably real, not a screenshot</div></div>
+</div>
+<div class="flow-note">⚠ The 20% treasury cut is still being tested by Variational and is subject to change.</div>
+
+<div class="live-card">
+  <div class="money-rain" id="rain"></div>
+  <div class="hg" aria-hidden="true">
+    <svg viewBox="0 0 96 120">
+      <defs>
+        <linearGradient id="sand" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#22e6a0"/><stop offset="1" stop-color="#38e1ff"/></linearGradient>
+        <clipPath id="topBulb"><path d="M18 10 H78 L52 58 Q48 62 44 58 Z"/></clipPath>
+        <clipPath id="botBulb"><path d="M18 110 H78 L52 62 Q48 58 44 62 Z"/></clipPath>
+      </defs>
+      <g class="hg-flip">
+        <!-- frame -->
+        <path d="M18 10 H78 L52 58 Q48 62 44 58 Z M18 110 H78 L52 62 Q48 58 44 62 Z"
+              fill="rgba(56,225,255,.05)" stroke="#2a3750" stroke-width="2.5" stroke-linejoin="round"/>
+        <rect x="12" y="6" width="72" height="6" rx="3" fill="#2a3750"/>
+        <rect x="12" y="108" width="72" height="6" rx="3" fill="#2a3750"/>
+        <!-- top sand (draining) -->
+        <g clip-path="url(#topBulb)"><rect id="sandTop" x="18" y="10" width="60" height="34" fill="url(#sand)" opacity=".85"/></g>
+        <!-- falling stream -->
+        <rect class="sand-stream" x="46.5" y="52" width="3" height="18" fill="url(#sand)"/>
+        <!-- bottom sand (filling) -->
+        <g clip-path="url(#botBulb)"><rect id="sandBot" x="18" y="96" width="60" height="14" fill="url(#sand)"/></g>
+      </g>
+    </svg>
+  </div>
+  <div class="live-body">
+    <div class="k"><span class="live-dot"></span> Printing right now · live</div>
+    <div class="ticker" id="ticker">$0<span class="cents">.00</span></div>
+    <div class="sub" id="tickerSub">USDC stacked since you opened this page · at the current pace</div>
+    <div class="twap-row">
+      <div class="twap"><span class="n" id="tw1h">—</span><span class="l">Next 1 hour</span></div>
+      <div class="twap"><span class="n" id="tw24h">—</span><span class="l">Next 24 hours</span></div>
+      <div class="twap"><span class="n" id="tw7d">—</span><span class="l">Next 7 days</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="note" id="note"></div>
+
+<div class="kpis" id="kpis"></div>
+
+<div class="grid">
+  <div class="card">
+    <h2>Cumulative Accumulation <span class="tag" id="curveTag">—</span></h2>
+    <div class="cap">Total USDC held over time — pure buyback inflow (no outflows recorded).</div>
+    <div class="legend">
+      <b><span class="sw act"></span>Actual on-chain</b>
+      <b><span class="sw fc"></span>Projected pace</b>
+      <b><span class="sw cone"></span>Range (soft–hot)</b>
+    </div>
+    <svg class="chart" id="curve" viewBox="0 0 720 300" preserveAspectRatio="none"></svg>
+  </div>
+
+  <div class="card">
+    <h2>Growth per Interval</h2>
+    <div class="cap">Switch the window to see how much stacked, and how fast.</div>
+    <div class="seg" id="seg">
+      <button data-i="day">Daily</button>
+      <button data-i="week" class="on">Weekly</button>
+      <button data-i="biweek">2-Week</button>
+      <button data-i="month">Monthly</button>
+    </div>
+    <svg class="chart" id="bars" viewBox="0 0 380 230"></svg>
+  </div>
+</div>
+
+<div class="card velo" style="margin-top:16px">
+  <h2>Earning Velocity <span class="tag">7-day avg · $/day</span></h2>
+  <div class="cap">Not the total — the <b style="color:var(--ink)">speed</b> it earns at. A rising line means the treasury is stacking faster over time (accelerating).</div>
+  <div class="velo-stats" id="veloStats"></div>
+  <svg class="chart" id="velo" viewBox="0 0 720 240" preserveAspectRatio="none"></svg>
+</div>
+
+<div class="card cal" style="margin-top:16px">
+  <h2>Earnings Calendar <span class="tag" id="calTag">daily</span></h2>
+  <div class="cap">Every day the treasury earns. Brighter = bigger day. Click any cell to see &amp; share that day / week / month.</div>
+  <div class="seg" id="calSeg">
+    <button data-c="day" class="on">일 Daily</button>
+    <button data-c="week">주 Weekly</button>
+    <button data-c="month">월 Monthly</button>
+  </div>
+  <div class="cal-scroll">
+    <div class="cal-months" id="calMonths"></div>
+    <div class="cal-grid" id="calGrid"></div>
+  </div>
+  <div class="cal-legend">
+    <span>less</span>
+    <span class="sc" style="background:#0f1826"></span>
+    <span class="sc" style="background:rgba(34,230,160,.28)"></span>
+    <span class="sc" style="background:rgba(34,230,160,.55)"></span>
+    <span class="sc" style="background:rgba(34,230,160,.8)"></span>
+    <span class="sc" style="background:linear-gradient(92deg,var(--grn),var(--cyan))"></span>
+    <span>more</span>
+  </div>
+  <div class="cal-sel" id="calSel">
+    <div><div class="amt pos" id="calAmt">—</div><div class="lab" id="calLab">Click a cell to pick a period</div></div>
+    <button class="share-btn" id="calShare">𝕏 Share this</button>
+    <button class="share-btn ghost" id="calCopy">⧉ Copy</button>
+  </div>
+  <div class="heaven-wrap" id="heaven">
+    <img src="assets/heaven.png" alt="to the moon" onerror="this.closest('.heaven-wrap').classList.add('noimg')">
+    <div class="cap2">💸 stack it till we reach the gates 🪜☁️</div>
+  </div>
+</div>
+
+<div class="card fc" style="margin-top:16px">
+  <h2>Forecast → Points-Program End <span class="tag" id="fcDays">—</span></h2>
+  <div class="cap">If the current pace holds, how big is the treasury when the points program ends? Drag the assumptions.</div>
+  <div class="fc-body">
+    <div class="fc-controls">
+      <label class="ctl">
+        <span>Daily accumulation pace <em id="rateEcho">—</em></span>
+        <input type="range" id="rate" min="20000" max="90000" step="1000">
+        <div class="ticks"><span>slow $20K</span><span>fast $90K</span></div>
+      </label>
+      <label class="ctl">
+        <span>Program end date <em id="tgtEcho">2026-09-30</em></span>
+        <input type="date" id="tgt" value="2026-09-30">
+      </label>
+      <label class="ctl">
+        <span>$VAR buy &amp; burn = min <em id="burnEcho">30%</em> of revenue</span>
+        <input type="range" id="burn" min="30" max="100" step="5" value="30">
+        <div class="ticks"><span>floor 30%</span><span>100%</span></div>
+      </label>
+      <div class="preset-row">
+        <button class="preset on" data-r="30d">Current pace</button>
+        <button class="preset" data-r="7d">Last 7d</button>
+        <button class="preset" data-r="60d">2-mo avg</button>
+        <button class="preset" data-r="all">All-time</button>
+      </div>
+    </div>
+    <div class="fc-out">
+      <div class="fc-hero">
+        <div class="k">Projected treasury on <span id="tgtLbl">Sep 30</span></div>
+        <div class="v" id="projVal">—</div>
+        <div class="d" id="projAdd">—</div>
+        <div class="range" id="projRange">—</div>
+      </div>
+      <div class="fc-burn">
+        <div class="k">Implied $VAR buy-&amp;-burn firepower <span class="q" title="At least 30% of protocol revenue is earmarked to purchase and burn $VAR. Revenue here = USDC captured by this treasury. This wallet has had zero outflows so far, so it's dry powder building up — the burn is a planned/floor mechanic, not yet executed on-chain.">ⓘ</span></div>
+        <div class="burn-row"><span>Earmarked now</span><b id="burnNow">—</b></div>
+        <div class="burn-row"><span>By program end</span><b id="burnProj" class="hi">—</b></div>
+        <div class="burn-note" id="burnNote">—</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card" style="margin-top:16px">
+  <h2>Interval Breakdown <span class="tag" id="tblTag">weekly</span></h2>
+  <div class="cap">Newest first · USDC added and % growth for each period.</div>
+  <div class="tbl-wrap">
+    <table id="tbl"><thead><tr>
+      <th>Period</th><th>Start</th><th>End</th><th>USDC Added</th><th>Δ %</th><th>Avg / day</th>
+    </tr></thead><tbody></tbody></table>
+  </div>
+</div>
+
+<footer>
+  <span>Source: Arbitrum native USDC (0xaf88…5831) · balances via Tenderly public gateway · not financial advice</span>
+  <span>Follow <a href="https://x.com/0xdefidaniel" target="_blank" rel="noopener" style="color:var(--cyan);border-bottom:1px dashed rgba(56,225,255,.4)">@0xdefidaniel</a> for more on-chain radars · <span id="genstamp"></span></span>
+</footer>
+
+<div class="tt" id="tt"></div>
+
+<script>
+/* ---------- embedded snapshot data ---------- */
+const RAW = [{"d":"2026-01-23","v":0.0},{"d":"2026-01-24","v":23706.33},{"d":"2026-01-25","v":41927.09},{"d":"2026-01-26","v":66649.93},{"d":"2026-01-27","v":87872.5},{"d":"2026-01-28","v":111377.16},{"d":"2026-01-29","v":136903.55},{"d":"2026-01-30","v":164875.64},{"d":"2026-01-31","v":186039.26},{"d":"2026-02-01","v":211164.05},{"d":"2026-02-02","v":232497.4},{"d":"2026-02-03","v":254228.81},{"d":"2026-02-04","v":277052.34},{"d":"2026-02-05","v":295061.69},{"d":"2026-02-06","v":323531.62},{"d":"2026-02-07","v":347133.93},{"d":"2026-02-08","v":364201.23},{"d":"2026-02-09","v":374008.77},{"d":"2026-02-10","v":387930.33},{"d":"2026-02-11","v":398762.96},{"d":"2026-02-12","v":410491.45},{"d":"2026-02-13","v":420611.31},{"d":"2026-02-14","v":429708.75},{"d":"2026-02-15","v":439870.28},{"d":"2026-02-16","v":452553.64},{"d":"2026-02-17","v":464938.74},{"d":"2026-02-18","v":479148.84},{"d":"2026-02-19","v":491703.45},{"d":"2026-02-20","v":500545.7},{"d":"2026-02-21","v":512441.8},{"d":"2026-02-22","v":521582.54},{"d":"2026-02-23","v":528333.68},{"d":"2026-02-24","v":543476.24},{"d":"2026-02-25","v":556464.73},{"d":"2026-02-26","v":569910.36},{"d":"2026-02-27","v":581517.03},{"d":"2026-02-28","v":595234.92},{"d":"2026-03-01","v":606315.91},{"d":"2026-03-02","v":618346.95},{"d":"2026-03-03","v":635711.39},{"d":"2026-03-04","v":649868.71},{"d":"2026-03-05","v":664237.59},{"d":"2026-03-06","v":675936.98},{"d":"2026-03-07","v":688101.39},{"d":"2026-03-08","v":694423.04},{"d":"2026-03-09","v":702015.89},{"d":"2026-03-10","v":714095.74},{"d":"2026-03-11","v":731071.34},{"d":"2026-03-12","v":745220.57},{"d":"2026-03-13","v":756305.19},{"d":"2026-03-14","v":775519.38},{"d":"2026-03-15","v":783551.21},{"d":"2026-03-16","v":791800.32},{"d":"2026-03-17","v":810205.24},{"d":"2026-03-18","v":825333.77},{"d":"2026-03-19","v":839706.51},{"d":"2026-03-20","v":852208.8},{"d":"2026-03-21","v":865420.63},{"d":"2026-03-22","v":870066.19},{"d":"2026-03-23","v":878964.14},{"d":"2026-03-24","v":897890.84},{"d":"2026-03-25","v":909425.49},{"d":"2026-03-26","v":932970.57},{"d":"2026-03-27","v":952995.71},{"d":"2026-03-28","v":975968.73},{"d":"2026-03-29","v":994205.91},{"d":"2026-03-30","v":1005595.12},{"d":"2026-03-31","v":1029204.17},{"d":"2026-04-01","v":1052596.87},{"d":"2026-04-02","v":1079928.62},{"d":"2026-04-03","v":1112243.78},{"d":"2026-04-04","v":1130942.67},{"d":"2026-04-05","v":1141753.21},{"d":"2026-04-06","v":1154938.25},{"d":"2026-04-07","v":1176810.8},{"d":"2026-04-08","v":1199731.02},{"d":"2026-04-09","v":1230147.71},{"d":"2026-04-10","v":1251549.21},{"d":"2026-04-11","v":1276221.01},{"d":"2026-04-12","v":1289059.16},{"d":"2026-04-13","v":1306820.43},{"d":"2026-04-14","v":1326350.3},{"d":"2026-04-15","v":1362960.74},{"d":"2026-04-16","v":1380610.95},{"d":"2026-04-17","v":1409158.55},{"d":"2026-04-18","v":1449068.03},{"d":"2026-04-19","v":1468909.01},{"d":"2026-04-20","v":1486886.65},{"d":"2026-04-21","v":1511186.37},{"d":"2026-04-22","v":1531565.37},{"d":"2026-04-23","v":1555438.56},{"d":"2026-04-24","v":1579550.01},{"d":"2026-04-25","v":1599008.2},{"d":"2026-04-26","v":1613081.9},{"d":"2026-04-27","v":1626685.01},{"d":"2026-04-28","v":1653130.45},{"d":"2026-04-29","v":1672191.34},{"d":"2026-04-30","v":1698305.85},{"d":"2026-05-01","v":1717540.62},{"d":"2026-05-02","v":1735805.49},{"d":"2026-05-03","v":1756472.33},{"d":"2026-05-04","v":1769897.44},{"d":"2026-05-05","v":1798088.08},{"d":"2026-05-06","v":1820801.79},{"d":"2026-05-07","v":1854525.18},{"d":"2026-05-08","v":1881322.12},{"d":"2026-05-09","v":1903199.37},{"d":"2026-05-10","v":1920509.15},{"d":"2026-05-11","v":1948091.62},{"d":"2026-05-12","v":1977332.81},{"d":"2026-05-13","v":2002406.49},{"d":"2026-05-14","v":2028172.94},{"d":"2026-05-15","v":2051671.69},{"d":"2026-05-16","v":2075426.81},{"d":"2026-05-17","v":2091557.22},{"d":"2026-05-18","v":2104806.61},{"d":"2026-05-19","v":2130135.51},{"d":"2026-05-20","v":2155000.99},{"d":"2026-05-21","v":2183496.49},{"d":"2026-05-22","v":2227026.38},{"d":"2026-05-23","v":2271753.2},{"d":"2026-05-24","v":2307878.55},{"d":"2026-05-25","v":2338082.25},{"d":"2026-05-26","v":2366325.86},{"d":"2026-05-27","v":2410525.81},{"d":"2026-05-28","v":2447361.05},{"d":"2026-05-29","v":2496203.12},{"d":"2026-05-30","v":2544270.77},{"d":"2026-05-31","v":2576706.8},{"d":"2026-06-01","v":2611871.56},{"d":"2026-06-02","v":2685645.84},{"d":"2026-06-03","v":2785986.17},{"d":"2026-06-04","v":2876625.14},{"d":"2026-06-05","v":2982895.69},{"d":"2026-06-06","v":3091894.16},{"d":"2026-06-07","v":3139507.04},{"d":"2026-06-08","v":3181401.6},{"d":"2026-06-09","v":3223358.84},{"d":"2026-06-10","v":3278138.33},{"d":"2026-06-11","v":3329583.16},{"d":"2026-06-12","v":3367593.66},{"d":"2026-06-13","v":3412833.43},{"d":"2026-06-14","v":3442548.46},{"d":"2026-06-15","v":3473511.33},{"d":"2026-06-16","v":3530870.3},{"d":"2026-06-17","v":3603531.63},{"d":"2026-06-18","v":3661007.04},{"d":"2026-06-19","v":3703678.69},{"d":"2026-06-20","v":3738786.0},{"d":"2026-06-21","v":3768101.21},{"d":"2026-06-22","v":3801659.12},{"d":"2026-06-23","v":3845258.9},{"d":"2026-06-24","v":3885403.85},{"d":"2026-06-25","v":3941837.59},{"d":"2026-06-26","v":4004947.49},{"d":"2026-06-27","v":4060645.95},{"d":"2026-06-28","v":4086201.55},{"d":"2026-06-29","v":4119188.21},{"d":"2026-06-30","v":4177689.34},{"d":"2026-07-01","v":4224124.69},{"d":"2026-07-02","v":4290470.62},{"d":"2026-07-03","v":4343005.02},{"d":"2026-07-04","v":4380454.83},{"d":"2026-07-05","v":4409440.01},{"d":"2026-07-06","v":4450488.66}];
+
+/* on-chain live-refresh anchors */
+const CHAIN = {
+  rpc:"https://arbitrum.gateway.tenderly.co",
+  usdc:"0xaf88d065e77c8cC2239327C5EDb3A432268e5831",
+  pad:"0000000000000000000000005e91b40467fb8902c46a7b6cb90482363188d645",
+  b0:424000000, t0:1769076491, bps:3.9958149219963364
+};
+
+/* ---------- data prep: dedupe by date, keep last ---------- */
+let SERIES = (()=>{ const m=new Map(); RAW.forEach(r=>m.set(r.d,r.v)); return [...m].map(([d,v])=>({d,v})).sort((a,b)=>a.d<b.d?-1:1); })();
+
+/* ---------- helpers ---------- */
+const $=s=>document.querySelector(s);
+const fmtUSD=(n,dp=0)=>'$'+Number(n).toLocaleString('en-US',{maximumFractionDigits:dp,minimumFractionDigits:dp});
+const fmtK=n=>{const a=Math.abs(n);if(a>=1e6)return (n/1e6).toFixed(2)+'M';if(a>=1e3)return (n/1e3).toFixed(1)+'K';return n.toFixed(0);};
+const fmtPct=p=>(p>=0?'+':'')+p.toFixed(1)+'%';
+const mdShort=d=>{const[y,m,da]=d.split('-');return m+'/'+da;};
+const valAt=d=>{const hit=SERIES.find(x=>x.d===d);return hit?hit.v:null;};
+const RM=matchMedia('(prefers-reduced-motion:reduce)').matches;
+let _ctToken=0;
+function countUp(el,to){
+  if(RM){el.textContent=fmtUSD(to);return;}
+  const tok=++_ctToken, dur=1100, t0=performance.now(), ease=x=>1-Math.pow(1-x,3);
+  (function frame(now){
+    if(tok!==_ctToken)return;               // superseded by a newer count-up
+    const p=Math.min(1,(now-t0)/dur);
+    el.textContent=fmtUSD(Math.round(to*ease(p)));
+    if(p<1)requestAnimationFrame(frame);
+  })(performance.now());
+}
+const addDays=(d,n)=>{const t=new Date(d+'T00:00:00Z');t.setUTCDate(t.getUTCDate()+n);return t.toISOString().slice(0,10);};
+
+/* cumulative value on-or-before a date (step, monotonic) */
+function cumAt(d){let v=0;for(const x of SERIES){if(x.d<=d)v=x.v;else break;}return v;}
+
+/* ---------- build interval rows ---------- */
+function buildPeriods(kind){
+  const first=SERIES[0].d, last=SERIES[SERIES.length-1].d;
+  let bounds=[];
+  if(kind==='day'){
+    bounds=SERIES.map(x=>x.d);
+  } else if(kind==='month'){
+    // month-end boundaries + inception + latest
+    const set=new Set([first]);
+    let cur=first.slice(0,7);
+    const endM=last.slice(0,7);
+    let [y,m]=first.split('-').map(Number);
+    while(true){
+      // last day of month y-m
+      const ld=new Date(Date.UTC(y,m,0)).toISOString().slice(0,10);
+      if(ld<=last) set.add(ld);
+      if(`${y}-${String(m).padStart(2,'0')}`===endM) break;
+      m++; if(m>12){m=1;y++;}
+    }
+    set.add(last);
+    bounds=[...set].sort();
+  } else { // week / biweek: fixed stride anchored to latest
+    const stride=kind==='week'?7:14;
+    let b=[last]; let d=last;
+    while(d>first){ d=addDays(d,-stride); if(d<=first){b.push(first);break;} b.push(d); }
+    bounds=b.sort();
+  }
+  const rows=[];
+  for(let i=1;i<bounds.length;i++){
+    const sD=bounds[i-1], eD=bounds[i];
+    const sV=cumAt(sD), eV=cumAt(eD);
+    const added=eV-sV;
+    const days=Math.max(1,Math.round((new Date(eD)-new Date(sD))/864e5));
+    rows.push({sD,eD,sV,eV,added,pct:sV>0?added/sV*100:null,days,perDay:added/days});
+  }
+  return rows;
+}
+
+/* ---------- KPIs ---------- */
+const intMeta={day:{lbl:'day',acc:'--grn'},week:{lbl:'week',acc:'--cyan'},biweek:{lbl:'2-week',acc:'--vio'},month:{lbl:'month',acc:'--amber'}};
+function renderKPIs(kind,rows){
+  const total=SERIES[SERIES.length-1].v;
+  const first=SERIES[0].d,last=SERIES[SERIES.length-1].d;
+  const spanDays=Math.round((new Date(last)-new Date(first))/864e5);
+  const lastRow=rows[rows.length-1];
+  const avg=rows.reduce((s,r)=>s+r.added,0)/rows.length;
+  const peak=rows.reduce((a,r)=>r.added>a.added?r:a,rows[0]);
+  const overallDaily=total/spanDays;
+  const m=intMeta[kind];
+  const cards=[
+    {k:'All-time total',v:fmtUSD(total),d:`${spanDays} days since inception`,acc:'--grn'},
+    {k:`Latest ${m.lbl} added`,v:'$'+fmtK(lastRow.added),d:lastRow.pct==null?'—':fmtPct(lastRow.pct)+' vs prior total',acc:m.acc},
+    {k:`Avg / ${m.lbl}`,v:'$'+fmtK(avg),d:`${rows.length} periods`,acc:m.acc},
+    {k:`Peak ${m.lbl}`,v:'$'+fmtK(peak.added),d:`${mdShort(peak.sD)}→${mdShort(peak.eD)}`,acc:'--cyan'},
+    {k:'Run-rate / day',v:'$'+fmtK(lastRow.perDay),d:`all-time avg ${fmtK(overallDaily)}`,acc:'--vio'},
+  ];
+  $('#kpis').innerHTML=cards.map(c=>`<div class="kpi" style="--accent:var(${c.acc})">
+    <div class="k">${c.k}</div><div class="v">${c.v}</div><div class="d">${c.d}</div></div>`).join('');
+}
+
+/* ---------- rate helpers & forecast state ---------- */
+function dailyRate(days){const n=SERIES.length;if(n-1<days)days=n-1;return (SERIES[n-1].v-SERIES[n-1-days].v)/days;}
+function allTimeRate(){const n=SERIES.length;const dd=Math.max(1,(new Date(SERIES[n-1].d)-new Date(SERIES[0].d))/864e5);return SERIES[n-1].v/dd;}
+const rateOf={ '7d':()=>dailyRate(7), '30d':()=>dailyRate(30), '60d':()=>dailyRate(60), 'all':()=>allTimeRate() };
+const FC={ rate:0, target:'2026-09-30', burn:30 };
+function daysTo(dstr){return Math.max(0,Math.round((new Date(dstr+'T00:00:00Z')-new Date(SERIES[SERIES.length-1].d+'T00:00:00Z'))/864e5));}
+
+/* ---------- cumulative area chart + forecast overlay ---------- */
+function renderCurve(){
+  const svg=$('#curve'),W=720,H=300,pl=54,pr=14,pt=14,pb=26;
+  const last=SERIES[SERIES.length-1], d0=SERIES[0].d;
+  const nDays=daysTo(FC.target);                 // forecast horizon
+  $('#curveTag').textContent='actual + '+nDays+'d forecast';
+  const rLo=Math.min(dailyRate(60),allTimeRate()), rHi=dailyRate(7); // cone bounds
+  const projBase=last.v+FC.rate*nDays, projHi=last.v+rHi*nDays;
+  const totalDays=Math.round((new Date(last.d)-new Date(d0))/864e5)+nDays; // x-axis max (day offset)
+  const ymax=Math.max(projHi,last.v)*1.06;
+  const dayOff=dstr=>Math.round((new Date(dstr)-new Date(d0))/864e5);
+  const X=off=>pl+(off/totalDays)*(W-pl-pr);
+  const Y=v=>pt+(1-v/ymax)*(H-pt-pb);
+  // historical line + area
+  let d='';SERIES.forEach((p,i)=>{const o=dayOff(p.d);d+=(i?'L':'M')+X(o).toFixed(1)+' '+Y(p.v).toFixed(1)+' ';});
+  const histEndX=X(dayOff(last.d));
+  const area=d+`L${histEndX.toFixed(1)} ${Y(0)} L${X(0).toFixed(1)} ${Y(0)} Z`;
+  // forecast paths (from last point to target)
+  const oLast=dayOff(last.d), oTgt=totalDays;
+  const fBase=`M${X(oLast).toFixed(1)} ${Y(last.v).toFixed(1)} L${X(oTgt).toFixed(1)} ${Y(projBase).toFixed(1)}`;
+  const cone=`M${X(oLast).toFixed(1)} ${Y(last.v).toFixed(1)} L${X(oTgt).toFixed(1)} ${Y(projHi).toFixed(1)} `+
+             `L${X(oTgt).toFixed(1)} ${Y(last.v+rLo*nDays).toFixed(1)} Z`;
+  // gridlines
+  let grid='';for(let g=0;g<=4;g++){const v=ymax*g/4,y=Y(v);
+    grid+=`<line x1="${pl}" y1="${y}" x2="${W-pr}" y2="${y}" stroke="#16203040"/>`+
+          `<text x="${pl-8}" y="${y+3}" fill="#4a5674" font-size="10" text-anchor="end" font-family="var(--mono)">$${fmtK(v)}</text>`;}
+  // month labels across full domain
+  let xl='';SERIES.forEach(p=>{if(p.d.slice(-2)==='01'){xl+=`<text x="${X(dayOff(p.d))}" y="${H-8}" fill="#4a5674" font-size="10" text-anchor="middle" font-family="var(--mono)">${p.d.slice(0,7)}</text>`;}});
+  // today + target markers
+  const mkToday=`<line x1="${histEndX}" y1="${pt}" x2="${histEndX}" y2="${H-pb}" stroke="#2a3750" stroke-dasharray="2 3"/>`;
+  const mkTgt=`<line x1="${X(oTgt)}" y1="${pt}" x2="${X(oTgt)}" y2="${H-pb}" stroke="rgba(139,108,255,.5)" stroke-dasharray="3 3"/>`+
+    `<text x="${X(oTgt)-4}" y="${pt+11}" fill="#b7a6ff" font-size="9.5" text-anchor="end" font-family="var(--mono)">Sep 30</text>`;
+  svg.innerHTML=`
+   <defs>
+     <linearGradient id="ag" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#22e6a0" stop-opacity=".38"/><stop offset="1" stop-color="#22e6a0" stop-opacity="0"/></linearGradient>
+     <linearGradient id="lg" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#22e6a0"/><stop offset="1" stop-color="#38e1ff"/></linearGradient>
+     <filter id="glow"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+   </defs>
+   ${grid}${xl}${mkToday}${mkTgt}
+   <path d="${area}" fill="url(#ag)"/>
+   <path d="${cone}" fill="rgba(139,108,255,.14)" stroke="none"/>
+   <path d="${d}" fill="none" stroke="url(#lg)" stroke-width="2.4" filter="url(#glow)" stroke-linejoin="round"/>
+   <path d="${fBase}" fill="none" stroke="#8b6cff" stroke-width="2.2" stroke-dasharray="5 4" filter="url(#glow)"/>
+   <circle cx="${histEndX}" cy="${Y(last.v)}" r="4" fill="#22e6a0" filter="url(#glow)"/>
+   <circle cx="${X(oTgt)}" cy="${Y(projBase)}" r="4.5" fill="#8b6cff" filter="url(#glow)"/>
+   <text x="${X(oTgt)}" y="${Y(projBase)-10}" fill="#c7bcff" font-size="11" font-weight="700" text-anchor="end" font-family="var(--mono)">$${fmtK(projBase)}</text>`;
+  // hover on history
+  const tt=$('#tt');
+  svg.onmousemove=e=>{
+    const r=svg.getBoundingClientRect();const px=(e.clientX-r.left)/r.width*W;
+    const off=(px-pl)/(W-pl-pr)*totalDays;
+    let i=Math.round(off);i=Math.max(0,Math.min(SERIES.length-1,i));
+    const p=SERIES[i];
+    tt.style.opacity=1;tt.style.left=(e.clientX+14)+'px';tt.style.top=(e.clientY-10)+'px';
+    tt.innerHTML=`${p.d}<br><b>${fmtUSD(p.v)}</b>${i>0?`<br>+${fmtUSD(p.v-SERIES[i-1].v)} / day`:''}`;
+  };
+  svg.onmouseleave=()=>tt.style.opacity=0;
+}
+
+/* ---------- forecast panel ---------- */
+function renderForecast(){
+  const last=SERIES[SERIES.length-1];
+  const nDays=daysTo(FC.target);
+  const projBase=last.v+FC.rate*nDays;
+  const rLo=Math.min(dailyRate(60),allTimeRate()), rHi=dailyRate(7);
+  const projLo=last.v+rLo*nDays, projHi=last.v+rHi*nDays;
+  const tgtNice=new Date(FC.target+'T00:00:00Z').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric',timeZone:'UTC'});
+  $('#fcDays').textContent=nDays+' days left';
+  $('#tgtLbl').textContent=tgtNice;
+  $('#rateEcho').textContent='$'+fmtK(FC.rate)+'/day';
+  $('#tgtEcho').textContent=FC.target;
+  $('#burnEcho').textContent=FC.burn+'%';
+  $('#projVal').textContent=fmtUSD(projBase);
+  $('#projAdd').textContent=`+${fmtUSD(projBase-last.v)} added in ${nDays} days`;
+  $('#projRange').textContent=`range ${fmtUSD(projLo)} – ${fmtUSD(projHi)} (soft→hot pace)`;
+  const bn=last.v*FC.burn/100, bp=projBase*FC.burn/100;
+  $('#burnNow').textContent='≥ '+fmtUSD(bn);
+  $('#burnProj').textContent='≥ '+fmtUSD(bp);
+  $('#burnNote').innerHTML=`≥${FC.burn}% of protocol revenue is committed to purchase &amp; burn $VAR. Treasury revenue ≈ USDC captured here. Zero outflows so far → this is dry powder building up, not yet burned on-chain.`;
+}
+
+/* ---------- interval bar chart ---------- */
+function renderBars(kind,rows){
+  const svg=$('#bars'),W=380,H=230,pl=42,pr=8,pt=12,pb=34;
+  const show=rows.slice(-18); // keep readable
+  const max=Math.max(...show.map(r=>r.added))*1.08||1;
+  const bw=(W-pl-pr)/show.length;
+  const Y=v=>pt+(1-v/max)*(H-pt-pb);
+  let grid='';for(let g=0;g<=3;g++){const v=max*g/3,y=Y(v);
+    grid+=`<line x1="${pl}" y1="${y}" x2="${W-pr}" y2="${y}" stroke="#16203040"/>`+
+          `<text x="${pl-6}" y="${y+3}" fill="#4a5674" font-size="9" text-anchor="end" font-family="var(--mono)">$${fmtK(v)}</text>`;}
+  const acc=getComputedStyle(document.documentElement).getPropertyValue(intMeta[kind].acc).trim();
+  let bars='';show.forEach((r,i)=>{
+    const x=pl+i*bw+bw*0.16,w=bw*0.68,y=Y(r.added),h=H-pb-y;
+    const lblEvery=Math.ceil(show.length/6);
+    bars+=`<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${w.toFixed(1)}" height="${Math.max(1,h).toFixed(1)}" rx="2.5"
+            fill="url(#bg)" data-i="${i}" class="barR"><title>${r.sD}→${r.eD}\n+${fmtUSD(r.added)} (${r.pct==null?'—':fmtPct(r.pct)})</title></rect>`;
+    if(i%lblEvery===0||i===show.length-1)
+      bars+=`<text x="${(x+w/2).toFixed(1)}" y="${H-20}" fill="#5a678a" font-size="8.5" text-anchor="middle" font-family="var(--mono)" transform="rotate(0)">${mdShort(r.eD)}</text>`;
+  });
+  svg.innerHTML=`<defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+     <stop offset="0" stop-color="${acc}" stop-opacity=".95"/><stop offset="1" stop-color="${acc}" stop-opacity=".28"/></linearGradient></defs>
+     ${grid}${bars}
+     <text x="${pl}" y="${H-4}" fill="#4a5674" font-size="9" font-family="var(--mono)">USDC added per ${intMeta[kind].lbl} (last ${show.length})</text>`;
+  const tt=$('#tt');
+  svg.querySelectorAll('.barR').forEach(b=>{
+    b.onmousemove=e=>{const r=show[+b.dataset.i];tt.style.opacity=1;tt.style.left=(e.clientX+14)+'px';tt.style.top=(e.clientY-10)+'px';
+      tt.innerHTML=`${r.sD} → ${r.eD}<br><b>+${fmtUSD(r.added)}</b><br>${r.pct==null?'first period':fmtPct(r.pct)+' growth'} · ${fmtUSD(r.perDay)}/day`;};
+    b.onmouseleave=()=>tt.style.opacity=0;
+  });
+}
+
+/* ---------- earning velocity (rolling $/day) ---------- */
+function rollRate(win){
+  const out=[];
+  for(let i=1;i<SERIES.length;i++){
+    const w=Math.min(win,i);
+    out.push({d:SERIES[i].d, r:(SERIES[i].v-SERIES[i-w].v)/w});
+  }
+  return out;
+}
+function renderVelocity(){
+  const svg=$('#velo'),W=720,H=240,pl=54,pr=14,pt=16,pb=26;
+  const R=rollRate(7), d0=R[0].d, last=R[R.length-1];
+  const span=Math.max(1,(new Date(last.d)-new Date(d0))/864e5);
+  const avg=allTimeRate();
+  const ymax=Math.max(...R.map(p=>p.r),avg)*1.12;
+  const dayOff=ds=>(new Date(ds)-new Date(d0))/864e5;
+  const X=o=>pl+(o/span)*(W-pl-pr);
+  const Y=v=>pt+(1-v/ymax)*(H-pt-pb);
+  let line='';R.forEach((p,i)=>{line+=(i?'L':'M')+X(dayOff(p.d)).toFixed(1)+' '+Y(p.r).toFixed(1)+' ';});
+  const x0=X(0),xN=X(dayOff(last.d));
+  const area=line+`L${xN.toFixed(1)} ${Y(0)} L${x0.toFixed(1)} ${Y(0)} Z`;
+  let grid='';for(let g=0;g<=3;g++){const v=ymax*g/3,y=Y(v);
+    grid+=`<line x1="${pl}" y1="${y}" x2="${W-pr}" y2="${y}" stroke="#16203040"/>`+
+          `<text x="${pl-8}" y="${y+3}" fill="#4a5674" font-size="10" text-anchor="end" font-family="var(--mono)">$${fmtK(v)}</text>`;}
+  const yA=Y(avg);
+  const base=`<line x1="${pl}" y1="${yA}" x2="${W-pr}" y2="${yA}" stroke="#ffb547" stroke-dasharray="4 4" stroke-opacity=".55"/>`+
+    `<text x="${W-pr}" y="${yA-5}" fill="#ffb547" font-size="9.5" text-anchor="end" font-family="var(--mono)" opacity=".85">all-time avg $${fmtK(avg)}/day</text>`;
+  let xl='';SERIES.forEach(p=>{if(p.d.slice(-2)==='01'&&p.d>=d0){xl+=`<text x="${X(dayOff(p.d))}" y="${H-8}" fill="#4a5674" font-size="10" text-anchor="middle" font-family="var(--mono)">${p.d.slice(0,7)}</text>`;}});
+  svg.innerHTML=`
+   <defs>
+     <linearGradient id="va" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffb547" stop-opacity=".32"/><stop offset="1" stop-color="#22e6a0" stop-opacity="0"/></linearGradient>
+     <linearGradient id="vl" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#38e1ff"/><stop offset=".55" stop-color="#22e6a0"/><stop offset="1" stop-color="#ffb547"/></linearGradient>
+     <filter id="vglow"><feGaussianBlur stdDeviation="2.6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+   </defs>
+   ${grid}${xl}${base}
+   <path d="${area}" fill="url(#va)"/>
+   <path d="${line}" fill="none" stroke="url(#vl)" stroke-width="2.4" filter="url(#vglow)" stroke-linejoin="round"/>
+   <circle cx="${xN}" cy="${Y(last.r)}" r="4" fill="#ffb547" filter="url(#vglow)"/>
+   <text x="${xN-6}" y="${Y(last.r)-9}" fill="#ffd39a" font-size="11" font-weight="700" text-anchor="end" font-family="var(--mono)">$${fmtK(last.r)}/day</text>`;
+  const mult=last.r/avg, ann=last.r*365;
+  $('#veloStats').innerHTML=
+    `<div class="vs"><span class="n hi">$${fmtK(last.r)}/day</span><span class="l">Now · 7-day avg</span></div>`+
+    `<div class="vs"><span class="n">${mult.toFixed(1)}×</span><span class="l">vs all-time avg</span></div>`+
+    `<div class="vs"><span class="n">$${fmtK(ann)}/yr</span><span class="l">Annualized run-rate</span></div>`;
+  const tt=$('#tt');
+  svg.onmousemove=e=>{const rc=svg.getBoundingClientRect();const px=(e.clientX-rc.left)/rc.width*W;
+    let i=Math.round((px-pl)/(W-pl-pr)*span);i=Math.max(0,Math.min(R.length-1,i));const p=R[i];
+    tt.style.opacity=1;tt.style.left=(e.clientX+14)+'px';tt.style.top=(e.clientY-10)+'px';
+    tt.innerHTML=`${p.d}<br><b>$${fmtK(p.r)}/day</b><br>7-day avg pace`;};
+  svg.onmouseleave=()=>tt.style.opacity=0;
+}
+
+/* ---------- table ---------- */
+function renderTable(kind,rows){
+  const max=Math.max(...rows.map(r=>r.added))||1;
+  const body=rows.slice().reverse().map(r=>{
+    const pct=r.pct==null?'<span class="muted">—</span>':`<span class="${r.pct>=0?'pos':'neg'}">${fmtPct(r.pct)}</span>`;
+    const bw=(r.added/max*100).toFixed(1);
+    return `<tr>
+      <td>${r.sD} → ${r.eD}</td>
+      <td class="muted">${fmtUSD(r.sV)}</td>
+      <td>${fmtUSD(r.eV)}</td>
+      <td class="barcell"><div class="bar" style="width:${bw}%"></div><span class="pos">+${fmtUSD(r.added)}</span></td>
+      <td>${pct}</td>
+      <td class="muted">${fmtUSD(r.perDay)}</td>
+    </tr>`;
+  }).join('');
+  $('#tbl tbody').innerHTML=body;
+}
+
+/* ================= LIVE ACCRUAL + HOURGLASS ================= */
+function ratePerSec(){return dailyRate(7)/86400;}
+function renderTwaps(){
+  const r=dailyRate(7);
+  $('#tw1h').textContent='+'+fmtUSD(r/24);
+  $('#tw24h').textContent='+'+fmtUSD(r);
+  $('#tw7d').textContent='+'+fmtUSD(r*7);
+}
+let _liveT0=performance.now();
+function tickLive(){
+  const earned=ratePerSec()*((performance.now()-_liveT0)/1000);
+  const whole=Math.floor(earned), cents=Math.floor((earned-whole)*100);
+  $('#ticker').innerHTML=fmtUSD(whole)+'<span class="cents">.'+String(cents).padStart(2,'0')+'</span>';
+}
+function initRain(){
+  const rain=$('#rain');if(!rain||RM)return;
+  const coins=['$','$','¢','◇'];let h='';
+  for(let i=0;i<14;i++)h+=`<i style="left:${(Math.random()*100).toFixed(1)}%;animation-duration:${(2+Math.random()*3).toFixed(1)}s;animation-delay:${(Math.random()*4).toFixed(1)}s;color:${i%2?'#22e6a0':'#38e1ff'}">${coins[i%coins.length]}</i>`;
+  rain.innerHTML=h;
+}
+function animHourglass(){
+  const top=$('#sandTop'),bot=$('#sandBot'),stream=document.querySelector('.sand-stream');
+  if(!top||RM)return;
+  const cycle=8000;
+  (function frame(now){
+    const t=(now%cycle)/cycle, drain=Math.min(1,t/0.86);
+    top.setAttribute('y',(10+drain*34).toFixed(1));top.setAttribute('height',(34*(1-drain)).toFixed(1));
+    bot.setAttribute('y',(96-drain*34).toFixed(1));bot.setAttribute('height',(14+drain*34).toFixed(1));
+    if(stream)stream.style.opacity=t<0.84?1:0;
+    requestAnimationFrame(frame);
+  })(performance.now());
+}
+function startLive(){renderTwaps();setInterval(tickLive,120);initRain();animHourglass();}
+
+/* ================= EARNINGS CALENDAR ================= */
+const weekStart=d=>{const dt=new Date(d+'T00:00:00Z');return addDays(d,-dt.getUTCDay());};
+const monthName=ym=>new Date(ym+'-01T00:00:00Z').toLocaleDateString('en-US',{month:'short',year:'numeric',timeZone:'UTC'});
+function dailyEarn(){return SERIES.map((x,i)=>({d:x.d,e:i===0?x.v:x.v-SERIES[i-1].v}));}
+function calColor(t){
+  if(t<=0)return '#0f1826';
+  if(t<0.22)return 'rgba(34,230,160,.28)';
+  if(t<0.45)return 'rgba(34,230,160,.5)';
+  if(t<0.7)return 'rgba(34,230,160,.72)';
+  if(t<0.9)return 'rgba(45,238,190,.9)';
+  return 'linear-gradient(135deg,var(--grn),var(--cyan))';
+}
+let CALMODE='day', CAL={};
+function buildCalendar(){
+  const de=dailyEarn();
+  CAL.eMap=new Map(de.map(x=>[x.d,x.e]));
+  CAL.wk=new Map();CAL.mo=new Map();
+  de.forEach(x=>{const ws=weekStart(x.d),ym=x.d.slice(0,7);
+    CAL.wk.set(ws,(CAL.wk.get(ws)||0)+x.e);CAL.mo.set(ym,(CAL.mo.get(ym)||0)+x.e);});
+  CAL.maxDay=Math.max(...de.map(x=>x.e));
+  CAL.maxWk=Math.max(...CAL.wk.values());CAL.maxMo=Math.max(...CAL.mo.values());
+  CAL.first=SERIES[0].d;CAL.last=SERIES[SERIES.length-1].d;
+  const fd=new Date(CAL.first+'T00:00:00Z');
+  const start=addDays(CAL.first,-fd.getUTCDay());
+  // columns (weeks)
+  const cols=[];let d=start;while(d<=CAL.last){cols.push(d);d=addDays(d,7);}
+  paintCalendar(cols);
+}
+function cellVal(dateStr){
+  if(CALMODE==='day')return {v:CAL.eMap.get(dateStr)||0,max:CAL.maxDay};
+  if(CALMODE==='week')return {v:CAL.wk.get(weekStart(dateStr))||0,max:CAL.maxWk};
+  return {v:CAL.mo.get(dateStr.slice(0,7))||0,max:CAL.maxMo};
+}
+function paintCalendar(cols){
+  let months='',cells='',prevM='';
+  cols.forEach(c0=>{
+    const m=c0.slice(0,7);
+    months+=`<span>${m!==prevM?monthName(m).split(' ')[0]:''}</span>`;prevM=m;
+    for(let r=0;r<7;r++){
+      const date=addDays(c0,r);
+      if(date<CAL.first||date>CAL.last){cells+=`<div class="cal-cell empty"></div>`;continue;}
+      const {v,max}=cellVal(date);
+      const col=calColor(max>0?v/max:0);
+      const bg=col.startsWith('linear')?`background-image:${col}`:`background:${col}`;
+      cells+=`<div class="cal-cell" data-d="${date}" style="${bg}"></div>`;
+    }
+  });
+  $('#calMonths').innerHTML=months;
+  $('#calMonths').style.gridTemplateColumns=`repeat(${cols.length},14px)`;
+  $('#calGrid').innerHTML=cells;
+  // auto-select the peak period of this mode
+  autoSelect();
+}
+function autoSelect(){
+  let best=null;
+  if(CALMODE==='day'){let mx=-1;CAL.eMap.forEach((v,k)=>{if(v>mx){mx=v;best=k;}});}
+  else if(CALMODE==='week'){let mx=-1;CAL.wk.forEach((v,k)=>{if(v>mx){mx=v;best=addDays(k,3);}});}
+  else{let mx=-1;CAL.mo.forEach((v,k)=>{if(v>mx){mx=v;best=k+'-15';}});}
+  if(best)selectCell(best);
+}
+function selectCell(dateStr){
+  let amt,label,scope;
+  if(CALMODE==='day'){
+    amt=CAL.eMap.get(dateStr)||0;
+    const wd=new Date(dateStr+'T00:00:00Z').toLocaleDateString('en-US',{weekday:'short',timeZone:'UTC'});
+    label=`<b>${dateStr}</b> (${wd}) · single day`;scope=`on ${dateStr}`;
+  }else if(CALMODE==='week'){
+    const ws=weekStart(dateStr),we=addDays(ws,6)>CAL.last?CAL.last:addDays(ws,6);
+    amt=CAL.wk.get(ws)||0;label=`<b>${ws} → ${we}</b> · 1 week`;scope=`the week of ${ws}`;
+  }else{
+    const ym=dateStr.slice(0,7);amt=CAL.mo.get(ym)||0;
+    label=`<b>${monthName(ym)}</b> · full month`;scope=`in ${monthName(ym)}`;
+  }
+  CAL.sel={amt:'+'+fmtUSD(amt),scope};
+  $('#calAmt').textContent='+'+fmtUSD(amt);
+  $('#calLab').innerHTML=label;
+  // highlight
+  document.querySelectorAll('.cal-cell.sel').forEach(c=>c.classList.remove('sel'));
+  document.querySelectorAll('.cal-cell[data-d]').forEach(c=>{
+    const d=c.dataset.d;let hit=false;
+    if(CALMODE==='day')hit=(d===dateStr);
+    else if(CALMODE==='week')hit=(weekStart(d)===weekStart(dateStr));
+    else hit=(d.slice(0,7)===dateStr.slice(0,7));
+    if(hit)c.classList.add('sel');
+  });
+}
+function calShareText(){
+  if(!CAL.sel)return '';
+  const url=location.href.startsWith('http')?location.href:'https://REPLACE-WITH-YOUR-URL/';
+  return {t:`Variational's buyback treasury stacked ${CAL.sel.amt} USDC ${CAL.sel.scope} 📈\n\n20% of every spread paid to OLP flows on-chain into this wallet. I built a live tracker 👇`,url};
+}
+$('#calSeg').addEventListener('click',e=>{
+  const b=e.target.closest('button');if(!b)return;
+  CALMODE=b.dataset.c;[...$('#calSeg').children].forEach(x=>x.classList.toggle('on',x===b));
+  $('#calTag').textContent={day:'daily',week:'weekly',month:'monthly'}[CALMODE];
+  buildCalendar();
+});
+$('#calGrid').addEventListener('click',e=>{const c=e.target.closest('.cal-cell[data-d]');if(c)selectCell(c.dataset.d);});
+$('#calShare').addEventListener('click',()=>{
+  const s=calShareText();if(!s.t)return;
+  window.open('https://twitter.com/intent/tweet?text='+encodeURIComponent(s.t)+'&url='+encodeURIComponent(s.url)+'&via=0xdefidaniel','_blank','noopener,width=600,height=520');
+});
+$('#calCopy').addEventListener('click',async()=>{
+  const s=calShareText();if(!s.t)return;
+  try{await navigator.clipboard.writeText(s.t+'\n'+s.url);$('#calCopy').textContent='✓ Copied';setTimeout(()=>$('#calCopy').textContent='⧉ Copy',1500);}catch(_){}
+});
+
+/* ---------- master render ---------- */
+let CUR='week', booted=false;
+function render(){
+  const rows=buildPeriods(CUR);
+  const total=SERIES[SERIES.length-1].v;
+  if(!booted)countUp($('#totalVal'),total); else $('#totalVal').textContent=fmtUSD(total);
+  $('#rangeBadge').textContent=SERIES[0].d+' → '+SERIES[SERIES.length-1].d;
+  $('#tblTag').textContent=intMeta[CUR].lbl;
+  renderKPIs(CUR,rows);
+  renderForecast();
+  renderCurve();
+  renderVelocity();
+  renderBars(CUR,rows);
+  renderTable(CUR,rows);
+}
+$('#seg').addEventListener('click',e=>{
+  const b=e.target.closest('button');if(!b)return;
+  CUR=b.dataset.i;[...$('#seg').children].forEach(x=>x.classList.toggle('on',x===b));
+  render();
+});
+
+/* ---------- forecast controls ---------- */
+function initForecast(){
+  FC.rate=Math.round(rateOf['30d']());
+  $('#rate').value=FC.rate; $('#burn').value=FC.burn; $('#tgt').value=FC.target;
+}
+$('#rate').addEventListener('input',e=>{
+  FC.rate=+e.target.value;
+  [...document.querySelectorAll('.preset')].forEach(p=>p.classList.remove('on'));
+  render();
+});
+$('#burn').addEventListener('input',e=>{FC.burn=+e.target.value;render();});
+$('#tgt').addEventListener('change',e=>{if(e.target.value){FC.target=e.target.value;render();}});
+document.querySelector('.preset-row').addEventListener('click',e=>{
+  const b=e.target.closest('.preset');if(!b)return;
+  [...document.querySelectorAll('.preset')].forEach(p=>p.classList.toggle('on',p===b));
+  FC.rate=Math.round(rateOf[b.dataset.r]()); $('#rate').value=FC.rate; render();
+});
+
+/* ---------- live refresh via Tenderly ---------- */
+async function rpc(method,params){
+  const r=await fetch(CHAIN.rpc,{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({jsonrpc:'2.0',id:1,method,params})});
+  const j=await r.json(); if(j.error) throw new Error(j.error.message); return j.result;
+}
+async function balAt(block){
+  const r=await rpc('eth_call',[{to:CHAIN.usdc,data:'0x70a08231'+CHAIN.pad}, typeof block==='number'?'0x'+block.toString(16):block]);
+  return parseInt(r,16)/1e6;
+}
+const blockAt=ts=>Math.round(CHAIN.b0+(ts-CHAIN.t0)*CHAIN.bps);
+async function refresh(){
+  const btn=$('#refresh'),note=$('#note');btn.classList.add('busy');btn.textContent='↻ syncing…';
+  try{
+    // fill any missing full UTC days since last snapshot
+    const todayUTC=new Date().toISOString().slice(0,10);
+    let last=SERIES[SERIES.length-1].d, guard=0;
+    while(last<todayUTC && guard++<40){
+      const nd=addDays(last,1);
+      const ts=Math.floor(Date.parse(nd+'T00:00:00Z')/1000);
+      const v=await balAt(blockAt(ts));
+      const i=SERIES.findIndex(x=>x.d===nd);
+      if(i>=0)SERIES[i].v=v; else SERIES.push({d:nd,v});
+      last=nd;
+    }
+    // update current live total (latest block)
+    const cur=await balAt('latest');
+    if(SERIES[SERIES.length-1].d===todayUTC)SERIES[SERIES.length-1].v=cur;
+    else SERIES.push({d:todayUTC,v:cur});
+    SERIES.sort((a,b)=>a.d<b.d?-1:1);
+    $('#stamp').textContent='live · '+new Date().toLocaleTimeString();
+    note.classList.remove('show');
+    render();
+    renderTwaps();
+    buildCalendar();
+  }catch(err){
+    note.textContent='Live sync unavailable ('+err.message+'). Showing embedded snapshot through '+SERIES[SERIES.length-1].d+'.';
+    note.classList.add('show');
+  }finally{btn.classList.remove('busy');btn.textContent='↻ Refresh live';}
+}
+$('#refresh').addEventListener('click',refresh);
+
+/* ---------- tweet share ---------- */
+$('#tweet').addEventListener('click',()=>{
+  const total=SERIES[SERIES.length-1].v;
+  const days=Math.round((new Date(SERIES[SERIES.length-1].d)-new Date(SERIES[0].d))/864e5);
+  const url=location.href.startsWith('http')?location.href:'https://REPLACE-WITH-YOUR-URL/';
+  const text=
+`Variational's buyback treasury has quietly stacked ${fmtUSD(total)} USDC in ${days} days 👀
+
+20% of every spread paid to OLP flows into this on-chain wallet. I built a live tracker for it 👇`;
+  const intent='https://twitter.com/intent/tweet?text='+encodeURIComponent(text)+'&url='+encodeURIComponent(url)+'&via=0xdefidaniel';
+  window.open(intent,'_blank','noopener,width=600,height=520');
+});
+
+/* ---------- init ---------- */
+$('#genstamp').textContent='Snapshot generated 2026-07-06 · click Refresh live to sync on-chain';
+initForecast();
+render();
+booted=true;
+buildCalendar();
+startLive();
+// attempt an automatic live sync on load (silent-fail to snapshot)
+refresh();
+</script>
+</body>
+</html>
