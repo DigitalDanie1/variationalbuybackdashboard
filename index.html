@@ -1705,6 +1705,7 @@ const EFF_WINDOWS={
   '1d':{label:'1D',days:1,volKey:'d1'},
   '7d':{label:'1W',days:7,volKey:'d7'},
   '30d':{label:'30D',days:30,volKey:'d30'},
+  month:{label:'Month',days:'month',volKey:'month'},
   all:{label:'All-time',days:null,volKey:'cum'}
 };
 let EFF_CAL_MONTH=null;
@@ -1712,9 +1713,18 @@ function computeEffWindow(key=EFF_WINDOW){
   const cfg=EFF_WINDOWS[key]||EFF_WINDOWS['1d'];
   const first=SERIES[0], last=SERIES[SERIES.length-1], cur=last.v;
   const allDays=Math.max(1,Math.round((new Date(last.d+'T00:00:00Z')-new Date(first.d+'T00:00:00Z'))/86400000)+1);
-  const days=cfg.days||allDays;
-  const rev=cfg.days?Math.max(1,cur-cumAt(addDays(last.d,-cfg.days))):cur;
-  const vol=MKT.vol[cfg.volKey];
+  let days=cfg.days||allDays;
+  let rev,vol,volSource='embedded snapshot';
+  if(key==='month'){
+    const monthStart=last.d.slice(0,7)+'-01';
+    days=Math.max(1,Math.round((new Date(last.d+'T00:00:00Z')-new Date(monthStart+'T00:00:00Z'))/86400000)+1);
+    rev=Math.max(1,cur-cumAt(addDays(monthStart,-1)));
+    vol=(MKT.vol.d30/30)*days;
+    volSource='30D avg daily volume × month elapsed days';
+  }else{
+    rev=cfg.days?Math.max(1,cur-cumAt(addDays(last.d,-cfg.days))):cur;
+    vol=MKT.vol[cfg.volKey];
+  }
   const dailyRev=rev/days;
   const spread=rev/MKT.spreadShare;
   const dailySpread=spread/days;
@@ -1725,7 +1735,7 @@ function computeEffWindow(key=EFF_WINDOW){
   const oiTurnover=(vol/days)/MKT.oi;
   const oiPerDayRev=MKT.oi/dailyRev;
   const annRevYield=dailyRev*365/MKT.oi*100;
-  return {...cfg,key,days,cur,rev,spread,vol,dailyRev,dailySpread,volPerRev,volPerFee,takeBpsRev,takeBpsFee,oiTurnover,oiPerDayRev,annRevYield};
+  return {...cfg,key,days,cur,rev,spread,vol,volSource,dailyRev,dailySpread,volPerRev,volPerFee,takeBpsRev,takeBpsFee,oiTurnover,oiPerDayRev,annRevYield};
 }
 function setEffWindow(key){
   EFF_WINDOW=EFF_WINDOWS[key]?key:'1d';
@@ -1777,7 +1787,7 @@ function renderDailyRevenueCalendar(e){
   });
   grid.innerHTML=html;
   $('#effCalTitle') && ($('#effCalTitle').textContent=monthName(EFF_CAL_MONTH));
-  $('#effCalSub') && ($('#effCalSub').textContent=`Exact daily treasury inflow · bps proxy uses ${e.label} avg daily volume (${e.vol>=1e9?'$'+(dailyVol/1e9).toFixed(2)+'B':'$'+fmtK(dailyVol)}/day).`);
+  $('#effCalSub') && ($('#effCalSub').textContent=`Exact daily treasury inflow · bps proxy uses ${e.label} avg daily volume (${e.vol>=1e9?'$'+(dailyVol/1e9).toFixed(2)+'B':'$'+fmtK(dailyVol)}/day; ${e.volSource}).`);
 }
 function renderImpliedSpreadTotal(treasuryTotal){
   const totalFees=treasuryTotal/MKT.spreadShare;
@@ -2017,10 +2027,11 @@ function renderEfficiency(){
   if(!$('#efVol'))return;
   const e=computeEffWindow(), base=computeEff();
   const fmtBig=n=>n>=1e9?'$'+(n/1e9).toFixed(2)+'B':n>=1e6?'$'+(n/1e6).toFixed(2)+'M':'$'+fmtK(n);
+  document.querySelector('.card.eff')?.setAttribute('data-eff-window',e.key);
   document.querySelectorAll('#effWindowTabs button').forEach(b=>b.classList.toggle('on',b.dataset.effWindow===e.key));
   $('#efVol').textContent=fmtBig(e.vol);
   $('#efVolLabel') && ($('#efVolLabel').textContent='Perp volume · '+e.label);
-  $('#efVolSub') && ($('#efVolSub').textContent=e.key==='all'?'$168B all-time':'selected window');
+  $('#efVolSub') && ($('#efVolSub').textContent=e.key==='all'?'$168B all-time':e.key==='month'?'MTD proxy volume':'selected window');
   $('#efTake').textContent=e.takeBpsFee.toFixed(2)+' bps';
   $('#efFee').textContent=fmtBig(e.spread);
   $('#efFeeLabel') && ($('#efFeeLabel').textContent='Spread payments · '+e.label);
@@ -2053,7 +2064,9 @@ function renderEfficiency(){
   $('#erTurn').textContent=e.oiTurnover.toFixed(2)+'×';
   $('#efOi').textContent=fmtBig(MKT.oi);
   $('#efYield').textContent=e.annRevYield.toFixed(1)+'%';
-  $('#effAsOf').textContent='Volume & OI snapshot '+MKT.asOf+'.';
+  $('#effAsOf').textContent=e.key==='month'
+    ? 'Month uses exact wallet inflow; volume is a 30D average proxy. OI snapshot '+MKT.asOf+'.'
+    : 'Volume & OI snapshot '+MKT.asOf+'.';
   $('#frReadRevNote') && ($('#frReadRevNote').textContent=e.label+' treasury revenue. If this rises, the venue is earning more real USDC.');
   renderFeeRevenueHistory();
   renderFeeOi();
