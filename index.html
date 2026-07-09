@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Variational Scanner — Live USDC Treasury Tracker</title>
 <link rel="icon" href="variational-scanner-logo-transparent.png?v=2">
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800;900&display=swap" rel="stylesheet">
 
 <!-- ============================================================
      TWITTER / LINK PREVIEW  —  ⚠️ AFTER YOU HOST THIS, replace
@@ -28,23 +27,29 @@
 <meta name="twitter:title" content="Variational Scanner — Live USDC Treasury Tracker">
 <meta name="twitter:description" content="10% of every spread paid to OLP flows into Variational's treasury per the OLP docs. Tracking it live on-chain.">
 <meta name="twitter:image" content="https://REPLACE-WITH-YOUR-URL/assets/heaven.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:opsz,wght@6..144,1..1000&display=swap" rel="stylesheet">
 <style>
   @font-face{
-    font-family:"Google Sans Flex";
-    src:local("Google Sans Flex"),local("Google Sans");
+    font-family:"Gilroy Dashboard";
+    src:
+      local("Gilroy Medium"),
+      local("Gilroy-Medium"),
+      local("Gilroy"),
+      url("./Gilroy-Medium.woff2") format("woff2"),
+      url("./Gilroy-Medium.woff") format("woff"),
+      url("./Gilroy-Medium.ttf") format("truetype");
+    font-weight:500;
+    font-style:normal;
     font-display:swap;
   }
   :root{
     --bg:#030814; --panel:#07101f; --panel2:#0a1628; --line:#16345c;
     --ink:#eef7ff; --sub:#84a2c6; --dim:#4f6f98;
     --grn:#26e6c2; --grn2:#18a994; --cyan:#55b8ff; --vio:#4d90ff; --amber:#6fb9ff; --red:#d95c58;
-    --sans:"Google Sans Flex","Google Sans",ui-sans-serif,system-ui,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";
-    --mono:"Google Sans Flex","Google Sans",ui-sans-serif,system-ui,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";
-    --display:"Google Sans Flex","Google Sans",Impact,Haettenschweiler,"Arial Narrow",ui-sans-serif,system-ui,sans-serif;
-    --serif:"Cinzel",Georgia,serif;
+    --gilroy:"Gilroy Dashboard","Gilroy Medium","Gilroy",Avenir Next,ui-sans-serif,system-ui,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";
+    --sans:var(--gilroy);
+    --mono:var(--gilroy);
+    --display:var(--gilroy);
+    --serif:var(--gilroy);
   }
   *{box-sizing:border-box;margin:0;padding:0}
   html,body{background:
@@ -67,181 +72,30 @@
     font:900 clamp(28px,4vw,62px)/1.45 var(--mono);letter-spacing:.42em;color:rgba(154,184,218,.035);text-align:right;
     text-shadow:-54vw 18vh 0 rgba(154,184,218,.025),-28vw 58vh 0 rgba(154,184,218,.02);
     mix-blend-mode:screen}
-  body > :not(.varhalla){position:relative;z-index:1}
+  body > *{position:relative;z-index:1}
   .skip,.wm{display:none!important}
   a{color:inherit;text-decoration:none}
   :focus-visible{outline:2px solid var(--cyan);outline-offset:3px;border-radius:8px}
-  /* ---- Variational intro gate ---- */
-  body.gate-open{overflow:hidden}
-  .varhalla{position:fixed;inset:0;z-index:1000;display:grid;place-items:center;min-height:100svh;overflow:hidden;
-    background:
-      radial-gradient(900px 520px at 73% 24%,rgba(78,230,178,.18),transparent 62%),
-      radial-gradient(760px 520px at 18% 72%,rgba(143,215,255,.13),transparent 58%),
-      linear-gradient(180deg,#06111d 0%,#04070d 55%,#020305 100%);
-    transition:opacity .55s ease,visibility .55s ease}
-  .varhalla.hide{opacity:0;visibility:hidden;pointer-events:none}
-  .v-bg{position:absolute;inset:-4%;background:
-    radial-gradient(760px 260px at 50% 8%,rgba(255,255,255,.14),transparent 66%),
-    linear-gradient(115deg,rgba(34,230,160,.08),transparent 27%,rgba(216,173,87,.08) 54%,transparent 83%),
-    repeating-linear-gradient(90deg,transparent 0 56px,rgba(143,215,255,.04) 57px 58px,transparent 59px 112px),
-    repeating-linear-gradient(0deg,transparent 0 56px,rgba(143,215,255,.025) 57px 58px,transparent 59px 112px);
-    transform:translate3d(calc(var(--mx,0)*-10px),calc(var(--my,0)*-8px),0)}
-  .v-bg::after{content:"";position:absolute;left:50%;top:50%;width:120vmax;height:120vmax;transform:translate(-50%,-50%);
-    background:conic-gradient(from 120deg,transparent,rgba(143,215,255,.12),transparent 20%,rgba(34,230,160,.13),transparent 42%,rgba(216,173,87,.12),transparent 66%);
-    opacity:.7;animation:vSpin 22s linear infinite}
-  @keyframes vSpin{to{transform:translate(-50%,-50%) rotate(360deg)}}
-  .v-card{position:relative;width:min(1180px,94vw);min-height:min(700px,88svh);display:grid;grid-template-columns:.95fr 1.05fr;align-items:center;
-    border:1px solid rgba(143,215,255,.24);background:linear-gradient(135deg,rgba(5,9,15,.74),rgba(8,15,25,.54));
-    box-shadow:0 34px 120px rgba(0,0,0,.72),0 0 90px rgba(34,230,160,.12);overflow:hidden;border-radius:26px}
-  .v-card::before{content:"";position:absolute;inset:0;background:
-    linear-gradient(180deg,rgba(255,255,255,.07),transparent 20%,rgba(0,0,0,.26) 100%),
-    linear-gradient(90deg,rgba(143,215,255,.13),transparent 1px),
-    linear-gradient(0deg,rgba(143,215,255,.09),transparent 1px);background-size:auto,84px 84px,84px 84px;pointer-events:none}
-  .v-card::after{content:"";position:absolute;inset:auto 0 0;height:2px;background:linear-gradient(90deg,transparent,var(--grn),var(--cyan),transparent);box-shadow:0 0 26px rgba(34,230,160,.65)}
-  .v-portrait{position:relative;min-height:min(700px,88svh);display:grid;place-items:center;overflow:hidden;
-    transform:translate3d(calc(var(--mx,0)*12px),calc(var(--my,0)*10px),0)}
-  .v-portal{position:relative;width:min(510px,42vw);aspect-ratio:1;display:grid;place-items:center;filter:drop-shadow(0 30px 50px rgba(0,0,0,.62))}
-  .v-portal::before,.v-portal::after{content:"";position:absolute;inset:0;border-radius:50%;border:1px solid rgba(143,215,255,.28)}
-  .v-portal::before{background:radial-gradient(circle at 50% 50%,rgba(34,230,160,.18),transparent 35%),conic-gradient(from 210deg,rgba(34,230,160,.08),rgba(143,215,255,.35),rgba(216,173,87,.2),rgba(34,230,160,.08));animation:vSpin 16s linear infinite}
-  .v-portal::after{inset:11%;border-color:rgba(216,173,87,.36);box-shadow:inset 0 0 42px rgba(0,0,0,.7),0 0 38px rgba(143,215,255,.22);animation:vSpin 24s linear infinite reverse}
-  .v-logo-mark{position:relative;width:38%;aspect-ratio:1;border-radius:28%;display:grid;place-items:center;background:rgba(4,7,13,.82);border:1px solid rgba(143,215,255,.34);box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 0 48px rgba(34,230,160,.28)}
-  .v-logo-mark svg,.v-logo-mark img{width:72%;height:72%;object-fit:contain;filter:drop-shadow(0 0 18px rgba(143,215,255,.58))}
-  .v-orbit{position:absolute;border:1px solid rgba(143,215,255,.24);border-radius:50%;animation:vSpin 18s linear infinite}
-  .v-orbit.o1{inset:6%;border-left-color:var(--grn)}
-  .v-orbit.o2{inset:21%;border-top-color:var(--vio);animation-duration:13s;animation-direction:reverse}
-  .v-coin{position:absolute;width:54px;height:54px;border-radius:50%;display:grid;place-items:center;color:#06120e;background:linear-gradient(135deg,#f3fff8,var(--grn));font:900 18px var(--mono);box-shadow:0 0 26px rgba(34,230,160,.45)}
-  .v-coin.c1{left:4%;top:27%;animation:vFloat 4.8s ease-in-out infinite}
-  .v-coin.c2{right:8%;bottom:22%;animation:vFloat 5.4s ease-in-out infinite reverse}
-  @keyframes vFloat{50%{transform:translateY(-18px) scale(1.04)}}
-  .v-feed{position:absolute;left:9%;right:9%;bottom:13%;height:92px;border-top:1px solid rgba(143,215,255,.18)}
-  .v-feed i{position:absolute;top:14px;width:2px;height:70px;background:linear-gradient(180deg,transparent,var(--grn),transparent);box-shadow:0 0 12px var(--grn);animation:vRain 1.7s linear infinite}
-  .v-feed i:nth-child(1){left:8%;animation-delay:.1s}.v-feed i:nth-child(2){left:22%;animation-delay:.4s}.v-feed i:nth-child(3){left:38%;animation-delay:.8s}.v-feed i:nth-child(4){left:55%;animation-delay:.2s}.v-feed i:nth-child(5){left:72%;animation-delay:.65s}.v-feed i:nth-child(6){left:88%;animation-delay:1s}
-  @keyframes vRain{0%{opacity:0;transform:translateY(-35px)}30%,70%{opacity:1}100%{opacity:0;transform:translateY(35px)}}
-  .v-copy{position:relative;z-index:2;padding:58px clamp(28px,5vw,78px) 58px 8px;transform:translate3d(calc(var(--mx,0)*-8px),calc(var(--my,0)*-6px),0)}
-  .v-kicker{display:inline-flex;align-items:center;gap:9px;font:900 11px var(--sans);letter-spacing:3px;color:var(--cyan);text-transform:uppercase;text-shadow:0 0 16px rgba(77,144,255,.45)}
-  .v-kicker::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--grn);box-shadow:0 0 14px var(--grn)}
-  .v-title{font:900 clamp(48px,7.6vw,106px)/.88 var(--sans);letter-spacing:-.035em;margin:20px 0 16px;text-transform:none;position:relative}
-  .v-title span{display:block;background:linear-gradient(92deg,#f7fbff,#55b8ff 40%,#4d90ff 72%,#26e6c2 100%);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 0 30px rgba(77,144,255,.28))}
-  .v-title::before,.v-title::after{content:"";position:absolute;top:50%;width:.42em;height:.22em;border:2px solid rgba(77,144,255,.5);border-right:0;border-bottom:0;border-radius:999px 0 0 0;transform:translateY(-50%);filter:drop-shadow(0 0 10px rgba(77,144,255,.35))}
-  .v-title::before{left:-.54em}.v-title::after{right:-.48em}
-  .v-sub{max-width:545px;font:14px/1.75 var(--mono);color:#c5d2e9}
-  .v-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;max-width:560px;margin-top:24px}
-  .v-stat{border:1px solid rgba(143,215,255,.2);background:rgba(10,17,27,.62);border-radius:14px;padding:12px 13px;box-shadow:inset 0 1px 0 rgba(255,255,255,.05)}
-  .v-stat b{display:block;font:900 clamp(18px,2.4vw,28px)/1 var(--mono);letter-spacing:-1px;color:var(--ink)}
-  .v-stat span{display:block;margin-top:6px;font:800 9px var(--mono);letter-spacing:1.2px;color:var(--sub);text-transform:uppercase}
-  .v-actions{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:28px}
-  .v-enter{cursor:pointer;border:1px solid rgba(78,230,178,.58);border-radius:999px;padding:14px 20px;
-    color:#04120c;background:linear-gradient(92deg,var(--grn),var(--cyan));font:900 12px var(--mono);letter-spacing:1.2px;text-transform:uppercase;
-    box-shadow:0 0 28px rgba(34,230,160,.3);transition:transform .16s ease,box-shadow .16s ease}
-  .v-enter:hover{transform:translateY(-2px);box-shadow:0 0 46px rgba(34,230,160,.48)}
-  .v-skip{cursor:pointer;margin-left:12px;border:0;background:transparent;color:var(--sub);font:800 11px var(--mono);letter-spacing:1px;text-transform:uppercase}
-  .v-shard{position:absolute;background:#dbe9ff;opacity:.5;clip-path:polygon(0 0,100% 38%,30% 100%);filter:drop-shadow(0 0 8px rgba(143,215,255,.45))}
-  @media(max-width:760px){.v-card{grid-template-columns:1fr;min-height:88svh;border-radius:20px}.v-portrait{opacity:.56;position:absolute;inset:0;min-height:auto}.v-portal{width:82vw}.v-copy{padding:34px;align-self:end}.v-title{font-size:clamp(46px,16vw,78px)}.v-stats{grid-template-columns:1fr 1fr}.v-stat:last-child{grid-column:1/-1}.v-sub{font-size:12.5px}.v-actions{gap:8px}.v-skip{margin-left:0}}
-  @media(max-width:620px){.v-copy{padding:30px 24px;max-width:100%;overflow:hidden}.v-kicker{font-size:9px;letter-spacing:3px}.v-title{font-size:clamp(34px,9.8vw,44px);letter-spacing:-.8px;margin:16px 0 14px}.v-title span,.v-sub,.v-stats,.v-actions{width:min(100%,310px)}.v-sub{max-width:310px;font-size:12px;line-height:1.6}.v-stats{grid-template-columns:1fr;gap:8px;margin-top:20px}.v-stat:last-child{grid-column:auto}.v-stat{padding:11px 12px}.v-stat b{font-size:clamp(18px,5vw,22px);letter-spacing:-.6px}.v-stat span{font-size:8px}.v-enter{padding:13px 18px}.v-portal{width:92vw;transform:translateX(-8vw)}}
-  @media(max-width:480px){.v-card{width:calc(100vw - 28px);min-height:88svh}.v-copy{padding:28px 24px}.v-title{font-size:clamp(34px,9.8vw,42px)}}
-
-  /* Full-bleed cinematic intro override */
-  .varhalla{place-items:stretch;background:
-    radial-gradient(900px 420px at 50% -6%,rgba(210,224,255,.58),transparent 62%),
-    radial-gradient(640px 360px at 50% 69%,rgba(255,226,160,.23),transparent 62%),
-    linear-gradient(180deg,#9eb6ee 0%,#34466d 28%,#07101f 68%,#010307 100%)}
-  .v-bg{inset:-5%;background:
-    radial-gradient(1000px 360px at 48% 0,rgba(255,255,255,.38),transparent 68%),
-    linear-gradient(180deg,rgba(175,199,247,.28),transparent 34%,rgba(1,4,9,.82) 100%),
-    repeating-linear-gradient(88deg,transparent 0 118px,rgba(255,255,255,.035) 119px 122px,transparent 123px 246px);
-    transform:translate3d(calc(var(--mx,0)*-5px),calc(var(--my,0)*-4px),0)}
-  .v-bg::after{background:radial-gradient(circle at 50% 50%,transparent 0 34%,rgba(255,255,255,.12) 35%,transparent 37%,rgba(143,215,255,.09) 44%,transparent 47%);opacity:.5;animation:vSpin 42s linear infinite}
-  .v-card{position:absolute;inset:0;width:100vw;min-height:100svh;display:block;border:0;border-radius:0;background:transparent;box-shadow:none;overflow:hidden}
-  .v-card::before{z-index:8;background:
-    radial-gradient(880px 420px at 50% 76%,rgba(255,226,172,.16),transparent 58%),
-    linear-gradient(180deg,rgba(18,27,49,.03),rgba(2,5,10,.26) 42%,rgba(0,0,0,.78) 100%),
-    radial-gradient(800px 720px at 50% 52%,transparent 0 45%,rgba(0,0,0,.34) 82%)}
-  .v-card::after{z-index:9;inset:auto 0 0;height:36svh;background:linear-gradient(180deg,transparent,rgba(0,0,0,.66));box-shadow:none}
-  .v-portrait{position:absolute;inset:0;min-height:100svh;display:block;overflow:hidden;opacity:1;transform:translate3d(calc(var(--mx,0)*8px),calc(var(--my,0)*5px),0)}
-  .v-portrait::before{content:"";position:absolute;left:-8vw;right:-8vw;top:8svh;height:70svh;background:
-    linear-gradient(102deg,transparent 0 8%,rgba(18,28,47,.92) 8.5% 18%,transparent 18.5% 21%,rgba(24,35,55,.96) 21.4% 31%,transparent 31.4%),
-    linear-gradient(78deg,transparent 0 66%,rgba(18,28,47,.97) 66.5% 77%,transparent 77.3%),
-    repeating-linear-gradient(90deg,rgba(35,49,75,.96) 0 30px,rgba(16,25,43,.98) 31px 42px,rgba(63,78,109,.82) 43px 50px);
-    clip-path:polygon(0 38%,5% 22%,12% 28%,20% 14%,28% 19%,34% 2%,43% 15%,50% 0,57% 15%,65% 4%,72% 19%,82% 12%,90% 25%,100% 18%,100% 100%,0 100%);
-    filter:drop-shadow(0 22px 28px rgba(0,0,0,.58));opacity:.94}
-  .v-portrait::after{content:"";position:absolute;left:25vw;right:24vw;top:8svh;height:55svh;background:
-    radial-gradient(90px 140px at 50% 17%,rgba(8,12,20,.74),rgba(8,12,20,.82) 58%,transparent 60%),
-    radial-gradient(190px 150px at 38% 18%,rgba(15,23,38,.95) 0 22%,transparent 23%),
-    radial-gradient(190px 150px at 62% 18%,rgba(15,23,38,.95) 0 22%,transparent 23%),
-    linear-gradient(180deg,rgba(20,30,50,.9),rgba(5,8,14,.98));
-    clip-path:polygon(15% 100%,15% 45%,24% 18%,40% 9%,50% 0,60% 9%,76% 18%,85% 45%,85% 100%);
-    box-shadow:inset 0 0 70px rgba(0,0,0,.8),0 0 44px rgba(143,215,255,.16);opacity:.92}
-  .v-portal{position:absolute;left:50%;bottom:8.5svh;width:min(210px,15vw);height:min(265px,26svh);transform:translateX(-50%);border:1px solid rgba(255,229,178,.64);border-radius:0;background:#fff5dc;box-shadow:0 0 34px #fff,0 0 90px rgba(255,209,113,.95),0 0 160px rgba(143,215,255,.45);filter:none}
-  .v-portal::before{inset:-120px -190px -70px;border:0;border-radius:0;background:radial-gradient(closest-side,rgba(255,241,208,.65),rgba(255,202,101,.18) 48%,transparent 72%);animation:vGlow 2.8s ease-in-out infinite}
-  .v-portal::after{left:50%;top:-56px;inset:auto auto auto 50%;width:460px;height:88px;transform:translateX(-50%);border:0;border-radius:0;background:linear-gradient(90deg,transparent,rgba(216,173,87,.95),transparent);filter:blur(8px);opacity:.6;box-shadow:none;animation:none}
-  @keyframes vGlow{50%{opacity:.72;transform:scale(1.05)}}
-  .v-logo-mark{position:absolute;left:50%;top:-62px;width:430px;height:28px;transform:translateX(-50%);background:none;border:0;box-shadow:none}
-  .v-logo-mark svg,.v-logo-mark img{display:none}
-  .v-logo-mark::before{content:"ᚹ ᚨ ᚱ ᚺ ᚨ ᛚ ᛚ ᚨ";display:block;text-align:center;font:1000 15px var(--mono);letter-spacing:10px;color:rgba(255,212,124,.92);text-shadow:0 0 14px rgba(255,209,113,.85),0 0 30px rgba(255,255,255,.36)}
-  .v-orbit{position:absolute;border:0;border-radius:0;animation:none}
-  .v-orbit.o1{left:18vw;bottom:6svh;width:13vw;height:5svh;background:linear-gradient(180deg,rgba(31,39,58,.9),rgba(6,9,15,.98));clip-path:polygon(0 100%,20% 20%,100% 0,88% 100%)}
-  .v-orbit.o2{right:16vw;bottom:5svh;width:15vw;height:6svh;background:linear-gradient(180deg,rgba(38,49,72,.9),rgba(5,8,14,.98));clip-path:polygon(10% 0,100% 28%,82% 100%,0 100%)}
-  .v-coin{width:62px;height:62px;color:#291700;background:radial-gradient(circle at 38% 28%,#fff2b8,#d8ad57 58%,#6d4614);box-shadow:0 0 30px rgba(255,194,84,.72),0 0 70px rgba(255,194,84,.28)}
-  .v-coin.c1{left:auto;right:20vw;top:auto;bottom:13svh}.v-coin.c2{right:auto;left:2vw;top:auto;bottom:21svh}
-  .v-feed{position:absolute;inset:0;height:auto;border:0;z-index:7;pointer-events:none}
-  .v-feed::before{content:"";position:absolute;left:13vw;bottom:0;width:27vw;height:55svh;background:
-    radial-gradient(70px 90px at 53% 12%,#121821 0 36%,transparent 37%),
-    linear-gradient(100deg,transparent 0 26%,#111722 27% 49%,#07090f 50% 72%,transparent 73%);
-    clip-path:polygon(28% 100%,28% 37%,40% 14%,54% 8%,67% 38%,82% 100%);filter:drop-shadow(30px 30px 24px rgba(0,0,0,.72))}
-  .v-feed::after{content:"";position:absolute;left:16vw;bottom:12svh;width:8vw;height:43svh;background:linear-gradient(90deg,#18233b,#617491 45%,#101727);clip-path:polygon(35% 0,70% 0,58% 76%,100% 83%,54% 100%,0 83%,42% 76%);transform:rotate(-22deg);box-shadow:0 0 20px rgba(190,215,255,.24)}
-  .v-feed i{top:-10svh;background:linear-gradient(180deg,transparent,#b9c9ff,transparent);box-shadow:0 0 12px #b9c9ff;animation:vRain 2.7s linear infinite}
-  @keyframes vRain{0%{opacity:0;transform:translateY(-10svh)}30%,70%{opacity:.9}100%{opacity:0;transform:translateY(74svh)}}
-  .v-copy{position:absolute;z-index:12;right:clamp(24px,6vw,92px);bottom:clamp(30px,7svh,78px);width:min(520px,42vw);padding:0;text-align:right;transform:translate3d(calc(var(--mx,0)*-8px),calc(var(--my,0)*-6px),0)}
-  .v-kicker{justify-content:flex-end;color:#ffd47c;letter-spacing:4px;text-shadow:0 0 16px rgba(255,209,113,.78)}
-  .v-title{font-size:clamp(54px,8.6vw,138px);line-height:.78;text-transform:uppercase;letter-spacing:-.045em}
-  .v-title::before,.v-title::after{display:none}
-  .v-sub{margin-left:auto;color:#dbe6ff;text-shadow:0 2px 16px rgba(0,0,0,.86)}
-  .v-stats{margin-left:auto}
-  .v-stat{background:rgba(4,8,14,.58);backdrop-filter:blur(5px);border-color:rgba(210,225,255,.24)}
-  .v-actions{justify-content:flex-end}
-  @media(max-width:760px){.v-copy{left:24px;right:24px;bottom:30px;width:auto;text-align:left;padding:0}.v-kicker{justify-content:flex-start}.v-title{font-size:clamp(42px,13vw,76px)}.v-sub,.v-stats,.v-actions{margin-left:0}.v-stats{grid-template-columns:1fr 1fr;max-width:420px}.v-stat:last-child{grid-column:1/-1}.v-feed::before{left:-4vw;width:48vw;height:42svh}.v-feed::after{left:2vw;width:15vw;height:32svh}.v-portal{width:110px;height:170px;bottom:24svh}.v-logo-mark{top:-48px}.v-logo-mark::before{font-size:10px;letter-spacing:6px}.v-portrait::after{left:13vw;right:13vw}.v-coin.c1{right:5vw;bottom:26svh}.v-coin.c2{left:-5vw;bottom:34svh}}
-
-  /* Bitmap cinematic hero layer */
-  .v-portrait{background:url("assets/varhalla-cinematic-bg.png") center center/cover no-repeat;transform:scale(1.015) translate3d(calc(var(--mx,0)*-8px),calc(var(--my,0)*-5px),0)}
-  .v-portrait::before,.v-portrait::after,.v-portal,.v-orbit,.v-coin,.v-logo-mark{display:none}
-  .v-card::before{background:
-    linear-gradient(90deg,rgba(0,0,0,.08),rgba(0,0,0,.06) 42%,rgba(0,0,0,.56) 72%,rgba(0,0,0,.78)),
-    linear-gradient(180deg,rgba(9,16,30,.04),rgba(0,0,0,.18) 52%,rgba(0,0,0,.78) 100%);
-    backdrop-filter:none}
-  .v-card::after{height:30svh;background:linear-gradient(180deg,transparent,rgba(0,0,0,.82))}
-  .v-bg{background:radial-gradient(900px 420px at 50% 0,rgba(180,205,255,.2),transparent 70%);opacity:.55}
-  .v-bg::after{display:none}
-  .v-shard{opacity:.28}
-  .v-feed{inset:0;z-index:7}
-  .v-feed::before,.v-feed::after{display:none}
-  .v-feed i{top:-12svh;width:2px;height:82px;background:linear-gradient(180deg,transparent,#86b5ff,transparent);box-shadow:0 0 14px rgba(134,181,255,.85);opacity:.6}
-  .varhalla{cursor:pointer}
-  .v-portrait::after{content:"";display:block;position:absolute;inset:0;background:url("assets/varhalla-cinematic-bg.png") center center/cover no-repeat;
-    clip-path:polygon(0 34%,33% 34%,33% 100%,0 100%);transform-origin:17% 72%;opacity:.28;mix-blend-mode:screen;filter:brightness(1.2) contrast(1.05);
-    animation:vWarriorBreath 4.6s ease-in-out infinite;pointer-events:none}
-  @keyframes vWarriorBreath{0%,100%{transform:translate3d(0,0,0) scale(1);opacity:.2}42%{transform:translate3d(2px,-5px,0) scale(1.012);opacity:.34}64%{transform:translate3d(0,2px,0) scale(1.002);opacity:.25}}
-  .v-portal{display:block;left:36%;top:65%;bottom:auto;width:min(118px,8vw);height:min(212px,23svh);transform:translate(-50%,-50%);border:1px solid rgba(255,240,196,.84);
-    background:linear-gradient(180deg,#fff 0%,#fff7d9 38%,#ffd274 100%);box-shadow:0 0 36px #fff,0 0 96px rgba(255,207,95,.96),0 0 190px rgba(255,207,95,.42);
-    opacity:.86;mix-blend-mode:screen;filter:blur(.3px);animation:vGateFire 1.9s ease-in-out infinite;pointer-events:none}
-  .v-portal::before,.v-portal::after{content:"";position:absolute;inset:-22% -58%;border:0;border-radius:0;background:radial-gradient(ellipse at center,rgba(255,249,221,.9),rgba(255,196,75,.22) 45%,transparent 72%);filter:blur(18px);animation:vGateFlare 3.4s ease-in-out infinite}
-  .v-portal::after{inset:-44% -120%;opacity:.42;animation-delay:1.15s}
-  @keyframes vGateFire{0%,100%{opacity:.72;transform:translate(-50%,-50%) scale(.985);box-shadow:0 0 28px #fff,0 0 82px rgba(255,207,95,.8),0 0 154px rgba(255,207,95,.3)}46%{opacity:.96;transform:translate(-50%,-50%) scale(1.035);box-shadow:0 0 48px #fff,0 0 124px rgba(255,221,126,1),0 0 230px rgba(255,207,95,.52)}} 
-  @keyframes vGateFlare{50%{opacity:.92;transform:scale(1.14)}}
-  .v-copy{left:50%;right:auto;bottom:clamp(28px,5.2svh,54px);width:min(740px,92vw);padding:0;text-align:center;transform:translateX(-50%)}
-  .v-kicker,.v-sub,.v-stats,.v-actions{display:none}
-  .v-title{font-family:"Cinzel",serif;font-weight:900;font-size:clamp(30px,4.3vw,58px);line-height:.8;letter-spacing:.2em;text-transform:uppercase;margin:0;color:#f4f7ff;
-    text-shadow:0 2px 7px #000,0 0 18px rgba(200,225,255,.72),0 0 3px #fff}
-  .v-title::before,.v-title::after{display:block;content:"ᚢ";top:50%;width:auto;height:auto;border:0;border-radius:0;color:#9fc8ff;font:600 .46em/1 "Cinzel",serif;letter-spacing:.12em;text-shadow:0 0 12px rgba(120,185,255,.75);transform:translateY(-50%)}
-  .v-title::before{left:calc(50% - min(300px,42vw))}.v-title::after{right:calc(50% - min(300px,42vw))}
-  .v-title span{display:block;background:none;color:#f4f7ff;filter:none}
-  .v-title span:first-child{font-size:.52em;letter-spacing:.42em;padding-left:.42em;margin-bottom:3px}
-  .v-title span:last-child{letter-spacing:.14em;padding-left:.14em}
-  .v-copy::after{content:"ONLY THE WORTHY MAY PASS · ᚱᚢᚾᛖᛋ";display:block;margin-top:17px;padding-top:13px;border-top:1px solid rgba(205,220,255,.28);
-    color:#d6e1ff;font:700 clamp(10px,1.05vw,13px)/1 var(--mono);letter-spacing:.48em;text-shadow:0 2px 7px #000,0 0 14px rgba(140,184,255,.54)}
-  @media(max-width:900px){.v-copy{width:min(520px,52vw)}.v-title{font-size:clamp(46px,8.6vw,84px)}}
-  @media(max-width:760px){.v-portrait{background-position:38% center;transform:scale(1.04)}.v-card::before{background:linear-gradient(180deg,rgba(0,0,0,.06),rgba(0,0,0,.1) 36%,rgba(0,0,0,.84) 100%)}.v-copy{left:50%;right:auto;bottom:24px;width:92vw;text-align:center}.v-title{font-size:clamp(29px,11vw,48px)}.v-copy::after{font-size:9px;letter-spacing:.3em;padding-left:.3em}.v-portal{left:50%;top:52%;width:110px;height:170px}}
-
   /* ---- header ---- */
+  .top-ref{display:inline-flex;align-items:center;gap:10px;width:max-content;max-width:100%;margin-top:1px;padding:7px 8px 7px 10px;
+    border:1px solid rgba(38,230,194,.34);border-radius:999px;background:rgba(7,16,31,.68);
+    box-shadow:inset 0 1px 0 rgba(85,184,255,.12),0 0 18px rgba(38,230,194,.08)}
+  .top-ref-mark{display:grid;place-items:center;width:22px;height:22px;flex:none;border-radius:50%;background:rgba(85,184,255,.10)}
+  .top-ref-mark img{width:15px;height:15px;object-fit:contain;filter:drop-shadow(0 0 7px rgba(85,184,255,.42))}
+  .top-ref-copy{cursor:pointer;display:flex;align-items:baseline;gap:8px;min-width:0;border:0;background:transparent;color:inherit;text-align:left}
+  .top-ref-label{font:950 8px/1 var(--mono);letter-spacing:1.7px;text-transform:uppercase;color:var(--dim);white-space:nowrap}
+  .top-ref-code{font:900 clamp(15px,1.35vw,20px)/1 var(--serif);letter-spacing:-.04em;text-transform:uppercase;color:#eaf6ff}
+  .top-ref-copy:hover .top-ref-code{color:var(--grn);text-shadow:0 0 14px rgba(38,230,194,.32)}
+  .top-ref-actions{display:flex;align-items:center;gap:6px;flex:none}
+  .top-ref-btn,.top-ref-link{display:inline-flex;align-items:center;justify-content:center;min-height:24px;padding:0 9px;border-radius:999px;
+    font:950 8px/1 var(--mono);letter-spacing:1px;text-transform:uppercase;white-space:nowrap}
+  .top-ref-btn{cursor:pointer;color:#03120f;background:var(--grn);border:1px solid rgba(38,230,194,.62)}
+  .top-ref-link{color:var(--grn);border:1px solid rgba(38,230,194,.3);background:rgba(38,230,194,.055)}
+  .top-ref-btn.copied{background:var(--cyan);border-color:rgba(85,184,255,.72)}
+  @media(max-width:760px){
+    .top-ref{width:100%;justify-content:space-between;border-radius:12px}
+    .top-ref-copy{flex-direction:column;gap:3px}
+  }
   header{display:flex;flex-wrap:wrap;align-items:flex-end;gap:18px;justify-content:space-between;
     padding-bottom:14px;margin-bottom:16px;border-bottom:1px solid var(--line);position:relative;z-index:1}
   header::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:1px;background:linear-gradient(90deg,transparent,var(--vio),var(--cyan),transparent);opacity:.5}
@@ -325,6 +179,42 @@
   .money-flow .hedge{margin-top:8px;color:#9fb4d2;font:11px/1.35 var(--mono)}
   .money-flow .hedge b{color:var(--cyan)}
   .flow-note{font:10.5px var(--mono);color:var(--amber);opacity:.85;margin:-14px 2px 22px;display:flex;gap:6px;align-items:center}
+  .protocol-map{display:block;margin:-4px 0 22px}
+  .pm-panel{border:1px solid rgba(85,184,255,.2);border-radius:14px;padding:16px;background:rgba(7,16,31,.58)}
+  .pm-title{font:950 11px var(--display);letter-spacing:2px;text-transform:uppercase;color:var(--cyan);margin-bottom:10px}
+  .pm-flow{display:grid;grid-template-columns:1fr 28px 1fr 28px 1fr;gap:8px;align-items:stretch}
+  .pm-node{border:1px solid rgba(85,184,255,.18);border-radius:11px;padding:12px;background:rgba(3,8,15,.42);min-width:0}
+  .pm-node.revenue{border-color:rgba(38,230,194,.36);background:rgba(38,230,194,.045)}
+  .pm-node b{display:block;font:950 13px/1.15 var(--sans);color:var(--ink)}
+  .pm-node span{display:block;margin-top:7px;font:11px/1.42 var(--mono);color:var(--sub)}
+  .pm-node code{display:inline-block;margin-top:9px;max-width:100%;overflow:hidden;text-overflow:ellipsis;vertical-align:bottom;
+    font:850 10px var(--mono);color:var(--cyan);border-bottom:1px dashed rgba(85,184,255,.36)}
+  .pm-arrow{display:grid;place-items:center;color:var(--cyan);font:950 18px var(--mono)}
+  .pm-metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:10px}
+  .pm-metric{border:1px solid rgba(85,184,255,.16);border-radius:10px;padding:10px;background:rgba(3,8,15,.34)}
+  .pm-metric strong{display:block;font:950 clamp(15px,1.7vw,27px)/1 var(--mono);letter-spacing:-1px;color:var(--grn);white-space:nowrap}
+  .pm-metric span{display:block;margin-top:5px;font:950 8.5px var(--mono);letter-spacing:1.1px;text-transform:uppercase;color:var(--sub)}
+  .pm-metric .pm-formula{display:block;margin-top:9px;padding-top:8px;border-top:1px solid rgba(85,184,255,.12);
+    font:850 9.5px/1.45 var(--mono);letter-spacing:.2px;text-transform:none;color:var(--dim)}
+  .pm-metric .pm-formula b{color:var(--cyan);font-weight:950}
+  .pm-relation{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:center;margin-top:12px}
+  .pm-balance{border:1px solid rgba(85,184,255,.16);border-radius:11px;padding:11px;background:rgba(3,8,15,.34)}
+  .pm-balance b{display:block;font:950 20px/1 var(--mono);letter-spacing:-.8px;color:var(--ink)}
+  .pm-balance span{display:block;margin-top:6px;font:950 8.5px var(--mono);letter-spacing:1.1px;text-transform:uppercase;color:var(--sub)}
+  .pm-relation-arrow{font:950 11px var(--mono);letter-spacing:1.5px;text-transform:uppercase;color:var(--cyan);text-align:center}
+  .pm-note{font:11.5px/1.55 var(--mono);color:var(--sub)}
+  .pm-note b{color:var(--ink)}
+  .pm-note .hi{color:var(--grn);font-weight:900}
+  .pm-sankey{width:100%;height:auto;max-height:290px;display:block;margin:0 0 2px}
+  .pm-sankey text{font-family:var(--mono)}
+  .pm-cap{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:10px;font:10.5px/1.45 var(--mono);color:var(--dim)}
+  .pm-cap span{border:1px solid rgba(85,184,255,.13);border-radius:10px;padding:9px;background:rgba(3,8,15,.32)}
+  .pm-cap b{color:var(--sub);font-weight:800}
+  .pm-cap a{color:var(--cyan);border-bottom:1px dashed rgba(56,225,255,.35)}
+  .pm-links{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px}
+  .pm-links a{border:1px solid rgba(85,184,255,.22);border-radius:999px;padding:6px 9px;background:rgba(85,184,255,.055);
+    font:850 10px var(--mono);color:var(--cyan)}
+  @media(max-width:980px){.pm-flow,.pm-metrics,.pm-relation,.pm-cap{grid-template-columns:1fr}.pm-arrow{transform:rotate(90deg)}}
 
   /* forecast */
   .fc-body{display:grid;grid-template-columns:1fr 1.15fr;gap:22px;margin-top:6px}
@@ -534,6 +424,128 @@
   .brandwrap::after{content:"";position:absolute;left:2px;top:50%;width:112px;height:66px;border:2px solid rgba(77,144,255,.16);border-right:0;border-bottom:0;border-radius:999px 0 0 0;z-index:-1;filter:drop-shadow(0 0 18px rgba(77,144,255,.18))}
   .logo{width:46px;height:46px;flex:none;border-radius:10px;object-fit:contain;filter:drop-shadow(0 0 14px rgba(77,144,255,.4));box-shadow:0 0 0 1px rgba(77,144,255,.18)}
   .scanner-logo{width:124px;height:136px;border-radius:0;background:transparent;box-shadow:none;filter:drop-shadow(0 0 18px rgba(255,255,255,.18)) drop-shadow(0 0 22px rgba(77,144,255,.24))}
+
+  /* ---- roadmap tracker ---- */
+  .roadmap{overflow:hidden}
+  .road-journey{margin-top:14px;border:1px solid rgba(85,184,255,.16);border-radius:18px;padding:clamp(18px,2.8vw,30px);
+    background:
+      radial-gradient(760px 320px at 10% -12%,rgba(38,230,194,.07),transparent 62%),
+      radial-gradient(560px 280px at 98% 6%,rgba(85,184,255,.08),transparent 64%),
+      rgba(5,12,22,.56)}
+  .road-top{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:clamp(20px,3.4vw,48px);align-items:center}
+  .road-eyebrow{font:950 10px var(--mono);letter-spacing:2.4px;text-transform:uppercase;color:var(--grn);display:flex;align-items:center;gap:9px}
+  .road-eyebrow::after{content:"";flex:0 0 44px;height:1px;background:linear-gradient(90deg,rgba(38,230,194,.55),transparent)}
+  .road-big{font:950 clamp(42px,6.4vw,86px)/.86 var(--display);letter-spacing:-3.2px;margin:10px 0 12px;color:var(--ink);text-wrap:balance}
+  .road-big b{background:linear-gradient(92deg,var(--grn),var(--cyan));-webkit-background-clip:text;background-clip:text;color:transparent;
+    filter:drop-shadow(0 0 22px rgba(85,184,255,.28))}
+  .road-copy{font:12.5px/1.7 var(--mono);color:var(--sub);max-width:62ch}
+  .road-progress{display:grid;gap:13px;border:1px solid rgba(85,184,255,.15);border-radius:16px;padding:18px;
+    background:linear-gradient(180deg,rgba(8,16,28,.85),rgba(3,8,15,.65));box-shadow:inset 0 1px 0 rgba(85,184,255,.08)}
+  .road-progress-head{display:flex;align-items:flex-end;justify-content:space-between;gap:10px}
+  .road-progress-head strong{font:950 42px/.9 var(--mono);letter-spacing:-2px;color:var(--grn);text-shadow:0 0 18px rgba(38,230,194,.22)}
+  .road-progress-head span{font:950 9px var(--mono);letter-spacing:1.5px;text-transform:uppercase;color:var(--sub);text-align:right;line-height:1.5}
+  .road-meter{position:relative;height:12px;border-radius:999px;background:rgba(85,184,255,.09);overflow:hidden;border:1px solid rgba(85,184,255,.16)}
+  .road-meter span{display:block;height:100%;width:63%;border-radius:999px;background:linear-gradient(90deg,var(--grn),var(--cyan));
+    box-shadow:0 0 16px rgba(38,230,194,.4);animation:roadFill 1.1s cubic-bezier(.2,.8,.2,1) both}
+  @keyframes roadFill{from{width:0}}
+  .road-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+  .road-stat{border:1px solid rgba(85,184,255,.12);border-radius:11px;padding:11px 10px;background:rgba(3,8,15,.34)}
+  .road-stat strong{display:block;font:950 24px/1 var(--mono);letter-spacing:-1px;color:var(--ink)}
+  .road-stat:nth-child(1) strong{color:var(--grn)}
+  .road-stat:nth-child(2) strong{color:var(--cyan)}
+  .road-stat span{display:block;margin-top:6px;font:950 8px var(--mono);letter-spacing:1.1px;text-transform:uppercase;color:var(--sub)}
+  /* path: line runs exactly through dot centers (pad 18 + dot 34/2 = 35) */
+  .road-path{position:relative;margin:26px 0 22px;padding:18px 0 6px}
+  .road-path::before{content:"";position:absolute;left:6.25%;right:6.25%;top:33.5px;height:3px;border-radius:999px;
+    background:repeating-linear-gradient(90deg,rgba(85,184,255,.22) 0 7px,transparent 7px 14px)}
+  .road-path::after{content:"";position:absolute;left:6.25%;top:33.5px;width:50%;height:3px;border-radius:999px;
+    background:linear-gradient(90deg,var(--grn),var(--cyan));box-shadow:0 0 12px rgba(38,230,194,.45);
+    animation:roadFill 1.1s cubic-bezier(.2,.8,.2,1) both}
+  .road-stop-grid{position:relative;z-index:1;display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:8px}
+  .road-stop{position:relative;display:grid;gap:8px;justify-items:center;text-align:center}
+  .road-dot{display:grid;place-items:center;width:34px;height:34px;border-radius:50%;font:950 14px var(--mono);color:#03120f;
+    background:linear-gradient(135deg,var(--grn),var(--cyan));box-shadow:0 0 18px rgba(38,230,194,.3)}
+  .road-stop.pending .road-dot{color:var(--cyan);background:#07101f;border:1px dashed rgba(85,184,255,.5);box-shadow:none}
+  /* "you are here" — the first pending gate pulses */
+  .road-stop.pending:nth-child(6) .road-dot{border-style:solid;border-color:var(--grn);color:var(--grn);
+    animation:gatePulse 2.4s ease-out infinite}
+  .road-stop.pending:nth-child(6)::before{content:"UP NEXT";position:absolute;top:-13px;left:50%;transform:translateX(-50%);
+    font:950 8px var(--mono);letter-spacing:1.6px;color:var(--grn);text-shadow:0 0 10px rgba(38,230,194,.5);white-space:nowrap}
+  @keyframes gatePulse{0%{box-shadow:0 0 0 0 rgba(38,230,194,.4)}75%{box-shadow:0 0 0 13px rgba(38,230,194,0)}100%{box-shadow:0 0 0 0 rgba(38,230,194,0)}}
+  .road-stop b{font:950 12px/1.15 var(--sans);color:var(--ink)}
+  .road-stop.pending b{color:var(--sub)}
+  .road-stop.pending:nth-child(6) b{color:var(--ink)}
+  .road-stop span{font:10px/1.4 var(--mono);color:var(--dim);max-width:17ch}
+  .road-next{counter-reset:gate;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:12px}
+  .road-card{counter-increment:gate;position:relative;min-height:122px;border:1px solid rgba(85,184,255,.16);border-radius:14px;
+    padding:14px;background:rgba(4,10,18,.6);overflow:hidden;transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease}
+  .road-card::before{content:"0" counter(gate);position:absolute;right:11px;top:6px;font:950 30px/1 var(--mono);
+    letter-spacing:-1.5px;color:rgba(85,184,255,.12);pointer-events:none}
+  .road-card:hover{transform:translateY(-3px);border-color:rgba(85,184,255,.42);box-shadow:0 14px 34px rgba(0,0,0,.3)}
+  .road-card.hot{border-color:rgba(38,230,194,.34);background:radial-gradient(240px 110px at 20% 0,rgba(38,230,194,.08),transparent 70%),rgba(4,10,18,.6)}
+  .road-card.hot::before{color:rgba(38,230,194,.14)}
+  .road-card.hot:hover{border-color:rgba(38,230,194,.6);box-shadow:0 14px 34px rgba(0,0,0,.3),0 0 22px rgba(38,230,194,.12)}
+  .road-card .n{display:inline-flex;margin-bottom:12px;border:1px solid rgba(85,184,255,.22);border-radius:999px;padding:4px 9px;
+    font:950 9px var(--mono);letter-spacing:1.2px;color:var(--cyan);text-transform:uppercase}
+  .road-card.hot .n{color:var(--grn);border-color:rgba(38,230,194,.32)}
+  .road-card b{display:block;font:950 16px/1.14 var(--sans);letter-spacing:-.3px;color:var(--ink);padding-right:26px}
+  .road-card span{display:block;margin-top:8px;font:11px/1.5 var(--mono);color:var(--sub)}
+  .road-backlog{margin-top:16px;border-top:1px solid rgba(85,184,255,.13);padding-top:16px}
+  .road-backlog h3{font:950 11px var(--display);letter-spacing:2px;text-transform:uppercase;color:var(--cyan);margin-bottom:11px}
+  .backlog-tags{display:flex;flex-wrap:wrap;gap:7px}
+  .backlog-tags span{border:1px solid rgba(85,184,255,.14);border-radius:999px;padding:6px 10px;background:rgba(3,8,15,.34);
+    font:850 10.5px var(--mono);color:var(--sub);transition:color .15s,border-color .15s,background .15s}
+  .backlog-tags span:hover{color:var(--ink);border-color:rgba(38,230,194,.4);background:rgba(38,230,194,.06)}
+  .backlog-tags span i{font-style:normal;font-weight:950;color:var(--grn);margin-right:7px;letter-spacing:.5px}
+  /* year-by-year checklist board (docs style) */
+  .road-years{display:grid;grid-template-columns:1.25fr 1fr;gap:14px;margin-top:16px}
+  .ry-col{border:1px solid rgba(85,184,255,.14);border-radius:16px;padding:18px;background:rgba(3,8,15,.42);min-width:0}
+  .ry-col.ahead{border-color:rgba(38,230,194,.32);
+    background:radial-gradient(460px 200px at 85% -8%,rgba(38,230,194,.09),transparent 65%),rgba(3,8,15,.42)}
+  .ry-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;border-bottom:1px solid rgba(85,184,255,.14);padding-bottom:12px;margin-bottom:14px}
+  .ry-head b{font:950 clamp(24px,3vw,32px)/1 var(--display);letter-spacing:-.8px;color:var(--ink)}
+  .ry-col.ahead .ry-head b{background:linear-gradient(92deg,var(--grn),var(--cyan));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .ry-head span{font:800 9.5px var(--mono);letter-spacing:1.3px;text-transform:uppercase;color:var(--sub);text-align:right}
+  .ry-qgrid{display:grid;grid-template-columns:1fr 1fr;gap:16px 18px}
+  .ry-q{min-width:0}
+  .ry-q h4{display:flex;justify-content:space-between;align-items:baseline;gap:8px;
+    font:950 10.5px var(--mono);letter-spacing:1.5px;text-transform:uppercase;color:var(--cyan);margin-bottom:9px}
+  .ry-q h4 i{font-style:normal;font-weight:900;color:var(--grn)}
+  .ry-q ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:7px}
+  .ry-q li{position:relative;padding-left:25px;font:11.5px/1.5 var(--mono);color:var(--sub)}
+  .ry-q li::before{content:"";position:absolute;left:0;top:1px;width:14px;height:14px;border-radius:4px;
+    border:1px solid rgba(85,184,255,.35);background:rgba(85,184,255,.05)}
+  .ry-q li.ok{color:#cfe0f5}
+  .ry-q li.ok::before{content:"✓";display:grid;place-items:center;font:900 9.5px var(--mono);color:#03120f;
+    background:linear-gradient(135deg,var(--grn),var(--cyan));border-color:transparent;box-shadow:0 0 9px rgba(38,230,194,.35)}
+  .ry-col.ahead li:first-child{color:var(--ink)}
+  .ry-col.ahead li:first-child::before{border:1px solid var(--grn);animation:gatePulse 2.4s ease-out infinite}
+  .ry-col.ahead li:first-child::after{content:"UP NEXT";margin-left:8px;font:950 8px var(--mono);letter-spacing:1.2px;
+    color:var(--grn);border:1px solid rgba(38,230,194,.4);border-radius:999px;padding:2px 7px;vertical-align:1px}
+  .ry-note{font:10.5px/1.65 var(--mono);color:var(--dim);margin-top:13px;border-top:1px dashed rgba(85,184,255,.16);padding-top:11px}
+  @media(max-width:880px){.road-years{grid-template-columns:1fr}.ry-qgrid{grid-template-columns:1fr}}
+  @media(prefers-reduced-motion:reduce){.ry-col.ahead li:first-child::before{animation:none}}
+  .road-source{margin-top:13px;font:11px/1.5 var(--mono);color:var(--dim)}
+  .road-source a{color:var(--cyan);border-bottom:1px dashed rgba(85,184,255,.4)}
+  @media(max-width:980px){
+    .road-top,.road-next{grid-template-columns:1fr}
+    .road-stop-grid{grid-template-columns:1fr;gap:0}
+    .road-path{margin:18px 0 16px;padding:6px 0}
+    .road-path::before{left:16px;right:auto;top:10px;bottom:10px;width:3px;height:auto;
+      background:repeating-linear-gradient(180deg,rgba(85,184,255,.22) 0 7px,transparent 7px 14px)}
+    .road-path::after{display:none}
+    .road-stop{grid-template-columns:auto 1fr;justify-items:start;text-align:left;column-gap:14px;padding:9px 0;align-items:center}
+    .road-stop b{grid-column:2}
+    .road-stop>span:last-child{grid-column:2;margin-top:-4px}
+    .road-stop .road-dot{grid-row:1/3}
+    .road-stop span{max-width:none}
+    .road-stop.pending:nth-child(6)::before{top:50%;left:auto;right:0;transform:translateY(-50%)}
+  }
+  @media(prefers-reduced-motion:reduce){
+    .road-meter span,.road-path::after{animation:none}
+    .road-stop.pending:nth-child(6) .road-dot{animation:none;box-shadow:0 0 14px rgba(38,230,194,.35)}
+    .road-card,.road-card:hover{transform:none;transition:none}
+  }
 
   /* ---- live accrual + beating logo ---- */
   .live-card{display:grid;grid-template-columns:auto 1fr;gap:22px;align-items:center;margin-bottom:22px;
@@ -897,18 +909,28 @@
   .ph-sub b{color:var(--grn)}
   @media(max-width:620px){.peers-hero{flex-direction:column;align-items:flex-start;gap:8px}}
 
-  .rank-list{display:flex;flex-direction:column;gap:7px;margin-top:6px}
-  .rk{display:grid;grid-template-columns:26px 1.4fr 3fr auto;align-items:center;gap:12px;padding:7px 4px;border-radius:8px}
+  .peers-combined{overflow:hidden}
+  .peer-layout{display:grid;grid-template-columns:minmax(360px,.72fr) minmax(540px,1.28fr);gap:18px;align-items:start}
+  .peer-rank-hero{display:grid;grid-template-columns:auto 1fr;gap:14px;align-items:center;margin:8px 0 12px;padding:12px;border:1px solid rgba(34,230,160,.22);border-radius:14px;background:rgba(34,230,160,.04)}
+  .peer-rank-hero .ph-rank{font-size:clamp(48px,5.5vw,76px)}
+  .peer-rank-hero .ph-title{font-size:clamp(18px,2vw,24px)}
+  .peer-rank-hero .ph-sub{font-size:11px;line-height:1.45}
+  .mini-head{font:950 9.5px var(--mono);letter-spacing:1.4px;text-transform:uppercase;color:var(--sub);margin:4px 0 8px}
+  .rank-list{display:flex;flex-direction:column;gap:5px;margin-top:6px}
+  .rk{display:grid;grid-template-columns:22px minmax(118px,1.2fr) minmax(82px,.9fr) auto;align-items:center;gap:8px;padding:5px 7px;border-radius:8px}
   .rk.me{background:linear-gradient(90deg,rgba(34,230,160,.12),transparent);box-shadow:inset 0 0 0 1px rgba(34,230,160,.35)}
   .rk .rk-i{font:700 12px var(--mono);color:var(--dim);text-align:right}
   .rk.me .rk-i{color:var(--grn)}
   .rk .rk-n{font:600 13px var(--mono);color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .rk-logo{width:19px;height:19px;border-radius:6px;object-fit:cover;vertical-align:-4px;margin-right:9px;background:#0a0e1a;display:inline-block}
+  .rk-logo.ph{background:linear-gradient(135deg,#1b2536,#0f1826)}
   .rk.me .rk-n{color:var(--grn);font-weight:800}
-  .rk .rk-bar{height:16px;border-radius:5px;background:#16202f;position:relative;overflow:hidden}
+  .rk .rk-bar{height:10px;border-radius:999px;background:#16202f;position:relative;overflow:hidden}
   .rk .rk-bar>i{position:absolute;left:0;top:0;bottom:0;border-radius:5px;background:linear-gradient(90deg,#25406b,#3f74c9)}
   .rk.me .rk-bar>i{background:linear-gradient(90deg,var(--grn),var(--cyan));box-shadow:0 0 14px rgba(34,230,160,.5)}
   .rk .rk-v{font:700 12.5px var(--mono);color:var(--sub);text-align:right;white-space:nowrap}
   .rk.me .rk-v{color:var(--ink)}
+  @media(max-width:1180px){.peer-layout{grid-template-columns:1fr}.rk{grid-template-columns:22px minmax(140px,1fr) minmax(120px,.8fr) auto}}
 
   .soon-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;margin-top:6px}
   .soon-card{position:relative;background:var(--panel);border:1px dashed var(--line);border-radius:13px;padding:16px;overflow:hidden}
@@ -917,6 +939,113 @@
     color:var(--vio);border:1px solid rgba(139,108,255,.4);border-radius:20px;padding:2px 8px}
   .soon-t{font:700 15px var(--sans)}
   .soon-d{font:11.5px var(--mono);color:var(--sub);margin-top:8px;line-height:1.6}
+
+  /* ---- head-to-head: Variational vs Lighter ---- */
+  .h2h-head{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:14px;margin:14px 0 18px}
+  .h2h-side b{display:block;font:950 clamp(19px,2.6vw,26px) var(--display);letter-spacing:-.4px;color:var(--ink)}
+  .h2h-side span{display:block;margin-top:4px;font:10.5px var(--mono);color:var(--sub)}
+  .h2h-side.var b{background:linear-gradient(92deg,var(--grn),var(--cyan));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .h2h-side.ltr{text-align:right}
+  .h2h-side.ltr b{color:#7fa8e8}
+  .h2h-vs{font:950 12px var(--mono);letter-spacing:2px;color:var(--dim);border:1px solid var(--line);border-radius:999px;padding:7px 12px}
+  .h2h-rows{overflow-x:auto}
+  .cmp-logo{width:18px;height:18px;border-radius:5px;object-fit:contain;vertical-align:-4px;margin-right:7px;background:#0a0e1a}
+  .cmp-logo.lg{width:28px;height:28px;border-radius:8px;vertical-align:-6px;margin-right:9px}
+  .rev-callout .big .bva{background:linear-gradient(92deg,#eafff6,var(--grn),var(--cyan));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .rev-callout .big .bli{color:#7fa8e8;-webkit-text-fill-color:#7fa8e8}
+  .rev-callout .big em{font-style:normal;font-weight:600;font-size:.55em;color:var(--dim);-webkit-text-fill-color:var(--dim);margin:0 8px;vertical-align:6px}
+  .lead{font:800 10.5px var(--mono);padding:3px 9px;border-radius:999px;white-space:nowrap}
+  .lead.var{color:var(--grn);border:1px solid rgba(34,230,160,.35);background:rgba(34,230,160,.06)}
+  .lead.ltr{color:#7fa8e8;border:1px solid rgba(85,144,232,.4);background:rgba(63,116,201,.08)}
+  .h2h-tbl{width:100%;min-width:560px;border-collapse:collapse;font:12px var(--mono)}
+  .h2h-tbl th{font:950 9.5px var(--mono);letter-spacing:1.4px;text-transform:uppercase;color:var(--sub);
+    text-align:right;padding:10px 12px;border-bottom:1px solid rgba(85,184,255,.2)}
+  .h2h-tbl th:first-child{text-align:left}
+  .h2h-tbl th.cva{color:var(--grn)} .h2h-tbl th.cli{color:#7fa8e8}
+  .h2h-tbl td{padding:13px 12px;border-bottom:1px solid rgba(27,37,54,.6);text-align:right;vertical-align:top;white-space:nowrap}
+  .h2h-tbl tr:last-child td{border-bottom:0}
+  .h2h-tbl td:first-child{text-align:left;font:800 11px var(--mono);letter-spacing:1px;text-transform:uppercase;color:var(--ink);white-space:normal}
+  .h2h-tbl td b{font:800 14.5px var(--mono);letter-spacing:-.3px;color:var(--sub)}
+  .h2h-tbl td.win b{color:var(--ink)}
+  .h2h-tbl td.win.cva b{color:var(--grn);text-shadow:0 0 14px rgba(34,230,160,.3)}
+  .h2h-tbl td.win.cli b{color:#7fa8e8;text-shadow:0 0 14px rgba(85,144,232,.3)}
+  .h2h-tbl td .sub{display:block;font:9.5px var(--mono);color:var(--dim);margin-top:4px;white-space:nowrap}
+  .h2h-tbl tbody tr:hover td{background:rgba(56,225,255,.03)}
+  .h2h-head.three{grid-template-columns:1fr auto 1fr auto 1fr}
+  .h2h-side.mid{text-align:center}
+  .h2h-side.chl{text-align:right}
+  .h2h-side.chl b{color:var(--amber)}
+  .h2h-tbl th.chl{color:var(--amber)}
+  .h2h-tbl td.win.chl b{color:var(--amber);text-shadow:0 0 14px rgba(255,181,71,.3)}
+  .lead.chl{color:var(--amber);border:1px solid rgba(255,181,71,.4);background:rgba(255,181,71,.07)}
+  @media(max-width:640px){.h2h-head.three{grid-template-columns:1fr}.h2h-side.mid,.h2h-side.chl{text-align:left}}
+  .king-frame{display:grid;gap:12px;margin:6px 0 16px}
+  .king-card{display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:center;padding:14px 0 16px;border-bottom:1px solid rgba(255,181,71,.22)}
+  .king-crown{display:grid;place-items:center;width:42px;height:42px;border-radius:50%;border:1px solid rgba(255,181,71,.34);color:var(--amber);font:950 18px var(--mono);background:rgba(255,181,71,.06)}
+  .king-card b{display:flex;align-items:center;font:950 clamp(24px,3.2vw,36px)/1 var(--display);letter-spacing:-.8px;color:var(--amber)}
+  .king-card span{display:block;margin-top:6px;font:12.5px/1.45 var(--mono);color:var(--sub)}
+  .king-score{display:grid;grid-template-columns:repeat(3,minmax(86px,1fr));gap:10px;min-width:300px}
+  .king-score div{border-left:1px solid rgba(85,184,255,.12);padding-left:12px}
+  .king-score strong{display:block;font:950 18px/1 var(--mono);color:#eaf1ff;letter-spacing:-.4px}
+  .king-score small{display:block;margin-top:5px;font:10.5px/1.25 var(--mono);letter-spacing:.8px;text-transform:uppercase;color:var(--dim)}
+  .challenger-duel{display:grid;grid-template-columns:1fr auto 1fr;gap:14px;align-items:stretch}
+  .challenger{display:grid;gap:10px;padding:0 0 13px;border-bottom:1px solid rgba(85,184,255,.14)}
+  .challenger.var{border-color:rgba(38,230,194,.28)}
+  .challenger-name{display:flex;align-items:center;justify-content:space-between;gap:10px}
+  .challenger-name b{display:flex;align-items:center;font:950 clamp(20px,2.5vw,29px)/1 var(--display);letter-spacing:-.5px}
+  .challenger.var .challenger-name b{background:linear-gradient(92deg,var(--grn),var(--cyan));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .challenger.ltr .challenger-name b{color:#7fa8e8}
+  .challenger-name span{font:950 9.5px/1 var(--mono);letter-spacing:1.2px;text-transform:uppercase;color:var(--dim)}
+  .challenger-thesis{font:12.5px/1.55 var(--mono);color:var(--sub)}
+  .challenger-thesis b{color:var(--ink)}
+  .challenger.var .challenger-thesis b{color:var(--grn)}
+  .duel-vs{display:grid;place-items:center;color:var(--dim);font:950 11px var(--mono);letter-spacing:1.8px;text-transform:uppercase}
+  .valuation-strip{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:2px 0 14px}
+  .valuation-strip div{padding:11px 0;border-bottom:1px solid rgba(85,184,255,.12)}
+  .valuation-strip b{display:block;font:950 clamp(18px,2vw,25px)/1 var(--mono);letter-spacing:-.6px;color:var(--grn)}
+  .valuation-strip span{display:block;margin-top:6px;font:12px/1.35 var(--mono);color:var(--sub)}
+  @media(max-width:900px){
+    .king-card{grid-template-columns:1fr}
+    .king-crown{display:none}
+    .king-score{min-width:0}
+    .challenger-duel,.valuation-strip{grid-template-columns:1fr}
+    .duel-vs{display:none}
+  }
+  /* money-flow split panel */
+  .rev-callout{display:block;padding:18px 20px}
+  .fs-title{font:950 11px var(--mono);letter-spacing:1.8px;text-transform:uppercase;color:var(--sub);margin-bottom:14px}
+  .fs-grid{display:grid;grid-template-columns:1.15fr 1fr;gap:22px}
+  @media(max-width:720px){.fs-grid{grid-template-columns:1fr}}
+  .fs-h{font:800 12px var(--mono);letter-spacing:.5px;color:var(--ink);margin-bottom:10px}
+  .fs-big{font:950 clamp(30px,4.4vw,44px)/1 var(--mono);letter-spacing:-1.5px}
+  .fs-big.grn{background:linear-gradient(92deg,#eafff6,var(--grn),var(--cyan));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .fs-big.bl{color:#7fa8e8}
+  .fs-sub{font:11.5px var(--mono);color:var(--sub);margin:7px 0 12px}
+  .fs-bar{display:flex;height:14px;border-radius:999px;overflow:hidden;background:#0d1522;margin-bottom:12px}
+  .fs-bar .olp{background:linear-gradient(90deg,#1f8c66,var(--grn))}
+  .fs-bar .tre{background:linear-gradient(90deg,var(--cyan),#8fd7ff);box-shadow:0 0 12px rgba(56,225,255,.5)}
+  .fs-bar .lir{background:linear-gradient(90deg,#2c4c7f,#3f74c9)}
+  .fs-row{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:7px 0;border-top:1px solid rgba(27,37,54,.7)}
+  .fs-row span{font:11.5px var(--mono);color:var(--sub)}
+  .fs-row b{font:800 17px var(--mono);letter-spacing:-.4px;color:var(--ink);white-space:nowrap}
+  .fs-row b.g{color:var(--grn)} .fs-row b.v{color:var(--vio)} .fs-row b.b{color:#7fa8e8}
+  .fs-row.dim span,.fs-row.dim b{color:var(--dim)}
+  .h2h-track{position:relative;display:flex;height:26px;border-radius:8px;overflow:hidden;background:#0d1522}
+  .h2h-track .va{background:linear-gradient(90deg,var(--grn),var(--cyan));box-shadow:0 0 16px rgba(34,230,160,.3)}
+  .h2h-track .li{background:linear-gradient(90deg,#2c4c7f,#3f74c9)}
+  .h2h-track .zero{flex:1;background:repeating-linear-gradient(135deg,#0d1522 0 8px,#111c2d 8px 16px)}
+  .h2h-vals{display:flex;justify-content:space-between;gap:10px;margin-top:6px;font:800 12.5px var(--mono)}
+  .h2h-vals .v1{color:var(--grn)} .h2h-vals .v2{color:#7fa8e8}
+  .h2h-vals small{font:10px var(--mono);color:var(--dim);font-weight:600;margin-left:6px}
+  .h2h-note{margin-top:16px;border-top:1px solid rgba(85,184,255,.12);padding-top:12px;font:11px/1.65 var(--mono);color:var(--dim)}
+  .h2h-note a{color:var(--cyan);border-bottom:1px dashed rgba(56,225,255,.4)}
+  .rev-callout{display:flex;flex-wrap:wrap;align-items:center;gap:12px 22px;margin-top:14px;border:1px solid rgba(34,230,160,.28);
+    border-radius:14px;padding:14px 16px;background:radial-gradient(420px 140px at 8% 0,rgba(34,230,160,.1),transparent 65%),var(--panel)}
+  .rev-callout .big{font:950 clamp(24px,3.4vw,34px)/1 var(--mono);letter-spacing:-1px;
+    background:linear-gradient(92deg,#eafff6,var(--grn),var(--cyan));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .rev-callout .txt{font:11.5px/1.6 var(--mono);color:var(--sub);max-width:56ch}
+  .rev-callout .txt b{color:var(--grn)}
+  @media(max-width:640px){.h2h-head{grid-template-columns:1fr;gap:6px}.h2h-side.ltr{text-align:left}.h2h-vs{display:none}}
 
   /* ---- distance to HL ---- */
 
@@ -937,7 +1066,19 @@
   .pts-in input{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px;color:var(--ink);font:800 18px var(--mono);width:100%}
   .pts-share{font:900 clamp(28px,4vw,48px)/1 var(--mono);letter-spacing:-1px;color:var(--grn)}
   .pts-fdv{font:900 clamp(44px,8vw,82px)/.9 var(--mono);letter-spacing:-2px;color:#ff9f70;text-align:right}
-  .pts-slider{width:100%;accent-color:var(--grn)}
+  .fdv-control{border:1px solid rgba(85,184,255,.34);border-radius:14px;padding:13px 14px;background:rgba(85,184,255,.055)}
+  .fdv-head{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin-bottom:12px}
+  .fdv-title{font:900 10px/1 var(--mono);letter-spacing:1.7px;text-transform:uppercase;color:var(--cyan)}
+  .fdv-title span{display:block;margin-top:6px;font:700 11px/1.35 var(--mono);letter-spacing:.2px;text-transform:none;color:var(--sub)}
+  .fdv-action{display:inline-flex;align-items:center;gap:7px;border:1px solid rgba(85,184,255,.42);border-radius:999px;padding:7px 10px;color:var(--ink);background:rgba(85,184,255,.09);font:900 9px/1 var(--mono);letter-spacing:1.1px;text-transform:uppercase;white-space:nowrap}
+  .fdv-action::before{content:"↔";display:grid;place-items:center;width:18px;height:18px;border-radius:999px;background:var(--cyan);color:#04111c;font:950 12px/1 var(--mono)}
+  .pts-slider{width:100%;height:26px;appearance:none;-webkit-appearance:none;background:transparent;cursor:pointer}
+  .pts-slider::-webkit-slider-runnable-track{height:12px;border-radius:999px;background:linear-gradient(90deg,#4d90ff 0%,#55b8ff 58%,#8fd7ff 100%);border:1px solid rgba(143,215,255,.72);box-shadow:0 0 18px rgba(85,184,255,.28)}
+  .pts-slider::-webkit-slider-thumb{-webkit-appearance:none;width:28px;height:28px;margin-top:-9px;border-radius:50%;background:#07101f;border:3px solid var(--cyan);box-shadow:0 0 0 6px rgba(85,184,255,.14),0 0 20px rgba(85,184,255,.55)}
+  .pts-slider:focus-visible{outline:none}
+  .pts-slider:focus-visible::-webkit-slider-thumb{box-shadow:0 0 0 8px rgba(85,184,255,.24),0 0 24px rgba(85,184,255,.7)}
+  .pts-slider::-moz-range-track{height:12px;border-radius:999px;background:linear-gradient(90deg,#4d90ff 0%,#55b8ff 58%,#8fd7ff 100%);border:1px solid rgba(143,215,255,.72);box-shadow:0 0 18px rgba(85,184,255,.28)}
+  .pts-slider::-moz-range-thumb{width:24px;height:24px;border-radius:50%;background:#07101f;border:3px solid var(--cyan);box-shadow:0 0 0 6px rgba(85,184,255,.14),0 0 20px rgba(85,184,255,.55)}
   .pts-outs{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}
   .pts-card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px;text-align:center}
   .pts-card b{display:block;font:900 20px var(--mono);color:var(--ink)}
@@ -999,7 +1140,7 @@
   .tlog-d{display:none}
 
   /* ---- 수식 / math block ---- */
-  .math var{font:italic 600 15px 'Fraunces',Georgia,'Times New Roman',serif;color:var(--cyan);letter-spacing:.2px}
+  .math var{font:500 15px var(--sans);color:var(--cyan);letter-spacing:.2px}
   .math-legend{display:flex;flex-wrap:wrap;gap:8px 14px;margin:2px 0 16px}
   .math-legend .lg{font:12px var(--mono);color:var(--sub);border:1px solid var(--line);border-radius:8px;padding:6px 11px;display:inline-flex;align-items:center;gap:7px}
   .math-legend .lg b{color:var(--ink);font-weight:700}
@@ -1011,9 +1152,9 @@
     padding:12px 4px;border-top:1px solid rgba(27,37,54,.55)}
   .eq:first-child{border-top:0}
   .eq-n{font:12.5px var(--mono);color:var(--sub)}
-  .eq-f{font:15px 'Fraunces',Georgia,serif;color:var(--ink);white-space:nowrap;display:flex;align-items:center;gap:6px;justify-self:end}
+  .eq-f{font:500 15px var(--sans);color:var(--ink);white-space:nowrap;display:flex;align-items:center;gap:6px;justify-self:end}
   .eq-f sub{font-size:.62em;color:var(--dim);font-family:var(--mono)}
-  .eq-eq{color:var(--dim);text-align:center;font:16px 'Fraunces',serif}
+  .eq-eq{color:var(--dim);text-align:center;font:500 16px var(--sans)}
   .eq-v{font:800 16px var(--mono);letter-spacing:-.4px;justify-self:end;white-space:nowrap;
     background:linear-gradient(92deg,#eafff6,var(--grn));-webkit-background-clip:text;background-clip:text;color:transparent}
   .frac{display:inline-flex;flex-direction:column;text-align:center;vertical-align:middle;line-height:1.05;margin:0 2px}
@@ -1024,29 +1165,262 @@
   .unit-eq .ue.burn{border-color:rgba(139,108,255,.4)} .unit-eq .ue.burn b{color:var(--vio)}
   .unit-eq .ue-plus{color:var(--dim);font-weight:700}
   @media(max-width:640px){.eq{grid-template-columns:1fr auto;row-gap:6px}.eq-eq{display:none}.eq-f{justify-self:start}.eq-v{grid-column:2}}
-</style>
-<style>
-/* compatibility for newer local sections, styled in the deployed dashboard language */
-.comp-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:12px}
-.comp-card{border:1px solid var(--line);border-radius:12px;background:var(--panel);padding:14px}
-.comp-card.me{border-color:rgba(34,230,160,.42);background:rgba(34,230,160,.045)}
-.comp-k{font:950 9px/1 var(--mono);letter-spacing:1.4px;text-transform:uppercase;color:var(--sub)}
-.comp-v{margin-top:8px;font:950 clamp(22px,2.5vw,34px)/.92 var(--mono);letter-spacing:-1.3px;color:var(--ink)}
-.comp-card.me .comp-v{color:var(--grn)}
-.comp-s,.comp-note{margin-top:8px;font:11px/1.5 var(--mono);color:var(--sub)}
-.comp-note b{color:var(--grn)}
-.roadmap-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px;margin-top:12px}
-.road-item{border:1px solid var(--line);border-radius:13px;background:var(--panel);padding:14px;min-height:128px}
-.road-item.done{border-color:rgba(34,230,160,.34);background:rgba(34,230,160,.045)}
-.road-item.next{border-color:rgba(85,184,255,.34)}
-.road-top{display:flex;align-items:center;justify-content:space-between;gap:10px}
-.road-q{font:950 10px var(--mono);letter-spacing:1.4px;text-transform:uppercase;color:var(--cyan)}
-.road-status{border:1px solid var(--line);border-radius:999px;padding:5px 8px;font:900 8px/1 var(--mono);letter-spacing:.9px;text-transform:uppercase;color:var(--sub)}
-.road-item.done .road-status{background:var(--grn);color:#05201c;border-color:transparent}
-.road-t{margin-top:12px;font:850 15px/1.2 var(--sans);color:var(--ink)}
-.road-d{margin-top:8px;font:11px/1.5 var(--mono);color:var(--sub)}
-@media(max-width:980px){.comp-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:560px){.comp-grid{grid-template-columns:1fr}}
+
+  /* ---- hierarchy cleanup: only major sections get boxes ---- */
+  .chg,
+  .formula-card,
+  .ra-step,
+  .ef-node,
+  .er,
+  .pm-node,
+  .pm-metric,
+  .pm-balance,
+  .pm-cap span,
+  .source-pair div,
+  .spread-slice,
+  .circuit-node,
+  .flow-node,
+  .road-stat,
+  .road-card,
+  .ry-col,
+  .cal-money-row,
+  .cal-flow-mini div,
+  .macro-box,
+  .play,
+  .unit-eq .ue{
+    background:transparent!important;
+    border-color:rgba(85,184,255,.10)!important;
+    box-shadow:none!important;
+  }
+  .formula-card,
+  .er,
+  .pm-metric,
+  .pm-balance,
+  .source-pair div,
+  .cal-money-row,
+  .cal-flow-mini div,
+  .macro-box,
+  .play,
+  .unit-eq .ue{
+    border-width:0 0 1px!important;
+    border-radius:0!important;
+    padding-left:0!important;
+    padding-right:0!important;
+  }
+  .chg{
+    border-width:0 0 1px!important;
+    border-radius:0!important;
+    padding:13px 2px 14px!important;
+  }
+  .chg::before,
+  .ef-node::before,
+  .reverse-audit::before,
+  .spread-circuit::before,
+  .flow-arrow::before,
+  .flow-arrow::after,
+  .road-card::before{
+    display:none!important;
+  }
+  .formula-strip,
+  .eff-ratios,
+  .eff-ratios.unit-core,
+  .pm-metrics,
+  .source-pair{
+    gap:18px!important;
+  }
+  .reverse-audit,
+  .eff-daily-cal,
+  .spread-circuit,
+  .road-journey,
+  .road-progress,
+  .pm-panel{
+    background:rgba(3,8,15,.18)!important;
+    border-color:rgba(85,184,255,.18)!important;
+    box-shadow:none!important;
+  }
+  .reverse-audit,
+  .eff-daily-cal,
+  .spread-circuit,
+  .pm-panel{
+    border-radius:12px!important;
+  }
+  .eff-funnel,
+  .spread-flow,
+  .circuit-grid,
+  .flow-map{
+    gap:18px!important;
+  }
+  .ef-arrow,
+  .spread-arrow,
+  .flow-arrow,
+  .pm-arrow,
+  .ra-step:not(:last-child)::after,
+  .ladder .ms:not(:last-child)::after{
+    opacity:.42;
+    text-shadow:none!important;
+  }
+  .card{
+    box-shadow:none!important;
+  }
+  .card::before{
+    opacity:.42;
+  }
+  .card h2 .tag,
+  .badge,
+  .eff-window-tabs,
+  .seg,
+  .zoom-controls{
+    background:rgba(3,8,15,.36)!important;
+    box-shadow:none!important;
+  }
+  .cal-cell,
+  .edc-cell{
+    box-shadow:none!important;
+  }
+  .cal-cell.empty,
+  .edc-cell.empty,
+  .edc-cell.no-data{
+    background:transparent!important;
+  }
+  .protocol-map .pm-panel{
+    display:grid!important;
+    grid-template-columns:minmax(0,1.08fr) minmax(430px,.92fr);
+    grid-template-areas:
+      "title title"
+      "flow caps"
+      "flow metrics";
+    gap:10px 18px;
+    align-items:start;
+  }
+  .protocol-map .pm-title{grid-area:title;margin-bottom:0!important}
+  .protocol-map .pm-sankey{grid-area:flow;width:100%!important;height:auto!important;max-height:285px!important;margin:0!important}
+  .protocol-map .pm-cap{grid-area:caps;grid-template-columns:1fr!important;margin-top:0!important;gap:6px!important}
+  .protocol-map .pm-metrics{grid-area:metrics;grid-template-columns:repeat(2,minmax(0,1fr))!important;margin-top:0!important;gap:10px 16px!important}
+  .protocol-map .pm-cap span{padding-top:0!important;padding-bottom:7px!important}
+  .protocol-map .pm-metric{padding-top:4px!important;padding-bottom:9px!important}
+  @media(max-width:1100px){
+    .protocol-map .pm-panel{
+      grid-template-columns:1fr;
+      grid-template-areas:"title" "flow" "metrics" "caps";
+    }
+    .protocol-map .pm-sankey{max-height:260px!important}
+  }
+  @media(max-width:680px){
+    .protocol-map .pm-metrics{grid-template-columns:1fr!important}
+  }
+  /* readability lift: explanatory copy should not feel like fine print */
+  .card .cap,
+  .flow-note,
+  .pm-cap,
+  .pm-note,
+  .pm-node span,
+  .pm-metric .pm-formula,
+  .road-copy,
+  .road-card span,
+  .ry-q li,
+  .ry-note,
+  .road-source,
+  .edc-title span,
+  .edc-foot,
+  .formula-card .f,
+  .ra-f,
+  .er-l,
+  .eff-note,
+  .circuit-node .d,
+  .flow-caption,
+  .spread-slice .d,
+  .fr-chart-head span,
+  .h2h-note,
+  .fs-sub,
+  .mf{
+    font-size:12.5px!important;
+    line-height:1.55!important;
+  }
+  .pm-cap{
+    font-size:12.5px!important;
+  }
+  .pm-cap span{
+    line-height:1.52!important;
+  }
+  .pm-cap a,
+  .pm-node code{
+    font-size:12px!important;
+  }
+  .pm-metric span,
+  .pm-balance span,
+  .formula-card .k,
+  .ra-k,
+  .ef-k,
+  .er-note,
+  .unit-core .er-note,
+  .source-pair span,
+  .spread-slice .k,
+  .fr-read b,
+  .edc-week span,
+  .cal-weekdays span,
+  .road-stat span,
+  .road-card .n,
+  .backlog-tags span{
+    font-size:10.5px!important;
+  }
+  .badge,
+  .card h2 .tag,
+  .eff-window-tabs button,
+  .seg button,
+  .zoom-controls button,
+  .tabs button .em{
+    font-size:11px!important;
+  }
+  table,
+  .h2h-tbl,
+  .tlog-list,
+  .eq-n,
+  .unit-eq{
+    font-size:13px!important;
+  }
+  .cal-money-row .tz,
+  .cal-flow-mini span,
+  .edc-meta,
+  .cal-sel .lab{
+    font-size:11.5px!important;
+    line-height:1.35!important;
+  }
+  .hist-split{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+    gap:20px;
+    align-items:start;
+    margin-top:12px;
+  }
+  .hist-pane{
+    min-width:0;
+    padding-top:2px;
+  }
+  .hist-pane + .hist-pane{
+    border-left:1px solid rgba(85,184,255,.14);
+    padding-left:20px;
+  }
+  .hist-pane h3{
+    font:950 13px/1 var(--display);
+    letter-spacing:1.5px;
+    text-transform:uppercase;
+    color:var(--ink);
+    margin-bottom:8px;
+  }
+  .hist-inline-table{
+    margin-top:14px!important;
+    max-height:300px!important;
+    border-top:1px solid rgba(85,184,255,.14);
+    padding-top:8px;
+  }
+  .hist-health #foiChart,
+  .hist-health #velo{
+    height:clamp(250px,22vw,340px);
+  }
+  @media(max-width:980px){
+    .hist-split{grid-template-columns:1fr}
+    .hist-pane + .hist-pane{border-left:0;border-top:1px solid rgba(85,184,255,.14);padding-left:0;padding-top:18px}
+  }
 </style>
 </head>
 <body>
@@ -1060,6 +1434,17 @@
       <a href="https://arbiscan.io/address/0x5e91b40467fb8902c46a7b6cb90482363188d645#tokentxns" target="_blank">0x5e91…d645 ↗</a>
       <span class="badge" id="resetBadge">Daily reset 00:00 ET</span>
       <span class="badge" id="rangeBadge">—</span>
+    </div>
+    <div class="top-ref" role="region" aria-label="Variational referral code">
+      <span class="top-ref-mark"><img src="variational-logo.png" alt=""></span>
+      <button class="top-ref-copy" id="refCodeCopy" type="button" data-code="OMNIKOREAN" aria-label="Copy referral code OMNIKOREAN">
+        <span class="top-ref-label">Ref</span>
+        <span class="top-ref-code">OMNIKOREAN</span>
+      </button>
+      <div class="top-ref-actions">
+        <button class="top-ref-btn" id="refCopyBtn" type="button">Copy</button>
+        <a class="top-ref-link" href="https://omni.variational.io/?ref=OMNIKOREAN" target="_blank" rel="noopener">Open ↗</a>
+      </div>
     </div>
   </div>
   </div>
@@ -1084,12 +1469,138 @@
 
 <nav class="tabs" id="tabs" role="tablist" aria-label="Dashboard sections">
   <button id="tab-overview" type="button" role="tab" aria-selected="true" data-tab="overview" class="on">Overview</button>
-  <button id="tab-efficiency" type="button" role="tab" aria-selected="false" data-tab="efficiency">Earnings / Revenue</button>
+  <button id="tab-implied" type="button" role="tab" aria-selected="false" data-tab="implied">Mechanic</button>
+  <button id="tab-historical" type="button" role="tab" aria-selected="false" data-tab="historical">Historical Data</button>
+  <button id="tab-efficiency" type="button" role="tab" aria-selected="false" data-tab="efficiency">Variational Revenue</button>
+  <button id="tab-roadmap" type="button" role="tab" aria-selected="false" data-tab="roadmap">Roadmap</button>
   <button id="tab-points" type="button" role="tab" aria-selected="false" data-tab="points">Points</button>
-  <button id="tab-comparison" type="button" role="tab" aria-selected="false" data-tab="comparison">Comparison <span class="tab-new">#3</span></button>
+  <button id="tab-comparison" type="button" role="tab" aria-selected="false" data-tab="comparison">Comparison <span class="tab-new">#5</span></button>
 </nav>
 
 <main id="main">
+
+<div class="card roadmap tsec tg-hide" data-tg="roadmap">
+  <h2>Roadmap Tracker <span class="tag">to the promise land</span></h2>
+  <div class="cap">A clean read of the official Variational roadmap: what has shipped, where the project is on the path, and what gates are still ahead.</div>
+  <div class="road-journey">
+    <div class="road-top">
+      <div>
+        <div class="road-eyebrow">Current journey</div>
+        <div class="road-big"><b>63%</b> of the listed path shipped</div>
+        <div class="road-copy">Every dated item from Q1 2025 through Q4 2025 is checked off in the docs, plus five undated items already shipped (read-only API, mobile, CSV exports, RWA Phase 1, portfolio analytics). Eleven undated items remain — in docs order, from Omni v3 all the way to Variational Pro.</div>
+      </div>
+      <div class="road-progress" aria-label="Roadmap completion estimate">
+        <div class="road-progress-head"><strong>19/30</strong><span>listed roadmap items completed</span></div>
+        <div class="road-meter"><span style="width:63%"></span></div>
+        <div class="road-stats">
+          <div class="road-stat"><strong>4</strong><span>quarters shipped</span></div>
+          <div class="road-stat"><strong>5</strong><span>undated shipped</span></div>
+          <div class="road-stat"><strong>11</strong><span>items left</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="road-path" aria-label="Roadmap path">
+      <div class="road-stop-grid">
+        <div class="road-stop">
+          <span class="road-dot">✓</span>
+          <b>Q1 2025</b>
+          <span>Private mainnet · referral (limited)</span>
+        </div>
+        <div class="road-stop">
+          <span class="road-dot">✓</span>
+          <b>Q2 2025</b>
+          <span>Leaderboard · PnL cards · referral full</span>
+        </div>
+        <div class="road-stop">
+          <span class="road-dot">✓</span>
+          <b>Q3 2025</b>
+          <span>Leverage · liq prices · TP/SL · Omni v2</span>
+        </div>
+        <div class="road-stop">
+          <span class="road-dot">✓</span>
+          <b>Q4 2025</b>
+          <span>Tighter spreads · triggers · points</span>
+        </div>
+        <div class="road-stop">
+          <span class="road-dot">✓</span>
+          <b>Undated · shipped</b>
+          <span>Read-only API · mobile · CSV · RWA P1</span>
+        </div>
+        <div class="road-stop pending">
+          <span class="road-dot">1</span>
+          <b>2026 · Omni v3</b>
+          <span>Major UI rework · isolated margin</span>
+        </div>
+        <div class="road-stop pending">
+          <span class="road-dot">2</span>
+          <b>2026 · Swaps &amp; APIs</b>
+          <span>Swaps P2–P3 · partial fills · API trading · stats</span>
+        </div>
+        <div class="road-stop pending">
+          <span class="road-dot">3</span>
+          <b>2026 · Launch era</b>
+          <span>Public mainnet · $VAR · OLP vault · Pro</span>
+        </div>
+      </div>
+    </div>
+    <div class="road-years">
+      <div class="ry-col">
+        <div class="ry-head"><b>2025</b><span>14/14 dated shipped<br>+5 undated ✓</span></div>
+        <div class="ry-qgrid">
+          <div class="ry-q"><h4>Q1 2025 <i>2/2</i></h4><ul>
+            <li class="ok">Omni private mainnet launch</li>
+            <li class="ok">Limited launch of Omni referral program</li>
+          </ul></div>
+          <div class="ry-q"><h4>Q2 2025 <i>3/3</i></h4><ul>
+            <li class="ok">Leaderboard page</li>
+            <li class="ok">PnL cards</li>
+            <li class="ok">Full launch of Omni referral program</li>
+          </ul></div>
+          <div class="ry-q"><h4>Q3 2025 <i>4/4</i></h4><ul>
+            <li class="ok">Configurable leverage</li>
+            <li class="ok">Display estimated liquidation prices</li>
+            <li class="ok">TP/SL triggers on quoted, mark, or index</li>
+            <li class="ok">Major UI rework ("Omni v2")</li>
+          </ul></div>
+          <div class="ry-q"><h4>Q4 2025 <i>5/5</i></h4><ul>
+            <li class="ok">Quoting upgrade to tighten spreads</li>
+            <li class="ok">New order type: trigger</li>
+            <li class="ok">Enabled referral reward claims</li>
+            <li class="ok">Drag &amp; drop TP/SL/Limit/Trigger on chart</li>
+            <li class="ok">Launch of the Omni points program</li>
+          </ul></div>
+          <div class="ry-q" style="grid-column:1/-1"><h4>Undated · already shipped <i>5/5</i></h4><ul>
+            <li class="ok">Enable read-only Omni API</li>
+            <li class="ok">Improved mobile experience</li>
+            <li class="ok">CSV data exports</li>
+            <li class="ok">Initial launch of RWA markets ("Phase 1")</li>
+            <li class="ok">Improved portfolio page analytics</li>
+          </ul></div>
+        </div>
+      </div>
+      <div class="ry-col ahead">
+        <div class="ry-head"><b>2026</b><span>0/11 · the road ahead</span></div>
+        <div class="ry-q"><h4>Undated backlog · docs order <i>slotted 2026</i></h4><ul>
+          <li>Major UI rework ("Omni v3")</li>
+          <li>Isolated margin</li>
+          <li>Launch swaps ("Phase 2")</li>
+          <li>Partial fills of limit orders</li>
+          <li>Enable API trading</li>
+          <li>Protocol statistics page</li>
+          <li>Enable 24/7 trading of swaps ("Phase 3")</li>
+          <li>Omni public mainnet launch</li>
+          <li>Launch of the $VAR token</li>
+          <li>Open community vault for OLP</li>
+          <li>Launch of Variational Pro</li>
+        </ul></div>
+        <div class="ry-note">The docs keep these items undated — this board slots them into 2026 as the working assumption, in the exact order the docs list them.</div>
+      </div>
+    </div>
+    <div class="road-backlog">
+      <div class="road-source">Source: <a href="https://docs.variational.io/roadmap" target="_blank" rel="noopener">Variational Docs Roadmap</a>. The docs describe this as a living roadmap, not a fixed promised timeline.</div>
+    </div>
+  </div>
+</div>
 
 <div class="flow money-flow tsec" data-tg="overview">
   <div class="step">
@@ -1112,6 +1623,37 @@
   </div>
 </div>
 <div class="flow-note tsec" data-tg="overview">Illustrative $1 spread example. This dashboard uses the current OLP docs: 10% of spreads paid to OLP flows to the protocol treasury. The percentage may be subject to change.</div>
+
+<div class="protocol-map tsec" data-tg="overview">
+  <div class="pm-panel">
+    <div class="pm-title">Protocol money map</div>
+    <svg class="pm-sankey" id="pmSankey" viewBox="0 0 720 230" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Income flow: spreads split to OLP vault and protocol treasury, treasury splits to buyback firepower and dry powder"></svg>
+    <div class="pm-cap">
+      <span><b>Core OLP Vault</b> quotes liquidity, absorbs trading flow, and keeps the OLP / LP side of spread economics — its balance is not company revenue. <a href="https://arbiscan.io/address/0x74bbbb0e7f0bad6938509dd4b556a39a4db1f2cd" target="_blank" rel="noopener">0x74bbbb…1f2cd ↗</a></span>
+      <span><b>Revenue cut</b> — current docs model: <b id="pmSpreadTotal">—</b> implied spread payments, of which 10% flows to Variational as protocol revenue (subject to change).</span>
+      <span><b>Protocol Treasury</b> — USDC actually accumulated on-chain; the cleanest measurable “company earns” number. <a href="https://arbiscan.io/address/0x5e91b40467fb8902c46a7b6cb90482363188d645" target="_blank" rel="noopener">0x5e91…d645 ↗</a></span>
+      <span><b>Settlement Pool Factory</b> creates settlement pools. It is infrastructure, not a direct revenue wallet. <a href="https://arbiscan.io/address/0x0F820B9afC270d658a9fD7D16B1Bdc45b70f074C" target="_blank" rel="noopener">0x0F820…074C ↗</a></span>
+    </div>
+    <div class="pm-metrics">
+      <div class="pm-metric">
+        <strong id="pmOlpBalance">syncing</strong><span>Core OLP Vault USDC</span>
+        <small class="pm-formula" id="pmOlpFormula">Formula: <b>USDC balanceOf(Core OLP Vault)</b></small>
+      </div>
+      <div class="pm-metric">
+        <strong id="pmTreasuryTotal">—</strong><span>treasury accumulated</span>
+        <small class="pm-formula" id="pmTreasuryFormula">Formula: <b>USDC balanceOf(Protocol Treasury)</b></small>
+      </div>
+      <div class="pm-metric">
+        <strong id="pmDailyRevenue">—</strong><span>30D avg revenue / day</span>
+        <small class="pm-formula" id="pmDailyFormula">Formula: <b>(today treasury - treasury 30D ago) / 30</b></small>
+      </div>
+      <div class="pm-metric">
+        <strong id="pmFeesTotal">—</strong><span>implied total spreads</span>
+        <small class="pm-formula" id="pmFeesFormula">Formula: <b>treasury accumulated / 10% revenue cut</b></small>
+      </div>
+    </div>
+  </div>
+</div>
 
 <div class="live-card tsec" data-tg="overview">
   <div class="money-rain" id="rain"></div>
@@ -1144,8 +1686,8 @@
 <div class="note tsec" id="note" data-tg="overview"></div>
 
 <div class="card eff tsec tg-hide" data-tg="efficiency">
-  <h2>Wallet Revenue Engine <span class="tag">treasury inflow · fees · bps</span></h2>
-  <div class="cap">Core question: <b>how much money is this protocol wallet actually earning, and what trading flow produces each $1?</b> Start from on-chain inflow, then back out spreads, volume, and BPS. OI is only a proxy until OLP TVL/statistics are public. <span id="effAsOf" class="muted"></span></div>
+  <h2>Growth to Hyperliquid-Level Earnings <span class="tag">health · gap · upside</span></h2>
+  <div class="cap">Core question: <b>how much bigger must Variational get to earn Hyperliquid-scale money?</b> Read this as current venue health first, formulas second. <span id="effAsOf" class="muted"></span></div>
 <div class="eff-window-tabs" id="effWindowTabs" aria-label="Fee revenue time window">
   <button type="button" class="on" data-eff-window="1d" onclick="setEffWindow('1d')">1D</button>
   <button type="button" data-eff-window="7d" onclick="setEffWindow('7d')">1W</button>
@@ -1200,22 +1742,6 @@
       </div>
     </div>
   </div>
-  <div class="eff-daily-cal" aria-label="Daily treasury revenue calendar">
-    <div class="edc-head">
-      <div class="edc-title">
-        <b id="effCalModeTitle">Daily money calendar</b>
-        <span id="effCalSub">Every tile starts from exact wallet inflow. BPS is marked as proxy when daily volume is unavailable.</span>
-      </div>
-      <div class="edc-nav">
-        <button type="button" id="effCalPrev" aria-label="Previous month">‹</button>
-        <strong id="effCalTitle">—</strong>
-        <button type="button" id="effCalNext" aria-label="Next month">›</button>
-      </div>
-    </div>
-    <div class="edc-week" aria-hidden="true"><span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span></div>
-    <div class="edc-grid" id="effDailyCal"></div>
-    <div class="edc-foot"><b>Revenue</b> is on-chain treasury inflow. <b>Fees</b> = revenue ÷ 10%. <b>BPS</b> uses selected-window avg daily volume because historical daily volume is not embedded.</div>
-  </div>
   <div class="eff-funnel">
     <div class="ef-node vol"><div class="ef-k" id="efVolLabel">Perp Volume · 1D</div><div class="ef-v" id="efVol">—</div><div class="ef-s" id="efVolSub">selected window</div></div>
     <div class="ef-arrow"><b id="efTake">—</b><span>spread take-rate</span></div>
@@ -1226,10 +1752,10 @@
   <div class="eff-ratios">
     <div class="er"><div class="er-v" id="erVolFee">—</div><div class="er-l">perp volume makes <b>$1 in fees</b></div></div>
     <div class="er"><div class="er-v" id="erVolRev">—</div><div class="er-l">volume makes <b>$1 to treasury</b></div></div>
-    <div class="er"><div class="er-v" id="erOi">—</div><div class="er-l">OI proxy for <b>$1/day</b><span class="er-note">replace with OLP TVL when available</span></div></div>
+    <div class="er"><div class="er-v" id="erOi">—</div><div class="er-l">open interest makes <b>$1/day</b></div></div>
     <div class="er"><div class="er-v" id="erTurn">—</div><div class="er-l">OI turns over <b>per day</b></div></div>
   </div>
-  <div class="eff-note">Volume and wallet BPS are the main read. OI <b id="efOi">—</b> is a capacity proxy only; OLP TVL would be the cleaner efficiency denominator once published. Current proxy yield: <b id="efYield">—</b>/yr on OI. <span class="muted">Snapshot; not financial advice.</span></div>
+  <div class="eff-note">Open interest <b id="efOi">—</b> · treasury earns <b id="efYield">—</b>/yr on that OI · take-rate holds ~flat across 24h/7d/30d → <b>fee capture scales linearly with volume</b>. <span class="muted">Snapshot; not financial advice.</span></div>
   <div class="fr-chart-head">
     <b>Is the exchange getting better at making money?</b>
     <span>Green up is good. Purple down is good. Together they show whether trading activity is turning into treasury revenue more efficiently.</span>
@@ -1242,7 +1768,7 @@
   <svg class="chart" id="frHist" viewBox="0 0 720 260"></svg>
 </div>
 
-<div class="card tsec tg-hide" data-tg="efficiency" style="margin-top:16px">
+<div class="card tsec tg-hide" data-tg="implied" style="margin-top:16px">
   <h2>Implied Spreads <span class="tag">money circuit</span></h2>
   <div class="cap">One view for the whole engine: volume creates customer spread payments, open interest shows capacity, and the current OLP docs say 10% of spreads flows into the Variational treasury.</div>
   <div class="spread-circuit">
@@ -1315,7 +1841,7 @@
   <div class="eff-note">A customer’s <b>$1.00 spread</b> now implies <b>$0.90</b> to the OLP / LP side, <b id="bbTreasuryCutNote">$0.10</b> to the Variational treasury, and <b id="bbSpreadBurnNote">$0.03</b> of buyback-burn firepower at the current <b id="bbShare">30%</b> burn floor. <span class="muted">Treasury has 0 outflows so far — this is loaded firepower, burn not yet executed on-chain.</span></div>
 </div>
 
-<div class="card math tsec tg-hide" data-tg="efficiency" style="margin-top:16px">
+<div class="card math tsec tg-hide" data-tg="implied" style="margin-top:16px">
   <h2>The Math <span class="tag">수식 · every implied number, derived</span></h2>
   <div class="cap">Only <b>2 measured inputs</b> and <b>2 protocol constants</b> drive the whole engine — every "implied" figure is one of these equations with the live value plugged in. Verify each line.</div>
   <div class="math-legend">
@@ -1358,7 +1884,7 @@
 <div class="card tsec tg-hide" data-tg="points" style="margin-top:16px">
   <h2>Points / FDV Calculator <span class="tag">airdrop scenario</span></h2>
   <div class="cap">Sep 31 does not exist, so this uses the actual campaign deadline: <b>Sep 30, 2026 at 11:59PM ET</b>. Your points ÷ total pool = share; share × FDV × airdrop allocation = estimated value.</div>
-	  <div class="pts-deadline">
+  <div class="pts-deadline">
     <div class="pts-dead-top">
       <div>
         <div class="pts-dead-k">Time left to deadline</div>
@@ -1367,27 +1893,22 @@
       <div class="pts-dead-v" id="ptsRemainPct">—</div>
     </div>
     <div class="pts-progress" aria-label="Campaign time progress"><i id="ptsProgress"></i></div>
-	    <div class="pts-dead-foot"><span><b id="ptsDonePct">—</b> elapsed</span><span id="ptsDaysLeft">—</span></div>
-	  </div>
-	  <div class="points-grid">
+    <div class="pts-dead-foot"><span><b id="ptsDonePct">—</b> elapsed</span><span id="ptsDaysLeft">—</span></div>
+  </div>
+  <div class="points-grid">
     <div class="points-controls">
       <div class="pts-row">
         <label class="pts-in">My points <input type="number" id="ptsMine" value="12000" min="0"></label>
         <label class="pts-in">Total pool <input type="number" id="ptsPool" value="9167500" min="1"></label>
       </div>
-      <div class="fdv-panel">
+      <div class="fdv-control">
         <div class="fdv-head">
           <div class="fdv-title">Adjust FDV here
-            <span>This controls the full calculator. Every output updates from this FDV scenario.</span>
+            <span id="ptsFdvLabel">74% of HYPE FDV</span>
           </div>
-          <label class="fdv-edit" aria-label="FDV in billions of dollars">
-            <input type="number" id="ptsFdvManual" min="0.001" max="67.7" step="0.1" value="50">
-            <b>B</b><small>FDV</small>
-          </label>
+          <div class="fdv-action">Drag slider</div>
         </div>
-        <div class="fdv-action"><b>Drag the logo</b><span>or type FDV above</span></div>
         <input class="pts-slider" type="range" id="ptsFdv" min="1000000" max="67700000000" step="1000000" value="50000000000">
-        <div class="fdv-help"><b id="ptsFdvLabel">74% of HYPE FDV ($67.7B)</b></div>
         <div class="fdv-presets" id="fdvPresets">
           <button type="button" class="preset" data-fdv="1000000000">$1B</button>
           <button type="button" class="preset" data-fdv="5000000000">$5B</button>
@@ -1398,12 +1919,10 @@
       </div>
       <div class="pts-share" id="ptsShare">—</div>
     </div>
-    <div class="points-output">
-      <div class="pts-scenario">
-        <div class="pts-fdv" id="ptsFdvBig">—</div>
-        <div class="pts-band" id="ptsBand">—</div>
-        <div class="pts-perpt" id="ptsPerPt">—</div>
-      </div>
+    <div>
+      <div class="pts-fdv" id="ptsFdvBig">—</div>
+      <div class="pts-band" id="ptsBand">—</div>
+      <div class="pts-perpt" id="ptsPerPt">—</div>
       <div class="pts-outs">
         <div class="pts-card"><b id="pts20">—</b><span id="ptv20">—</span><small>20% airdrop</small></div>
         <div class="pts-card base"><b id="pts25">—</b><span id="ptv25">—</span><small>25% airdrop</small></div>
@@ -1425,14 +1944,14 @@
     <div class="mrow"><span class="ms">Perp volume &amp; OI</span><span class="mf">DeFiLlama — OI live from <code>/overview/open-interest</code>; volume is a dated snapshot (DeFiLlama paywalls per-protocol volume).</span></div>
     <div class="mrow"><span class="ms">Volume → $1 spread</span><span class="mf"><code>volume_30d ÷ spreads_30d</code> where <code>spreads_30d = revenue_30d ÷ 0.10</code>. Take-rate (bps) = <code>spreads ÷ volume × 10000</code>.</span></div>
     <div class="mrow"><span class="ms">Volume → $1 burned</span><span class="mf"><code>volume_30d ÷ (revenue_30d × 0.30)</code> — burn is ≥30% of revenue.</span></div>
-    <div class="mrow"><span class="ms">OI proxy</span><span class="mf"><code>OI ÷ (revenue_30d ÷ 30)</code>. This is a capacity proxy, not the preferred efficiency denominator. Once public, OLP TVL/statistics should replace this.</span></div>
+    <div class="mrow"><span class="ms">OI → $1/day</span><span class="mf"><code>OI ÷ (revenue_30d ÷ 30)</code>. Annual yield on OI = <code>daily_rev × 365 ÷ OI</code>.</span></div>
     <div class="mrow"><span class="ms">Distance to HL</span><span class="mf"><code>(HL_metric ÷ VAR_metric − 1) × 100%</code>. Comparison tab uses Perpetual Pulse OI and volume snapshots.</span></div>
     <div class="mrow"><span class="ms">Fee per trader</span><span class="mf"><code>cumulative_fees ÷ unique_traders</code> (traders from Dune).</span></div>
     <div class="mrow"><span class="ms">Points calc</span><span class="mf"><code>my_points ÷ total_pool × FDV × airdrop_%</code>. Point value = output ÷ my_points.</span></div>
   </div>
 </div>
 
-<div class="card tsec tg-hide" data-tg="efficiency">
+<div class="card tsec tg-hide" data-tg="historical">
   <h2>Cumulative Accumulation <span class="tag" id="curveTag">—</span></h2>
   <div class="cap">Total USDC held over time — pure buyback inflow (no outflows recorded).</div>
   <div class="legend">
@@ -1452,20 +1971,36 @@
   <svg class="chart" id="curve" viewBox="0 0 720 340" preserveAspectRatio="none"></svg>
 </div>
 
-<div class="card tsec tg-hide" data-tg="efficiency" style="margin-top:16px">
-  <h2>Fees vs Open Interest <span class="tag">real history · did fees track OI?</span></h2>
-  <div class="cap">Both series are real daily data: open interest from DeFiLlama, spread payments implied from the treasury (10% of spreads). Indexed to 100 at the start so you can see which grew faster. <span class="muted">Daily perp volume is paywalled on DeFiLlama, so OI is the venue-activity yardstick here.</span></div>
-  <div class="foi-read" id="foiRead"></div>
-  <div class="legend">
-    <b><span class="sw" style="background:var(--cyan)"></span>Open interest</b>
-    <b><span class="sw act"></span>Treasury fees (30D)</b>
-    <b><span class="sw" style="background:var(--amber)"></span>OI proxy yield</b>
+<div class="card hist-health tsec tg-hide" data-tg="historical" style="margin-top:16px">
+  <h2>Historical Health <span class="tag">fees · OI · speed</span></h2>
+  <div class="cap">One read for whether the venue is getting healthier: OI/capacity, implied spread fees, and the actual daily earning speed.</div>
+  <div class="hist-split">
+    <section class="hist-pane">
+      <h3>Fees vs Open Interest</h3>
+      <div class="cap">Real daily data: OI from DeFiLlama, spread payments implied from treasury revenue ÷ 10%. Indexed to 100 at the start.</div>
+      <div class="foi-read" id="foiRead"></div>
+      <div class="legend">
+        <b><span class="sw" style="background:var(--cyan)"></span>Open interest</b>
+        <b><span class="sw act"></span>Treasury fees (30D)</b>
+        <b><span class="sw" style="background:var(--amber)"></span>Fee yield on OI</b>
+      </div>
+      <svg class="chart" id="foiChart" viewBox="0 0 720 320" preserveAspectRatio="none"></svg>
+    </section>
+    <section class="hist-pane">
+      <h3>Earning Velocity</h3>
+      <div class="cap">Not the total — the speed it earns at. A rising line means the treasury is stacking faster over time.</div>
+      <div class="velo-stats" id="veloStats"></div>
+      <div class="legend">
+        <b><span class="sw act"></span>Daily added bars</b>
+        <b><span class="sw avg"></span>7-day avg line</b>
+      </div>
+      <svg class="chart" id="velo" viewBox="0 0 720 300" preserveAspectRatio="none"></svg>
+    </section>
   </div>
-  <svg class="chart" id="foiChart" viewBox="0 0 720 320" preserveAspectRatio="none"></svg>
 </div>
 
-<div class="card tsec tg-hide" data-tg="efficiency">
-  <h2>Growth per Interval</h2>
+<div class="card tsec tg-hide" data-tg="historical">
+  <h2>Growth per Interval <span class="tag" id="tblTag">weekly</span></h2>
   <div class="cap">Switch the window to see how much stacked, how fast, and where the rolling average is bending.</div>
   <div class="seg" id="seg">
     <button type="button" data-i="day">Daily</button>
@@ -1478,22 +2013,16 @@
     <b><span class="sw avg"></span>4-period rolling avg</b>
   </div>
   <svg class="chart" id="bars" viewBox="0 0 380 230"></svg>
-</div>
-
-<div class="card velo tsec tg-hide" data-tg="efficiency" style="margin-top:16px">
-  <h2>Earning Velocity <span class="tag">7-day avg · $/day</span></h2>
-  <div class="cap">Not the total — the <b style="color:var(--ink)">speed</b> it earns at. A rising line means the treasury is stacking faster over time (accelerating).</div>
-  <div class="velo-stats" id="veloStats"></div>
-  <div class="legend">
-    <b><span class="sw act"></span>Daily added bars</b>
-    <b><span class="sw avg"></span>7-day avg line</b>
+  <div class="tbl-wrap hist-inline-table">
+    <table id="tbl"><thead><tr>
+      <th>Period</th><th>Start</th><th>End</th><th>USDC Added</th><th>Δ %</th><th>Avg / day</th>
+    </tr></thead><tbody></tbody></table>
   </div>
-  <svg class="chart" id="velo" viewBox="0 0 720 300" preserveAspectRatio="none"></svg>
 </div>
 
 <div class="card cal tsec tg-hide" data-tg="efficiency" style="margin-top:16px">
-  <h2>Total Earnings per Day <span class="tag" id="calTag">daily totals</span></h2>
-  <div class="cap">Each date box answers one question: <b>what was the completed daily total?</b> Today stays pending until the day closes, so it does not pretend a future date has already earned money.</div>
+  <h2>Total Earnings + Fee/Revenue Calendar <span class="tag" id="calTag">daily totals</span></h2>
+  <div class="cap">One calendar for the combined page: <b>completed treasury revenue</b>, implied fee flow, estimated activity, burn firepower, and market events. Today stays pending until the ET day closes.</div>
   <div class="seg" id="calSeg">
     <button type="button" data-c="day" class="on">Daily</button>
     <button type="button" data-c="week">Weekly</button>
@@ -1519,7 +2048,7 @@
     <span class="sc" style="background:rgba(34,230,160,.28)"></span>
     <span class="sc" style="background:rgba(34,230,160,.55)"></span>
     <span class="sc" style="background:rgba(34,230,160,.8)"></span>
-    <span class="sc" style="background:var(--grn)"></span>
+    <span class="sc" style="background:linear-gradient(92deg,var(--grn),var(--cyan))"></span>
     <span>more</span>
   </div>
   <div class="cal-sel" id="calSel">
@@ -1543,94 +2072,78 @@
   </div>
 </div>
 
-<div class="card fc tsec" data-tg="overview" style="margin-top:16px">
-  <h2>Forecast → Points-Program End <span class="tag" id="fcDays">—</span></h2>
-  <div class="cap">If the current pace holds, how big is the treasury when the points program ends? Drag the assumptions.</div>
-  <div class="fc-body">
-    <div class="fc-controls">
-      <label class="ctl">
-        <span>Daily accumulation pace <em id="rateEcho">—</em></span>
-        <input type="range" id="rate" min="20000" max="90000" step="1000">
-        <div class="ticks"><span>slow $20K</span><span>fast $90K</span></div>
-      </label>
-      <label class="ctl">
-        <span>Program end date <em id="tgtEcho">2026-09-30</em></span>
-        <input type="date" id="tgt" value="2026-09-30">
-      </label>
-      <label class="ctl">
-        <span>$VAR buy &amp; burn = min <em id="burnEcho">30%</em> of revenue</span>
-        <input type="range" id="burn" min="30" max="100" step="5" value="30">
-        <div class="ticks"><span>floor 30%</span><span>100%</span></div>
-      </label>
-      <div class="preset-row">
-        <button class="preset on" type="button" data-r="30d">Current pace</button>
-        <button class="preset" type="button" data-r="7d">Last 7d</button>
-        <button class="preset" type="button" data-r="60d">2-mo avg</button>
-        <button class="preset" type="button" data-r="all">All-time</button>
+<div class="card h2h peers-combined tsec tg-hide" data-tg="comparison">
+  <h2>Road to the King <span class="tag">HL benchmark · Lighter comp</span></h2>
+  <div class="cap">Hyperliquid is the king/ceiling. Lighter is the cleanest valuation comp. The question is whether Variational’s venue capacity and spread-fee pool can justify a Lighter-level, or premium, TGE read.</div>
+  <div class="peer-layout">
+    <div class="peer-left">
+      <div class="peer-rank-hero">
+        <div class="ph-rank"><span class="ph-hash">#</span><span id="phRank">5</span></div>
+        <div>
+          <div class="ph-k">Variational rank <span class="beta">Closed Beta</span></div>
+          <div class="ph-title">#<span id="phRank2">5</span> of <span id="phCount">87</span> by OI</div>
+          <div class="ph-sub"><b id="phShare">5.4%</b> of perp OI (<b id="phTotal">$21.7B</b>) · <b id="phVsHl">8.9×</b> smaller than Hyperliquid.</div>
+        </div>
+      </div>
+      <div class="mini-head">Top 15 by open interest · <span id="peersAsOf">retrieved 2026-07-08</span></div>
+      <div class="rank-list" id="rankList"></div>
+      <span id="peersTotal" hidden>22</span>
+    </div>
+    <div class="peer-right">
+  <div class="king-frame">
+    <div class="king-card">
+      <div class="king-crown">♕</div>
+      <div>
+        <b><img class="cmp-logo lg" src="logo-hyperliquid.png" alt="">Hyperliquid is the king</b>
+        <span>The benchmark ceiling: deepest OI, largest volume, biggest protocol revenue. Variational and Lighter are not compared as equals to HL — they are challengers priced by how close they can get.</span>
+      </div>
+      <div class="king-score">
+        <div><strong id="kingOi">—</strong><small>open interest</small></div>
+        <div><strong id="kingVol">—</strong><small>24h volume</small></div>
+        <div><strong id="kingRev">—</strong><small>30D revenue</small></div>
       </div>
     </div>
-    <div class="fc-out">
-      <div class="fc-hero">
-        <div class="k">Projected treasury on <span id="tgtLbl">Sep 30</span></div>
-        <div class="v" id="projVal">—</div>
-        <div class="d" id="projAdd">—</div>
-        <div class="range" id="projRange">—</div>
+    <div class="challenger-duel">
+      <div class="challenger var">
+        <div class="challenger-name"><b><img class="cmp-logo lg" src="variational-symbol-transparent.png" alt="">Variational</b><span>challenger A</span></div>
+        <div class="challenger-thesis" id="varThesis">Higher OI and larger spread-fee pool than Lighter; lower realized protocol revenue today because only the treasury cut is counted.</div>
       </div>
-      <div class="fc-burn">
-        <div class="k">Implied $VAR buy-&amp;-burn firepower <span class="q" title="At least 30% of protocol revenue is earmarked to purchase and burn $VAR. Revenue here = USDC captured by this treasury. This wallet has had zero outflows so far, so it's dry powder building up — the burn is a planned/floor mechanic, not yet executed on-chain.">ⓘ</span></div>
-        <div class="burn-row"><span>Earmarked now</span><b id="burnNow">—</b></div>
-        <div class="burn-row"><span>By program end</span><b id="burnProj" class="hi">—</b></div>
-        <div class="burn-note" id="burnNote">—</div>
+      <div class="duel-vs">vs comp</div>
+      <div class="challenger ltr">
+        <div class="challenger-name"><b><img class="cmp-logo lg" src="lighter-logo.png" alt="">Lighter</b><span>market comp</span></div>
+        <div class="challenger-thesis" id="lighterThesis">Useful TGE comp: higher current booked revenue, but smaller OI and much smaller fee pool than Variational in this snapshot.</div>
       </div>
     </div>
+    <div class="valuation-strip">
+      <div><b id="valOiEdge">—</b><span>Variational OI vs Lighter</span></div>
+      <div><b id="valFeeEdge">—</b><span>Variational fee pool vs Lighter</span></div>
+      <div><b id="valTgeRead">Near / premium</b><span>TGE argument if market values venue capacity + fee potential</span></div>
+    </div>
   </div>
-</div>
-
-<div class="card tsec tg-hide" data-tg="efficiency" style="margin-top:16px">
-  <h2>Interval Breakdown <span class="tag" id="tblTag">weekly</span></h2>
-  <div class="cap">Newest first · USDC added and % growth for each period.</div>
-  <div class="tbl-wrap">
-    <table id="tbl"><thead><tr>
-      <th>Period</th><th>Start</th><th>End</th><th>USDC Added</th><th>Δ %</th><th>Avg / day</th>
-    </tr></thead><tbody></tbody></table>
+  <div class="h2h-rows" id="h2hRows"></div>
+  <div class="h2h-note" id="h2hNote"></div>
+    </div>
   </div>
-</div>
-
-<div class="card tsec tg-hide" data-tg="comparison">
-  <h2>Trading Economics Comparison <span class="tag">volume · fees · revenue</span></h2>
-  <div class="cap">Revenue comparison is easy to misread. Variational has two views: <b>protocol wallet revenue</b> captured on-chain, and <b>implied gross spread fees</b> paid by traders/OLP economics. Lighter figures below are DeFiLlama 30D fee/revenue snapshots.</div>
-  <div class="comp-grid" id="compGrid">
-    <div class="comp-card me"><div class="comp-k">VAR 30D Volume</div><div class="comp-v" id="compVarVol">—</div><div class="comp-s">embedded Variational snapshot</div></div>
-    <div class="comp-card me"><div class="comp-k">VAR Gross Spread Fees</div><div class="comp-v" id="compVarFees">—</div><div class="comp-s">treasury revenue ÷ 10%</div></div>
-    <div class="comp-card"><div class="comp-k">Lighter 30D Fees</div><div class="comp-v">$2.91M</div><div class="comp-s">DeFiLlama fees 30D</div></div>
-    <div class="comp-card"><div class="comp-k">Lighter 30D Revenue</div><div class="comp-v">$2.26M</div><div class="comp-s">DeFiLlama revenue 30D</div></div>
-  </div>
-  <div class="comp-note" id="compRead">—</div>
-</div>
-
-<div class="card peers-hero tsec tg-hide" data-tg="comparison" style="margin-top:16px">
-  <div class="ph-rank"><span class="ph-hash">#</span><span id="phRank">5</span></div>
-  <div class="ph-body">
-    <div class="ph-k">Variational's rank among perp DEXs <span class="beta">Closed Beta</span></div>
-    <div class="ph-title">#<span id="phRank2">5</span> of <span id="phCount">87</span> by open interest</div>
-    <div class="ph-sub">Already a top-5 venue by open interest — <b id="phShare">5.4%</b> of all perp OI (<b id="phTotal">$21.7B</b>), while still in closed beta. <b id="phVsHl">8.9×</b> smaller than Hyperliquid.</div>
-  </div>
-</div>
-
-<div class="card peers-rank tsec tg-hide" data-tg="comparison" style="margin-top:16px">
-  <h2>Perp DEX Leaderboard <span class="tag">open interest</span></h2>
-  <div class="cap">Open interest by protocol (Perpetual Pulse, <span id="peersAsOf">retrieved 2026-07-08</span>). Variational highlighted. This is the cleanest side-by-side view for where Variational sits against other perp DEXs.</div>
-  <div class="rank-list" id="rankList"></div>
 </div>
 
 <div class="card tsec tg-hide" data-tg="comparison" style="margin-top:16px">
-  <h2>Roadmap Tracker <span class="tag">docs digest</span></h2>
-  <div class="cap">A compact version of the official Variational roadmap so you do not need to keep digging through docs. Roadmap is a living document, not a hard promise. <a href="https://docs.variational.io/roadmap" target="_blank" rel="noopener" style="color:var(--cyan)">Open docs ↗</a></div>
-  <div class="roadmap-list">
-    <div class="road-item done"><div class="road-top"><span class="road-q">Q4 2025</span><span class="road-status">done</span></div><div class="road-t">Points program + referral reward claims</div><div class="road-d">Docs mark launch of Omni points, referral reward claims, tighter spreads, and trigger/order chart interactions as completed.</div></div>
-    <div class="road-item next"><div class="road-top"><span class="road-q">Undated</span><span class="road-status">watch</span></div><div class="road-t">OLP statistics page + community vault</div><div class="road-d">Most important for this dashboard: OLP TVL/statistics would make efficiency analysis cleaner than Fee/OI proxies.</div></div>
-    <div class="road-item next"><div class="road-top"><span class="road-q">Undated</span><span class="road-status">watch</span></div><div class="road-t">Public mainnet + API trading</div><div class="road-d">Useful signal for volume expansion and whether closed-beta economics can scale to public usage.</div></div>
-    <div class="road-item next"><div class="road-top"><span class="road-q">Undated</span><span class="road-status">watch</span></div><div class="road-t">$VAR token + Pro launch</div><div class="road-d">Token launch, Variational Pro, multi-chain settlement, and additional collateral types remain roadmap items.</div></div>
+  <h2>Variational Revenue vs Lighter Revenue <span class="tag">weekly · trailing 8 weeks</span></h2>
+  <div class="cap">Weekly protocol revenue, same 7-day windows. Variational = USDC actually landing in the on-chain treasury (verifiable). Lighter = daily revenue on DeFiLlama. Hyperliquid is left off this chart — at ~$47M/30d it would flatten both bars.</div>
+  <div class="legend">
+    <b><img class="cmp-logo" src="variational-symbol-transparent.png" alt=""><span class="sw act"></span>Variational · on-chain</b>
+    <b><img class="cmp-logo" src="lighter-logo.png" alt=""><span class="sw" style="background:linear-gradient(90deg,#2c4c7f,#3f74c9)"></span>Lighter · DeFiLlama</b>
+  </div>
+  <svg class="chart" id="revVs" viewBox="0 0 720 250" preserveAspectRatio="none"></svg>
+  <div class="rev-callout" id="revCallout"></div>
+</div>
+
+<div class="card soon tsec tg-hide" data-tg="comparison" style="margin-top:16px">
+  <h2>Coming soon <span class="tag">roadmap</span></h2>
+  <div class="cap">Deeper build-outs in progress — inspired by <a href="https://hl.eco/" target="_blank" rel="noopener" style="color:var(--cyan)">hl.eco</a>.</div>
+  <div class="soon-grid">
+    <div class="soon-card"><div class="soon-badge">soon</div><div class="soon-t">🔥 $VAR burn tracker</div><div class="soon-d">Buy-&amp;-burn executed vs firepower loaded · % of supply burnt. <span class="muted">Treasury has 0 outflows so far — burn not yet fired.</span></div></div>
+    <div class="soon-card"><div class="soon-badge">soon</div><div class="soon-t">📊 Gross fees &amp; revenue split</div><div class="soon-d">hl.eco-style Gross Fees → Revenue → Holders/LP split, all-time &amp; annualized.</div></div>
+    <div class="soon-card"><div class="soon-badge">soon</div><div class="soon-t">Editorial redesign</div><div class="soon-d">Gilroy Medium type + mint palette + spacious hl.eco layout across every tab.</div></div>
   </div>
 </div>
 
@@ -1652,6 +2165,7 @@ const CHAIN = {
   rpc:"https://arbitrum.gateway.tenderly.co",
   usdc:"0xaf88d065e77c8cC2239327C5EDb3A432268e5831",
   pad:"0000000000000000000000005e91b40467fb8902c46a7b6cb90482363188d645",
+  olpPad:"00000000000000000000000074bbbb0e7f0bad6938509dd4b556a39a4db1f2cd",
   b0:424000000, t0:1769076491, bps:3.9958149219963364
 };
 
@@ -1697,9 +2211,8 @@ const PEERS = {
 };
 /* the fee-efficiency thesis: how much volume / OI does it take to make $1?
    revenue = treasury inflow (on-chain, live); total fees (spreads) = revenue / spreadShare */
-function computeEffAt(idx=SERIES.length-1){
-  idx=Math.max(0,Math.min(idx,SERIES.length-1));
-  const last=SERIES[idx], cur=last.v;
+function computeEff(){
+  const last=SERIES[SERIES.length-1], cur=last.v;
   const rev30=Math.max(1,cur-cumAt(addDays(last.d,-30)));   // treasury revenue, trailing 30d (live)
   const dailyRev=rev30/30;
   const volPerRev=MKT.vol.d30/rev30;                        // $ volume per $1 treasury revenue
@@ -1712,7 +2225,6 @@ function computeEffAt(idx=SERIES.length-1){
   const feesCum=cur/MKT.spreadShare;                        // implied cumulative spreads paid
   return {cur,rev30,dailyRev,volPerRev,volPerFee,takeBpsRev,takeBpsFee,oiPerDayRev,oiTurnover,annRevYield,feesCum};
 }
-function computeEff(){return computeEffAt();}
 let EFF_WINDOW='1d';
 const EFF_WINDOWS={
   '1d':{label:'1D',days:1,volKey:'d1'},
@@ -1763,105 +2275,8 @@ function effMonthEnd(ym){
   const [y,m]=ym.split('-').map(Number);
   return new Date(Date.UTC(y,m,0)).toISOString().slice(0,10);
 }
-function ordinal(n){
-  const s=['th','st','nd','rd'], v=n%100;
-  return n+(s[(v-20)%10]||s[v]||s[0]);
-}
-function periodTile({label,range,rev,days,vol,volSource='',latest=false}){
-  const fee=rev/MKT.spreadShare;
-  const dailyRev=rev/Math.max(1,days);
-  const bps=vol>0?rev/vol*1e4:0;
-  const yld=MKT.oi>0?dailyRev*365/MKT.oi*100:0;
-  const burn=rev*MKT.burnShare;
-  return `<div class="edc-cell period ${latest?'today':''}" style="--heat:${Math.max(18,Math.min(100,dailyRev/70000*100)).toFixed(1)}" title="${label}: treasury ${fmtUSD(rev)}, fees ${fmtUSD(fee)}, wallet bps ${bps.toFixed(3)}">
-    <div class="edc-d"><span>${label}</span>${latest?'<i>latest</i>':''}</div>
-    <div class="edc-money">${fmtUSD(rev)}</div>
-    <div class="edc-meta">
-      <span>range <b>${range}</b></span>
-      <span>fees <b>${fmtUSD(fee)}</b></span>
-      <span class="bps">wallet bps <b>${bps.toFixed(3)}</b></span>
-      <span class="yield">OI yield <b>${yld.toFixed(2)}%</b></span>
-      <span>burn firepower <b>${fmtUSD(burn)}</b></span>
-      <span>daily avg <b>${fmtUSD(dailyRev)}</b></span>
-    </div>
-    ${volSource?`<div class="edc-foot">${volSource}</div>`:''}
-  </div>`;
-}
-function renderWeeklyRevenueView(e){
-  const grid=$('#effDailyCal'); if(!grid)return;
-  const rows=buildPeriods('week').slice(-12);
-  const max=Math.max(...rows.map(r=>r.added),1);
-  grid.innerHTML=rows.map((r,i)=>{
-    const dt=new Date(r.eD+'T00:00:00Z');
-    const month=dt.toLocaleDateString('en-US',{month:'short',timeZone:'UTC'});
-    const week=Math.ceil(+r.eD.slice(-2)/7);
-    const vol=(MKT.vol.d7/7)*r.days;
-    return periodTile({label:`${month} ${ordinal(week)} week`,range:`${r.sD} → ${r.eD}`,rev:r.added,days:r.days,vol,volSource:'bps proxy: 7D avg daily volume × week days',latest:i===rows.length-1});
-  }).join('');
-  $('#effCalTitle') && ($('#effCalTitle').textContent='Weekly view');
-  $('#effCalSub') && ($('#effCalSub').textContent='Grouped by week. Revenue is exact wallet inflow; bps uses 7D average daily volume as proxy.');
-}
-function rollingPeriodRows(stride,count=6){
-  const first=SERIES[0].d, last=SERIES[SERIES.length-1].d;
-  const rows=[];
-  let end=last;
-  while(end>first&&rows.length<count){
-    const base=addDays(end,-stride);
-    const start=base<first?first:base;
-    const days=Math.max(1,Math.round((new Date(end+'T00:00:00Z')-new Date(start+'T00:00:00Z'))/86400000));
-    rows.push({start:addDays(start,1),end,rev:Math.max(0,cumAt(end)-cumAt(start)),days});
-    end=start;
-  }
-  return rows;
-}
-function renderRolling30RevenueView(e){
-  const grid=$('#effDailyCal'); if(!grid)return;
-  const rows=rollingPeriodRows(30,6);
-  grid.innerHTML=rows.map((r,i)=>{
-    const vol=(MKT.vol.d30/30)*r.days;
-    return periodTile({label:i===0?'Latest 30D':`Previous 30D #${i}`,range:`${r.start} → ${r.end}`,rev:r.rev,days:r.days,vol,volSource:'bps proxy: 30D avg daily volume × period days',latest:i===0});
-  }).join('');
-  $('#effCalTitle') && ($('#effCalTitle').textContent='Rolling 30D');
-  $('#effCalSub') && ($('#effCalSub').textContent='Grouped into rolling 30-day blocks. Revenue is exact wallet inflow; bps uses 30D average daily volume as proxy.');
-}
-function renderMonthlyRevenueView(e){
-  const grid=$('#effDailyCal'); if(!grid)return;
-  const months=[...new Set(SERIES.map(x=>x.d.slice(0,7)))].slice(-8);
-  grid.innerHTML=months.map((ym,i)=>{
-    const start=ym+'-01';
-    const end=SERIES.filter(x=>x.d.slice(0,7)===ym).at(-1).d;
-    const rev=Math.max(0,cumAt(end)-cumAt(addDays(start,-1)));
-    const days=Math.max(1,Math.round((new Date(end+'T00:00:00Z')-new Date(start+'T00:00:00Z'))/86400000)+1);
-    const vol=(MKT.vol.d30/30)*days;
-    return periodTile({label:monthName(ym),range:`${start} → ${end}`,rev,days,vol,volSource:'bps proxy: 30D avg daily volume × month days',latest:i===months.length-1});
-  }).join('');
-  $('#effCalTitle') && ($('#effCalTitle').textContent='Monthly view');
-  $('#effCalSub') && ($('#effCalSub').textContent='Grouped by month. Revenue is exact wallet inflow; bps uses 30D average daily volume as proxy.');
-}
-function renderAllTimeRevenueView(e){
-  const grid=$('#effDailyCal'); if(!grid)return;
-  const first=SERIES[0].d,last=SERIES[SERIES.length-1].d;
-  const months=[...new Set(SERIES.map(x=>x.d.slice(0,7)))];
-  const bestDay=dailyEarn().reduce((a,b)=>b.e>a.e?b:a,{d:first,e:0});
-  grid.innerHTML=[
-    periodTile({label:'All-time total',range:`${first} → ${last}`,rev:e.rev,days:e.days,vol:e.vol,volSource:'embedded all-time volume snapshot',latest:true}),
-    periodTile({label:'Best day',range:bestDay.d,rev:bestDay.e,days:1,vol:e.vol/e.days,volSource:'bps proxy: all-time avg daily volume'}),
-    periodTile({label:'Average month',range:`${months.length} months`,rev:e.rev/Math.max(1,months.length),days:e.days/Math.max(1,months.length),vol:e.vol/Math.max(1,months.length),volSource:'average across embedded history'})
-  ].join('');
-  $('#effCalTitle') && ($('#effCalTitle').textContent='All-time');
-  $('#effCalSub') && ($('#effCalSub').textContent='Total history only. No daily calendar here; this view summarizes the full embedded period.');
-}
 function renderDailyRevenueCalendar(e){
   const grid=$('#effDailyCal'); if(!grid)return;
-  const shell=grid.closest('.eff-daily-cal');
-  shell?.setAttribute('data-period',e.key);
-  $('#effCalTitle') && ($('#effCalTitle').textContent='—');
-  const titleMap={'1d':'Daily money calendar','7d':'Weekly money view','30d':'Rolling 30D view',month:'Monthly money view',all:'All-time money summary'};
-  $('#effCalModeTitle') && ($('#effCalModeTitle').textContent=titleMap[e.key]||'Money view');
-  if(e.key==='7d')return renderWeeklyRevenueView(e);
-  if(e.key==='30d')return renderRolling30RevenueView(e);
-  if(e.key==='month')return renderMonthlyRevenueView(e);
-  if(e.key==='all')return renderAllTimeRevenueView(e);
   if(!EFF_CAL_MONTH)EFF_CAL_MONTH=SERIES[SERIES.length-1].d.slice(0,7);
   const first=EFF_CAL_MONTH+'-01';
   const last=effMonthEnd(EFF_CAL_MONTH);
@@ -1874,31 +2289,25 @@ function renderDailyRevenueCalendar(e){
     const rev=Math.max(0,earnOn(d)||0);
     vals.push({d,rev});
   }
-  const max=Math.max(...vals.filter(x=>isClosedDailyTotal(x.d)).map(x=>x.rev),1);
+  const max=Math.max(...vals.map(x=>x.rev),1);
   let html='';
   for(let i=0;i<lead;i++)html+='<div class="edc-cell empty" aria-hidden="true"></div>';
   vals.forEach(x=>{
-    const closed=isClosedDailyTotal(x.d);
-    const inRange=x.d>=SERIES[0].d;
-    const events=macroByDate(x.d);
-    const evHtml=events.map(ev=>`<span class="ev ${ev.kind}" title="${ev.t} · ${ev.name}">${ev.tag}</span>`).join('');
+    const hasData=x.d<=SERIES[SERIES.length-1].d&&x.d>=SERIES[0].d;
     const fee=x.rev/MKT.spreadShare;
     const bps=dailyVol>0?x.rev/dailyVol*1e4:0;
     const yld=MKT.oi>0?x.rev*365/MKT.oi*100:0;
     const heat=Math.max(0,Math.min(100,x.rev/max*100));
-    const latest=x.d===SERIES[SERIES.length-1].d;
-    const pending=!closed&&inRange;
-    const p=pending?pendingDailyClose(x.d):null;
-    const title=closed?`${x.d}: treasury ${fmtUSD(x.rev)}, spread fees ${fmtUSD(fee)}, proxy wallet bps ${bps.toFixed(3)}, OI yield ${yld.toFixed(2)}%`:(pending?`${x.d}: final daily wallet revenue closes ${p.countdown}`:x.d+': no embedded wallet data yet');
-    html+=`<div class="edc-cell ${latest?'today':''} ${closed?'':(pending?'pending':'no-data')}" style="--heat:${closed?heat.toFixed(1):'0'}" title="${title}">
-      <div class="edc-d"><span>${+x.d.slice(-2)}</span>${latest?'<i>latest</i>':''}</div>
-      ${closed?`<div class="edc-metrics">
-        <div class="edc-metric fee"><span>Fee</span><b>${fmtUSD(fee)}</b></div>
-        <div class="edc-metric rev"><span>Revenue</span><b>${fmtUSD(x.rev)}</b></div>
-        <div class="edc-metric bps"><span>Wallet BPS</span><b>${bps.toFixed(3)}</b></div>
-        <div class="edc-metric yield"><span>OI Yield</span><b>${yld.toFixed(2)}%</b></div>
-      </div>`:(pending?`<div class="edc-money">Results ${p.countdown}</div><div class="edc-meta"><span>final close <b>${p.detail}</b></span><span class="bps">same ET close as Earnings / Day</span></div>`:`<div class="edc-money">no data</div><div class="edc-meta"><span>awaiting wallet close / embedded data</span></div>`)}
-      ${evHtml?`<div class="edc-events">${evHtml}</div>`:''}
+    const today=x.d===SERIES[SERIES.length-1].d;
+    const title=`${x.d}: treasury ${fmtUSD(x.rev)}, spread fees ${fmtUSD(fee)}, proxy wallet bps ${bps.toFixed(3)}, OI yield ${yld.toFixed(2)}%`;
+    html+=`<div class="edc-cell ${today?'today':''} ${hasData?'':'no-data'}" style="--heat:${hasData?heat.toFixed(1):'0'}" title="${hasData?title:x.d+': no embedded wallet data yet'}">
+      <div class="edc-d"><span>${+x.d.slice(-2)}</span>${today?'<i>latest</i>':''}</div>
+      <div class="edc-money">${hasData?fmtUSD(x.rev):'no data'}</div>
+      <div class="edc-meta">
+        <span>fees <b>${hasData?fmtUSD(fee):'—'}</b></span>
+        <span class="bps">wallet bps <b>${hasData?bps.toFixed(3):'—'}</b></span>
+        <span class="yield">OI yield <b>${hasData?yld.toFixed(2)+'%':'—'}</b></span>
+      </div>
     </div>`;
   });
   grid.innerHTML=html;
@@ -1910,9 +2319,64 @@ function renderImpliedSpreadTotal(treasuryTotal){
   const olpSide=totalFees-treasuryTotal;
   const burnFirepower=treasuryTotal*MKT.burnShare;
   const compact=n=>n>=1e9?'$'+(n/1e9).toFixed(2)+'B':n>=1e6?'$'+(n/1e6).toFixed(2)+'M':fmtUSD(n);
+  const n=SERIES.length, days=Math.min(30,Math.max(0,n-1));
+  const start30=days?SERIES[n-1-days].v:treasuryTotal;
+  const avg30=days?((treasuryTotal-start30)/days):0;
   $('#impliedSpreadTotal') && ($('#impliedSpreadTotal').textContent=compact(totalFees));
   $('#sfTreasuryTotal') && ($('#sfTreasuryTotal').textContent=compact(treasuryTotal));
   $('#sfBurnTotal') && ($('#sfBurnTotal').textContent=compact(burnFirepower));
+  $('#pmTreasuryTotal') && ($('#pmTreasuryTotal').textContent=fmtUSD(treasuryTotal));
+  $('#pmDailyRevenue') && ($('#pmDailyRevenue').textContent=fmtUSD(dailyRate(30))+'/day');
+  $('#pmFeesTotal') && ($('#pmFeesTotal').textContent=compact(totalFees));
+  $('#pmSpreadTotal') && ($('#pmSpreadTotal').textContent=compact(totalFees));
+  $('#pmTreasuryFormula') && ($('#pmTreasuryFormula').innerHTML=`Formula: <b>USDC balanceOf(0x5e91...d645) = ${fmtUSD(treasuryTotal)}</b>`);
+  $('#pmDailyFormula') && ($('#pmDailyFormula').innerHTML=days?`Formula: <b>(${fmtUSD(treasuryTotal)} - ${fmtUSD(start30)}) / ${days}D = ${fmtUSD(avg30)}/day</b>`:'Formula: <b>waiting for historical treasury series</b>');
+  $('#pmFeesFormula') && ($('#pmFeesFormula').innerHTML=`Formula: <b>${fmtUSD(treasuryTotal)} / ${(MKT.spreadShare*100).toFixed(0)}% = ${compact(totalFees)}</b>`);
+  renderMoneyMap(treasuryTotal);
+}
+/* income-flow sankey: spreads -> OLP 90% / treasury 10% -> burn / dry powder */
+function renderMoneyMap(T){
+  const svg=$('#pmSankey'); if(!svg||!T)return;
+  const F=T/MKT.spreadShare, OLP=F-T, BURN=T*MKT.burnShare, DRY=T-BURN;
+  const c=n=>n>=1e9?'$'+(n/1e9).toFixed(2)+'B':'$'+(n/1e6).toFixed(2)+'M';
+  const W=720,H=230,bw=11,x1=20,x2=350,x3=690,top=46,bot=184,gap=9;
+  const usable=bot-top-gap, hv=v=>Math.max(4,v/F*usable);
+  const hOLP=hv(OLP), hT=hv(T);
+  const yA0=top, yA1=top+usable+gap;                       // source bar (full)
+  const yO0=top, yO1=top+hOLP;                             // OLP bar
+  const yT0=yO1+gap, yT1=yT0+hT;                           // treasury bar
+  const hB=hv(BURN)*0.999, hD=hv(DRY);                     // stage C (rises right, keeps labels clear)
+  const cGap=11;
+  const yB0=Math.max(top+30,yT0-46), yB1=yB0+hB;
+  const yD0=yB1+cGap, yD1=yD0+hD;
+  const rib=(xa,ya0,ya1,xb,yb0,yb1,fill,tip)=>{const mx=((xa+xb)/2).toFixed(1);
+    return `<path d="M ${xa} ${ya0} C ${mx} ${ya0} ${mx} ${yb0} ${xb} ${yb0} L ${xb} ${yb1} C ${mx} ${yb1} ${mx} ${ya1} ${xa} ${ya1} Z" fill="${fill}"><title>${tip}</title></path>`;};
+  // treasury bar's internal split point for outgoing ribbons
+  const tSplit=yT0+(hT*(BURN/T));
+  svg.innerHTML=`
+   <defs>
+     <linearGradient id="pmRibOlp" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#3f74c9" stop-opacity=".34"/><stop offset="1" stop-color="#25406b" stop-opacity=".3"/></linearGradient>
+     <linearGradient id="pmRibT" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#22e6a0" stop-opacity=".55"/><stop offset="1" stop-color="#38e1ff" stop-opacity=".5"/></linearGradient>
+     <linearGradient id="pmRibB" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#8b6cff" stop-opacity=".6"/><stop offset="1" stop-color="#8b6cff" stop-opacity=".45"/></linearGradient>
+     <linearGradient id="pmRibD" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#22e6a0" stop-opacity=".45"/><stop offset="1" stop-color="#22e6a0" stop-opacity=".35"/></linearGradient>
+   </defs>
+   ${rib(x1+bw,yA0,yA0+hOLP,x2,yO0,yO1,'url(#pmRibOlp)',`OLP / LP side · ${fmtUSD(OLP)} (90%)`)}
+   ${rib(x1+bw,yA0+hOLP+gap,yA1,x2,yT0,yT1,'url(#pmRibT)',`Protocol treasury · ${fmtUSD(T)} (10%)`)}
+   ${rib(x2+bw,yT0,tSplit,x3,yB0,yB1,'url(#pmRibB)',`$VAR buy & burn firepower · ≥ ${fmtUSD(BURN)} (≥30% of treasury)`)}
+   ${rib(x2+bw,tSplit,yT1,x3,yD0,yD1,'url(#pmRibD)',`Dry powder retained · ≤ ${fmtUSD(DRY)}`)}
+   <rect x="${x1}" y="${yA0}" width="${bw}" height="${yA1-yA0}" rx="3" fill="#3f74c9"/>
+   <rect x="${x2}" y="${yO0}" width="${bw}" height="${hOLP}" rx="3" fill="#2f5590"/>
+   <rect x="${x2}" y="${yT0}" width="${bw}" height="${hT}" rx="3" fill="#22e6a0"/>
+   <rect x="${x3}" y="${yB0}" width="${bw}" height="${hB}" rx="3" fill="#8b6cff"/>
+   <rect x="${x3}" y="${yD0}" width="${bw}" height="${hD}" rx="3" fill="#1db584"/>
+   <text x="${x1}" y="20" fill="#7d8aa5" font-size="9.5" font-weight="800" letter-spacing="1.5">TRADER SPREADS</text>
+   <text x="${x1}" y="36" fill="#eaf1ff" font-size="16" font-weight="900">${c(F)} · 100%</text>
+   <text x="${x2}" y="20" fill="#7d8aa5" font-size="9.5" font-weight="800" letter-spacing="1.5">SPLIT</text>
+   <text x="${x2}" y="36" fill="#eaf1ff" font-size="15" font-weight="900">OLP ${c(OLP)} · 90%</text>
+   <text x="${x2}" y="${Math.min(H-10,yT1+22)}" fill="#22e6a0" font-size="15" font-weight="900">Treasury ${c(T)} · 10%</text>
+   <text x="${x3}" y="20" fill="#7d8aa5" font-size="9.5" font-weight="800" letter-spacing="1.5" text-anchor="end">USE OF TREASURY</text>
+   <text x="${x3}" y="${Math.max(56,yB0-8)}" fill="#c7bcff" font-size="13" font-weight="900" text-anchor="end">Burn ≥ ${c(BURN)}</text>
+   <text x="${x3}" y="${Math.min(H-10,yD1+16)}" fill="#7fe8c4" font-size="13" font-weight="900" text-anchor="end">Dry powder ≤ ${c(DRY)}</text>`;
 }
 function feeRevenueHistory(){
   const out=[];
@@ -2106,41 +2570,140 @@ function shiftYear(dstr,delta){
   dt.setUTCFullYear(dt.getUTCFullYear()+delta);
   return dt.toISOString().slice(0,10);
 }
+const PLOGO={'Hyperliquid':'logo-hyperliquid.png','Aster':'logo-aster.png','Variational':'variational-symbol-transparent.png','Lighter':'lighter-logo.png','GRVT':'logo-grvt.png','edgeX':'logo-edgex.png','Jupiter':'logo-jupiter.png','Extended':'logo-extended.png','Ostium':'logo-ostium.png','Drift':'logo-drift.png','ApeX Protocol':'logo-apex-protocol.png','Pacifica':'logo-pacifica.png','Backpack':'logo-backpack.png','Vest Exchange':'logo-vest-exchange.png','GMX':'logo-gmx.png'};
 function renderPeers(){
   if(!$('#rankList'))return;
   const fmtB=v=>v>=1e9?'$'+(v/1e9).toFixed(2)+'B':'$'+fmtK(v);
-  const varOi=PEERS.list.find(p=>p.me)?.oi||MKT.oi;
-  $('#rankList').innerHTML=PEERS.list.slice(0,15).map((p,i)=>{
-    const share=p.oi/PEERS.total*100;
-    const rel=p.me?'You are here':p.oi>=varOi?(p.oi/varOi).toFixed(1)+'× Variational':(varOi/p.oi).toFixed(1)+'× smaller';
-    return `
+  const max=PEERS.list[0].oi;
+  $('#rankList').innerHTML=PEERS.list.slice(0,15).map((p,i)=>`
     <div class="rk${p.me?' me':''}">
-      <div class="rk-top">
-        <div class="rk-i">#${i+1}</div>
-        <div class="rk-n">${p.n}</div>
-      </div>
+      <div class="rk-i">${i+1}</div>
+      <div class="rk-n">${PLOGO[p.n]?`<img class="rk-logo" src="${PLOGO[p.n]}" alt="" onerror="this.style.visibility='hidden'">`:`<span class="rk-logo ph"></span>`}${p.n}</div>
+      <div class="rk-bar"><i style="width:${(p.oi/max*100).toFixed(1)}%"></i></div>
       <div class="rk-v">${fmtB(p.oi)}</div>
-      <div class="rk-meta">
-        <span><b>${share.toFixed(1)}%</b><small>of perp OI</small></span>
-        <span><b>${rel}</b><small>${p.me?'rank signal':'vs VAR'}</small></span>
-      </div>
-    </div>`}).join('');
+    </div>`).join('');
+  if($('#peersTotal'))$('#peersTotal').textContent=PEERS.count;
   $('#phRank').textContent=PEERS.varRank; $('#phRank2').textContent=PEERS.varRank;
   $('#phCount').textContent=PEERS.count; $('#phShare').textContent=PEERS.varShare+'%';
   $('#phTotal').textContent='$'+(PEERS.total/1e9).toFixed(1)+'B';
   $('#phVsHl').textContent=PEERS.vsHl+'×';
   $('#peersAsOf').textContent=PEERS.asOf;
 }
-function renderComparisonEconomics(){
-  if(!$('#compGrid'))return;
-  const e=computeEffAt(latestClosedSeriesIndex());
-  const lighterFees30=2.91e6, lighterRev30=2.26e6;
-  const varGross=e.rev30/MKT.spreadShare;
-  $('#compVarVol').textContent='$'+(MKT.vol.d30/1e9).toFixed(2)+'B';
-  $('#compVarFees').textContent='$'+(varGross/1e6).toFixed(2)+'M';
-  const feeVs=varGross/lighterFees30;
-  const walletVs=e.rev30/lighterRev30;
-  $('#compRead').innerHTML=`Read this cleanly: <b>Variational gross spread fees are ${feeVs.toFixed(1)}× Lighter's 30D fees</b>, but the on-chain protocol wallet cut alone is <b>${(walletVs*100).toFixed(0)}%</b> of Lighter's reported 30D revenue. So “VAR revenue is higher” is true only if you mean gross OLP/spread economics, not just the protocol wallet cut.`;
+
+/* ---------- head-to-head: Variational vs Lighter ---------- */
+const VSL={
+  // volume & OI: Perpetual Pulse snapshot (2026-07-08) · fees & revenue: DeFiLlama + app.lighter.xyz/stats (2026-07-08)
+  li:{ vol1d:1465961931.57, oi:810022995.62, fees30:2975571, rev30:2321912, feesAll:69683968, revAll:53652406 },
+  hl:{ vol1d:8112902385.84, oi:10133720905.35, fees30:65130968, rev30:46828446, feesAll:1418488399, revAll:1153924947 },
+  note:'Lighter standard accounts trade fee-free, but premium/institutional accounts pay trade fees — plus withdraw &amp; transfer fees — so Lighter books real protocol revenue (visible on <a href="https://app.lighter.xyz/stats" target="_blank" rel="noopener">app.lighter.xyz/stats</a>). Variational works differently: traders pay spreads, ~90% flows to OLP liquidity providers, and only the treasury cut counts as protocol revenue here.'
+};
+/* Lighter daily protocol revenue — DeFiLlama totalDataChart snapshot (last 70 days, retrieved 2026-07-08) */
+const LREV=[{"d":"2026-04-30","v":58526},{"d":"2026-05-01","v":61102},{"d":"2026-05-02","v":30662},{"d":"2026-05-03","v":45338},{"d":"2026-05-04","v":102673},{"d":"2026-05-05","v":80540},{"d":"2026-05-06","v":92873},{"d":"2026-05-07","v":85086},{"d":"2026-05-08","v":71735},{"d":"2026-05-09","v":33817},{"d":"2026-05-10","v":51198},{"d":"2026-05-11","v":73638},{"d":"2026-05-12","v":94042},{"d":"2026-05-13","v":81824},{"d":"2026-05-14","v":68538},{"d":"2026-05-15","v":73810},{"d":"2026-05-16","v":37478},{"d":"2026-05-17","v":42600},{"d":"2026-05-18","v":70164},{"d":"2026-05-19","v":72272},{"d":"2026-05-20","v":83957},{"d":"2026-05-21","v":83480},{"d":"2026-05-22","v":73985},{"d":"2026-05-23","v":37862},{"d":"2026-05-24","v":40732},{"d":"2026-05-25","v":57998},{"d":"2026-05-26","v":78983},{"d":"2026-05-27","v":81009},{"d":"2026-05-28","v":86039},{"d":"2026-05-29","v":74981},{"d":"2026-05-30","v":40895},{"d":"2026-05-31","v":46853},{"d":"2026-06-01","v":72508},{"d":"2026-06-02","v":95970},{"d":"2026-06-03","v":115572},{"d":"2026-06-04","v":121003},{"d":"2026-06-05","v":109944},{"d":"2026-06-06","v":59967},{"d":"2026-06-07","v":58201},{"d":"2026-06-08","v":227921},{"d":"2026-06-09","v":132873},{"d":"2026-06-10","v":125872},{"d":"2026-06-11","v":110290},{"d":"2026-06-12","v":91264},{"d":"2026-06-13","v":47280},{"d":"2026-06-14","v":49093},{"d":"2026-06-15","v":78248},{"d":"2026-06-16","v":85183},{"d":"2026-06-17","v":92159},{"d":"2026-06-18","v":119439},{"d":"2026-06-19","v":85809},{"d":"2026-06-20","v":45095},{"d":"2026-06-21","v":48774},{"d":"2026-06-22","v":73362},{"d":"2026-06-23","v":80605},{"d":"2026-06-24","v":83029},{"d":"2026-06-25","v":81158},{"d":"2026-06-26","v":74519},{"d":"2026-06-27","v":40645},{"d":"2026-06-28","v":42999},{"d":"2026-06-29","v":66084},{"d":"2026-06-30","v":76169},{"d":"2026-07-01","v":85172},{"d":"2026-07-02","v":74282},{"d":"2026-07-03","v":66684},{"d":"2026-07-04","v":41835},{"d":"2026-07-05","v":41312},{"d":"2026-07-06","v":93944},{"d":"2026-07-07","v":78245},{"d":"2026-07-08","v":97075}];
+const liRevBetween=(s,e)=>LREV.reduce((sum,x)=>sum+(x.d>s&&x.d<=e?x.v:0),0);
+function renderVsLighter(){
+  if(!$('#h2hRows'))return;
+  const cB=v=>v>=1e9?'$'+(v/1e9).toFixed(2)+'B':v>=1e6?'$'+(v/1e6).toFixed(2)+'M':'$'+fmtK(v);
+  const va=PEERS.list.find(p=>p.me), li=VSL.li;
+  const last=SERIES[SERIES.length-1];
+  const rev30=Math.max(0,last.v-cumAt(addDays(last.d,-30)));
+  const fees30=rev30/MKT.spreadShare;
+  const hl=VSL.hl;
+  $('#kingOi') && ($('#kingOi').textContent=cB(hl.oi));
+  $('#kingVol') && ($('#kingVol').textContent=cB(hl.vol1d));
+  $('#kingRev') && ($('#kingRev').textContent=cB(hl.rev30));
+  const oiEdge=li.oi?va.oi/li.oi:0;
+  const feeEdge=li.fees30?fees30/li.fees30:0;
+  const revGap=rev30?li.rev30/rev30:0;
+  $('#valOiEdge') && ($('#valOiEdge').textContent=oiEdge.toFixed(1)+'×');
+  $('#valFeeEdge') && ($('#valFeeEdge').textContent=feeEdge.toFixed(1)+'×');
+  $('#valTgeRead') && ($('#valTgeRead').textContent=(oiEdge>1&&feeEdge>1?'Lighter+ range':'comp range'));
+  $('#varThesis') && ($('#varThesis').innerHTML=`<b>${oiEdge.toFixed(1)}× Lighter OI</b> and <b>${feeEdge.toFixed(1)}× Lighter 30D fee pool</b>. The current revenue line is lower because Variational only books the treasury cut, not the OLP side.`);
+  $('#lighterThesis') && ($('#lighterThesis').innerHTML=`Lighter is the clean market comp: <b>${revGap.toFixed(1)}× Variational 30D booked revenue</b>, but smaller OI and fee pool in this snapshot.`);
+  const rows=[
+    {k:'Trading volume · 24h', a:va.vol, b:li.vol1d, h:hl.vol1d, an:'', bn:'', hn:''},
+    {k:'Open interest · live', a:va.oi, b:li.oi, h:hl.oi, an:'', bn:'', hn:''},
+    {k:'Trading fees · 30d', a:fees30, b:li.fees30, h:hl.fees30, an:'spreads paid by traders', bn:'premium accs + wd/tx fees', hn:'taker/maker fees'},
+    {k:'Protocol revenue · 30d', a:rev30, b:li.rev30, h:hl.rev30, an:'treasury cut · on-chain', bn:'~78% of its fees', hn:'assistance fund + HLP'},
+    {k:'Protocol revenue · all-time', a:SERIES[SERIES.length-1].v, b:li.revAll, h:hl.revAll, an:'since 2026-01-23', bn:'all listed history', hn:'all listed history'},
+  ];
+  $('#h2hRows').innerHTML=`<table class="h2h-tbl">
+    <thead><tr><th>Metric</th><th class="cva"><img class="cmp-logo" src="variational-symbol-transparent.png" alt="">Variational</th><th class="cli"><img class="cmp-logo" src="lighter-logo.png" alt="">Lighter</th><th class="chl"><img class="cmp-logo" src="logo-hyperliquid.png" alt="">Hyperliquid</th><th>Edge</th></tr></thead>
+    <tbody>${rows.map(r=>{
+      const vals=[{c:'var',n:'Variational',v:r.a},{c:'ltr',n:'Lighter',v:r.b},{c:'chl',n:'Hyperliquid',v:r.h}].sort((x,y)=>y.v-x.v);
+      const lead={c:vals[0].c,t:vals[0].n+' '+(vals[1].v>0?(vals[0].v/vals[1].v).toFixed(1)+'×':'')};
+      const win=x=>vals[0].v===x?' win':'';
+      return `<tr>
+        <td>${r.k}</td>
+        <td class="cva${win(r.a)}"><b>${cB(r.a)}</b>${r.an?`<span class="sub">${r.an}</span>`:''}</td>
+        <td class="cli${win(r.b)}"><b>${cB(r.b)}</b>${r.bn?`<span class="sub">${r.bn}</span>`:''}</td>
+        <td class="chl${win(r.h)}"><b>${cB(r.h)}</b>${r.hn?`<span class="sub">${r.hn}</span>`:''}</td>
+        <td><span class="lead ${lead.c}">${lead.t}</span></td>
+      </tr>`;
+    }).join('')}</tbody></table>`;
+  $('#h2hNote').innerHTML=`Read: Hyperliquid is the ceiling, not the direct peer. Lighter is the market comp. Variational’s strongest TGE argument is capacity + fee-pool quality: higher OI and higher implied trader spread fees than Lighter, while current booked protocol revenue is lower because only ${(MKT.spreadShare*100).toFixed(0)}% of spreads reaches treasury. Sources: volume &amp; OI — Perpetual Pulse (${PEERS.asOf}); Variational fees/revenue — treasury wallet on Arbitrum; Lighter &amp; Hyperliquid fees/revenue — <a href="https://defillama.com/protocol/lighter" target="_blank" rel="noopener">DeFiLlama</a>. ${VSL.note}`;
+  renderRevVs(rev30);
+}
+function renderRevVs(rev30){
+  const svg=$('#revVs'); if(!svg)return;
+  const W=720,H=250,pl=56,pr=14,pt=16,pb=30;
+  const last=SERIES[SERIES.length-1];
+  const liLast=LREV[LREV.length-1].d;
+  const anchor=last.d<liLast?last.d:liLast; // only weeks both sides have data for
+  // trailing 8 complete 7-day windows ending at the shared anchor day
+  const weeks=[];
+  for(let k=7;k>=0;k--){
+    const end=addDays(anchor,-7*k), start=addDays(end,-7);
+    weeks.push({end, v:Math.max(0,cumAt(end)-cumAt(start)), l:liRevBetween(start,end)});
+  }
+  const max=Math.max(...weeks.map(w=>Math.max(w.v,w.l)))*1.15||1;
+  const Y=v=>pt+(1-v/max)*(H-pt-pb);
+  const slot=(W-pl-pr)/weeks.length, bw=Math.min(30,slot*0.32);
+  let grid='';for(let g=0;g<=3;g++){const v=max*g/3,y=Y(v);
+    grid+=`<line x1="${pl}" y1="${y.toFixed(1)}" x2="${W-pr}" y2="${y.toFixed(1)}" stroke="#16203040"/>`+
+          `<text x="${pl-8}" y="${(y+3).toFixed(1)}" fill="#4a5674" font-size="10" text-anchor="end">$${fmtK(v)}</text>`;}
+  let bars='';
+  weeks.forEach((w,i)=>{
+    const cx=pl+slot*(i+0.5);
+    const vy=Y(w.v), ly=Y(w.l);
+    bars+=`<rect x="${(cx-bw-1.5).toFixed(1)}" y="${vy.toFixed(1)}" width="${bw.toFixed(1)}" height="${Math.max(1,H-pb-vy).toFixed(1)}" rx="3" fill="url(#rvA)"><title>wk → ${w.end}\nVariational +${fmtUSD(w.v)}\nLighter +${fmtUSD(w.l)}</title></rect>`;
+    bars+=`<rect x="${(cx+1.5).toFixed(1)}" y="${ly.toFixed(1)}" width="${bw.toFixed(1)}" height="${Math.max(1,H-pb-ly).toFixed(1)}" rx="3" fill="url(#rvB)"><title>wk → ${w.end}\nLighter +${fmtUSD(w.l)}\nVariational +${fmtUSD(w.v)}</title></rect>`;
+    bars+=`<text x="${cx.toFixed(1)}" y="${H-10}" fill="#4a5674" font-size="9" text-anchor="middle">${w.end.slice(5)}</text>`;
+    if(i===weeks.length-1){
+      bars+=`<image href="variational-symbol-transparent.png" x="${(cx-bw/2-1.5-8).toFixed(1)}" y="${(vy-20).toFixed(1)}" width="16" height="16"/>`;
+      bars+=`<image href="lighter-logo.png" x="${(cx+bw/2+1.5-8).toFixed(1)}" y="${(ly-20).toFixed(1)}" width="16" height="16"/>`;
+    }
+  });
+  svg.innerHTML=`
+    <defs>
+      <linearGradient id="rvA" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#22e6a0" stop-opacity=".95"/><stop offset="1" stop-color="#38e1ff" stop-opacity=".3"/></linearGradient>
+      <linearGradient id="rvB" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3f74c9" stop-opacity=".95"/><stop offset="1" stop-color="#2c4c7f" stop-opacity=".3"/></linearGradient>
+    </defs>
+    ${grid}${bars}
+    <line x1="${pl}" y1="${Y(0)}" x2="${W-pr}" y2="${Y(0)}" stroke="#22304a" stroke-width="1"/>`;
+  const cM=v=>v>=1e9?'$'+(v/1e9).toFixed(2)+'B':'$'+(v/1e6).toFixed(2)+'M';
+  const fees=rev30/MKT.spreadShare, olp=fees-rev30, burn=rev30*MKT.burnShare;
+  const liKept=VSL.li.rev30/VSL.li.fees30*100;
+  $('#revCallout').innerHTML=`
+    <div class="fs-title">Where the money goes · last 30 days</div>
+    <div class="fs-grid">
+      <div class="fs-col cva2">
+        <div class="fs-h"><img class="cmp-logo" src="variational-symbol-transparent.png" alt="">Variational</div>
+        <div class="fs-big grn">${cM(fees)}</div>
+        <div class="fs-sub">traders paid in spreads — ${ (fees/VSL.li.fees30).toFixed(1) }× Lighter</div>
+        <div class="fs-bar"><i class="olp" style="width:${(100-MKT.spreadShare*100).toFixed(0)}%"></i><i class="tre" style="width:${(MKT.spreadShare*100).toFixed(0)}%"></i></div>
+        <div class="fs-row"><span>→ OLP liquidity providers · ${(100-MKT.spreadShare*100).toFixed(0)}%</span><b>${cM(olp)}</b></div>
+        <div class="fs-row"><span>→ Treasury · ${(MKT.spreadShare*100).toFixed(0)}%</span><b class="g">${cM(rev30)}</b></div>
+        <div class="fs-row"><span>→ of treasury, ≥30% buys &amp; burns $VAR</span><b class="v">≥ ${cM(burn)}</b></div>
+      </div>
+      <div class="fs-col cli2">
+        <div class="fs-h"><img class="cmp-logo" src="lighter-logo.png" alt="">Lighter</div>
+        <div class="fs-big bl">${cM(VSL.li.fees30)}</div>
+        <div class="fs-sub">fees collected · premium accs + wd/tx</div>
+        <div class="fs-bar"><i class="lir" style="width:${liKept.toFixed(0)}%"></i></div>
+        <div class="fs-row"><span>→ protocol revenue · ~${liKept.toFixed(0)}% of fees</span><b class="b">${cM(VSL.li.rev30)}</b></div>
+        <div class="fs-row dim"><span>no LP payout leg — different engine</span><b>—</b></div>
+      </div>
+    </div>`;
 }
 function renderMath(){
   if(!$('#mqF'))return;
@@ -2200,8 +2763,8 @@ function renderEfficiency(){
   $('#efOi').textContent=fmtBig(MKT.oi);
   $('#efYield').textContent=e.annRevYield.toFixed(1)+'%';
   $('#effAsOf').textContent=e.key==='month'
-    ? 'Month view uses exact wallet inflow; volume is a 30D average proxy. OI snapshot '+MKT.asOf+'.'
-    : 'Volume and OI snapshot '+MKT.asOf+'.';
+    ? 'Month uses exact wallet inflow; volume is a 30D average proxy. OI snapshot '+MKT.asOf+'.'
+    : 'Volume & OI snapshot '+MKT.asOf+'.';
   $('#frReadRevNote') && ($('#frReadRevNote').textContent=e.label+' treasury revenue. If this rises, the venue is earning more real USDC.');
   renderFeeRevenueHistory();
   renderFeeOi();
@@ -2237,7 +2800,7 @@ function renderFeeOi(){
   if(rd)rd.innerHTML=
     `<div class="fr-item"><div class="fr-v oi">${(oiG>=0?'+':'')+oiG.toFixed(0)}%</div><div class="fr-l">Open interest · since ${mdShort(first.d)}</div></div>`+
     `<div class="fr-item"><div class="fr-v fee">${(feeG>=0?'+':'')+feeG.toFixed(0)}%</div><div class="fr-l">Treasury fees (30D) · same window</div></div>`+
-    `<div class="fr-item"><div class="fr-v y">${first.yield.toFixed(1)}% → ${last.yield.toFixed(1)}%</div><div class="fr-l">OI proxy yield · replace with OLP TVL when public</div></div>`+
+    `<div class="fr-item"><div class="fr-v y">${first.yield.toFixed(1)}% → ${last.yield.toFixed(1)}%</div><div class="fr-l">Fee yield on OI · per year</div></div>`+
     `<div class="fr-item"><div class="fr-v ${feeG>=oiG?'fee':'oi'}">${feeG>=oiG?'Fees outran OI':'OI outran fees'}</div><div class="fr-l">${feeG>=oiG?'monetizing OI better over time':'capacity grew faster than fees'}</div></div>`;
   const {W,H}=chartDims(svg,720,320),pl=52,pr=54,pt=26,gap=32,pb=34;
   const panelH=(H-pt-pb-gap)/2, aTop=pt,aBot=aTop+panelH,bTop=aBot+gap,bBot=bTop+panelH;
@@ -2262,7 +2825,7 @@ function renderFeeOi(){
     <path d="${path(idxFee,YA)}" fill="none" stroke="#22e6a0" stroke-width="2.4" filter="url(#foiG)" stroke-linejoin="round"/>
     <circle cx="${X(n-1)}" cy="${YA(idxOi[n-1])}" r="3.5" fill="#38e1ff"/><text class="chart-label" x="${X(n-1)-6}" y="${clamp(YA(idxOi[n-1])+4,aTop+10,aBot-2)}" fill="#9fe9ff" text-anchor="end">OI ${Math.round(idxOi[n-1])}</text>
     <circle cx="${X(n-1)}" cy="${YA(idxFee[n-1])}" r="3.5" fill="#22e6a0"/><text class="chart-label" x="${X(n-1)-6}" y="${clamp(YA(idxFee[n-1])-8,aTop+10,aBot-2)}" fill="#65ffd2" text-anchor="end">Fees ${Math.round(idxFee[n-1])}</text>
-    <text class="axis" x="${pl}" y="${bTop-9}" fill="#ffb547">OI proxy yield (annualised wallet revenue ÷ OI)</text>
+    <text class="axis" x="${pl}" y="${bTop-9}" fill="#ffb547">Fee yield on OI (annualised treasury fees ÷ OI)</text>
     ${gB}
     <path d="${yArea}" fill="url(#foiY)"/>
     <path d="${path(ys,YB)}" fill="none" stroke="#ffb547" stroke-width="2.2" stroke-linejoin="round"/>
@@ -2338,8 +2901,6 @@ function renderPointsCalc(){
   const hype=67.7e9, share=mine/pool;
   renderPointsDeadline();
   const pctHype=fdv/hype*100;
-  const manual=$('#ptsFdvManual');
-  if(manual&&document.activeElement!==manual)manual.value=(fdv/1e9).toFixed(fdv>=10?1:2).replace(/\.0$/,'');
   $('#ptsShare').textContent='Share '+(share*100).toFixed(4)+'%';
   $('#ptsFdvLabel').textContent=pctHype.toFixed(0)+'% of HYPE FDV ($67.7B)';
   $('#ptsFdvBig').textContent='$'+(fdv/1e9).toFixed(fdv>=1e9?1:3)+'B';
@@ -2389,8 +2950,7 @@ function renderPointsDeadline(){
   $('#ptsProgress').style.setProperty('--p',(done*100).toFixed(2)+'%');
 }
 function renderChanges(){
-  const closedIdx=latestClosedSeriesIndex();
-  const last=SERIES[closedIdx].d;
+  const last=SERIES[SERIES.length-1].d;
   const prev=addDays(last,-1);
   const lastEarn=earnOn(last), prevEarn=earnOn(prev);
   const dailyPct=pctChange(lastEarn,prevEarn);
@@ -2406,17 +2966,17 @@ function renderChanges(){
   const yoyEarn=earnOn(yoyDate);
   const yoyPct=pctChange(lastEarn,yoyEarn);
 
-  const r7=dailyRateAt(7,closedIdx), r30=dailyRateAt(30,closedIdx);
+  const r7=dailyRate(7), r30=dailyRate(30);
   const rollPct=pctChange(r7,r30);
   renderEfficiency();
   renderMath();
   renderPointsCalc();
-  const eff=computeEffAt(closedIdx);
+  const eff=computeEff();
   const cards=[
-    {k:'Latest closed day',v:changeVal(dailyPct),d:`${fmtUSD(lastEarn||0)} on ${last} vs ${fmtUSD(prevEarn||0)} on ${prev}`,p:dailyPct},
-    {k:'Closed MTD pace',v:changeVal(momPct),d:`${fmtUSD(momNow||0)} through ${last} vs ${fmtUSD(momBase||0)} same days last month`,p:momPct},
-    {k:'Volume → $1 fee',v:'$'+fmtK(eff.volPerFee),d:`closed 30D · ${eff.takeBpsFee.toFixed(2)} bps spread · $${fmtK(eff.volPerRev)} vol per $1 treasury`,p:14,raw:true},
-    {k:'Closed rolling avg',v:changeVal(rollPct),d:`7D ${fmtUSD(r7)}/day vs 30D ${fmtUSD(r30)}/day`,p:rollPct}
+    {k:'Daily change',v:changeVal(dailyPct),d:`${fmtUSD(lastEarn||0)} ET day vs ${fmtUSD(prevEarn||0)} on ${prev}`,p:dailyPct},
+    {k:'MoM pace',v:changeVal(momPct),d:`${fmtUSD(momNow||0)} ET MTD vs ${fmtUSD(momBase||0)} same days last month`,p:momPct},
+    {k:'Volume → $1 fee',v:'$'+fmtK(eff.volPerFee),d:`${eff.takeBpsFee.toFixed(2)} bps spread take · $${fmtK(eff.volPerRev)} vol per $1 to treasury`,p:14,raw:true},
+    {k:'Rolling average',v:changeVal(rollPct),d:`7D ${fmtUSD(r7)}/day vs 30D ${fmtUSD(r30)}/day`,p:rollPct}
   ];
   $('#changes').innerHTML=cards.map(c=>`<div class="chg ${changeTone(c.p)}">
     <div class="k">${c.k}</div><div class="v">${c.v}</div><div class="d">${c.d}</div>
@@ -2426,17 +2986,6 @@ function renderChanges(){
 
 /* ---------- rate helpers & forecast state ---------- */
 function dailyRate(days){const n=SERIES.length;if(n-1<days)days=n-1;return (SERIES[n-1].v-SERIES[n-1-days].v)/days;}
-function latestClosedSeriesIndex(){
-  const today=resetDateKey();
-  for(let i=SERIES.length-1;i>=0;i--)if(SERIES[i].d<today)return i;
-  return SERIES.length-1;
-}
-function dailyRateAt(days,idx=SERIES.length-1){
-  idx=Math.max(0,Math.min(idx,SERIES.length-1));
-  const span=Math.min(days,idx);
-  if(span<=0)return 0;
-  return (SERIES[idx].v-SERIES[idx-span].v)/span;
-}
 function allTimeRate(){const n=SERIES.length;const dd=Math.max(1,(new Date(SERIES[n-1].d)-new Date(SERIES[0].d))/864e5);return SERIES[n-1].v/dd;}
 const rateOf={ '7d':()=>dailyRate(7), '30d':()=>dailyRate(30), '60d':()=>dailyRate(60), 'all':()=>allTimeRate() };
 const FC={ rate:0, target:'2026-09-30', burn:30 };
@@ -2550,7 +3099,7 @@ function renderCurve(){
       const projected=Math.max(last.v,V(y));
       FC.rate=Math.round(clamp((projected-last.v)/Math.max(1,nDays),20000,90000)/1000)*1000;
     }
-    $('#rate').value=FC.rate;
+    $('#rate') && ($('#rate').value=FC.rate);
     [...document.querySelectorAll('.preset')].forEach(p=>p.classList.remove('on'));
     render();
   };
@@ -2587,6 +3136,7 @@ function renderCurve(){
 
 /* ---------- forecast panel ---------- */
 function renderForecast(){
+  if(!$('#fcDays'))return;
   const last=SERIES[SERIES.length-1];
   const nDays=daysTo(FC.target);
   const projBase=last.v+FC.rate*nDays;
@@ -2945,7 +3495,7 @@ function calColor(t){
   if(t<0.45)return 'rgba(34,230,160,.5)';
   if(t<0.7)return 'rgba(34,230,160,.72)';
   if(t<0.9)return 'rgba(45,238,190,.9)';
-  return 'rgba(45,238,190,.92)';
+  return 'linear-gradient(135deg,var(--grn),var(--cyan))';
 }
 let CALMODE='day', CAL={month:null};
 function buildCalendar(){
@@ -2966,25 +3516,6 @@ function cellVal(dateStr){
   return {v:CAL.mo.get(dateStr.slice(0,7))||0,max:CAL.maxMo};
 }
 const isClosedDailyTotal=dateStr=>dateStr<resetDateKey()&&dateStr<=CAL.last&&CAL.eMap.has(dateStr);
-function pendingDailyClose(dateStr){
-  const close=new Date(resetLocalTs(addDays(dateStr,1),0,0,0)*1000);
-  const diff=close-new Date();
-  let countdown='refresh soon';
-  if(diff>0){
-    const mins=Math.ceil(diff/60000);
-    const days=Math.floor(mins/1440);
-    const hours=Math.floor((mins%1440)/60);
-    const rem=mins%60;
-    const parts=[];
-    if(days)parts.push(days+'d');
-    if(hours)parts.push(hours+'h');
-    if(rem||!parts.length)parts.push(rem+'m');
-    countdown='in '+parts.join(' ');
-  }
-  const sgt=close.toLocaleString('en-US',{timeZone:ASIA_TZ.tz,month:'short',day:'numeric',hour:'2-digit',minute:'2-digit',hourCycle:'h23'});
-  const et=close.toLocaleString('en-US',{timeZone:RESET_TZ.tz,month:'short',day:'numeric',hour:'2-digit',minute:'2-digit',hourCycle:'h23'});
-  return {countdown,detail:`${sgt} ${ASIA_TZ.label} · ${et} ${RESET_TZ.label}`};
-}
 function calImpliedActivity(earn){
   const e=computeEff();
   return {
@@ -2999,9 +3530,8 @@ function calendarEarnHtml(dateStr,disp){
   if(CALMODE!=='day')return `<div class="cal-earn ${disp.span?'span':(disp.v?'':'zero')}">${disp.label}</div>`;
   const closed=isClosedDailyTotal(dateStr), total=CAL.eMap.get(dateStr)||0;
   const a=closed?calImpliedActivity(total):null;
-  const pending=closed?null:pendingDailyClose(dateStr);
   return `<div class="cal-dual" title="Completed daily total only. Current/future dates stay pending until the day closes.">
-    ${closed?`<div class="cal-money-row total"><span class="tz">Total</span><span class="money">+${fmtUSD(total)}</span></div>`:`<div class="cal-pending"><span>Final total closes</span><b>Results ${pending.countdown}</b><small>${pending.detail}</small></div>`}
+    <div class="cal-money-row total ${closed?'':'pending'}"><span class="tz">Total</span><span class="money">${closed?('+'+fmtUSD(total)):'pending'}</span></div>
     ${closed?`<div class="cal-flow-mini" title="Implied from 30D fee efficiency, not raw reported daily volume/OI">
       <div><b>${calMiniMoney(a.volume)}</b><span>Est Vol</span></div>
       <div><b>${calMiniMoney(a.oi)}</b><span>OI needed</span></div>
@@ -3085,8 +3615,7 @@ function selectCell(dateStr){
       label=`<b>${dateStr}</b> (${wd}) · completed daily total<br>
         implied activity: <b>${calMiniMoney(a.volume)}</b> estimated volume · <b>${calMiniMoney(a.oi)}</b> OI needed at current efficiency · <b>${calMiniMoney(a.spreadFees)}</b> spread fees · <b>${calMiniMoney(a.burn)}</b> buyback-burn firepower`;
     }else{
-      const p=pendingDailyClose(dateStr);
-      label=`<b>${dateStr}</b> (${wd}) · final total closes <b>${p.countdown}</b><br>Expected at <b>${p.detail}</b>. Daily totals close at 00:00 ET, so Singapore sees the prior ET day around noon.`;
+      label=`<b>${dateStr}</b> (${wd}) · pending until day close`;
     }
     scope=`on ${dateStr}`;
   }else if(CALMODE==='week'){
@@ -3157,11 +3686,6 @@ $('#effCalNext')?.addEventListener('click',()=>{
   renderEfficiency();
 });
 ['#ptsMine','#ptsPool','#ptsFdv'].forEach(s=>$(s)?.addEventListener('input',renderPointsCalc));
-$('#ptsFdvManual')?.addEventListener('input',e=>{
-  const b=Math.max(.001,Math.min(67.7,parseFloat(e.target.value)||0));
-  $('#ptsFdv').value=Math.round(b*1e9);
-  renderPointsCalc();
-});
 $('#fdvPresets')?.addEventListener('click',e=>{
   const b=e.target.closest('.preset');if(!b)return;
   $('#ptsFdv').value=b.dataset.fdv;renderPointsCalc();
@@ -3206,7 +3730,6 @@ function render(){
   renderTable(CUR,rows);
   renderRunningTotals();
   renderHeaderDeltasFallback();
-  renderComparisonEconomics();
 }
 let _chartResizeTimer=0;
 window.addEventListener('resize',()=>{
@@ -3239,19 +3762,21 @@ $('#curveZoom')?.addEventListener('click',e=>{
 /* ---------- forecast controls ---------- */
 function initForecast(){
   FC.rate=Math.round(rateOf['30d']());
-  $('#rate').value=FC.rate; $('#burn').value=FC.burn; $('#tgt').value=FC.target;
+  $('#rate') && ($('#rate').value=FC.rate);
+  $('#burn') && ($('#burn').value=FC.burn);
+  $('#tgt') && ($('#tgt').value=FC.target);
 }
-$('#rate').addEventListener('input',e=>{
+$('#rate')?.addEventListener('input',e=>{
   FC.rate=+e.target.value;
   [...document.querySelectorAll('.preset')].forEach(p=>p.classList.remove('on'));
   render();
 });
-$('#burn').addEventListener('input',e=>{FC.burn=+e.target.value;render();});
-$('#tgt').addEventListener('change',e=>{if(e.target.value){FC.target=e.target.value;render();}});
-document.querySelector('.preset-row').addEventListener('click',e=>{
+$('#burn')?.addEventListener('input',e=>{FC.burn=+e.target.value;render();});
+$('#tgt')?.addEventListener('change',e=>{if(e.target.value){FC.target=e.target.value;render();}});
+document.querySelector('.preset-row')?.addEventListener('click',e=>{
   const b=e.target.closest('.preset');if(!b)return;
   [...document.querySelectorAll('.preset')].forEach(p=>p.classList.toggle('on',p===b));
-  FC.rate=Math.round(rateOf[b.dataset.r]()); $('#rate').value=FC.rate; render();
+  FC.rate=Math.round(rateOf[b.dataset.r]()); $('#rate') && ($('#rate').value=FC.rate); render();
 });
 
 /* ---------- live refresh via Tenderly ---------- */
@@ -3267,6 +3792,10 @@ async function rpc(method,params){
 }
 async function balAt(block){
   const r=await rpc('eth_call',[{to:CHAIN.usdc,data:'0x70a08231'+CHAIN.pad}, typeof block==='number'?'0x'+block.toString(16):block]);
+  return parseInt(r,16)/1e6;
+}
+async function balAtPad(pad,block='latest'){
+  const r=await rpc('eth_call',[{to:CHAIN.usdc,data:'0x70a08231'+pad}, typeof block==='number'?'0x'+block.toString(16):block]);
   return parseInt(r,16)/1e6;
 }
 const blockAt=ts=>Math.round(CHAIN.b0+(ts-CHAIN.t0)*CHAIN.bps);
@@ -3292,6 +3821,14 @@ async function refresh(){
     SERIES.sort((a,b)=>a.d<b.d?-1:1);
     LIVE_BASE={balance:cur,at:performance.now()};
     LIVE_HOUR_BASE={key:resetHourKey(),balance:cur,at:performance.now()};
+    try{
+      const olpBal=await balAtPad(CHAIN.olpPad,'latest');
+      $('#pmOlpBalance') && ($('#pmOlpBalance').textContent=fmtUSD(olpBal));
+      $('#pmOlpFormula') && ($('#pmOlpFormula').innerHTML=`Formula: <b>USDC balanceOf(0x74bbbb...1f2cd) = ${fmtUSD(olpBal)}</b>`);
+    }catch(_){
+      $('#pmOlpBalance') && ($('#pmOlpBalance').textContent='check Arbiscan');
+      $('#pmOlpFormula') && ($('#pmOlpFormula').innerHTML='Formula: <b>read Core OLP Vault USDC balance on Arbiscan</b>');
+    }
     await renderHourlyEarnings(cur);
     $('#stamp').textContent='live · '+resetTimeString()+' ET';
     $('#stamp').className='live';
@@ -3300,6 +3837,7 @@ async function refresh(){
     renderTwaps();
     renderActuals(cur);
     buildCalendar();
+    renderVsLighter();
   }catch(err){
     note.textContent='Live sync unavailable ('+err.message+'). Showing embedded ET snapshot through '+SERIES[SERIES.length-1].d+'.';
     note.classList.add('show');
@@ -3322,13 +3860,42 @@ The current OLP docs say 10% of every spread paid to OLP flows into this on-chai
   window.open(intent,'_blank','noopener,width=600,height=520');
 });
 
+/* ---------- referral copy ---------- */
+function fallbackCopy(text){
+  const ta=document.createElement('textarea');
+  ta.value=text;
+  ta.setAttribute('readonly','');
+  ta.style.position='fixed';
+  ta.style.top='-1000px';
+  document.body.appendChild(ta);
+  ta.select();
+  try{document.execCommand('copy');}catch(_){}
+  ta.remove();
+}
+function copyReferralCode(){
+  const code='OMNIKOREAN';
+  const btn=$('#refCopyBtn');
+  const done=()=>{
+    if(!btn)return;
+    btn.classList.add('copied');
+    btn.textContent='Copied';
+    setTimeout(()=>{btn.classList.remove('copied');btn.textContent='Copy code';},1300);
+  };
+  if(navigator.clipboard?.writeText)navigator.clipboard.writeText(code).then(done).catch(()=>{fallbackCopy(code);done();});
+  else{fallbackCopy(code);done();}
+}
+$('#refCopyBtn')?.addEventListener('click',copyReferralCode);
+$('#refCodeCopy')?.addEventListener('click',copyReferralCode);
+
 /* ---------- tabs ---------- */
 const TABS=$('#tabs');
 const TAB_ORDER_KEY='variationalTabOrder';
-const VALID_TABS=['overview','efficiency','comparison','points'];
+const VALID_TABS=['overview','implied','historical','efficiency','roadmap','points','comparison'];
 const normalizeTabName=name=>{
-  if(name==='charts'||name==='interval'||name==='historical'||name==='calendar'||name==='implied'||name==='spreads'||name==='implied-fees')return 'efficiency';
+  if(name==='charts'||name==='interval')return 'historical';
   if(name==='peers')return 'comparison';
+  if(name==='spreads'||name==='implied-fees')return 'implied';
+  if(name==='calendar'||name==='total-earnings'||name==='earnings')return 'efficiency';
   return name;
 };
 function saveTabOrder(){
@@ -3400,59 +3967,17 @@ TABS.addEventListener('keydown',e=>{
   tabs[next].focus();showTab(tabs[next].dataset.tab);
 });
 
-/* ---------- Variational intro gate ---------- */
-function closeVarhalla(){
-  const gate=$('#varhallaGate'); if(!gate)return;
-  gate.classList.add('hide');
-  document.body.classList.remove('gate-open');
-  try{sessionStorage.setItem('varhallaEntered','1');}catch(_){}
-  setTimeout(()=>gate.remove(),650);
-}
-function initVarhalla(){
-  const gate=$('#varhallaGate'); if(!gate)return;
-  const params=new URLSearchParams(location.search);
-  const forceIntro=params.get('intro')==='1';
-  const fromVarhalla=params.get('fromVarhalla')==='1';
-  const directTab=location.hash&&normalizeTabName(location.hash.slice(1))!=='overview';
-  let seen=false;try{seen=sessionStorage.getItem('varhallaEntered')==='1';}catch(_){}
-  if((fromVarhalla||directTab)&&!forceIntro){
-    gate.remove();
-    document.body.classList.remove('gate-open');
-    if(fromVarhalla&&history.replaceState) history.replaceState(null,'',location.pathname+location.hash);
-    return;
-  }
-  if(seen&&!forceIntro){gate.remove();return;}
-  document.body.classList.add('gate-open');
-  const move=e=>{
-    const x=(e.clientX/innerWidth-.5)*2, y=(e.clientY/innerHeight-.5)*2;
-    gate.style.setProperty('--mx',x.toFixed(3));
-    gate.style.setProperty('--my',y.toFixed(3));
-  };
-  gate.addEventListener('pointermove',move);
-  $('#enterVarhalla')?.addEventListener('click',closeVarhalla);
-  $('#skipVarhalla')?.addEventListener('click',closeVarhalla);
-  gate.addEventListener('click',e=>{
-    const x=e.clientX/innerWidth, y=e.clientY/innerHeight;
-    const onGate=innerWidth<=760 ? x>.38&&x<.62&&y>.34&&y<.74 : x>.27&&x<.47&&y>.42&&y<.82;
-    if(onGate)closeVarhalla();
-  });
-  gate.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key==='Escape')closeVarhalla();});
-}
-function organizeEfficiencyPage(){
-  const first=document.querySelector('.card.eff[data-tg="efficiency"]');
-  const cal=document.querySelector('.card.cal[data-tg="efficiency"]');
-  const hist=document.querySelector('#curve')?.closest('.card');
-  if(first&&cal)first.after(cal);
-  if(cal&&hist)cal.after(hist);
-}
 /* ---------- init ---------- */
-organizeEfficiencyPage();
 $('#genstamp').textContent='Snapshot generated 2026-07-06 ET · daily reset 00:00 ET · click Refresh live to sync on-chain';
+const combinedCal=document.querySelector('.card.cal[data-tg="efficiency"]');
+const feeRevenueCard=document.querySelector('.card.eff[data-tg="efficiency"]');
+if(combinedCal&&feeRevenueCard)feeRevenueCard.before(combinedCal);
 initDraggableTabs();
 showTab(location.hash.replace('#','')||'overview',{push:false,scroll:false});
 initForecast();
 render();
 renderPeers();
+renderVsLighter();
 booted=true;
 buildCalendar();
 startLive();
