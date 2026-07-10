@@ -944,6 +944,29 @@
   .pulse-table .exchange{display:inline-flex;align-items:center;gap:8px;color:var(--ink);font-weight:900}
   .pulse-table tr.me .exchange{color:var(--grn)}
   .pulse-table .table-logo{width:20px;height:20px;object-fit:contain;border-radius:5px;vertical-align:middle;background:#0a101b}
+  .pulse-table td:nth-child(2) img.table-logo{
+    display:block!important;
+    flex:0 0 20px!important;
+    width:20px!important;
+    min-width:20px!important;
+    max-width:20px!important;
+    height:20px!important;
+    min-height:20px!important;
+    max-height:20px!important;
+    object-fit:contain!important;
+  }
+  .pulse-table .exchange{min-height:24px}
+  .pulse-table tbody tr{height:42px}
+  .rank-list img.rk-logo{
+    display:inline-block!important;
+    width:19px!important;
+    min-width:19px!important;
+    max-width:19px!important;
+    height:19px!important;
+    min-height:19px!important;
+    max-height:19px!important;
+    object-fit:contain!important;
+  }
   .pulse-table .source-link{color:var(--cyan);font-weight:900}
   .pulse-table .fee-zero{color:var(--grn)}
   .pulse-table .rank-badge{display:inline-block;margin-left:6px;padding:2px 5px;border:1px solid rgba(34,230,160,.4);border-radius:999px;color:var(--grn);font:900 8px var(--mono);letter-spacing:.5px;text-transform:uppercase}
@@ -978,6 +1001,26 @@
   .h2h-rows{overflow-x:auto}
   .cmp-logo{width:18px;height:18px;border-radius:5px;object-fit:contain;vertical-align:-4px;margin-right:7px;background:#0a0e1a}
   .cmp-logo.lg{width:28px;height:28px;border-radius:8px;vertical-align:-6px;margin-right:9px}
+  [data-tg="comparison"] img,
+  [data-tg="comparison"] img.cmp-logo,
+  [data-tg="comparison"] img.cmp-logo.lg,
+  [data-tg="comparison"] img.table-logo,
+  [data-tg="comparison"] img.rk-logo,
+  [data-tg="comparison"] img.vs-logo{
+    display:inline-block!important;
+    flex:0 0 20px!important;
+    width:20px!important;
+    min-width:20px!important;
+    max-width:20px!important;
+    height:20px!important;
+    min-height:20px!important;
+    max-height:20px!important;
+    object-fit:contain!important;
+    vertical-align:middle!important;
+    margin-right:7px!important;
+    border-radius:4px!important;
+    background:#0d0d0d!important;
+  }
   .rev-callout .big .bva{background:linear-gradient(92deg,#eafff6,var(--grn),var(--cyan));-webkit-background-clip:text;background-clip:text;color:transparent}
   .rev-callout .big .bli{color:#7fa8e8;-webkit-text-fill-color:#7fa8e8}
   .rev-callout .big em{font-style:normal;font-weight:600;font-size:.55em;color:var(--dim);-webkit-text-fill-color:var(--dim);margin:0 8px;vertical-align:6px}
@@ -1076,12 +1119,14 @@
   .h2h-note{margin-top:16px;border-top:1px solid rgba(85,184,255,.12);padding-top:12px;font:11px/1.65 var(--mono);color:var(--dim)}
   /* ---- implied valuation (OI -> market-cap model) ---- */
   .valmodel{overflow:hidden}
-  .val-hero{display:grid;grid-template-columns:1.15fr 1fr;gap:16px;margin:14px 0 18px}
+  .val-hero{display:grid;grid-template-columns:1.08fr .78fr 1fr;gap:10px;margin:14px 0 18px}
   .val-cell{position:relative;border:1px solid rgba(85,184,255,.16);border-radius:16px;padding:clamp(16px,2.2vw,22px);overflow:hidden;
     background:radial-gradient(560px 240px at 8% -20%,rgba(38,230,194,.08),transparent 60%),linear-gradient(180deg,rgba(10,22,40,.7),rgba(5,12,22,.55))}
   .val-cell.fdv{background:radial-gradient(560px 240px at 92% -20%,rgba(85,184,255,.09),transparent 60%),linear-gradient(180deg,rgba(10,22,40,.7),rgba(5,12,22,.55))}
   .val-cell::before{content:"";position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--grn),transparent 78%)}
   .val-cell.fdv::before{background:linear-gradient(90deg,var(--cyan),transparent 78%)}
+  .val-cell.actual::before{background:linear-gradient(90deg,var(--sub),transparent 78%)}
+  .val-cell.actual .vh-big{background:none;color:var(--sub);-webkit-text-fill-color:var(--sub);filter:none}
   .vh-k{font:950 9.5px var(--mono);letter-spacing:1.6px;text-transform:uppercase;color:var(--sub)}
   .vh-big{font:950 clamp(38px,6vw,64px)/.92 var(--mono);letter-spacing:-2.4px;margin:8px 0 8px;
     background:linear-gradient(92deg,#eafff6,var(--grn),var(--cyan));-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 0 22px rgba(38,230,194,.28))}
@@ -1095,12 +1140,15 @@
   #valScatter{width:100%;height:auto;display:block}
   #valScatter text{font-family:var(--mono)}
   .val-side{display:flex;flex-direction:column;gap:9px}
-  .val-side .vs-h{font:950 9.5px var(--mono);letter-spacing:1.5px;text-transform:uppercase;color:var(--sub);margin-bottom:2px}
+  .val-side .vs-h{display:flex;align-items:center;justify-content:space-between;gap:10px;font:950 9.5px var(--mono);letter-spacing:1.3px;text-transform:uppercase;color:var(--sub);margin-bottom:2px}
+  .val-side .vs-hs{color:var(--dim);font-size:8.5px;letter-spacing:.5px;text-transform:none;text-align:right}
   .vs-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid rgba(27,37,54,.6);font:11.5px var(--mono)}
   .vs-row:last-child{border-bottom:0}
   .vs-row .n{color:var(--sub);display:flex;align-items:center;gap:7px}
   .vs-row .n i{width:8px;height:8px;border-radius:50%;flex:none}
   .vs-row .v{color:var(--ink);font-weight:800;letter-spacing:-.3px}
+  .vs-row .vs-nm small{display:block;margin-top:3px;color:var(--dim);font-size:9.5px;line-height:1.35}
+  .vs-row .vs-nm small b{color:var(--sub);font-weight:800}
   .vs-row.me{margin-top:2px;padding:11px 12px;border:1px solid rgba(38,230,194,.35);border-radius:11px;background:rgba(38,230,194,.06)}
   .vs-row.me .n{color:var(--grn);font-weight:900} .vs-row.me .v{color:var(--grn)}
   .val-note{margin-top:15px;border-top:1px solid rgba(85,184,255,.12);padding-top:12px;font:10.5px/1.65 var(--mono);color:var(--dim)}
@@ -1576,6 +1624,20 @@
     width:78px;
     height:86px;
     filter:none;
+  }
+  .logo.header-var-logo{
+    width:58px;
+    height:44px;
+    margin-top:13px;
+    align-self:flex-start;
+    flex:0 0 58px;
+    border:0;
+    border-radius:0;
+    background:transparent;
+    object-fit:contain;
+    opacity:.96;
+    filter:brightness(0) invert(1);
+    box-shadow:none;
   }
   .header-terminal .brand{
     gap:8px;
@@ -2223,9 +2285,11 @@
     body{
       padding:10px 10px 34px;
     }
-    .logo.scanner-logo{
-      width:62px;
-      height:68px;
+    .logo.header-var-logo{
+      width:46px;
+      height:35px;
+      margin-top:11px;
+      flex-basis:46px;
     }
     .header-terminal .brandwrap{
       gap:11px;
@@ -2263,7 +2327,7 @@
 <body>
 <header class="header-terminal">
   <div class="brandwrap">
-  <img class="logo scanner-logo" src="variational-scanner-logo-transparent.png?v=2" alt="Variational Scanner logo">
+  <img class="logo header-var-logo" src="variational-symbol-transparent.png?v=2" alt="Variational logo" width="58" height="44">
   <div class="brand">
     <a class="kd" href="https://x.com/0xdefidaniel" target="_blank" rel="noopener"><span class="dot"></span><span class="by">Variational Scanner</span><strong>Revenue Radar</strong><span class="handle">Built by @0xdefidaniel</span><span class="follow">Live ↗</span></a>
     <div class="contract">
@@ -2866,7 +2930,7 @@
     <div class="king-card">
       <div class="king-crown">♕</div>
       <div>
-        <b><img class="cmp-logo lg" src="logo-hyperliquid.png" alt="">Hyperliquid is the king</b>
+        <b><img class="cmp-logo lg" src="logo-hyperliquid.png" alt="" width="20" height="20">Hyperliquid is the king</b>
         <span>The benchmark ceiling: deepest OI, largest volume, biggest protocol revenue. Variational and Lighter are not compared as equals to HL — they are challengers priced by how close they can get.</span>
       </div>
       <div class="king-score">
@@ -2877,12 +2941,12 @@
     </div>
     <div class="challenger-duel">
       <div class="challenger var">
-        <div class="challenger-name"><b><img class="cmp-logo lg" src="variational-symbol-transparent.png" alt="">Variational</b><span>challenger A</span></div>
+        <div class="challenger-name"><b><img class="cmp-logo lg" src="variational-symbol-transparent.png" alt="" width="20" height="20">Variational</b><span>challenger A</span></div>
         <div class="challenger-thesis" id="varThesis">Higher OI and larger spread-fee pool than Lighter; lower realized protocol revenue today because only the treasury cut is counted.</div>
       </div>
       <div class="duel-vs">vs comp</div>
       <div class="challenger ltr">
-        <div class="challenger-name"><b><img class="cmp-logo lg" src="lighter-logo.png" alt="">Lighter</b><span>market comp</span></div>
+        <div class="challenger-name"><b><img class="cmp-logo lg" src="lighter-logo.png" alt="" width="20" height="20">Lighter</b><span>market comp</span></div>
         <div class="challenger-thesis" id="lighterThesis">Useful TGE comp: higher current booked revenue, but smaller OI and much smaller fee pool than Variational in this snapshot.</div>
       </div>
     </div>
@@ -2902,24 +2966,29 @@
   <h2>Variational Revenue vs Lighter Revenue <span class="tag">weekly · trailing 8 weeks</span></h2>
   <div class="cap">Weekly protocol revenue, same 7-day windows. Variational = USDC actually landing in the on-chain treasury (verifiable). Lighter = daily revenue on DeFiLlama.</div>
   <div class="legend">
-    <b><img class="cmp-logo" src="variational-symbol-transparent.png" alt=""><span class="sw act"></span>Variational · on-chain</b>
-    <b><img class="cmp-logo" src="lighter-logo.png" alt=""><span class="sw" style="background:linear-gradient(90deg,#2c4c7f,#3f74c9)"></span>Lighter · DeFiLlama</b>
+    <b><img class="cmp-logo" src="variational-symbol-transparent.png" alt="" width="20" height="20"><span class="sw act"></span>Variational · on-chain</b>
+    <b><img class="cmp-logo" src="lighter-logo.png" alt="" width="20" height="20"><span class="sw" style="background:linear-gradient(90deg,#2c4c7f,#3f74c9)"></span>Lighter · DeFiLlama</b>
   </div>
   <svg class="chart" id="revVs" viewBox="0 0 720 250" preserveAspectRatio="none"></svg>
   <div class="rev-callout" id="revCallout"></div>
 </div>
 
 <div class="card valmodel tsec tg-hide" data-tg="comparison" style="margin-top:16px">
-  <h2>Implied Valuation <span class="tag">OI → market-cap model</span></h2>
-  <div class="cap">Where $VAR could price at TGE. Every live perp-DEX token is plotted by open interest vs its circulating market cap; a power-law fit turns Variational's current OI into an implied valuation. Model &amp; peer set: <a href="https://www.perpetualpulse.xyz/" target="_blank" rel="noopener" style="color:var(--cyan)">Perpetual Pulse</a>.</div>
+  <h2>Model MCAP vs Current Market <span class="tag">actual · model · gap</span></h2>
+  <div class="cap">The model converts Variational's current OI into an implied circulating market cap. <b>$VAR is still pre-TGE, so Variational has no current market cap yet.</b> Listed peer market caps update from CoinGecko and are compared against the same model. <a href="https://docs.variational.io/roadmap" target="_blank" rel="noopener" style="color:var(--cyan)">Token status ↗</a></div>
   <div class="val-hero">
     <div class="val-cell">
-      <div class="vh-k">Predicted circulating market cap</div>
+      <div class="vh-k">Model-implied Variational MCAP</div>
       <div class="vh-big" id="valMcap">$—</div>
       <div class="vh-sub">from current OI <b id="valOiBase">$—</b> · fit <span class="mono">MCAP ≈ 10.0 · OI<sup>0.875</sup></span> · R² 0.74</div>
     </div>
+    <div class="val-cell actual">
+      <div class="vh-k">Current Variational MCAP</div>
+      <div class="vh-big" id="valCurrentMcap">N/A</div>
+      <div class="vh-sub" id="valMcapStatus">No traded $VAR market · pre-TGE</div>
+    </div>
     <div class="val-cell fdv">
-      <div class="vh-k">Implied FDV</div>
+      <div class="vh-k">Model-implied FDV</div>
       <div class="vh-big" id="valFdv">$—</div>
       <div class="vh-sub">at <b id="valFloat">25%</b> circulating float · range <b id="valFdvRange">—</b> across 20–33%</div>
     </div>
@@ -3363,7 +3432,7 @@ function renderPeers(){
   $('#rankList').innerHTML=PEERS.list.slice(0,13).map((p,i)=>`
     <div class="rk${p.me?' me':''}">
       <div class="rk-i">${i+1}</div>
-      <div class="rk-n">${PLOGO[p.n]?`<img class="rk-logo" src="${PLOGO[p.n]}" alt="" onerror="this.style.visibility='hidden'">`:`<span class="rk-logo ph"></span>`}${p.n}</div>
+      <div class="rk-n">${PLOGO[p.n]?`<img class="rk-logo" src="${PLOGO[p.n]}" alt="" width="20" height="20" style="width:20px!important;height:20px!important;min-width:20px!important;max-width:20px!important;min-height:20px!important;max-height:20px!important;object-fit:contain!important" onerror="this.style.visibility='hidden'">`:`<span class="rk-logo ph"></span>`}${p.n}</div>
       <div class="rk-bar"><i style="width:${(p.oi/max*100).toFixed(1)}%"></i></div>
       <div class="rk-v">${fmtB(p.oi)}</div>
     </div>`).join('');
@@ -3386,7 +3455,7 @@ function renderPulseTable(){
   if(!body)return;
   body.innerHTML=PEERS.list.slice(0,13).map((p,i)=>`<tr class="${p.me?'me':''}">
     <td class="rank">${i+1}</td>
-    <td><span class="exchange"><img class="table-logo" src="${PLOGO[p.n]||'variational-symbol-transparent.png'}" alt="">${p.n}${p.me?'<span class="rank-badge">Variational</span>':''}</span></td>
+    <td><span class="exchange"><img class="table-logo" src="${PLOGO[p.n]||'variational-symbol-transparent.png'}" alt="" width="20" height="20" style="width:20px!important;height:20px!important;min-width:20px!important;max-width:20px!important;min-height:20px!important;max-height:20px!important;object-fit:contain!important">${p.n}${p.me?'<span class="rank-badge">Variational</span>':''}</span></td>
     <td class="${(PEERS.live&&!p.live)?'snap':''}">${fmtPulseMoney(p.oi)}</td><td class="${(PEERS.live&&!p.live)?'snap':''}">${fmtPulseMoney(p.vol)}</td><td>${fmtPulseMoney(p.tvl)}</td><td>${p.pairs??'—'}</td>
     <td class="${p.maker==='0%'?'fee-zero':''}">${p.maker}</td><td class="${p.taker==='0%'?'fee-zero':''}">${p.taker}</td><td>${p.lev}</td>
     <td><a class="source-link" href="${p.url}" target="_blank" rel="noopener">↗</a></td>
@@ -3405,28 +3474,35 @@ function renderKing(){
    A/B reproduce the Perpetual Pulse "Circulating MarketCap vs OI" model (R^2~0.74, log-log). */
 const VAL_FIT={A:10.0339,B:0.8753,r2:0.74};
 const VAL_FLOAT=0.25; // assumed circulating float at TGE, for FDV
+let VAL_MCAP_ASOF='CoinGecko snapshot · 2026-07-10 16:55 SGT';
 const VAL_COMPS=[
-  {n:'Hyperliquid',oi:10650289066,mc:15166202533,big:1},
-  {n:'Aster',oi:1873558499,mc:1688647643,big:1},
-  {n:'Lighter',oi:841224409,mc:623795984,big:1},
-  {n:'Jupiter',oi:231885286,mc:708656055,big:1},
-  {n:'edgeX',oi:297961154,mc:167041481},
-  {n:'dYdX',oi:39069154,mc:113618792},
-  {n:'GMX',oi:45194812,mc:64954468},
-  {n:'ApeX Protocol',oi:113429724,mc:38608839},
-  {n:'Avantis',oi:12551268,mc:31447239},
-  {n:'Orderly',oi:35976834,mc:13473096},
-  {n:'Gains Network',oi:3337198,mc:14491130},
-  {n:'Drift',oi:123964778,mc:9032977}
+  {n:'Hyperliquid',cg:'hyperliquid',oi:10650289066,mc:15251711817,big:1},
+  {n:'Aster',cg:'aster-2',oi:1873558499,mc:1694156746,big:1},
+  {n:'Lighter',cg:'lighter',oi:841224409,mc:617506501,big:1},
+  {n:'Jupiter',cg:'jupiter-exchange-solana',oi:231885286,mc:696647498,big:1},
+  {n:'edgeX',cg:'edgex',oi:297961154,mc:143319946},
+  {n:'dYdX',cg:'dydx-chain',oi:39069154,mc:113579140},
+  {n:'GMX',cg:'gmx',oi:45194812,mc:64586151},
+  {n:'ApeX Protocol',cg:'apex-token-2',oi:113429724,mc:38384644},
+  {n:'Avantis',cg:'avantis',oi:12551268,mc:31220697},
+  {n:'Orderly',cg:'orderly-network',oi:35976834,mc:13370390},
+  {n:'Gains Network',cg:'gains-network',oi:3337198,mc:14535752},
+  {n:'Drift',cg:'drift-protocol',oi:123964778,mc:9022464}
 ];
 const valPred=oi=>VAL_FIT.A*Math.pow(oi,VAL_FIT.B);
 function fmtBig(v){return v>=1e9?'$'+(v/1e9).toFixed(2)+'B':v>=1e6?'$'+(v/1e6).toFixed(0)+'M':'$'+fmtK(v);}
 function renderValuation(){
   const svg=$('#valScatter'); if(!svg)return;
+  VAL_COMPS.forEach(c=>{
+    const livePeer=PEERS.list.find(p=>p.n===c.n);
+    if(livePeer&&livePeer.oi>0)c.oi=livePeer.oi;
+  });
   const va=PEERS.list.find(p=>p.me);
   const oi=va&&va.oi>0?va.oi:1210288593;
   const mcap=valPred(oi), fdv=mcap/VAL_FLOAT;
   $('#valMcap')&&($('#valMcap').textContent=fmtBig(mcap));
+  $('#valCurrentMcap')&&($('#valCurrentMcap').textContent='N/A');
+  $('#valMcapStatus')&&($('#valMcapStatus').textContent='No traded $VAR market · pre-TGE');
   $('#valOiBase')&&($('#valOiBase').textContent=fmtBig(oi)+(PEERS.live?' live':''));
   $('#valFdv')&&($('#valFdv').textContent=fmtBig(fdv));
   $('#valFloat')&&($('#valFloat').textContent=Math.round(VAL_FLOAT*100)+'%');
@@ -3458,7 +3534,7 @@ function renderValuation(){
   let dots='';
   VAL_COMPS.forEach(c=>{if(c.oi<=0||c.mc<=0)return;
     const imp=valPred(c.oi), prem=c.mc/imp, col=premCol(prem);
-    const x=X(c.oi), ya=Y(c.mc), yi=Y(imp), logo=PLOGO[c.n], s=c.big?26:22;
+    const x=X(c.oi), ya=Y(c.mc), yi=Y(imp), logo=PLOGO[c.n], s=20;
     dots+=`<line x1="${x.toFixed(1)}" y1="${yi.toFixed(1)}" x2="${x.toFixed(1)}" y2="${ya.toFixed(1)}" stroke="${col}" stroke-width="1.3" stroke-dasharray="2 2" opacity=".5"/>`;
     if(logo){
       dots+=`<rect x="${(x-s/2).toFixed(1)}" y="${(ya-s/2).toFixed(1)}" width="${s}" height="${s}" rx="6" fill="#0a1220" stroke="${col}" stroke-width="1.5"/>`+
@@ -3467,10 +3543,10 @@ function renderValuation(){
       dots+=`<circle cx="${x.toFixed(1)}" cy="${ya.toFixed(1)}" r="5" fill="${col}" stroke="#0a1220" stroke-width="1"/>`+
         `<text x="${x.toFixed(1)}" y="${(ya-9).toFixed(1)}" fill="#9db6da" font-size="8.5" text-anchor="middle">${c.n}</text>`;
     }});
-  const vx=X(oi),vy=Y(mcap),vs=32;
+  const vx=X(oi),vy=Y(mcap),vs=20;
   const cxL=Math.min(vx+20,W-pr-108).toFixed(1), cyL=Math.max(vy-50,pt+14).toFixed(1);
   const vlogo=PLOGO['Variational'];
-  const hero=`<circle cx="${vx.toFixed(1)}" cy="${vy.toFixed(1)}" r="20" fill="rgba(38,230,194,.16)"/>`+
+  const hero=`<circle cx="${vx.toFixed(1)}" cy="${vy.toFixed(1)}" r="14" fill="rgba(38,230,194,.16)"/>`+
     `<rect x="${(vx-vs/2).toFixed(1)}" y="${(vy-vs/2).toFixed(1)}" width="${vs}" height="${vs}" rx="9" fill="#061019" stroke="#26e6c2" stroke-width="2.2"/>`+
     `<image href="${vlogo}" x="${(vx-vs/2+5).toFixed(1)}" y="${(vy-vs/2+5).toFixed(1)}" width="${vs-10}" height="${vs-10}" preserveAspectRatio="xMidYMid meet"/>`+
     `<line x1="${vx.toFixed(1)}" y1="${(vy-vs/2).toFixed(1)}" x2="${cxL}" y2="${(+cyL+14).toFixed(1)}" stroke="rgba(38,230,194,.5)" stroke-width="1"/>`+
@@ -3482,14 +3558,41 @@ function renderValuation(){
   const side=$('#valSide');
   if(side){
     const rows=VAL_COMPS.map(c=>({n:c.n,mc:c.mc,imp:valPred(c.oi),prem:c.mc/valPred(c.oi)})).sort((a,b)=>b.prem-a.prem);
-    const chip=n=>PLOGO[n]?`<img class="vs-logo" src="${PLOGO[n]}" alt="" onerror="this.style.visibility='hidden'">`:`<span class="vs-dot"></span>`;
+    const chip=n=>PLOGO[n]?`<img class="vs-logo" src="${PLOGO[n]}" alt="" width="20" height="20" style="width:20px!important;height:20px!important;min-width:20px!important;max-width:20px!important;min-height:20px!important;max-height:20px!important;object-fit:contain!important" onerror="this.style.visibility='hidden'">`:`<span class="vs-dot"></span>`;
     const pcol=p=>p>=1.08?'var(--grn)':p<=0.92?'#e0728a':'var(--sub)';
-    const pf=p=>p>=1?p.toFixed(1)+'×':p.toFixed(2)+'×';
-    side.innerHTML=`<div class="vs-h">Premium to model <span class="vs-hs">· mkt mcap ÷ implied</span></div>`+
-      `<div class="vs-row me"><span class="n">${chip('Variational')}<span class="vs-nm"><b>Variational</b><small>implied ${fmtBig(mcap)} · pre-TGE</small></span></span><span class="v" style="color:var(--grn)">sets it</span></div>`+
-      rows.map(r=>`<div class="vs-row"><span class="n">${chip(r.n)}<span class="vs-nm"><b>${r.n}</b><small>${fmtBig(r.mc)} vs ${fmtBig(r.imp)}</small></span></span><span class="v" style="color:${pcol(r.prem)}">${pf(r.prem)}</span></div>`).join('');}
+    const gap=p=>`${p>=1?'+':''}${((p-1)*100).toFixed(0)}%`;
+    side.innerHTML=`<div class="vs-h"><span>Actual vs model MCAP</span><span class="vs-hs">${VAL_MCAP_ASOF}</span></div>`+
+      `<div class="vs-row me"><span class="n">${chip('Variational')}<span class="vs-nm"><b>Variational</b><small><b>Actual N/A</b> · Model ${fmtBig(mcap)} · pre-TGE</small></span></span><span class="v" style="color:var(--sub)">N/A</span></div>`+
+      rows.map(r=>`<div class="vs-row"><span class="n">${chip(r.n)}<span class="vs-nm"><b>${r.n}</b><small><b>Actual ${fmtBig(r.mc)}</b> · Model ${fmtBig(r.imp)}</small></span></span><span class="v" title="Actual market cap minus model-implied market cap" style="color:${pcol(r.prem)}">${gap(r.prem)}</span></div>`).join('');}
   const note=$('#valNote');
-  if(note)note.innerHTML=`Model: circulating market cap regressed on open interest across ${VAL_COMPS.length} live perp-DEX tokens — MCAP ≈ ${VAL_FIT.A.toFixed(1)} · OI<sup>${VAL_FIT.B}</sup> (R² ${VAL_FIT.r2}, log-log). Variational's OI implies a circulating mcap of <b>${fmtBig(mcap)}</b>; FDV scales that by the assumed circulating float at TGE. Peer OI &amp; market caps: <a href="https://www.perpetualpulse.xyz/" target="_blank" rel="noopener">Perpetual Pulse</a>. A valuation model, not a price target — not financial advice.`;
+  if(note)note.innerHTML=`<b>Read this correctly:</b> Variational current MCAP = <b>N/A</b> because $VAR is not yet trading. The model-implied circulating MCAP is <b>${fmtBig(mcap)}</b>; it is an estimate, not a current market value. Peer actual MCAP updates from <a href="https://www.coingecko.com/" target="_blank" rel="noopener">CoinGecko</a> (${VAL_MCAP_ASOF}); OI updates from CoinGecko derivatives where available. Model: MCAP ≈ ${VAL_FIT.A.toFixed(1)} · OI<sup>${VAL_FIT.B}</sup> (R² ${VAL_FIT.r2}, log-log). Model framework: <a href="https://www.perpetualpulse.xyz/" target="_blank" rel="noopener">Perpetual Pulse</a>. Not financial advice.`;
+}
+
+async function refreshValuationMcaps(){
+  try{
+    const ids=VAL_COMPS.map(c=>c.cg).filter(Boolean).join(',');
+    const url='https://api.coingecko.com/api/v3/simple/price?ids='+encodeURIComponent(ids)+'&vs_currencies=usd&include_market_cap=true&include_last_updated_at=true';
+    const res=await fetch(url);
+    if(!res.ok)throw new Error('coingecko mcap http '+res.status);
+    const data=await res.json();
+    let hit=0,latest=0;
+    VAL_COMPS.forEach(c=>{
+      const live=data[c.cg];
+      if(live&&Number.isFinite(+live.usd_market_cap)&&+live.usd_market_cap>0){
+        c.mc=+live.usd_market_cap;
+        c.mcLive=true;
+        hit++;
+        latest=Math.max(latest,+live.last_updated_at||0);
+      }
+    });
+    if(!hit)throw new Error('no current market caps');
+    const stamp=latest?new Date(latest*1000):new Date();
+    VAL_MCAP_ASOF='Live CoinGecko · '+stamp.toLocaleString('en-US',{month:'short',day:'2-digit',hour:'2-digit',minute:'2-digit',timeZoneName:'short'});
+    renderValuation();
+  }catch(err){
+    console.warn('Valuation market-cap sync fell back to snapshot:',err);
+    renderValuation();
+  }
 }
 /* ---------- live perp-DEX board via CoinGecko (free, CORS-open) ----------
    OI & 24h volume come back in BTC; multiply by live BTC price for USD.
@@ -3578,7 +3681,7 @@ function renderVsLighter(){
     {k:'Protocol revenue · all-time', a:SERIES[SERIES.length-1].v, b:li.revAll, an:'since 2026-01-23', bn:'all listed history'},
   ];
   $('#h2hRows').innerHTML=`<table class="h2h-tbl">
-    <thead><tr><th>Metric</th><th class="cva"><img class="cmp-logo" src="variational-symbol-transparent.png" alt="">Variational</th><th class="cli"><img class="cmp-logo" src="lighter-logo.png" alt="">Lighter</th><th>Lead</th></tr></thead>
+    <thead><tr><th>Metric</th><th class="cva"><img class="cmp-logo" src="variational-symbol-transparent.png" alt="" width="20" height="20">Variational</th><th class="cli"><img class="cmp-logo" src="lighter-logo.png" alt="" width="20" height="20">Lighter</th><th>Lead</th></tr></thead>
     <tbody>${rows.map(r=>{
       const vals=[{c:'var',n:'Variational',v:r.a},{c:'ltr',n:'Lighter',v:r.b}].sort((x,y)=>y.v-x.v);
       const lead={c:vals[0].c,t:vals[0].n+' '+(vals[1].v>0?(vals[0].v/vals[1].v).toFixed(1)+'×':'')};
@@ -3620,7 +3723,7 @@ function renderRevVs(rev30){
     bars+=`<text x="${cx.toFixed(1)}" y="${H-10}" fill="#4a5674" font-size="9" text-anchor="middle">${w.end.slice(5)}</text>`;
     if(i===weeks.length-1){
       bars+=`<image href="variational-symbol-transparent.png" x="${(cx-bw/2-1.5-8).toFixed(1)}" y="${(vy-20).toFixed(1)}" width="16" height="16"/>`;
-      bars+=`<image href="lighter-logo.png" x="${(cx+bw/2+1.5-8).toFixed(1)}" y="${(ly-20).toFixed(1)}" width="16" height="16"/>`;
+      bars+=`<image href="lighter-logo.png" x="${(cx+bw/2+1.5-10).toFixed(1)}" y="${(ly-22).toFixed(1)}" width="20" height="20"/>`;
     }
   });
   svg.innerHTML=`
@@ -3637,7 +3740,7 @@ function renderRevVs(rev30){
     <div class="fs-title">Where the money goes · last 30 days</div>
     <div class="fs-grid">
       <div class="fs-col cva2">
-        <div class="fs-h"><img class="cmp-logo" src="variational-symbol-transparent.png" alt="">Variational</div>
+        <div class="fs-h"><img class="cmp-logo" src="variational-symbol-transparent.png" alt="" width="20" height="20">Variational</div>
         <div class="fs-big grn">${cM(fees)}</div>
         <div class="fs-sub">traders paid in spreads — ${ (fees/VSL.li.fees30).toFixed(1) }× Lighter</div>
         <div class="fs-bar"><i class="olp" style="width:${(100-MKT.spreadShare*100).toFixed(0)}%"></i><i class="tre" style="width:${(MKT.spreadShare*100).toFixed(0)}%"></i></div>
@@ -3646,7 +3749,7 @@ function renderRevVs(rev30){
         <div class="fs-row"><span>→ of treasury, ≥30% buys &amp; burns $VAR</span><b class="v">≥ ${cM(burn)}</b></div>
       </div>
       <div class="fs-col cli2">
-        <div class="fs-h"><img class="cmp-logo" src="lighter-logo.png" alt="">Lighter</div>
+        <div class="fs-h"><img class="cmp-logo" src="lighter-logo.png" alt="" width="20" height="20">Lighter</div>
         <div class="fs-big bl">${cM(VSL.li.fees30)}</div>
         <div class="fs-sub">fees collected · premium accs + wd/tx</div>
         <div class="fs-bar"><i class="lir" style="width:${liKept.toFixed(0)}%"></i></div>
@@ -5063,7 +5166,9 @@ refresh();
 setInterval(quickSyncLive,8000);
 // live perp-DEX board (CoinGecko) — refresh on load, then every 3 min
 refreshPerpBoard();
+refreshValuationMcaps();
 setInterval(refreshPerpBoard,180000);
+setInterval(refreshValuationMcaps,180000);
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')quickSyncLive();});
 </script>
 </body>
