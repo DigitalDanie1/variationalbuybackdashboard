@@ -1518,6 +1518,746 @@
     .hist-split{grid-template-columns:1fr}
     .hist-pane + .hist-pane{border-left:0;border-top:1px solid rgba(85,184,255,.14);padding-left:0;padding-top:18px}
   }
+
+  /* ---- GUM-inspired clarity pass: flat surfaces, one accent, stronger hierarchy ---- */
+  :root{
+    --bg:#0d0d0d;
+    --panel:#111413;
+    --panel2:#151918;
+    --line:rgba(255,255,255,.12);
+    --ink:#f4f6f2;
+    --sub:#a3aaa4;
+    --dim:#687069;
+    --grn:#c7f284;
+    --grn2:#8fbd61;
+    --cyan:#72cdf7;
+    --vio:#9e8cff;
+    --amber:#f3c96f;
+    --red:#ff7676;
+  }
+  html,body{
+    background:#0d0d0d;
+    color:var(--ink);
+  }
+  body{
+    padding:14px clamp(14px,2.2vw,34px) 48px;
+  }
+  body::before,
+  body::after{
+    display:none!important;
+  }
+  :focus-visible{
+    outline-color:var(--grn);
+    outline-offset:2px;
+    border-radius:4px;
+  }
+  .live-dot{
+    background:var(--grn)!important;
+    box-shadow:none!important;
+  }
+
+  /* header */
+  header.header-terminal{
+    align-items:center;
+    gap:28px;
+    margin-bottom:14px;
+    padding:14px 0 18px;
+    border-bottom:1px solid var(--line);
+  }
+  header::after,
+  .brandwrap::after,
+  h1::after{
+    display:none!important;
+  }
+  .header-terminal .brandwrap{
+    gap:18px;
+  }
+  .logo.scanner-logo{
+    width:78px;
+    height:86px;
+    filter:none;
+  }
+  .header-terminal .brand{
+    gap:8px;
+  }
+  .header-terminal .kd{
+    gap:4px 9px;
+  }
+  .header-terminal .kd .by{
+    color:var(--sub);
+    font-size:9px;
+    letter-spacing:1.5px;
+  }
+  .header-terminal .kd strong{
+    color:var(--ink);
+    font:760 clamp(25px,2.5vw,36px)/.95 var(--sans);
+    letter-spacing:-1.5px;
+  }
+  .header-terminal .kd .handle{
+    color:var(--dim);
+    text-transform:none;
+  }
+  .header-terminal .kd .follow{
+    color:var(--grn);
+  }
+  .header-terminal .contract{
+    gap:5px;
+  }
+  .badge,
+  .header-terminal .top-ref{
+    border-color:var(--line)!important;
+    background:transparent!important;
+    box-shadow:none!important;
+  }
+  .badge{
+    border-radius:4px;
+    padding:3px 6px;
+  }
+  .header-terminal .top-ref{
+    border-radius:6px;
+    padding:5px 6px 5px 8px;
+  }
+  .top-ref-mark{
+    border-radius:4px;
+    background:rgba(255,255,255,.05);
+  }
+  .top-ref-code{
+    color:var(--ink);
+  }
+  .top-ref-copy:hover .top-ref-code{
+    color:var(--grn);
+    text-shadow:none;
+  }
+  .top-ref-btn,
+  .top-ref-link{
+    border-radius:4px;
+    box-shadow:none;
+  }
+  .top-ref-btn{
+    color:#0d0d0d;
+    background:var(--grn);
+    border-color:var(--grn);
+  }
+  .top-ref-link{
+    color:var(--ink);
+    background:transparent;
+    border-color:var(--line);
+  }
+  .hero-total .lbl,
+  .header-terminal .hero-total .lbl{
+    color:var(--sub);
+    font:750 10px/1.25 var(--mono);
+    letter-spacing:1.4px;
+  }
+  .hero-total .val,
+  .header-terminal .hero-total .val{
+    margin-top:6px;
+    background:none;
+    color:var(--grn);
+    font:760 clamp(44px,6vw,82px)/.9 var(--sans);
+    letter-spacing:-4px;
+    filter:none;
+    animation:none;
+  }
+  .hero-deltas{
+    margin-top:10px;
+    gap:5px;
+  }
+  .delta-pill{
+    padding:4px 7px;
+    border-color:var(--line);
+    border-radius:4px;
+    color:var(--ink);
+    background:transparent;
+    box-shadow:none;
+  }
+  .delta-pill b{
+    color:var(--grn);
+  }
+  .delta-pill.neg b{
+    color:var(--red);
+  }
+  .hero-total .sub{
+    margin-top:8px;
+    gap:8px;
+  }
+  #tweet,
+  #refresh,
+  .share-btn,
+  .cal-collapse{
+    border-radius:5px;
+    box-shadow:none!important;
+    text-shadow:none!important;
+  }
+  #tweet,
+  .share-btn{
+    color:#0d0d0d;
+    background:var(--grn);
+  }
+  #refresh{
+    color:var(--ink);
+    background:transparent;
+    border-color:var(--line);
+  }
+  #refresh:hover{
+    color:var(--grn);
+    background:rgba(199,242,132,.06);
+    box-shadow:none;
+  }
+
+  /* top signals */
+  .changes{
+    gap:1px;
+    margin:0 0 14px;
+    overflow:hidden;
+    border:1px solid var(--line);
+    border-radius:8px;
+    background:var(--line);
+  }
+  .chg{
+    min-height:112px;
+    padding:14px 16px!important;
+    border:0!important;
+    border-radius:0!important;
+    background:var(--panel)!important;
+  }
+  .chg .k{
+    color:var(--sub);
+    font-size:9px;
+    letter-spacing:1.4px;
+  }
+  .chg .v{
+    margin-top:8px;
+    color:var(--accent,var(--grn));
+    font:760 clamp(27px,3vw,38px)/.95 var(--sans);
+    letter-spacing:-1.6px;
+    text-shadow:none;
+  }
+  .chg .d{
+    margin-top:6px;
+    color:var(--dim);
+    font-size:10.5px;
+  }
+  .chg .spark{
+    height:2px;
+    margin-top:11px;
+    border-radius:0;
+    background:rgba(255,255,255,.07);
+  }
+  .chg .spark i{
+    background:var(--accent,var(--grn));
+    box-shadow:none;
+  }
+
+  /* primary navigation */
+  .tabs{
+    gap:2px;
+    margin:0 0 14px;
+    border-color:var(--line);
+  }
+  .tabs button{
+    padding:10px 14px;
+    color:var(--sub);
+    font:720 11px var(--sans);
+    letter-spacing:.7px;
+    text-transform:none;
+    font-stretch:normal;
+  }
+  .tabs button:hover{
+    color:var(--ink);
+    background:rgba(255,255,255,.025);
+  }
+  .tabs button.on{
+    color:var(--ink);
+    border-bottom-color:var(--grn);
+    text-shadow:none;
+  }
+  .tabs button.on::before{
+    display:none;
+  }
+  .tabs button.drag-over{
+    background:rgba(199,242,132,.06);
+    box-shadow:inset 2px 0 0 var(--grn);
+  }
+  .tab-new{
+    color:#0d0d0d;
+    background:var(--grn);
+    border-radius:3px;
+    box-shadow:none;
+  }
+
+  /* shared surfaces */
+  .card,
+  .live-card,
+  .pm-panel,
+  .reverse-audit,
+  .eff-daily-cal,
+  .spread-circuit,
+  .road-journey,
+  .road-progress{
+    background:var(--panel)!important;
+    border:1px solid var(--line)!important;
+    border-radius:8px!important;
+    box-shadow:none!important;
+  }
+  .card{
+    padding:18px;
+  }
+  .card::before,
+  .card.eff::after,
+  .live-card::before,
+  .live-card::after,
+  .eff-daily-cal::before,
+  .spread-circuit::before{
+    display:none!important;
+  }
+  .card h2{
+    gap:8px;
+    margin-bottom:5px;
+    color:var(--ink);
+    font:720 15px/1.25 var(--sans);
+    letter-spacing:-.15px;
+  }
+  .card h2::before{
+    display:none!important;
+  }
+  .card h2 .tag,
+  .historical-combo .interval-head .tag{
+    padding:3px 6px;
+    color:var(--sub);
+    border-color:var(--line);
+    border-radius:4px;
+    background:transparent!important;
+    font-size:9px!important;
+    letter-spacing:.7px;
+  }
+  .card .cap{
+    max-width:1100px;
+    margin-bottom:12px;
+    color:var(--sub);
+    font:11.5px/1.5 var(--sans)!important;
+  }
+  .card .cap b{
+    color:var(--ink);
+  }
+  .grid{
+    gap:12px;
+  }
+
+  /* compact flat controls */
+  .seg,
+  .zoom-controls{
+    gap:1px;
+    padding:2px;
+    border-color:var(--line);
+    border-radius:6px;
+    background:#0d0d0d!important;
+  }
+  .seg button,
+  .zoom-controls button{
+    border-radius:4px;
+  }
+  .seg button.on,
+  .zoom-controls button.on{
+    color:#0d0d0d;
+    background:var(--grn);
+    box-shadow:none;
+  }
+  .tt{
+    border-color:var(--line);
+    border-radius:6px;
+    background:#111413;
+    box-shadow:0 10px 28px rgba(0,0,0,.35);
+  }
+
+  /* overview flow */
+  .protocol-map{
+    margin:0 0 14px;
+  }
+  .protocol-map .pm-panel{
+    gap:12px 20px;
+    padding:16px;
+  }
+  .pm-title{
+    margin-bottom:2px;
+    color:var(--sub);
+    font-size:9px;
+    letter-spacing:1.5px;
+  }
+  .pm-cap span,
+  .pm-metric,
+  .pm-balance{
+    border-color:var(--line)!important;
+  }
+  .pm-metric strong{
+    color:var(--ink);
+    font-family:var(--sans);
+    font-weight:720;
+    letter-spacing:-1px;
+  }
+  .pm-metric:nth-child(2) strong,
+  .pm-metric:nth-child(3) strong{
+    color:var(--grn);
+  }
+
+  /* live earnings */
+  .live-card{
+    display:block;
+    margin-bottom:14px;
+    padding:18px;
+  }
+  .money-rain,
+  .hg{
+    display:none!important;
+  }
+  .live-body{
+    display:grid;
+    grid-template-columns:minmax(180px,.32fr) minmax(0,1fr);
+    gap:14px 24px;
+  }
+  .live-body .k,
+  .twap-lead,
+  .tlog-h{
+    color:var(--sub);
+    font-size:9px;
+    letter-spacing:1.4px;
+  }
+  .ticker{
+    margin:8px 0 5px;
+    background:none;
+    color:var(--grn);
+    filter:none;
+    font-family:var(--sans);
+    font-weight:760;
+    letter-spacing:-2px;
+  }
+  .ticker .cents{
+    color:var(--sub);
+    -webkit-text-fill-color:var(--sub);
+  }
+  .live-stats{
+    grid-column:2;
+  }
+  .twap-row{
+    gap:1px!important;
+    overflow:hidden;
+    border:1px solid var(--line);
+    border-radius:8px;
+    background:var(--line);
+  }
+  .twap{
+    min-height:96px;
+    padding:14px 16px!important;
+    border:0;
+    border-radius:0;
+    background:var(--panel2);
+    box-shadow:none;
+  }
+  .twap .n,
+  .live-stats .twap-row.act .n{
+    color:var(--ink);
+    font-family:var(--sans);
+    font-weight:730;
+    font-size:clamp(31px,3.4vw,52px);
+    letter-spacing:-2px;
+    text-shadow:none;
+  }
+  .twap .l{
+    color:var(--sub);
+    font:700 9px/1 var(--sans);
+    letter-spacing:1.2px;
+  }
+  .tlog{
+    grid-column:1/-1;
+    margin-top:0;
+    padding-top:12px;
+    border-color:var(--line);
+  }
+  .tlog-row{
+    border-color:rgba(255,255,255,.07);
+  }
+  .tlog-row::before{
+    background:rgba(199,242,132,.06);
+  }
+  .tlog-row.hot .tlog-b{
+    color:var(--grn);
+    text-shadow:none;
+  }
+
+  /* fundamentals: one quiet monthly story */
+  .card.eff[data-eff-window]{
+    border-color:var(--line)!important;
+    box-shadow:none!important;
+  }
+  .eff-window-status{
+    display:inline-flex;
+    gap:7px;
+    margin:2px 0 0;
+    padding:0;
+    border:0;
+  }
+  .eff-window-status b{
+    color:#0d0d0d;
+    padding:3px 6px;
+    border-radius:3px;
+    background:var(--grn);
+    font-size:9px;
+    letter-spacing:.8px;
+  }
+  .eff-window-status span{
+    align-self:center;
+    color:var(--dim);
+  }
+  .activity-read{
+    margin:12px 0 14px;
+    padding:0;
+    overflow:hidden;
+    border:1px solid var(--line);
+    border-radius:8px;
+    background:#0f1110;
+    box-shadow:none;
+  }
+  .activity-read-head{
+    padding:11px 13px;
+    border-bottom:1px solid var(--line);
+  }
+  .activity-read-head b{
+    color:var(--ink);
+    font-size:9px;
+    letter-spacing:1.3px;
+  }
+  .activity-period{
+    padding:3px 6px;
+    color:#0d0d0d;
+    border:0;
+    border-radius:3px;
+    background:var(--grn);
+    font-size:9px;
+  }
+  .activity-read-flow{
+    gap:6px;
+    margin-top:0;
+    padding:12px;
+  }
+  .activity-input,
+  .activity-result{
+    padding:12px;
+    border-color:var(--line);
+    border-radius:6px;
+    background:var(--panel);
+  }
+  .activity-input strong,
+  .activity-result strong{
+    color:var(--ink);
+    font-family:var(--sans);
+    font-weight:730;
+    letter-spacing:-1px;
+  }
+  .activity-result.treasury{
+    border-color:rgba(199,242,132,.28);
+    background:rgba(199,242,132,.045);
+  }
+  .activity-result.treasury strong,
+  .activity-outcome b{
+    color:var(--grn);
+    text-shadow:none;
+  }
+  .activity-plus,
+  .activity-arrow{
+    color:var(--dim);
+    text-shadow:none;
+  }
+  .activity-outcome{
+    margin:0 12px;
+    padding:11px 0 12px;
+    border-color:var(--line);
+  }
+  .eff-ratios{
+    gap:1px!important;
+    overflow:hidden;
+    border:1px solid var(--line);
+    border-radius:8px;
+    background:var(--line);
+  }
+  .eff-ratios .er{
+    padding:14px!important;
+    border:0!important;
+    border-radius:0!important;
+    background:var(--panel2)!important;
+  }
+  .er-v{
+    background:none;
+    color:var(--ink);
+    font-family:var(--sans);
+    font-weight:730;
+    -webkit-text-fill-color:initial;
+  }
+  .fr-read{
+    gap:1px;
+    overflow:hidden;
+    border:1px solid var(--line);
+    border-radius:8px;
+    background:var(--line);
+  }
+  .fr-read .box,
+  .fr-read .box.good,
+  .fr-read .box.eff{
+    padding:13px;
+    border:0;
+    border-radius:0;
+    background:var(--panel2);
+  }
+  .fr-read .box strong{
+    text-shadow:none;
+  }
+
+  /* tables, calendars and comparison */
+  .tbl-wrap,
+  .pulse-table-wrap{
+    scrollbar-color:rgba(199,242,132,.4) transparent;
+  }
+  table,
+  .pulse-table,
+  .h2h-tbl{
+    background:transparent;
+  }
+  th{
+    background:#0f1110;
+    color:var(--sub);
+    border-color:var(--line);
+  }
+  td{
+    border-color:rgba(255,255,255,.07);
+  }
+  tr:hover td{
+    background:rgba(199,242,132,.035);
+  }
+  .cal-cell,
+  .cal-summary-card,
+  .edc-cell{
+    border-color:var(--line)!important;
+    border-radius:6px!important;
+    background:var(--panel2)!important;
+    box-shadow:none!important;
+  }
+  .cal-cell.weekend{
+    background:#141512!important;
+    border-color:rgba(243,201,111,.18)!important;
+  }
+  .cal-cell.sel,
+  .cal-cell:hover{
+    border-color:var(--grn)!important;
+    box-shadow:none!important;
+    transform:none;
+  }
+  .cal-earn,
+  .cal-summary-value,
+  .edc-money{
+    color:var(--grn);
+    text-shadow:none;
+  }
+  .cal-fill{
+    background:rgba(199,242,132,.055);
+  }
+  .cal-nav button,
+  .edc-nav button{
+    border-color:var(--line);
+    border-radius:5px;
+    background:transparent;
+    box-shadow:none;
+  }
+  .ev,
+  .backlog-tags span{
+    border-radius:4px;
+  }
+  .peer-layout,
+  .rev-callout,
+  .valmodel .fdv-box,
+  .pts-deadline,
+  .fdv-control,
+  .pts-card{
+    border-radius:8px!important;
+    box-shadow:none!important;
+  }
+  .king-card,
+  .peer-stat,
+  .fs-side,
+  .pts-card{
+    background:var(--panel2)!important;
+  }
+
+  /* remove decorative glow and constant motion */
+  .road-meter span,
+  .road-dot,
+  .flow-arrow::after,
+  .money-stream::after,
+  .rune-logo{
+    animation:none!important;
+  }
+  [style*="text-shadow"],
+  .pos,
+  .neg{
+    text-shadow:none!important;
+  }
+
+  @media(max-width:860px){
+    header.header-terminal{
+      align-items:flex-start;
+    }
+    .hero-total{
+      width:100%;
+      text-align:left;
+    }
+    .hero-deltas,
+    .hero-total .sub{
+      justify-content:flex-start;
+    }
+    .live-body{
+      grid-template-columns:1fr;
+    }
+    .live-stats{
+      grid-column:1;
+    }
+  }
+  @media(max-width:620px){
+    body{
+      padding:10px 10px 34px;
+    }
+    .logo.scanner-logo{
+      width:62px;
+      height:68px;
+    }
+    .header-terminal .brandwrap{
+      gap:11px;
+    }
+    .hero-total .val,
+    .header-terminal .hero-total .val{
+      font-size:clamp(42px,16vw,66px);
+      letter-spacing:-3px;
+    }
+    .changes{
+      grid-template-columns:1fr 1fr;
+    }
+    .chg{
+      min-height:104px;
+    }
+    .tabs{
+      flex-wrap:nowrap;
+      overflow-x:auto;
+    }
+    .tabs button{
+      flex:none;
+    }
+    .card,
+    .live-card,
+    .pm-panel{
+      padding:14px!important;
+    }
+    .twap-row{
+      grid-template-columns:1fr;
+      gap:1px!important;
+    }
+  }
 </style>
 </head>
 <body>
@@ -1546,7 +2286,7 @@
   </div>
   </div>
   <div class="hero-total">
-    <div class="lbl">Variational Protocol Revenue Cut From OLP</div>
+    <div class="lbl">On-chain protocol treasury revenue</div>
     <div class="val" id="totalVal">—</div>
     <div class="hero-deltas" aria-label="Treasury balance percentage changes">
       <div class="delta-pill" id="hd12"><span>12H</span><b>—</b></div>
@@ -1761,18 +2501,11 @@
 <div class="note tsec" id="note" data-tg="overview"></div>
 
 <div class="card eff tsec tg-hide" data-tg="efficiency">
-  <h2>How Current Activity Becomes Revenue <span class="tag">volume · OI · earnings</span></h2>
-  <div class="cap"><b>Why this matters:</b> Volume and open interest are not just market statistics. They are the activity and capacity that produce spread fees, treasury revenue, and buyback-burn firepower. Read this section as: <b>current activity → money earned</b>. <span id="effAsOf" class="muted"></span></div>
-<div class="eff-window-tabs" id="effWindowTabs" aria-label="Fee revenue time window">
-  <button type="button" class="on" data-eff-window="1d">1D</button>
-  <button type="button" data-eff-window="7d">1W</button>
-  <button type="button" data-eff-window="30d">30D</button>
-  <button type="button" data-eff-window="month">Month</button>
-  <button type="button" data-eff-window="all">All-time</button>
-</div>
-  <div class="eff-window-status"><b id="effWindowTitle">1D VIEW</b><span id="effWindowRange">Last 24 hours</span></div>
+  <h2>Monthly Fundamentals <span class="tag">activity → revenue</span></h2>
+  <div class="cap">One month-to-date view of how trading activity becomes spread fees, treasury revenue, and buyback-burn firepower. <span id="effAsOf" class="muted"></span></div>
+  <div class="eff-window-status monthly-only"><b id="effWindowTitle">MTD VIEW</b><span id="effWindowRange">Current month-to-date</span></div>
   <div class="activity-read" aria-label="Current activity and earnings summary">
-    <div class="activity-read-head"><span class="live-dot"></span><b>READ THIS FIRST</b><span>Selected-period activity → implied money earned</span><strong class="activity-period" id="effActivePeriod">1D</strong></div>
+    <div class="activity-read-head"><span class="live-dot"></span><b>READ THIS FIRST</b><span>Monthly activity → implied money earned</span><strong class="activity-period" id="effActivePeriod">MTD</strong></div>
     <div class="activity-read-flow">
       <div class="activity-input"><span id="fmVolLabel">1D PERP VOLUME</span><strong id="fmDailyVol">—</strong><small id="fmDailyVolFormula">selected trading flow</small></div>
       <div class="activity-plus">+</div>
@@ -2272,7 +3005,7 @@ function computeEff(){
   const feesCum=cur/MKT.spreadShare;                        // implied cumulative spreads paid
   return {cur,rev30,dailyRev,volPerRev,volPerFee,takeBpsRev,takeBpsFee,oiPerDayRev,oiTurnover,annRevYield,feesCum};
 }
-let EFF_WINDOW='1d';
+let EFF_WINDOW='month';
 const EFF_WINDOWS={
   '1d':{label:'1D',days:1,volKey:'d1'},
   '7d':{label:'1W',days:7,volKey:'d7'},
