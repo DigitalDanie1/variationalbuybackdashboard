@@ -685,6 +685,9 @@
   .cal-money-row .money{font:950 clamp(14px,1.18vw,20px)/1 var(--mono);letter-spacing:-.8px;color:var(--grn);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .cal-money-row.total{border-color:rgba(34,230,160,.22);background:rgba(34,230,160,.045)}
   .cal-money-row.pending .money{color:var(--dim);font-size:12px;letter-spacing:.5px;text-transform:uppercase}
+  .cal-pending-meta{display:flex;justify-content:space-between;align-items:baseline;gap:6px;margin-top:8px;padding-top:7px;border-top:1px solid rgba(85,184,255,.12);color:var(--dim);font:8px/1.3 var(--mono);letter-spacing:.2px}
+  .cal-pending-meta b{color:var(--cyan);font-weight:900;white-space:nowrap}
+  .cal-pending-meta .countdown{color:var(--grn)}
   .cal-flow-mini{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;position:relative;z-index:1}
   .cal-flow-mini div{border:1px solid rgba(85,184,255,.12);border-radius:6px;padding:5px 5px;background:rgba(5,12,20,.35);min-width:0}
   .cal-flow-mini b{display:block;font:950 clamp(10px,.86vw,13px)/1 var(--mono);letter-spacing:-.4px;color:var(--cyan);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -982,6 +985,15 @@
   .pulse-table .source-link{color:var(--cyan);font-weight:900}
   .pulse-table .fee-zero{color:var(--grn)}
   .pulse-table .rank-badge{display:inline-block;margin-left:6px;padding:2px 5px;border:1px solid rgba(34,230,160,.4);border-radius:999px;color:var(--grn);font:900 8px var(--mono);letter-spacing:.5px;text-transform:uppercase}
+  @media(min-width:1181px){
+    .comparison-focus{display:grid;grid-template-columns:minmax(0,1.28fr) minmax(390px,.92fr);gap:14px 18px;align-items:start}
+    .comparison-focus>h2,.comparison-focus>.cap{grid-column:1 / -1}
+    .comparison-focus>.mini-head{grid-column:1;grid-row:3;margin:0 0 -4px}
+    .comparison-focus>.pulse-table-wrap{grid-column:1;grid-row:4;margin:0;max-height:650px}
+    .comparison-focus>.peer-layout{grid-column:2;grid-row:3 / span 2;margin:0;min-width:0}
+    .comparison-focus .peer-right{min-width:0}
+    .comparison-focus .pulse-table{min-width:760px}
+  }
 
   .soon-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;margin-top:6px}
   .soon-card{position:relative;background:var(--panel);border:1px dashed var(--line);border-radius:13px;padding:16px;overflow:hidden}
@@ -1081,6 +1093,14 @@
   .fs-row b{font:800 17px var(--mono);letter-spacing:-.4px;color:var(--ink);white-space:nowrap}
   .fs-row b.g{color:var(--grn)} .fs-row b.v{color:var(--vio)} .fs-row b.b{color:#7fa8e8}
   .fs-row.dim span,.fs-row.dim b{color:var(--dim)}
+  .comparison-revenue-card{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(340px,.8fr);gap:12px 20px;align-items:start}
+  .comparison-revenue-card>h2,.comparison-revenue-card>.cap,.comparison-revenue-card>.legend{grid-column:1 / -1}
+  .comparison-revenue-card>svg{grid-column:1;width:100%;min-height:260px;margin:0}
+  .comparison-revenue-card>.rev-callout{grid-column:2;grid-row:4;align-self:stretch;margin:0;padding:16px}
+  .comparison-revenue-card .fs-grid{grid-template-columns:1fr;gap:14px}
+  .comparison-revenue-card .fs-big{font-size:clamp(28px,3.2vw,40px)}
+  @media(max-width:980px){.comparison-revenue-card{display:block}.comparison-revenue-card>svg{margin-top:10px}.comparison-revenue-card>.rev-callout{margin-top:14px}.comparison-revenue-card .fs-grid{grid-template-columns:1.15fr 1fr}}
+  @media(max-width:720px){.comparison-revenue-card .fs-grid{grid-template-columns:1fr}}
   .h2h-track{position:relative;display:flex;height:26px;border-radius:8px;overflow:hidden;background:#0d1522}
   .h2h-track .va{background:linear-gradient(90deg,var(--grn),var(--cyan));box-shadow:0 0 16px rgba(34,230,160,.3)}
   .h2h-track .li{background:linear-gradient(90deg,#2c4c7f,#3f74c9)}
@@ -1143,8 +1163,9 @@
   .pts-card b{display:block;font:900 20px var(--mono);color:var(--ink)}
   .pts-card span{display:block;font:11px var(--mono);color:var(--grn);margin-top:5px}
   .pts-card small{display:block;font:10px var(--mono);color:var(--sub);margin-top:4px;text-transform:uppercase;letter-spacing:.5px}
-  .pts-deadline{margin-bottom:16px;padding:15px 16px;border:1px solid rgba(56,225,255,.24);border-radius:14px;background:
+  .pts-deadline{position:relative;overflow:hidden;margin-bottom:16px;padding:15px 126px 15px 16px;border:1px solid rgba(56,225,255,.24);border-radius:14px;background:
     radial-gradient(420px 160px at 100% 0,rgba(56,225,255,.13),transparent 64%),var(--panel)}
+  .pts-deadline-cat{position:absolute;right:17px;top:50%;width:88px;height:88px;object-fit:cover;transform:translateY(-50%) rotate(2deg);border:3px solid #fff;border-radius:14px;background:#fff;box-shadow:0 8px 18px rgba(0,0,0,.32),0 0 22px rgba(255,255,255,.14)}
   .pts-dead-top{display:flex;justify-content:space-between;gap:14px;align-items:flex-end;margin-bottom:12px}
   .pts-dead-k{font:800 10px var(--mono);letter-spacing:1.6px;text-transform:uppercase;color:var(--sub)}
   .pts-dead-v{font:900 clamp(30px,4.8vw,56px)/.95 var(--mono);letter-spacing:-1.5px;color:var(--cyan);text-align:right}
@@ -1156,7 +1177,7 @@
   .hist-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:-4px;margin-bottom:10px}
   .hist-row button{cursor:pointer;border:1px solid var(--line);background:var(--panel);color:var(--sub);border-radius:999px;padding:5px 9px;font:800 10px var(--mono)}
   .hist-row button.on,.hist-row button:hover{color:#04120c;background:linear-gradient(92deg,var(--grn),var(--cyan));border-color:transparent}
-  @media(max-width:780px){.points-grid{grid-template-columns:1fr}.fdv-control{grid-template-columns:1fr}.pts-outs{grid-template-columns:1fr;width:100%;margin-top:12px}.pts-card{width:100%;min-width:0}.pts-results{display:block;text-align:left}.pts-fdv{text-align:left}.pts-dead-top{align-items:flex-start;flex-direction:column}.pts-dead-v{text-align:left}.pts-band{text-align:left}}
+  @media(max-width:780px){.points-grid{grid-template-columns:1fr}.fdv-control{grid-template-columns:1fr}.pts-outs{grid-template-columns:1fr;width:100%;margin-top:12px}.pts-card{width:100%;min-width:0}.pts-results{display:block;text-align:left}.pts-fdv{text-align:left}.pts-deadline{padding-right:100px}.pts-deadline-cat{right:10px;width:68px;height:68px}.pts-dead-top{align-items:flex-start;flex-direction:column}.pts-dead-v{text-align:left}.pts-band{text-align:left}}
   .fdv-presets{display:flex;flex-wrap:wrap;gap:7px;margin-top:9px}
   .fdv-presets .preset{padding:6px 10px}
   .pts-band{margin-top:9px;text-align:left;font:800 11px var(--mono);letter-spacing:1.3px;text-transform:uppercase;color:var(--sub)}
@@ -1173,6 +1194,11 @@
   .pts-share-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px;padding-top:15px;border-top:1px solid var(--line)}
   .historical-combo{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(340px,.85fr);column-gap:18px;align-items:start}
   .historical-combo>h2,.historical-combo>.cap,.historical-combo>.legend,.historical-combo>.chart-tools,.historical-combo>#curve{grid-column:1}
+  .historical-combo>h2{margin-bottom:0}
+  .historical-combo>.cap{margin-bottom:6px}
+  .historical-combo>.legend{margin:0 2px 6px}
+  .historical-combo>.chart-tools{margin:2px 0 0}
+  .historical-combo>#curve{margin-top:0}
   .historical-combo .interval-block{grid-column:2;grid-row:1 / span 5;margin-top:0;padding-top:0;border-top:0}
   .historical-combo .interval-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:10px}
   .historical-combo .interval-head h3{font:800 14px var(--sans);color:var(--ink)}
@@ -1677,28 +1703,6 @@
   </div>
 </div>
 
-<div class="flow money-flow tsec" data-tg="overview">
-  <div class="step">
-    <div class="s-top">User pays spread</div>
-    <div class="dollar">$1.00</div>
-    <div class="s-sub">the spread embedded in the quoted fill</div>
-  </div>
-  <div class="step">
-    <div class="s-top">OLP market making engine</div>
-    <div class="s-mid"><b>Quotes fair spread</b> for each asset</div>
-    <div class="hedge">Users trade against OLP. OLP then <b>hedges directional exposure</b> on external venues when needed.</div>
-  </div>
-  <div class="step hi">
-    <div class="s-top">$1 spread split</div>
-    <div class="split">
-      <div class="split-card olp"><b>$0.90</b><span>stays with OLP / LP side</span></div>
-      <div class="split-card treasury"><b>$0.10</b><span>to Variational treasury</span></div>
-    </div>
-    <a class="wallet-link" href="https://arbiscan.io/address/0x5e91b40467fb8902c46a7b6cb90482363188d645" target="_blank" rel="noopener">treasury wallet ↗</a>
-  </div>
-</div>
-<div class="flow-note tsec" data-tg="overview">Illustrative $1 spread example. This dashboard uses the current OLP docs: 10% of spreads paid to OLP flows to the protocol treasury. The percentage may be subject to change.</div>
-
 <div class="protocol-map tsec" data-tg="overview">
   <div class="pm-panel">
     <div class="pm-title">Protocol money map</div>
@@ -1951,6 +1955,7 @@
   <h2>Points / FDV Calculator <span class="tag">airdrop scenario</span></h2>
   <div class="cap">Sep 31 does not exist, so this uses the actual campaign deadline: <b>Sep 30, 2026 at 11:59PM ET</b>. Your points ÷ total pool = share; share × FDV × airdrop allocation = estimated value.</div>
   <div class="pts-deadline">
+    <img class="pts-deadline-cat" src="campaign-cat.png" alt="Cheering campaign mascot">
     <div class="pts-dead-top">
       <div>
         <div class="pts-dead-k">Time left to deadline</div>
@@ -2199,7 +2204,7 @@
   </div>
 </div>
 
-<div class="card tsec tg-hide" data-tg="comparison" style="margin-top:16px">
+<div class="card comparison-revenue-card tsec tg-hide" data-tg="comparison" style="margin-top:16px">
   <h2>Variational Revenue vs Lighter Revenue <span class="tag">weekly · trailing 8 weeks</span></h2>
   <div class="cap">Weekly protocol revenue, same 7-day windows. Variational = USDC actually landing in the on-chain treasury (verifiable). Lighter = daily revenue on DeFiLlama.</div>
   <div class="legend">
@@ -2652,7 +2657,7 @@ function renderPeers(){
   $('#phRank').textContent=PEERS.varRank; $('#phRank2').textContent=PEERS.varRank;
   $('#phCount').textContent=PEERS.count; $('#phShare').textContent=PEERS.varShare+'%';
   $('#phTotal').textContent='$'+(PEERS.total/1e9).toFixed(1)+'B';
-  $('#phVsHl').textContent=PEERS.vsHl+'×';
+  if($('#phVsHl'))$('#phVsHl').textContent=PEERS.vsHl+'×';
   $('#peersAsOf').textContent=PEERS.asOf;
 }
 function fmtPulseMoney(v){
@@ -3615,6 +3620,20 @@ function calImpliedActivity(earn){
   };
 }
 const calMiniMoney=n=>n>=1e9?'$'+(n/1e9).toFixed(1)+'B':n>=1e6?'$'+(n/1e6).toFixed(1)+'M':n>=1e3?'$'+(n/1e3).toFixed(0)+'K':fmtUSD(n);
+function pending24Meta(dateStr){
+  const today=resetDateKey(), nextTs=resetMidnightTs(addDays(today,1))*1000;
+  if(dateStr===today){
+    const nextLabel=new Date(nextTs).toLocaleDateString('en-US',{month:'short',day:'numeric',timeZone:RESET_TZ.tz});
+    return `<div class="cal-pending-meta"><span>24H closes <b>${nextLabel} · 00:00 ET</b></span><b class="countdown" data-countdown="${dateStr}">—</b></div>`;
+  }
+  if(dateStr>today)return `<div class="cal-pending-meta"><span>24H window</span><b>closes 00:00 ET</b></div>`;
+  return `<div class="cal-pending-meta"><span>24H snapshot</span><b>not available</b></div>`;
+}
+function updateCalendarCountdowns(){
+  const today=resetDateKey(), nextTs=resetMidnightTs(addDays(today,1))*1000, left=Math.max(0,nextTs-Date.now());
+  const h=Math.floor(left/36e5),m=Math.floor((left%36e5)/6e4),s=Math.floor((left%6e4)/1e3);
+  document.querySelectorAll('[data-countdown]').forEach(el=>{el.textContent=`${String(h).padStart(2,'0')}h ${String(m).padStart(2,'0')}m ${String(s).padStart(2,'0')}s`;});
+}
 function calendarEarnHtml(dateStr,disp){
   if(CALMODE!=='day')return `<div class="cal-earn ${disp.span?'span':(disp.v?'':'zero')}">${disp.label}</div>`;
   const closed=isClosedDailyTotal(dateStr), total=CAL.eMap.get(dateStr)||0;
@@ -3625,7 +3644,7 @@ function calendarEarnHtml(dateStr,disp){
       <div><b>${calMiniMoney(a.volume)}</b><span>Est Vol</span></div>
       <div><b>${calMiniMoney(a.oi)}</b><span>OI needed</span></div>
       <div class="burn"><b>${calMiniMoney(a.burn)}</b><span>Burn</span></div>
-    </div>`:''}
+    </div>`:pending24Meta(dateStr)}
   </div>`;
 }
 function calendarDisplay(dateStr){
@@ -4110,6 +4129,8 @@ try{
 }
 booted=true;
 try{buildCalendar();}catch(err){console.warn('Calendar startup render recovered:',err);}
+updateCalendarCountdowns();
+setInterval(updateCalendarCountdowns,1000);
 startLive();
 setInterval(renderPointsDeadline,60000);
 // attempt an automatic live sync on load (silent-fail to snapshot)
