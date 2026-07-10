@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Variational Scanner — Live USDC Treasury Tracker</title>
 <link rel="icon" href="variational-scanner-logo-transparent.png?v=2">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@100..900&family=Geist:wght@100..900&display=swap" rel="stylesheet">
 
 <!-- ============================================================
      TWITTER / LINK PREVIEW  —  ⚠️ AFTER YOU HOST THIS, replace
@@ -28,28 +31,16 @@
 <meta name="twitter:description" content="10% of every spread paid to OLP flows into Variational's treasury per the OLP docs. Tracking it live on-chain.">
 <meta name="twitter:image" content="https://REPLACE-WITH-YOUR-URL/assets/heaven.png">
 <style>
-  @font-face{
-    font-family:"Gilroy Dashboard";
-    src:
-      local("Gilroy Medium"),
-      local("Gilroy-Medium"),
-      local("Gilroy"),
-      url("./Gilroy-Medium.woff2") format("woff2"),
-      url("./Gilroy-Medium.woff") format("woff"),
-      url("./Gilroy-Medium.ttf") format("truetype");
-    font-weight:500;
-    font-style:normal;
-    font-display:swap;
-  }
   :root{
     --bg:#030814; --panel:#07101f; --panel2:#0a1628; --line:#16345c;
     --ink:#eef7ff; --sub:#84a2c6; --dim:#4f6f98;
     --grn:#26e6c2; --grn2:#18a994; --cyan:#55b8ff; --vio:#4d90ff; --amber:#6fb9ff; --red:#d95c58;
-    --gilroy:"Gilroy Dashboard","Gilroy Medium","Gilroy",Avenir Next,ui-sans-serif,system-ui,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";
-    --sans:var(--gilroy);
-    --mono:var(--gilroy);
-    --display:var(--gilroy);
-    --serif:var(--gilroy);
+    --geist-sans:"Geist",Avenir Next,ui-sans-serif,system-ui,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";
+    --geist-mono:"Geist Mono",ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono",monospace;
+    --sans:var(--geist-sans);
+    --mono:var(--geist-mono);
+    --display:var(--geist-sans);
+    --serif:var(--geist-sans);
   }
   *{box-sizing:border-box;margin:0;padding:0}
   html,body{background:
@@ -147,6 +138,25 @@
     background:linear-gradient(92deg,var(--grn),var(--cyan));border:0;padding:6px 13px;border-radius:8px;transition:.15s;
     box-shadow:0 0 16px rgba(34,230,160,.3)}
   #tweet:hover{filter:brightness(1.08);box-shadow:0 0 22px rgba(34,230,160,.5)}
+  /* Terminal Signal header direction */
+  header.header-terminal{align-items:center;gap:24px;padding:14px 0 16px;margin-bottom:16px}
+  .header-terminal .brandwrap{align-items:center;gap:15px;flex:1 1 640px}
+  .header-terminal .brand{gap:9px;min-width:0}
+  .header-terminal .kd{grid-template-columns:auto 1fr;column-gap:10px;row-gap:5px;width:max-content;max-width:100%;padding:0;border:0}
+  .header-terminal .kd::before,.header-terminal .kd::after{display:none}
+  .header-terminal .kd .by{grid-column:1 / span 2;grid-row:1;color:var(--cyan);font:900 10px/1 var(--mono);letter-spacing:2px}
+  .header-terminal .kd strong{grid-column:1 / span 2;grid-row:2;font:800 clamp(27px,3vw,40px)/.95 var(--mono);letter-spacing:-2px;background:none;color:var(--ink);filter:none;text-transform:none}
+  .header-terminal .kd .handle{grid-column:1;grid-row:3;color:var(--sub);font:700 10px/1 var(--mono);letter-spacing:.7px;text-transform:uppercase}
+  .header-terminal .kd .follow{grid-column:2;grid-row:3;align-self:center;color:var(--grn);font:900 9px/1 var(--mono);letter-spacing:1.4px}
+  .header-terminal .kd .dot{left:-7px;top:50%;width:5px;height:5px}
+  .header-terminal .contract{font-size:10px;gap:6px;color:var(--sub)}
+  .header-terminal .top-ref{margin-top:3px;border-radius:5px;background:rgba(6,19,27,.82);box-shadow:inset 0 1px 0 rgba(85,184,255,.1),0 0 18px rgba(38,230,194,.06)}
+  .header-terminal .top-ref-code{font-family:var(--mono);letter-spacing:.4px}
+  .header-terminal .hero-total{max-width:min(100%,720px)}
+  .header-terminal .hero-total .lbl{font-family:var(--mono);letter-spacing:2px}
+  .header-terminal .hero-total .val{font-size:clamp(42px,6.8vw,88px);letter-spacing:-3px}
+  .header-terminal .hero-deltas{margin-top:7px}
+  @media(max-width:760px){.header-terminal .brandwrap{align-items:flex-start}.header-terminal .kd strong{font-size:31px}.header-terminal .top-ref{border-radius:5px}.header-terminal .hero-total{margin-top:4px}}
 
   /* how-it-fills flow strip */
   .flow{display:flex;align-items:stretch;gap:0;flex-wrap:wrap;margin-bottom:22px;
@@ -647,6 +657,12 @@
   .cal-weekdays span{font:900 10px var(--mono);letter-spacing:1.4px;text-transform:uppercase;color:var(--dim)}
   .cal-weekdays span:nth-child(1),.cal-weekdays span:nth-child(7){color:var(--amber)}
   .cal-grid{display:grid;grid-template-columns:repeat(7,minmax(96px,1fr));grid-auto-rows:minmax(122px,auto);gap:6px;min-width:760px}
+  .cal-grid.period-summary{grid-template-columns:repeat(auto-fit,minmax(220px,1fr));grid-auto-rows:minmax(108px,auto);min-width:0}
+  .cal-summary-card{min-height:108px;padding:14px;border:1px solid rgba(34,230,160,.38);border-radius:11px;background:linear-gradient(180deg,rgba(8,29,31,.9),rgba(5,13,20,.96));cursor:pointer;box-shadow:inset 0 -34px 60px rgba(34,230,160,.08)}
+  .cal-summary-card:hover{transform:translateY(-1px);box-shadow:0 0 0 1px var(--grn),0 8px 24px rgba(0,0,0,.22)}
+  .cal-summary-period{font:950 9px var(--display);letter-spacing:1.5px;text-transform:uppercase;color:var(--sub)}
+  .cal-summary-value{margin-top:14px;font:950 clamp(24px,2.6vw,38px)/1 var(--mono);letter-spacing:-1.4px;color:var(--grn);text-shadow:0 0 18px rgba(34,230,160,.2)}
+  .cal-summary-empty{grid-column:1/-1;padding:24px;border:1px dashed rgba(85,184,255,.25);border-radius:10px;color:var(--dim);font:12px var(--mono)}
   .cal-cell{min-height:122px;border-radius:10px;background:linear-gradient(180deg,var(--panel2),var(--panel));
     border:1px solid rgba(27,37,54,.9);cursor:pointer;transition:transform .1s,box-shadow .1s,border-color .1s;
     padding:8px;display:flex;flex-direction:column;gap:6px;position:relative;overflow:hidden}
@@ -729,6 +745,25 @@
   .formula-card.vol .v{color:var(--cyan);text-shadow:0 0 20px rgba(85,184,255,.22)}
   .formula-card .f{font:10.5px/1.45 var(--mono);color:var(--sub);margin-top:8px}
   .formula-card .f code{color:var(--ink);font-family:var(--mono)}
+  .activity-read{position:relative;overflow:hidden;margin:14px 0 18px;padding:15px;border:1px solid rgba(34,230,160,.34);border-radius:14px;background:
+    radial-gradient(520px 180px at 8% 0,rgba(34,230,160,.14),transparent 66%),
+    linear-gradient(180deg,rgba(8,24,31,.9),rgba(4,11,18,.96));box-shadow:0 0 26px rgba(34,230,160,.08)}
+  .activity-read-head{display:flex;align-items:center;gap:8px;flex-wrap:wrap;color:var(--sub);font:11px var(--mono);letter-spacing:.3px}
+  .activity-read-head b{color:var(--grn);font:950 10px var(--display);letter-spacing:2px}
+  .activity-read-flow{display:grid;grid-template-columns:1fr 18px 1fr 28px 1fr 28px 1fr;gap:8px;align-items:center;margin-top:13px}
+  .activity-input,.activity-result{min-width:0;padding:12px;border:1px solid rgba(85,184,255,.2);border-radius:10px;background:rgba(3,10,18,.72)}
+  .activity-input span,.activity-result span{display:block;color:var(--sub);font:950 8px var(--display);letter-spacing:1.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .activity-input strong,.activity-result strong{display:block;margin-top:7px;font:950 clamp(21px,2.4vw,32px)/1 var(--mono);letter-spacing:-1px;color:var(--cyan);white-space:nowrap}
+  .activity-result strong{color:var(--ink)}
+  .activity-result.treasury{border-color:rgba(34,230,160,.3);background:rgba(10,39,34,.5)}
+  .activity-result.treasury strong,.activity-outcome b{color:var(--grn);text-shadow:0 0 18px rgba(34,230,160,.2)}
+  .activity-input small,.activity-result small{display:block;margin-top:6px;color:var(--sub);font:9px/1.35 var(--mono)}
+  .activity-plus,.activity-arrow{color:var(--cyan);font:950 18px var(--mono);text-align:center}
+  .activity-outcome{display:flex;align-items:baseline;gap:9px;margin-top:11px;padding-top:10px;border-top:1px solid rgba(34,230,160,.16);color:var(--sub);font:10px var(--mono)}
+  .activity-outcome b{font:950 22px var(--mono)}
+  .activity-outcome small{color:var(--dim);font:9px var(--mono)}
+  @media(max-width:1080px){.activity-read-flow{grid-template-columns:1fr 18px 1fr;}.activity-result:nth-of-type(5){grid-column:1 / 2}.activity-result.treasury{grid-column:3 / 4}.activity-arrow:nth-of-type(6){display:none}}
+  @media(max-width:620px){.activity-read-flow{grid-template-columns:1fr}.activity-plus,.activity-arrow{display:none}.activity-result:nth-of-type(5),.activity-result.treasury{grid-column:auto}.activity-outcome{flex-wrap:wrap}}
   @media(max-width:900px){.formula-strip{grid-template-columns:1fr 1fr}}
   @media(max-width:560px){.formula-strip{grid-template-columns:1fr}}
   .reverse-audit{position:relative;overflow:hidden;border:1px solid rgba(34,230,160,.22);border-radius:13px;margin:-4px 0 16px;padding:13px 14px;background:
@@ -931,6 +966,22 @@
   .rk .rk-v{font:700 12.5px var(--mono);color:var(--sub);text-align:right;white-space:nowrap}
   .rk.me .rk-v{color:var(--ink)}
   @media(max-width:1180px){.peer-layout{grid-template-columns:1fr}.rk{grid-template-columns:22px minmax(140px,1fr) minmax(120px,.8fr) auto}}
+  .pulse-table-wrap{margin:16px 0 20px;border:1px solid rgba(85,184,255,.2);border-radius:12px;overflow:auto;background:rgba(3,10,18,.62)}
+  .pulse-table{width:100%;min-width:960px;border-collapse:collapse;font-family:var(--mono)}
+  .pulse-table th{padding:10px 12px;text-align:right;color:var(--dim);font:900 9px var(--mono);letter-spacing:1.1px;text-transform:uppercase;white-space:nowrap;background:rgba(85,184,255,.05);border-bottom:1px solid rgba(85,184,255,.2)}
+  .pulse-table th:first-child,.pulse-table td:first-child{text-align:left}
+  .pulse-table td{padding:9px 12px;text-align:right;color:var(--sub);font:700 11px var(--mono);white-space:nowrap;border-bottom:1px solid rgba(27,37,54,.72)}
+  .pulse-table tbody tr:last-child td{border-bottom:0}
+  .pulse-table tbody tr:hover{background:rgba(85,184,255,.055)}
+  .pulse-table tr.me{background:linear-gradient(90deg,rgba(34,230,160,.16),rgba(34,230,160,.035))}
+  .pulse-table tr.me td{color:var(--ink);font-weight:900}
+  .pulse-table .rank{color:var(--dim);width:38px}
+  .pulse-table .exchange{display:inline-flex;align-items:center;gap:8px;color:var(--ink);font-weight:900}
+  .pulse-table tr.me .exchange{color:var(--grn)}
+  .pulse-table .table-logo{width:20px;height:20px;object-fit:contain;border-radius:5px;vertical-align:middle;background:#0a101b}
+  .pulse-table .source-link{color:var(--cyan);font-weight:900}
+  .pulse-table .fee-zero{color:var(--grn)}
+  .pulse-table .rank-badge{display:inline-block;margin-left:6px;padding:2px 5px;border:1px solid rgba(34,230,160,.4);border-radius:999px;color:var(--grn);font:900 8px var(--mono);letter-spacing:.5px;text-transform:uppercase}
 
   .soon-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;margin-top:6px}
   .soon-card{position:relative;background:var(--panel);border:1px dashed var(--line);border-radius:13px;padding:16px;overflow:hidden}
@@ -1039,6 +1090,8 @@
   .h2h-vals small{font:10px var(--mono);color:var(--dim);font-weight:600;margin-left:6px}
   .h2h-note{margin-top:16px;border-top:1px solid rgba(85,184,255,.12);padding-top:12px;font:11px/1.65 var(--mono);color:var(--dim)}
   .h2h-note a{color:var(--cyan);border-bottom:1px dashed rgba(56,225,255,.4)}
+  .comparison-focus .peer-left,.comparison-focus .king-card{display:none}
+  .comparison-focus .peer-layout{display:block}
   .rev-callout{display:flex;flex-wrap:wrap;align-items:center;gap:12px 22px;margin-top:14px;border:1px solid rgba(34,230,160,.28);
     border-radius:14px;padding:14px 16px;background:radial-gradient(420px 140px at 8% 0,rgba(34,230,160,.1),transparent 65%),var(--panel)}
   .rev-callout .big{font:950 clamp(24px,3.4vw,34px)/1 var(--mono);letter-spacing:-1px;
@@ -1059,18 +1112,24 @@
   .ftp-v{font:800 24px var(--mono);letter-spacing:-.5px;
     background:linear-gradient(92deg,#eafff6,var(--grn));-webkit-background-clip:text;background-clip:text;color:transparent}
   .ftp-l{font:10.5px var(--mono);color:var(--sub);margin-top:5px}
-  .points-grid{display:grid;grid-template-columns:1fr 1.15fr;gap:18px;margin-top:6px}
-  .points-controls{display:flex;flex-direction:column;gap:14px}
+  .points-grid{display:grid;grid-template-columns:minmax(260px,.9fr) minmax(0,1.35fr);gap:18px;margin-top:6px;align-items:start}
+  .points-controls{display:flex;flex-direction:column;gap:14px;min-height:0;align-self:start}
   .pts-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
   .pts-in{display:flex;flex-direction:column;gap:7px;font:700 11px var(--mono);letter-spacing:.8px;color:var(--sub);text-transform:uppercase}
   .pts-in input{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px;color:var(--ink);font:800 18px var(--mono);width:100%}
-  .pts-share{font:900 clamp(28px,4vw,48px)/1 var(--mono);letter-spacing:-1px;color:var(--grn)}
-  .pts-fdv{font:900 clamp(44px,8vw,82px)/.9 var(--mono);letter-spacing:-2px;color:#ff9f70;text-align:right}
-  .fdv-control{border:1px solid rgba(85,184,255,.34);border-radius:14px;padding:13px 14px;background:rgba(85,184,255,.055)}
+  .pts-share{margin-top:auto;padding:14px 16px;border:1px solid rgba(34,230,160,.28);border-radius:12px;background:rgba(34,230,160,.06);color:var(--grn);text-align:left}
+  .pts-share span{display:block;font:950 10px/1 var(--display);letter-spacing:1.8px;text-transform:uppercase;color:var(--sub)}
+  .pts-share b{display:block;margin-top:7px;font:950 clamp(28px,4vw,48px)/1 var(--mono);letter-spacing:-1px;color:var(--grn)}
+  .pts-results{display:block;text-align:left}
+  .pts-fdv{margin-top:0;font:950 clamp(44px,7vw,68px)/.9 var(--mono);letter-spacing:-2px;color:#ff9f70;text-align:left}
+  .fdv-control{display:grid;grid-template-columns:minmax(120px,.55fr) minmax(0,1.45fr);gap:14px;align-items:center;border:1px solid rgba(85,184,255,.34);border-radius:14px;padding:13px 14px;background:rgba(85,184,255,.055)}
+  .fdv-value{min-width:0}
+  .fdv-value .pts-fdv{margin-top:5px}
+  .fdv-tools{min-width:0}
   .fdv-head{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin-bottom:12px}
-  .fdv-title{font:900 10px/1 var(--mono);letter-spacing:1.7px;text-transform:uppercase;color:var(--cyan)}
+  .fdv-title{font:950 11px/1 var(--mono);letter-spacing:1.9px;text-transform:uppercase;color:var(--cyan)}
   .fdv-title span{display:block;margin-top:6px;font:700 11px/1.35 var(--mono);letter-spacing:.2px;text-transform:none;color:var(--sub)}
-  .fdv-action{display:inline-flex;align-items:center;gap:7px;border:1px solid rgba(85,184,255,.42);border-radius:999px;padding:7px 10px;color:var(--ink);background:rgba(85,184,255,.09);font:900 9px/1 var(--mono);letter-spacing:1.1px;text-transform:uppercase;white-space:nowrap}
+  .fdv-action{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--cyan);border-radius:999px;padding:8px 11px;color:#03101b;background:linear-gradient(92deg,var(--cyan),#8fd7ff);font:950 9px/1 var(--mono);letter-spacing:1.2px;text-transform:uppercase;white-space:nowrap;box-shadow:0 0 18px rgba(85,184,255,.24)}
   .fdv-action::before{content:"↔";display:grid;place-items:center;width:18px;height:18px;border-radius:999px;background:var(--cyan);color:#04111c;font:950 12px/1 var(--mono)}
   .pts-slider{width:100%;height:26px;appearance:none;-webkit-appearance:none;background:transparent;cursor:pointer}
   .pts-slider::-webkit-slider-runnable-track{height:12px;border-radius:999px;background:linear-gradient(90deg,#4d90ff 0%,#55b8ff 58%,#8fd7ff 100%);border:1px solid rgba(143,215,255,.72);box-shadow:0 0 18px rgba(85,184,255,.28)}
@@ -1079,8 +1138,8 @@
   .pts-slider:focus-visible::-webkit-slider-thumb{box-shadow:0 0 0 8px rgba(85,184,255,.24),0 0 24px rgba(85,184,255,.7)}
   .pts-slider::-moz-range-track{height:12px;border-radius:999px;background:linear-gradient(90deg,#4d90ff 0%,#55b8ff 58%,#8fd7ff 100%);border:1px solid rgba(143,215,255,.72);box-shadow:0 0 18px rgba(85,184,255,.28)}
   .pts-slider::-moz-range-thumb{width:24px;height:24px;border-radius:50%;background:#07101f;border:3px solid var(--cyan);box-shadow:0 0 0 6px rgba(85,184,255,.14),0 0 20px rgba(85,184,255,.55)}
-  .pts-outs{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}
-  .pts-card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px;text-align:center}
+  .pts-outs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;width:100%;max-width:none;margin-top:10px}
+  .pts-card{width:100%;max-width:none;min-width:0;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 16px;text-align:left}
   .pts-card b{display:block;font:900 20px var(--mono);color:var(--ink)}
   .pts-card span{display:block;font:11px var(--mono);color:var(--grn);margin-top:5px}
   .pts-card small{display:block;font:10px var(--mono);color:var(--sub);margin-top:4px;text-transform:uppercase;letter-spacing:.5px}
@@ -1097,16 +1156,32 @@
   .hist-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:-4px;margin-bottom:10px}
   .hist-row button{cursor:pointer;border:1px solid var(--line);background:var(--panel);color:var(--sub);border-radius:999px;padding:5px 9px;font:800 10px var(--mono)}
   .hist-row button.on,.hist-row button:hover{color:#04120c;background:linear-gradient(92deg,var(--grn),var(--cyan));border-color:transparent}
-  @media(max-width:780px){.points-grid{grid-template-columns:1fr}.pts-outs{grid-template-columns:1fr}.pts-fdv{text-align:left}.pts-dead-top{align-items:flex-start;flex-direction:column}.pts-dead-v{text-align:left}.pts-band{text-align:left}}
+  @media(max-width:780px){.points-grid{grid-template-columns:1fr}.fdv-control{grid-template-columns:1fr}.pts-outs{grid-template-columns:1fr;width:100%;margin-top:12px}.pts-card{width:100%;min-width:0}.pts-results{display:block;text-align:left}.pts-fdv{text-align:left}.pts-dead-top{align-items:flex-start;flex-direction:column}.pts-dead-v{text-align:left}.pts-band{text-align:left}}
   .fdv-presets{display:flex;flex-wrap:wrap;gap:7px;margin-top:9px}
   .fdv-presets .preset{padding:6px 10px}
-  .pts-band{margin-top:9px;text-align:right;font:800 11px var(--mono);letter-spacing:1.3px;text-transform:uppercase;color:var(--sub)}
-  .pts-perpt{margin-top:6px;text-align:right;font:700 13px var(--mono);color:var(--sub)}
+  .pts-band{margin-top:9px;text-align:left;font:800 11px var(--mono);letter-spacing:1.3px;text-transform:uppercase;color:var(--sub)}
+  .pts-perpt{margin-top:5px;text-align:left;font:700 13px var(--mono);color:var(--sub)}
   .pts-perpt b{color:var(--grn);font-weight:800}
+  .cal>h2{display:flex;align-items:center;justify-content:flex-start;gap:10px;min-width:0}
+  .cal>h2>span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .cal-collapse{cursor:pointer;display:inline-flex;align-items:center;justify-content:center;flex:none;min-width:98px;height:29px;padding:0 10px;border:1px solid rgba(85,184,255,.45);border-radius:8px;background:rgba(85,184,255,.1);color:var(--cyan);font:900 9px/1 var(--mono);letter-spacing:1px;text-transform:uppercase;transition:.15s}
+  .cal-collapse:hover{background:rgba(85,184,255,.16);box-shadow:0 0 15px rgba(85,184,255,.18)}
+  .cal.is-collapsed> :not(h2){display:none}
   .pts-card.base{border-color:rgba(34,230,160,.5);background:radial-gradient(300px 120px at 50% 0,rgba(34,230,160,.1),transparent 70%),var(--panel);position:relative}
   .pts-card.base::after{content:"BASE CASE";position:absolute;top:-8px;left:50%;transform:translateX(-50%);
     font:800 8px var(--mono);letter-spacing:1px;color:#04120c;background:linear-gradient(92deg,var(--grn),var(--cyan));padding:2px 7px;border-radius:999px}
   .pts-share-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px;padding-top:15px;border-top:1px solid var(--line)}
+  .historical-combo{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(340px,.85fr);column-gap:18px;align-items:start}
+  .historical-combo>h2,.historical-combo>.cap,.historical-combo>.legend,.historical-combo>.chart-tools,.historical-combo>#curve{grid-column:1}
+  .historical-combo .interval-block{grid-column:2;grid-row:1 / span 5;margin-top:0;padding-top:0;border-top:0}
+  .historical-combo .interval-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:10px}
+  .historical-combo .interval-head h3{font:800 14px var(--sans);color:var(--ink)}
+  .historical-combo .interval-head .cap{margin:4px 0 0}
+  .historical-combo .interval-head .tag{font:600 10px var(--mono);letter-spacing:1px;color:var(--sub);padding:3px 8px;border:1px solid var(--line);border-radius:20px;white-space:nowrap}
+  .historical-combo .interval-chart{max-width:920px;margin:0 auto}
+  .historical-combo .hist-inline-table{max-height:240px;overflow:auto}
+  @media(max-width:980px){.historical-combo{display:block}.historical-combo .interval-block{margin-top:22px;padding-top:18px;border-top:1px solid rgba(85,184,255,.2)}}
+  @media(max-width:620px){.historical-combo .interval-head{flex-direction:column;gap:6px}}
 
   /* ---- methodology ---- */
   .method{display:flex;flex-direction:column;gap:0}
@@ -1424,11 +1499,11 @@
 </style>
 </head>
 <body>
-<header>
+<header class="header-terminal">
   <div class="brandwrap">
   <img class="logo scanner-logo" src="variational-scanner-logo-transparent.png?v=2" alt="Variational Scanner logo">
   <div class="brand">
-    <a class="kd" href="https://x.com/0xdefidaniel" target="_blank" rel="noopener"><span class="dot"></span><span class="by">Built by</span><strong>Daniel</strong><span class="handle">@0xdefidaniel</span><span class="follow">Follow ↗</span></a>
+    <a class="kd" href="https://x.com/0xdefidaniel" target="_blank" rel="noopener"><span class="dot"></span><span class="by">Variational Scanner</span><strong>Revenue Radar</strong><span class="handle">Built by @0xdefidaniel</span><span class="follow">Live ↗</span></a>
     <div class="contract">
       <span class="badge">Arbitrum · USDC</span>
       <a href="https://arbiscan.io/address/0x5e91b40467fb8902c46a7b6cb90482363188d645#tokentxns" target="_blank">0x5e91…d645 ↗</a>
@@ -1686,8 +1761,8 @@
 <div class="note tsec" id="note" data-tg="overview"></div>
 
 <div class="card eff tsec tg-hide" data-tg="efficiency">
-  <h2>Growth to Hyperliquid-Level Earnings <span class="tag">health · gap · upside</span></h2>
-  <div class="cap">Core question: <b>how much bigger must Variational get to earn Hyperliquid-scale money?</b> Read this as current venue health first, formulas second. <span id="effAsOf" class="muted"></span></div>
+  <h2>How Current Activity Becomes Revenue <span class="tag">volume · OI · earnings</span></h2>
+  <div class="cap"><b>Why this matters:</b> Volume and open interest are not just market statistics. They are the activity and capacity that produce spread fees, treasury revenue, and buyback-burn firepower. Read this section as: <b>current activity → money earned</b>. <span id="effAsOf" class="muted"></span></div>
 <div class="eff-window-tabs" id="effWindowTabs" aria-label="Fee revenue time window">
   <button type="button" class="on" data-eff-window="1d" onclick="setEffWindow('1d')">1D</button>
   <button type="button" data-eff-window="7d" onclick="setEffWindow('7d')">1W</button>
@@ -1695,45 +1770,36 @@
   <button type="button" data-eff-window="month" onclick="setEffWindow('month')">Month</button>
   <button type="button" data-eff-window="all" onclick="setEffWindow('all')">All-time</button>
 </div>
-  <div class="formula-strip" aria-label="Fee and revenue formulas">
-    <div class="formula-card good">
-      <div class="k">Avg daily treasury revenue</div>
-      <div class="v" id="fmDailyRev">—</div>
-      <div class="f"><code id="fmDailyRevFormula">selected treasury ÷ days</code></div>
+  <div class="activity-read" aria-label="Current activity and earnings summary">
+    <div class="activity-read-head"><span class="live-dot"></span><b>READ THIS FIRST</b><span>Current venue activity → implied money earned</span></div>
+    <div class="activity-read-flow">
+      <div class="activity-input"><span>1D PERP VOLUME</span><strong id="fmDailyVol">—</strong><small id="fmDailyVolFormula">selected trading flow</small></div>
+      <div class="activity-plus">+</div>
+      <div class="activity-input"><span>OPEN INTEREST</span><strong id="fmOi">—</strong><small>capital kept active in positions</small></div>
+      <div class="activity-arrow">→</div>
+      <div class="activity-result"><span>SPREAD FEES PAID BY TRADERS</span><strong id="fmDailyFees">—</strong><small id="fmDailyFeesFormula">daily treasury ÷ 10%</small></div>
+      <div class="activity-arrow">→</div>
+      <div class="activity-result treasury"><span>VARIATIONAL TREASURY REVENUE</span><strong id="fmDailyRev">—</strong><small id="fmDailyRevFormula">selected treasury ÷ days</small></div>
     </div>
-    <div class="formula-card fee">
-      <div class="k">Avg daily spread payments</div>
-      <div class="v" id="fmDailyFees">—</div>
-      <div class="f"><code id="fmDailyFeesFormula">daily treasury ÷ 10%</code></div>
-    </div>
-    <div class="formula-card vol">
-      <div class="k">Avg daily volume</div>
-      <div class="v" id="fmDailyVol">—</div>
-      <div class="f"><code id="fmDailyVolFormula">daily spreads × vol/$1 spread</code></div>
-    </div>
-    <div class="formula-card">
-      <div class="k">Avg daily burn firepower</div>
-      <div class="v" id="fmDailyBurn">—</div>
-      <div class="f"><code id="fmDailyBurnFormula">daily treasury × 30%</code></div>
-    </div>
+    <div class="activity-outcome"><b id="fmDailyBurn">—</b><span>estimated buyback-burn firepower per day</span><small id="fmDailyBurnFormula">daily treasury × 30%</small></div>
   </div>
   <div class="reverse-audit" aria-label="Reverse calculation audit from treasury revenue">
-    <div class="ra-title">Reverse check · start from the on-chain treasury inflow</div>
+    <div class="ra-title">The money path · activity translated into earnings</div>
     <div class="ra-steps">
       <div class="ra-step start">
-        <div class="ra-k">1 · Wallet earns</div>
+        <div class="ra-k">1 · Current activity</div>
         <div class="ra-v" id="raTreasuryDay">—</div>
-        <div class="ra-f">measured treasury inflow / day</div>
+        <div class="ra-f">measured treasury revenue / day</div>
       </div>
       <div class="ra-step">
-        <div class="ra-k">2 · Back out spreads</div>
+        <div class="ra-k">2 · Trader spread fees</div>
         <div class="ra-v" id="raSpreadDay">—</div>
-        <div class="ra-f"><b id="raTreasuryShare">10%</b> treasury share ⇒ spread/day</div>
+        <div class="ra-f"><b id="raTreasuryShare">10%</b> of spread fees reaches treasury</div>
       </div>
       <div class="ra-step volume">
-        <div class="ra-k">3 · Back out volume</div>
+        <div class="ra-k">3 · Volume required</div>
         <div class="ra-v" id="raVolumeDay">—</div>
-        <div class="ra-f"><span id="raVolPerSpread">—</span> volume per $1 spread</div>
+        <div class="ra-f"><span id="raVolPerSpread">—</span> trading volume per $1 spread</div>
       </div>
       <div class="ra-step pass">
         <div class="ra-k" id="raPeriodK">4 · Lands back at selected period</div>
@@ -1901,26 +1967,30 @@
         <label class="pts-in">My points <input type="number" id="ptsMine" value="12000" min="0"></label>
         <label class="pts-in">Total pool <input type="number" id="ptsPool" value="9167500" min="1"></label>
       </div>
-      <div class="fdv-control">
-        <div class="fdv-head">
-          <div class="fdv-title">Adjust FDV here
-            <span id="ptsFdvLabel">74% of HYPE FDV</span>
-          </div>
-          <div class="fdv-action">Drag slider</div>
+    </div>
+    <div class="pts-results">
+      <div class="fdv-control" aria-label="Editable FDV scenario">
+        <div class="fdv-value">
+          <div class="fdv-title">FDV scenario</div>
+          <div class="pts-fdv" id="ptsFdvBig">—</div>
         </div>
-        <input class="pts-slider" type="range" id="ptsFdv" min="1000000" max="67700000000" step="1000000" value="50000000000">
-        <div class="fdv-presets" id="fdvPresets">
-          <button type="button" class="preset" data-fdv="1000000000">$1B</button>
-          <button type="button" class="preset" data-fdv="5000000000">$5B</button>
-          <button type="button" class="preset" data-fdv="10000000000">$10B</button>
-          <button type="button" class="preset" data-fdv="33850000000">½ HYPE · $33.9B</button>
-          <button type="button" class="preset" data-fdv="67700000000">HYPE · $67.7B</button>
+        <div class="fdv-tools">
+          <div class="fdv-head">
+            <div class="fdv-title">Edit this FDV scenario
+              <span id="ptsFdvLabel">74% of HYPE FDV</span>
+            </div>
+            <div class="fdv-action">EDIT · DRAG TO CHANGE</div>
+          </div>
+          <input class="pts-slider" type="range" id="ptsFdv" min="1000000" max="67700000000" step="1000000" value="50000000000" aria-label="Edit FDV scenario">
+          <div class="fdv-presets" id="fdvPresets">
+            <button type="button" class="preset" data-fdv="1000000000">$1B</button>
+            <button type="button" class="preset" data-fdv="5000000000">$5B</button>
+            <button type="button" class="preset" data-fdv="10000000000">$10B</button>
+            <button type="button" class="preset" data-fdv="33850000000">½ HYPE · $33.9B</button>
+            <button type="button" class="preset" data-fdv="67700000000">HYPE · $67.7B</button>
+          </div>
         </div>
       </div>
-      <div class="pts-share" id="ptsShare">—</div>
-    </div>
-    <div>
-      <div class="pts-fdv" id="ptsFdvBig">—</div>
       <div class="pts-band" id="ptsBand">—</div>
       <div class="pts-perpt" id="ptsPerPt">—</div>
       <div class="pts-outs">
@@ -1951,7 +2021,7 @@
   </div>
 </div>
 
-<div class="card tsec tg-hide" data-tg="historical">
+<div class="card historical-combo tsec tg-hide" data-tg="historical">
   <h2>Cumulative Accumulation <span class="tag" id="curveTag">—</span></h2>
   <div class="cap">Total USDC held over time — pure buyback inflow (no outflows recorded).</div>
   <div class="legend">
@@ -1969,6 +2039,28 @@
     <div class="chart-hint">Drag either endpoint to tune pace</div>
   </div>
   <svg class="chart" id="curve" viewBox="0 0 720 340" preserveAspectRatio="none"></svg>
+  <div class="interval-block">
+    <div class="interval-head">
+      <div><h3>Growth per Interval</h3><div class="cap">See how much the treasury added in each window and whether the rolling average is bending.</div></div>
+      <span class="tag" id="tblTag">weekly</span>
+    </div>
+    <div class="seg" id="seg">
+      <button type="button" data-i="day">Daily</button>
+      <button type="button" data-i="week" class="on">Weekly</button>
+      <button type="button" data-i="biweek">2-Week</button>
+      <button type="button" data-i="month">Monthly</button>
+    </div>
+    <div class="legend">
+      <b><span class="sw act"></span>Interval added</b>
+      <b><span class="sw avg"></span>4-period rolling avg</b>
+    </div>
+    <div class="interval-chart"><svg class="chart" id="bars" viewBox="0 0 380 230"></svg></div>
+    <div class="tbl-wrap hist-inline-table">
+      <table id="tbl"><thead><tr>
+        <th>Period</th><th>Start</th><th>End</th><th>USDC Added</th><th>Δ %</th><th>Avg / day</th>
+      </tr></thead><tbody></tbody></table>
+    </div>
+  </div>
 </div>
 
 <div class="card hist-health tsec tg-hide" data-tg="historical" style="margin-top:16px">
@@ -1999,29 +2091,8 @@
   </div>
 </div>
 
-<div class="card tsec tg-hide" data-tg="historical">
-  <h2>Growth per Interval <span class="tag" id="tblTag">weekly</span></h2>
-  <div class="cap">Switch the window to see how much stacked, how fast, and where the rolling average is bending.</div>
-  <div class="seg" id="seg">
-    <button type="button" data-i="day">Daily</button>
-    <button type="button" data-i="week" class="on">Weekly</button>
-    <button type="button" data-i="biweek">2-Week</button>
-    <button type="button" data-i="month">Monthly</button>
-  </div>
-  <div class="legend">
-    <b><span class="sw act"></span>Interval added</b>
-    <b><span class="sw avg"></span>4-period rolling avg</b>
-  </div>
-  <svg class="chart" id="bars" viewBox="0 0 380 230"></svg>
-  <div class="tbl-wrap hist-inline-table">
-    <table id="tbl"><thead><tr>
-      <th>Period</th><th>Start</th><th>End</th><th>USDC Added</th><th>Δ %</th><th>Avg / day</th>
-    </tr></thead><tbody></tbody></table>
-  </div>
-</div>
-
 <div class="card cal tsec tg-hide" data-tg="efficiency" style="margin-top:16px">
-  <h2>Total Earnings + Fee/Revenue Calendar <span class="tag" id="calTag">daily totals</span></h2>
+  <h2><button class="cal-collapse" id="calCollapse" type="button" aria-expanded="true" aria-label="Collapse calendar" title="Collapse calendar">⌃ Collapse</button><span>Total Earnings + Fee/Revenue Calendar <span class="tag" id="calTag">daily totals</span></span></h2>
   <div class="cap">One calendar for the combined page: <b>completed treasury revenue</b>, implied fee flow, estimated activity, burn firepower, and market events. Today stays pending until the ET day closes.</div>
   <div class="seg" id="calSeg">
     <button type="button" data-c="day" class="on">Daily</button>
@@ -2072,9 +2143,11 @@
   </div>
 </div>
 
-<div class="card h2h peers-combined tsec tg-hide" data-tg="comparison">
-  <h2>Road to the King <span class="tag">HL benchmark · Lighter comp</span></h2>
-  <div class="cap">Hyperliquid is the king/ceiling. Lighter is the cleanest valuation comp. The question is whether Variational’s venue capacity and spread-fee pool can justify a Lighter-level, or premium, TGE read.</div>
+<div class="card h2h peers-combined comparison-focus tsec tg-hide" data-tg="comparison">
+  <h2>Variational vs the Perp DEX Market <span class="tag">top 15 by OI</span></h2>
+  <div class="cap">See where Variational sits among the largest perpetual DEXs by open interest, with Lighter kept as the direct market comparison. <a href="https://www.perpetualpulse.xyz/" target="_blank" rel="noopener" style="color:var(--cyan)">Source: Perpetual Pulse ↗</a></div>
+  <div class="mini-head">Perpetual DEX market board · top 15 by open interest · <span>Variational highlighted</span></div>
+  <div class="pulse-table-wrap"><table class="pulse-table" id="pulseTable"><thead><tr><th>#</th><th>Exchange</th><th>OI</th><th>24H Volume</th><th>TVL</th><th>Pairs</th><th>Maker Fee</th><th>Taker Fee</th><th>Leverage</th><th>Source</th></tr></thead><tbody></tbody></table></div>
   <div class="peer-layout">
     <div class="peer-left">
       <div class="peer-rank-hero">
@@ -2082,10 +2155,10 @@
         <div>
           <div class="ph-k">Variational rank <span class="beta">Closed Beta</span></div>
           <div class="ph-title">#<span id="phRank2">5</span> of <span id="phCount">87</span> by OI</div>
-          <div class="ph-sub"><b id="phShare">5.4%</b> of perp OI (<b id="phTotal">$21.7B</b>) · <b id="phVsHl">8.9×</b> smaller than Hyperliquid.</div>
+          <div class="ph-sub"><b id="phShare">5.4%</b> of perp OI (<b id="phTotal">$21.7B</b>) · ranked by current open interest.</div>
         </div>
       </div>
-      <div class="mini-head">Top 15 by open interest · <span id="peersAsOf">retrieved 2026-07-08</span></div>
+      <div class="mini-head">Top 15 by open interest · <span id="peersAsOf">Perpetual Pulse snapshot</span></div>
       <div class="rank-list" id="rankList"></div>
       <span id="peersTotal" hidden>22</span>
     </div>
@@ -2128,7 +2201,7 @@
 
 <div class="card tsec tg-hide" data-tg="comparison" style="margin-top:16px">
   <h2>Variational Revenue vs Lighter Revenue <span class="tag">weekly · trailing 8 weeks</span></h2>
-  <div class="cap">Weekly protocol revenue, same 7-day windows. Variational = USDC actually landing in the on-chain treasury (verifiable). Lighter = daily revenue on DeFiLlama. Hyperliquid is left off this chart — at ~$47M/30d it would flatten both bars.</div>
+  <div class="cap">Weekly protocol revenue, same 7-day windows. Variational = USDC actually landing in the on-chain treasury (verifiable). Lighter = daily revenue on DeFiLlama.</div>
   <div class="legend">
     <b><img class="cmp-logo" src="variational-symbol-transparent.png" alt=""><span class="sw act"></span>Variational · on-chain</b>
     <b><img class="cmp-logo" src="lighter-logo.png" alt=""><span class="sw" style="background:linear-gradient(90deg,#2c4c7f,#3f74c9)"></span>Lighter · DeFiLlama</b>
@@ -2143,7 +2216,7 @@
   <div class="soon-grid">
     <div class="soon-card"><div class="soon-badge">soon</div><div class="soon-t">🔥 $VAR burn tracker</div><div class="soon-d">Buy-&amp;-burn executed vs firepower loaded · % of supply burnt. <span class="muted">Treasury has 0 outflows so far — burn not yet fired.</span></div></div>
     <div class="soon-card"><div class="soon-badge">soon</div><div class="soon-t">📊 Gross fees &amp; revenue split</div><div class="soon-d">hl.eco-style Gross Fees → Revenue → Holders/LP split, all-time &amp; annualized.</div></div>
-    <div class="soon-card"><div class="soon-badge">soon</div><div class="soon-t">Editorial redesign</div><div class="soon-d">Gilroy Medium type + mint palette + spacious hl.eco layout across every tab.</div></div>
+    <div class="soon-card"><div class="soon-badge">soon</div><div class="soon-t">Editorial redesign</div><div class="soon-d">Geist Sans + Geist Mono type, mint palette, and spacious hl.eco layout across every tab.</div></div>
   </div>
 </div>
 
@@ -2183,30 +2256,23 @@ const MKT = {
 };
 /* perp-DEX peer ranking by open interest (Perpetual Pulse snapshot) */
 const PEERS = {
-  asOf:'retrieved 2026-07-08', total:15.86389235446e9, count:22, varRank:3, varShare:7.4, vsHl:8.6,
+  asOf:'Perpetual Pulse · live page snapshot', total:16.408469162e9, count:15, varRank:3, varShare:7.4, vsHl:8.9,
   list:[
-    {n:'Hyperliquid',oi:10133720905.35,vol:8112902385.84},
-    {n:'Aster',oi:1863757660.96,vol:1683620386.91},
-    {n:'Variational',oi:1172068400.71,vol:961702369.53,me:true},
-    {n:'Lighter',oi:810022995.62,vol:1465961931.57},
-    {n:'GRVT',oi:348721866.62,vol:1342772613.63},
-    {n:'edgeX',oi:309908191.50,vol:127732288.58},
-    {n:'Jupiter',oi:231885286.00,vol:258477468.00},
-    {n:'Extended',oi:202421353.60,vol:268596209.41},
-    {n:'Ostium',oi:157364995.69,vol:11787807.21},
-    {n:'Drift',oi:123964778.50,vol:75541709.94},
-    {n:'ApeX Protocol',oi:112379718.83,vol:1067237351.85},
-    {n:'Pacifica',oi:87096517.11,vol:774769076.35},
-    {n:'Backpack',oi:78405723.78,vol:154380827.55},
-    {n:'Vest Exchange',oi:59897520.56,vol:39758831.54},
-    {n:'GMX',oi:46818634.72,vol:42765303.54},
-    {n:'dYdX',oi:40823331.68,vol:70848652.01},
-    {n:'Orderly',oi:35320401.98,vol:58591977.59},
-    {n:'Reya',oi:13460057.19,vol:250155989.00},
-    {n:'Avantis',oi:12729980.73,vol:255754827.00},
-    {n:'Byreal',oi:10504381.00},
-    {n:'Paradex',oi:8959950.07,vol:7149991.68},
-    {n:'Gains Network',oi:3659702.26,vol:47519520.86}
+    {n:'Hyperliquid',oi:10684309662,vol:7126971862,tvl:5711017306,pairs:353,maker:'0.01%',taker:'0.045%',lev:'40x',url:'https://app.hyperliquid.xyz/'},
+    {n:'Aster',oi:1880005706,vol:1230816436,tvl:1363035561,pairs:514,maker:'0.01%',taker:'0.035%',lev:'100x',url:'https://www.asterdex.com/'},
+    {n:'Variational',oi:1206870736,vol:800298819,tvl:null,pairs:506,maker:'0%',taker:'0%',lev:'50x',me:true,url:'https://omni.variational.io/'},
+    {n:'Lighter',oi:838501998,vol:1125433816,tvl:519756720,pairs:191,maker:'0%',taker:'0%',lev:'50x',url:'https://app.lighter.xyz/'},
+    {n:'GRVT',oi:352183672,vol:1429270972,tvl:39227830,pairs:168,maker:'-0.0001%',taker:'0.055%',lev:'50x',url:'https://grvt.io/'},
+    {n:'Ostium',oi:267613768,vol:99175845,tvl:61452624,pairs:44,maker:'0.03%',taker:'0.1%',lev:'200x',url:'https://app.ostium.com/'},
+    {n:'Jupiter',oi:231885286,vol:258477468,tvl:3438598110,pairs:3,maker:'0.06%',taker:'0.06%',lev:'100x',url:'https://jup.ag/'},
+    {n:'edgeX',oi:214889911,vol:105579834,tvl:95335629,pairs:31,maker:'0.012%',taker:'0.038%',lev:'100x',url:'https://pro.edgex.exchange/'},
+    {n:'Extended',oi:204911013,vol:259124156,tvl:137001630,pairs:103,maker:'0%',taker:'0.025%',lev:'50x',url:'https://app.extended.exchange/'},
+    {n:'Drift',oi:123964778,vol:75541710,tvl:218924986,pairs:0,maker:'-0.02%',taker:'0.035%',lev:'50x',url:'https://app.drift.trade/'},
+    {n:'ApeX Protocol',oi:113634503,vol:341478529,tvl:34259653,pairs:343,maker:'0%',taker:'0.025%',lev:'50x',url:'https://omni.apex.exchange/'},
+    {n:'Pacifica',oi:89999223,vol:961617175,tvl:27315143,pairs:70,maker:'0.015%',taker:'0.04%',lev:'50x',url:'https://app.pacifica.fi/'},
+    {n:'Backpack',oi:87726672,vol:167821143,tvl:null,pairs:74,maker:'0.02%',taker:'0.05%',lev:'50x',url:'https://backpack.exchange/'},
+    {n:'Vest Exchange',oi:62337833,vol:35979665,tvl:705662,pairs:548,maker:'0.01%',taker:'0.01%',lev:'50x',url:'https://trade.vest.exchange/'},
+    {n:'GMX',oi:49634401,vol:42765304,tvl:252749585,pairs:6,maker:'0.04%',taker:'0.06%',lev:'100x',url:'https://app.gmx.io/'}
   ]
 };
 /* the fee-efficiency thesis: how much volume / OI does it take to make $1?
@@ -2589,6 +2655,24 @@ function renderPeers(){
   $('#phVsHl').textContent=PEERS.vsHl+'×';
   $('#peersAsOf').textContent=PEERS.asOf;
 }
+function fmtPulseMoney(v){
+  if(v==null)return '—';
+  if(v>=1e9)return '$'+(v/1e9).toFixed(2)+'B';
+  if(v>=1e6)return '$'+(v/1e6).toFixed(2)+'M';
+  if(v>=1e3)return '$'+(v/1e3).toFixed(1)+'K';
+  return '$'+Math.round(v).toLocaleString('en-US');
+}
+function renderPulseTable(){
+  const body=$('#pulseTable tbody');
+  if(!body)return;
+  body.innerHTML=PEERS.list.slice(0,15).map((p,i)=>`<tr class="${p.me?'me':''}">
+    <td class="rank">${i+1}</td>
+    <td><span class="exchange"><img class="table-logo" src="${PLOGO[p.n]||'variational-symbol-transparent.png'}" alt="">${p.n}${p.me?'<span class="rank-badge">Variational</span>':''}</span></td>
+    <td>${fmtPulseMoney(p.oi)}</td><td>${fmtPulseMoney(p.vol)}</td><td>${fmtPulseMoney(p.tvl)}</td><td>${p.pairs??'—'}</td>
+    <td class="${p.maker==='0%'?'fee-zero':''}">${p.maker}</td><td class="${p.taker==='0%'?'fee-zero':''}">${p.taker}</td><td>${p.lev}</td>
+    <td><a class="source-link" href="${p.url}" target="_blank" rel="noopener">↗</a></td>
+  </tr>`).join('');
+}
 
 /* ---------- head-to-head: Variational vs Lighter ---------- */
 const VSL={
@@ -2607,10 +2691,6 @@ function renderVsLighter(){
   const last=SERIES[SERIES.length-1];
   const rev30=Math.max(0,last.v-cumAt(addDays(last.d,-30)));
   const fees30=rev30/MKT.spreadShare;
-  const hl=VSL.hl;
-  $('#kingOi') && ($('#kingOi').textContent=cB(hl.oi));
-  $('#kingVol') && ($('#kingVol').textContent=cB(hl.vol1d));
-  $('#kingRev') && ($('#kingRev').textContent=cB(hl.rev30));
   const oiEdge=li.oi?va.oi/li.oi:0;
   const feeEdge=li.fees30?fees30/li.fees30:0;
   const revGap=rev30?li.rev30/rev30:0;
@@ -2620,27 +2700,26 @@ function renderVsLighter(){
   $('#varThesis') && ($('#varThesis').innerHTML=`<b>${oiEdge.toFixed(1)}× Lighter OI</b> and <b>${feeEdge.toFixed(1)}× Lighter 30D fee pool</b>. The current revenue line is lower because Variational only books the treasury cut, not the OLP side.`);
   $('#lighterThesis') && ($('#lighterThesis').innerHTML=`Lighter is the clean market comp: <b>${revGap.toFixed(1)}× Variational 30D booked revenue</b>, but smaller OI and fee pool in this snapshot.`);
   const rows=[
-    {k:'Trading volume · 24h', a:va.vol, b:li.vol1d, h:hl.vol1d, an:'', bn:'', hn:''},
-    {k:'Open interest · live', a:va.oi, b:li.oi, h:hl.oi, an:'', bn:'', hn:''},
-    {k:'Trading fees · 30d', a:fees30, b:li.fees30, h:hl.fees30, an:'spreads paid by traders', bn:'premium accs + wd/tx fees', hn:'taker/maker fees'},
-    {k:'Protocol revenue · 30d', a:rev30, b:li.rev30, h:hl.rev30, an:'treasury cut · on-chain', bn:'~78% of its fees', hn:'assistance fund + HLP'},
-    {k:'Protocol revenue · all-time', a:SERIES[SERIES.length-1].v, b:li.revAll, h:hl.revAll, an:'since 2026-01-23', bn:'all listed history', hn:'all listed history'},
+    {k:'Trading volume · 24h', a:va.vol, b:li.vol1d, an:'', bn:''},
+    {k:'Open interest · live', a:va.oi, b:li.oi, an:'', bn:''},
+    {k:'Trading fees · 30d', a:fees30, b:li.fees30, an:'spreads paid by traders', bn:'premium accs + wd/tx fees'},
+    {k:'Protocol revenue · 30d', a:rev30, b:li.rev30, an:'treasury cut · on-chain', bn:'~78% of its fees'},
+    {k:'Protocol revenue · all-time', a:SERIES[SERIES.length-1].v, b:li.revAll, an:'since 2026-01-23', bn:'all listed history'},
   ];
   $('#h2hRows').innerHTML=`<table class="h2h-tbl">
-    <thead><tr><th>Metric</th><th class="cva"><img class="cmp-logo" src="variational-symbol-transparent.png" alt="">Variational</th><th class="cli"><img class="cmp-logo" src="lighter-logo.png" alt="">Lighter</th><th class="chl"><img class="cmp-logo" src="logo-hyperliquid.png" alt="">Hyperliquid</th><th>Edge</th></tr></thead>
+    <thead><tr><th>Metric</th><th class="cva"><img class="cmp-logo" src="variational-symbol-transparent.png" alt="">Variational</th><th class="cli"><img class="cmp-logo" src="lighter-logo.png" alt="">Lighter</th><th>Lead</th></tr></thead>
     <tbody>${rows.map(r=>{
-      const vals=[{c:'var',n:'Variational',v:r.a},{c:'ltr',n:'Lighter',v:r.b},{c:'chl',n:'Hyperliquid',v:r.h}].sort((x,y)=>y.v-x.v);
+      const vals=[{c:'var',n:'Variational',v:r.a},{c:'ltr',n:'Lighter',v:r.b}].sort((x,y)=>y.v-x.v);
       const lead={c:vals[0].c,t:vals[0].n+' '+(vals[1].v>0?(vals[0].v/vals[1].v).toFixed(1)+'×':'')};
       const win=x=>vals[0].v===x?' win':'';
       return `<tr>
         <td>${r.k}</td>
         <td class="cva${win(r.a)}"><b>${cB(r.a)}</b>${r.an?`<span class="sub">${r.an}</span>`:''}</td>
         <td class="cli${win(r.b)}"><b>${cB(r.b)}</b>${r.bn?`<span class="sub">${r.bn}</span>`:''}</td>
-        <td class="chl${win(r.h)}"><b>${cB(r.h)}</b>${r.hn?`<span class="sub">${r.hn}</span>`:''}</td>
         <td><span class="lead ${lead.c}">${lead.t}</span></td>
       </tr>`;
     }).join('')}</tbody></table>`;
-  $('#h2hNote').innerHTML=`Read: Hyperliquid is the ceiling, not the direct peer. Lighter is the market comp. Variational’s strongest TGE argument is capacity + fee-pool quality: higher OI and higher implied trader spread fees than Lighter, while current booked protocol revenue is lower because only ${(MKT.spreadShare*100).toFixed(0)}% of spreads reaches treasury. Sources: volume &amp; OI — Perpetual Pulse (${PEERS.asOf}); Variational fees/revenue — treasury wallet on Arbitrum; Lighter &amp; Hyperliquid fees/revenue — <a href="https://defillama.com/protocol/lighter" target="_blank" rel="noopener">DeFiLlama</a>. ${VSL.note}`;
+  $('#h2hNote').innerHTML=`Read: Lighter is the direct market comp. Compare capacity first (OI), then activity (volume), then monetization (spread fees and booked treasury revenue). Variational’s fee pool is implied from its on-chain treasury cut of ${(MKT.spreadShare*100).toFixed(0)}% of spreads. Sources: volume &amp; OI — Perpetual Pulse (${PEERS.asOf}); Variational fees/revenue — treasury wallet on Arbitrum; Lighter fees/revenue — <a href="https://defillama.com/protocol/lighter" target="_blank" rel="noopener">DeFiLlama</a>. ${VSL.note}`;
   renderRevVs(rev30);
 }
 function renderRevVs(rev30){
@@ -2739,6 +2818,7 @@ function renderEfficiency(){
   $('#fmDailyRev') && ($('#fmDailyRev').textContent=fmtBig(e.dailyRev));
   $('#fmDailyFees') && ($('#fmDailyFees').textContent=fmtBig(e.dailySpread));
   $('#fmDailyVol') && ($('#fmDailyVol').textContent=fmtBig(e.dailySpread*e.volPerFee));
+  $('#fmOi') && ($('#fmOi').textContent=fmtBig(MKT.oi));
   $('#fmDailyBurn') && ($('#fmDailyBurn').textContent=fmtBig(e.dailyRev*MKT.burnShare));
   $('#fmDailyRevFormula') && ($('#fmDailyRevFormula').textContent=e.label+' treasury ÷ '+e.days+' day'+(e.days===1?'':'s'));
   $('#fmDailyFeesFormula') && ($('#fmDailyFeesFormula').textContent='daily treasury ÷ 10%');
@@ -2901,7 +2981,6 @@ function renderPointsCalc(){
   const hype=67.7e9, share=mine/pool;
   renderPointsDeadline();
   const pctHype=fdv/hype*100;
-  $('#ptsShare').textContent='Share '+(share*100).toFixed(4)+'%';
   $('#ptsFdvLabel').textContent=pctHype.toFixed(0)+'% of HYPE FDV ($67.7B)';
   $('#ptsFdvBig').textContent='$'+(fdv/1e9).toFixed(fdv>=1e9?1:3)+'B';
   // scenario band — grounds expectations vs a live comp (HYPE)
@@ -3314,6 +3393,14 @@ function renderHeaderDeltasFallback(){
   setDeltaPill('#hd7d',cur,SERIES[Math.max(0,n-8)].v);
 }
 /* actual on-chain added over trailing windows (12h / 24h / 7d) */
+function renderActualsFallback(cur){
+  const daily=Math.max(0,dailyRate(7));
+  const values=[daily*.5,daily,daily*7];
+  ['#ac12h','#ac24h','#ac7d'].forEach((sel,i)=>{const el=$(sel);if(el)el.textContent='~'+fmtUSD(values[i]);});
+  setDeltaPill('#hd12',cur,Math.max(0,cur-values[0]));
+  setDeltaPill('#hd24',cur,Math.max(0,cur-values[1]));
+  setDeltaPill('#hd7d',cur,Math.max(0,cur-values[2]));
+}
 async function renderActuals(cur){
   try{
     const nowTs=Math.floor(Date.now()/1000);
@@ -3329,7 +3416,7 @@ async function renderActuals(cur){
     setDeltaPill('#hd12',cur,b12);
     setDeltaPill('#hd24',cur,b24);
     setDeltaPill('#hd7d',cur,b7);
-  }catch(e){/* keep dashes on failure */}
+  }catch(e){renderActualsFallback(cur??SERIES[SERIES.length-1].v);}
 }
 let _liveT0=performance.now();
 let LIVE_BASE={balance:SERIES[SERIES.length-1].v,at:performance.now()};
@@ -3451,8 +3538,10 @@ function animHourglass(){
   // Logo pulse is handled in CSS.
 }
 function startLive(){
-  renderTwaps();setInterval(tickLive,120);initRain();animHourglass();
+  renderTwaps();setInterval(tickLive,250);initRain();animHourglass();
   renderProjectedHourlyEarnings(projectedBalance());
+  renderActualsFallback(LIVE_BASE.balance);
+  renderActuals(LIVE_BASE.balance);
 }
 
 /* ================= EARNINGS CALENDAR ================= */
@@ -3568,6 +3657,24 @@ function paintCalendar(){
   let cells='',d=start;
   $('#calTitle').textContent=monthName(CAL.month);
   renderHistoryMonths();
+  if(CALMODE!=='day'){
+    const summaries=[];
+    if(CALMODE==='week'){
+      let ws=weekStart(first);
+      while(ws<=end){
+        const we=addDays(ws,6);
+        if(we.slice(0,7)===CAL.month&&we<=CAL.last&&CAL.wk.has(ws))summaries.push({d:we,label:`Week ending ${we}`,v:CAL.wk.get(ws)||0});
+        ws=addDays(ws,7);
+      }
+    }else if(CAL.mo.has(CAL.month)&&end<=CAL.last){
+      summaries.push({d:end,label:`Month ending ${end}`,v:CAL.mo.get(CAL.month)||0});
+    }
+    $('#calGrid').className='cal-grid period-summary';
+    $('#calGrid').innerHTML=summaries.length?summaries.map(x=>`<div class="cal-summary-card" data-d="${x.d}"><div class="cal-summary-period">${x.label}</div><div class="cal-summary-value">+${fmtUSD(x.v)}</div></div>`).join(''):'<div class="cal-summary-empty">No completed result for this period yet.</div>';
+    autoSelect();
+    return;
+  }
+  $('#calGrid').className='cal-grid';
   while(d<=finish){
     const inMonth=d.slice(0,7)===CAL.month;
     if(!inMonth){
@@ -3595,7 +3702,7 @@ function paintCalendar(){
 }
 function autoSelect(){
   let best=null,mx=-1;
-  document.querySelectorAll('.cal-cell[data-d]').forEach(c=>{
+  document.querySelectorAll('#calGrid [data-d]').forEach(c=>{
     const d=c.dataset.d,disp=calendarDisplay(d);
     if(!disp.end)return;
     if(disp.v>mx){mx=disp.v;best=d;}
@@ -3634,8 +3741,8 @@ function selectCell(dateStr){
   $('#calLab').innerHTML=label;
   renderMacroPanel(events,dateStr);
   // highlight
-  document.querySelectorAll('.cal-cell.sel').forEach(c=>c.classList.remove('sel'));
-  document.querySelectorAll('.cal-cell[data-d]').forEach(c=>{
+  document.querySelectorAll('#calGrid .cal-cell.sel,#calGrid .cal-summary-card.sel').forEach(c=>c.classList.remove('sel'));
+  document.querySelectorAll('#calGrid [data-d]').forEach(c=>{
     const d=c.dataset.d;let hit=false;
     if(CALMODE==='day')hit=(d===dateStr);
     else if(CALMODE==='week')hit=(weekStart(d)===weekStart(dateStr));
@@ -3665,7 +3772,7 @@ $('#calSeg').addEventListener('click',e=>{
   $('#calTag').textContent={day:'daily totals',week:'weekly totals',month:'monthly totals'}[CALMODE];
   buildCalendar();
 });
-$('#calGrid').addEventListener('click',e=>{const c=e.target.closest('.cal-cell[data-d]');if(c)selectCell(c.dataset.d);});
+$('#calGrid').addEventListener('click',e=>{const c=e.target.closest('[data-d]');if(c)selectCell(c.dataset.d);});
 $('#calPrev').addEventListener('click',()=>{CAL.month=ymAdd(CAL.month,-1);buildCalendar();});
 $('#calNext').addEventListener('click',()=>{CAL.month=ymAdd(CAL.month,1);buildCalendar();});
 $('#calToday').addEventListener('click',()=>{CAL.month=SERIES[SERIES.length-1].d.slice(0,7);buildCalendar();});
@@ -3972,14 +4079,37 @@ $('#genstamp').textContent='Snapshot generated 2026-07-06 ET · daily reset 00:0
 const combinedCal=document.querySelector('.card.cal[data-tg="efficiency"]');
 const feeRevenueCard=document.querySelector('.card.eff[data-tg="efficiency"]');
 if(combinedCal&&feeRevenueCard)feeRevenueCard.before(combinedCal);
+const calCollapse=document.querySelector('#calCollapse');
+const CAL_COLLAPSE_KEY='variationalCalendarCollapsed';
+function setCalendarCollapsed(collapsed){
+  if(!combinedCal||!calCollapse)return;
+  combinedCal.classList.toggle('is-collapsed',collapsed);
+  calCollapse.textContent=collapsed?'⌄ Expand':'⌃ Collapse';
+  calCollapse.setAttribute('aria-expanded',collapsed?'false':'true');
+  calCollapse.setAttribute('aria-label',collapsed?'Expand calendar':'Collapse calendar');
+  calCollapse.title=collapsed?'Expand calendar':'Collapse calendar';
+  try{localStorage.setItem(CAL_COLLAPSE_KEY,collapsed?'1':'0');}catch(_){ }
+}
+if(calCollapse){
+  let collapsed=false;
+  try{collapsed=localStorage.getItem(CAL_COLLAPSE_KEY)==='1';}catch(_){ }
+  setCalendarCollapsed(collapsed);
+  calCollapse.addEventListener('click',()=>setCalendarCollapsed(!combinedCal.classList.contains('is-collapsed')));
+}
 initDraggableTabs();
 showTab(location.hash.replace('#','')||'overview',{push:false,scroll:false});
-initForecast();
-render();
-renderPeers();
-renderVsLighter();
+try{
+  initForecast();
+  render();
+  renderPeers();
+  renderPulseTable();
+  renderVsLighter();
+}catch(err){
+  console.warn('Dashboard startup render recovered with fallback:',err);
+  renderActualsFallback(SERIES[SERIES.length-1].v);
+}
 booted=true;
-buildCalendar();
+try{buildCalendar();}catch(err){console.warn('Calendar startup render recovered:',err);}
 startLive();
 setInterval(renderPointsDeadline,60000);
 // attempt an automatic live sync on load (silent-fail to snapshot)
