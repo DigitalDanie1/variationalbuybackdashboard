@@ -21,7 +21,6 @@
 <meta property="og:title" content="Variational Scanner — Live USDC Treasury Tracker">
 <meta property="og:description" content="10% of every spread paid to OLP flows into Variational's treasury per the OLP docs. Tracking it live on-chain — day / week / 2-week / month growth.">
 <meta property="og:url" content="https://REPLACE-WITH-YOUR-URL/">
-<meta property="og:image" content="https://REPLACE-WITH-YOUR-URL/assets/heaven.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
@@ -29,7 +28,6 @@
 <meta name="twitter:creator" content="@0xdefidaniel">
 <meta name="twitter:title" content="Variational Scanner — Live USDC Treasury Tracker">
 <meta name="twitter:description" content="10% of every spread paid to OLP flows into Variational's treasury per the OLP docs. Tracking it live on-chain.">
-<meta name="twitter:image" content="https://REPLACE-WITH-YOUR-URL/assets/heaven.png">
 <style>
   :root{
     --bg:#030814; --panel:#07101f; --panel2:#0a1628; --line:#16345c;
@@ -690,19 +688,15 @@
   .share-btn.ghost{color:var(--sub);background:var(--panel);border:1px solid var(--line);box-shadow:none}
   .share-btn.ghost:hover{color:var(--ink);border-color:var(--grn);filter:none}
 
-  /* ---- heaven easter-egg ---- */
-  .heaven-wrap{position:relative;margin-top:14px;border-radius:12px;overflow:hidden;border:1px solid var(--line);max-width:340px}
-  .heaven-wrap img{display:block;width:100%;height:auto}
-  .heaven-wrap .cap2{position:absolute;left:0;right:0;bottom:0;padding:10px 12px;font:700 12px var(--mono);color:#fff;
-    background:linear-gradient(0deg,rgba(3,6,12,.9),transparent);text-shadow:0 1px 6px rgba(0,0,0,.8)}
-  .heaven-wrap.noimg{display:none}
-
   /* ---- fee efficiency engine ---- */
   .eff-funnel{display:flex;align-items:stretch;gap:10px;flex-wrap:wrap;margin:6px 0 16px}
   .eff-window-tabs{display:inline-flex;gap:4px;margin:12px 0 4px;padding:4px;border:1px solid rgba(85,184,255,.22);border-radius:999px;background:rgba(3,9,16,.55)}
   .eff-window-tabs button{cursor:pointer;border:0;border-radius:999px;padding:8px 13px;background:transparent;color:var(--sub);font:950 10px var(--display);letter-spacing:1.6px;text-transform:uppercase;font-stretch:120%;transition:.15s}
   .eff-window-tabs button.on{color:#04120c;background:linear-gradient(92deg,var(--grn),var(--cyan));box-shadow:0 0 18px rgba(34,230,160,.22)}
   .eff-window-tabs button:hover:not(.on){color:var(--ink);background:rgba(85,184,255,.08)}
+  .eff-window-status{display:flex;align-items:baseline;gap:10px;margin:5px 0 0;padding-left:10px;border-left:3px solid var(--cyan)}
+  .eff-window-status b{color:var(--cyan);font:950 14px var(--mono);letter-spacing:1.5px}
+  .eff-window-status span{color:var(--sub);font:10px var(--mono)}
   .formula-strip{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:12px 0 16px}
   .formula-card{border:1px solid rgba(85,184,255,.2);border-radius:12px;padding:13px 14px;background:linear-gradient(180deg,rgba(10,22,35,.82),rgba(5,12,20,.9))}
   .formula-card .k{font:950 9.5px var(--display);letter-spacing:1.7px;text-transform:uppercase;color:var(--sub);font-stretch:120%}
@@ -717,6 +711,10 @@
     linear-gradient(180deg,rgba(8,24,31,.9),rgba(4,11,18,.96));box-shadow:0 0 26px rgba(34,230,160,.08)}
   .activity-read-head{display:flex;align-items:center;gap:8px;flex-wrap:wrap;color:var(--sub);font:11px var(--mono);letter-spacing:.3px}
   .activity-read-head b{color:var(--grn);font:950 10px var(--display);letter-spacing:2px}
+  .activity-period{margin-left:auto;padding:5px 9px;border:1px solid rgba(85,184,255,.38);border-radius:999px;background:rgba(85,184,255,.09);color:var(--cyan);font:950 10px var(--mono);letter-spacing:1px}
+  .card.eff.window-changing .activity-read{animation:windowFlash .38s ease-out}
+  .card.eff.window-changing .eff-ratios{animation:windowFlash .38s ease-out}
+  @keyframes windowFlash{0%{opacity:.48;transform:translateY(4px);filter:brightness(1.35)}100%{opacity:1;transform:none;filter:none}}
   .activity-read-flow{display:grid;grid-template-columns:1fr 18px 1fr 28px 1fr 28px 1fr;gap:8px;align-items:center;margin-top:13px}
   .activity-input,.activity-result{min-width:0;padding:12px;border:1px solid rgba(85,184,255,.2);border-radius:10px;background:rgba(3,10,18,.72)}
   .activity-input span,.activity-result span{display:block;color:var(--sub);font:950 8px var(--display);letter-spacing:1.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -949,23 +947,25 @@
   .pulse-table .source-link{color:var(--cyan);font-weight:900}
   .pulse-table .fee-zero{color:var(--grn)}
   .pulse-table .rank-badge{display:inline-block;margin-left:6px;padding:2px 5px;border:1px solid rgba(34,230,160,.4);border-radius:999px;color:var(--grn);font:900 8px var(--mono);letter-spacing:.5px;text-transform:uppercase}
+  .pulse-table td.snap{color:var(--dim)}
+  .pulse-table td.snap::after{content:"snap";display:inline-block;margin-left:5px;font-size:7.5px;letter-spacing:.5px;color:var(--dim);opacity:.7;vertical-align:top}
+  .live-pill{display:inline-flex;align-items:center;gap:6px;margin-left:10px;padding:2px 9px;border-radius:999px;border:1px solid rgba(85,184,255,.22);font:900 8.5px var(--mono);letter-spacing:1px;text-transform:uppercase;color:var(--sub);vertical-align:middle}
+  .live-pill i{width:6px;height:6px;border-radius:50%;background:var(--dim);flex:none}
+  .live-pill.on{color:var(--grn);border-color:rgba(38,230,194,.4);background:rgba(38,230,194,.05)}
+  .live-pill.on i{background:var(--grn);animation:livePulse 2s ease-out infinite}
+  .live-pill.err{color:var(--sub);border-color:var(--line)}
+  @keyframes livePulse{0%{box-shadow:0 0 0 0 rgba(38,230,194,.55)}70%{box-shadow:0 0 0 6px rgba(38,230,194,0)}100%{box-shadow:0 0 0 0 rgba(38,230,194,0)}}
+  @media (prefers-reduced-motion:reduce){.live-pill.on i{animation:none}}
   @media(min-width:1181px){
     .comparison-focus{display:grid;grid-template-columns:minmax(0,1.28fr) minmax(390px,.92fr);gap:14px 18px;align-items:start}
     .comparison-focus>h2,.comparison-focus>.cap{grid-column:1 / -1}
     .comparison-focus>.mini-head{grid-column:1;grid-row:3;margin:0 0 -4px}
-    .comparison-focus>.pulse-table-wrap{grid-column:1;grid-row:4;margin:0;max-height:650px}
+    .comparison-focus>.pulse-table-wrap{grid-column:1;grid-row:4;margin:0;overflow-x:auto;overflow-y:hidden}
     .comparison-focus>.peer-layout{grid-column:2;grid-row:3 / span 2;margin:0;min-width:0}
     .comparison-focus .peer-right{min-width:0}
     .comparison-focus .pulse-table{min-width:760px}
   }
 
-  .soon-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;margin-top:6px}
-  .soon-card{position:relative;background:var(--panel);border:1px dashed var(--line);border-radius:13px;padding:16px;overflow:hidden}
-  .soon-card::after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(45deg,transparent,transparent 8px,rgba(139,108,255,.03) 8px,rgba(139,108,255,.03) 16px);pointer-events:none}
-  .soon-badge{position:absolute;top:10px;right:10px;font:700 8.5px var(--mono);letter-spacing:1px;text-transform:uppercase;
-    color:var(--vio);border:1px solid rgba(139,108,255,.4);border-radius:20px;padding:2px 8px}
-  .soon-t{font:700 15px var(--sans)}
-  .soon-d{font:11.5px var(--mono);color:var(--sub);margin-top:8px;line-height:1.6}
 
   /* ---- head-to-head: Variational vs Lighter ---- */
   .h2h-head{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:14px;margin:14px 0 18px}
@@ -1027,10 +1027,11 @@
   .challenger-thesis b{color:var(--ink)}
   .challenger.var .challenger-thesis b{color:var(--grn)}
   .duel-vs{display:grid;place-items:center;color:var(--dim);font:950 11px var(--mono);letter-spacing:1.8px;text-transform:uppercase}
-  .valuation-strip{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:2px 0 14px}
-  .valuation-strip div{padding:11px 0;border-bottom:1px solid rgba(85,184,255,.12)}
-  .valuation-strip b{display:block;font:950 clamp(18px,2vw,25px)/1 var(--mono);letter-spacing:-.6px;color:var(--grn)}
-  .valuation-strip span{display:block;margin-top:6px;font:12px/1.35 var(--mono);color:var(--sub)}
+  .valuation-strip{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:4px 0 16px}
+  .valuation-strip div{padding:12px 0 11px;border-top:1px solid rgba(85,184,255,.16)}
+  .valuation-strip b{display:block;font:950 clamp(19px,2.1vw,26px)/1 var(--mono);letter-spacing:-.6px;color:var(--grn)}
+  .valuation-strip div:nth-child(3) b{font-size:clamp(15px,1.6vw,19px);background:linear-gradient(92deg,var(--grn),var(--cyan));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .valuation-strip span{display:block;margin-top:7px;font:11.5px/1.4 var(--mono);color:var(--sub)}
   @media(max-width:900px){
     .king-card{grid-template-columns:1fr}
     .king-crown{display:none}
@@ -1073,6 +1074,37 @@
   .h2h-vals .v1{color:var(--grn)} .h2h-vals .v2{color:#7fa8e8}
   .h2h-vals small{font:10px var(--mono);color:var(--dim);font-weight:600;margin-left:6px}
   .h2h-note{margin-top:16px;border-top:1px solid rgba(85,184,255,.12);padding-top:12px;font:11px/1.65 var(--mono);color:var(--dim)}
+  /* ---- implied valuation (OI -> market-cap model) ---- */
+  .valmodel{overflow:hidden}
+  .val-hero{display:grid;grid-template-columns:1.15fr 1fr;gap:16px;margin:14px 0 18px}
+  .val-cell{position:relative;border:1px solid rgba(85,184,255,.16);border-radius:16px;padding:clamp(16px,2.2vw,22px);overflow:hidden;
+    background:radial-gradient(560px 240px at 8% -20%,rgba(38,230,194,.08),transparent 60%),linear-gradient(180deg,rgba(10,22,40,.7),rgba(5,12,22,.55))}
+  .val-cell.fdv{background:radial-gradient(560px 240px at 92% -20%,rgba(85,184,255,.09),transparent 60%),linear-gradient(180deg,rgba(10,22,40,.7),rgba(5,12,22,.55))}
+  .val-cell::before{content:"";position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--grn),transparent 78%)}
+  .val-cell.fdv::before{background:linear-gradient(90deg,var(--cyan),transparent 78%)}
+  .vh-k{font:950 9.5px var(--mono);letter-spacing:1.6px;text-transform:uppercase;color:var(--sub)}
+  .vh-big{font:950 clamp(38px,6vw,64px)/.92 var(--mono);letter-spacing:-2.4px;margin:8px 0 8px;
+    background:linear-gradient(92deg,#eafff6,var(--grn),var(--cyan));-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 0 22px rgba(38,230,194,.28))}
+  .val-cell.fdv .vh-big{background-image:linear-gradient(92deg,#eaf3ff,var(--cyan),#9fd4ff);-webkit-background-clip:text;background-clip:text;filter:drop-shadow(0 0 22px rgba(85,184,255,.26))}
+  .vh-sub{font:11px/1.6 var(--mono);color:var(--sub)}
+  .vh-sub b{color:var(--ink)} .vh-sub sup{font-size:.7em}
+  .vh-sub .mono{color:var(--grn);white-space:nowrap}
+  .val-cell.fdv .vh-sub .mono{color:var(--cyan)}
+  .val-grid{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(220px,.75fr);gap:18px;align-items:stretch}
+  .val-chart-wrap{border:1px solid rgba(85,184,255,.14);border-radius:14px;padding:10px 8px 4px;background:rgba(3,10,18,.5);min-width:0}
+  #valScatter{width:100%;height:auto;display:block}
+  #valScatter text{font-family:var(--mono)}
+  .val-side{display:flex;flex-direction:column;gap:9px}
+  .val-side .vs-h{font:950 9.5px var(--mono);letter-spacing:1.5px;text-transform:uppercase;color:var(--sub);margin-bottom:2px}
+  .vs-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid rgba(27,37,54,.6);font:11.5px var(--mono)}
+  .vs-row:last-child{border-bottom:0}
+  .vs-row .n{color:var(--sub);display:flex;align-items:center;gap:7px}
+  .vs-row .n i{width:8px;height:8px;border-radius:50%;flex:none}
+  .vs-row .v{color:var(--ink);font-weight:800;letter-spacing:-.3px}
+  .vs-row.me{margin-top:2px;padding:11px 12px;border:1px solid rgba(38,230,194,.35);border-radius:11px;background:rgba(38,230,194,.06)}
+  .vs-row.me .n{color:var(--grn);font-weight:900} .vs-row.me .v{color:var(--grn)}
+  .val-note{margin-top:15px;border-top:1px solid rgba(85,184,255,.12);padding-top:12px;font:10.5px/1.65 var(--mono);color:var(--dim)}
+  @media(max-width:900px){.val-hero{grid-template-columns:1fr}.val-grid{grid-template-columns:1fr}}
   .h2h-note a{color:var(--cyan);border-bottom:1px dashed rgba(56,225,255,.4)}
   .comparison-focus .peer-left,.comparison-focus .king-card{display:none}
   .comparison-focus .peer-layout{display:block}
@@ -1536,7 +1568,7 @@
   <button id="tab-overview" type="button" role="tab" aria-selected="true" data-tab="overview" class="on">Overview</button>
   <button id="tab-implied" type="button" role="tab" aria-selected="false" data-tab="implied">Mechanic</button>
   <button id="tab-historical" type="button" role="tab" aria-selected="false" data-tab="historical">Historical Data</button>
-  <button id="tab-efficiency" type="button" role="tab" aria-selected="false" data-tab="efficiency">Variational Revenue</button>
+  <button id="tab-efficiency" type="button" role="tab" aria-selected="false" data-tab="efficiency">Fundamentals</button>
   <button id="tab-roadmap" type="button" role="tab" aria-selected="false" data-tab="roadmap">Roadmap</button>
   <button id="tab-points" type="button" role="tab" aria-selected="false" data-tab="points">Points</button>
   <button id="tab-comparison" type="button" role="tab" aria-selected="false" data-tab="comparison">Comparison <span class="tab-new">#5</span></button>
@@ -1732,56 +1764,25 @@
   <h2>How Current Activity Becomes Revenue <span class="tag">volume · OI · earnings</span></h2>
   <div class="cap"><b>Why this matters:</b> Volume and open interest are not just market statistics. They are the activity and capacity that produce spread fees, treasury revenue, and buyback-burn firepower. Read this section as: <b>current activity → money earned</b>. <span id="effAsOf" class="muted"></span></div>
 <div class="eff-window-tabs" id="effWindowTabs" aria-label="Fee revenue time window">
-  <button type="button" class="on" data-eff-window="1d" onclick="setEffWindow('1d')">1D</button>
-  <button type="button" data-eff-window="7d" onclick="setEffWindow('7d')">1W</button>
-  <button type="button" data-eff-window="30d" onclick="setEffWindow('30d')">30D</button>
-  <button type="button" data-eff-window="month" onclick="setEffWindow('month')">Month</button>
-  <button type="button" data-eff-window="all" onclick="setEffWindow('all')">All-time</button>
+  <button type="button" class="on" data-eff-window="1d">1D</button>
+  <button type="button" data-eff-window="7d">1W</button>
+  <button type="button" data-eff-window="30d">30D</button>
+  <button type="button" data-eff-window="month">Month</button>
+  <button type="button" data-eff-window="all">All-time</button>
 </div>
+  <div class="eff-window-status"><b id="effWindowTitle">1D VIEW</b><span id="effWindowRange">Last 24 hours</span></div>
   <div class="activity-read" aria-label="Current activity and earnings summary">
-    <div class="activity-read-head"><span class="live-dot"></span><b>READ THIS FIRST</b><span>Current venue activity → implied money earned</span></div>
+    <div class="activity-read-head"><span class="live-dot"></span><b>READ THIS FIRST</b><span>Selected-period activity → implied money earned</span><strong class="activity-period" id="effActivePeriod">1D</strong></div>
     <div class="activity-read-flow">
-      <div class="activity-input"><span>1D PERP VOLUME</span><strong id="fmDailyVol">—</strong><small id="fmDailyVolFormula">selected trading flow</small></div>
+      <div class="activity-input"><span id="fmVolLabel">1D PERP VOLUME</span><strong id="fmDailyVol">—</strong><small id="fmDailyVolFormula">selected trading flow</small></div>
       <div class="activity-plus">+</div>
-      <div class="activity-input"><span>OPEN INTEREST</span><strong id="fmOi">—</strong><small>capital kept active in positions</small></div>
+      <div class="activity-input"><span id="fmOiLabel">OPEN INTEREST · LIVE SNAPSHOT</span><strong id="fmOi">—</strong><small>capital kept active in positions</small></div>
       <div class="activity-arrow">→</div>
-      <div class="activity-result"><span>SPREAD FEES PAID BY TRADERS</span><strong id="fmDailyFees">—</strong><small id="fmDailyFeesFormula">daily treasury ÷ 10%</small></div>
+      <div class="activity-result"><span id="fmFeesLabel">1D SPREAD FEES PAID BY TRADERS</span><strong id="fmDailyFees">—</strong><small id="fmDailyFeesFormula">treasury ÷ 10%</small></div>
       <div class="activity-arrow">→</div>
-      <div class="activity-result treasury"><span>VARIATIONAL TREASURY REVENUE</span><strong id="fmDailyRev">—</strong><small id="fmDailyRevFormula">selected treasury ÷ days</small></div>
+      <div class="activity-result treasury"><span id="fmRevLabel">1D VARIATIONAL TREASURY REVENUE</span><strong id="fmDailyRev">—</strong><small id="fmDailyRevFormula">selected treasury inflow</small></div>
     </div>
-    <div class="activity-outcome"><b id="fmDailyBurn">—</b><span>estimated buyback-burn firepower per day</span><small id="fmDailyBurnFormula">daily treasury × 30%</small></div>
-  </div>
-  <div class="reverse-audit" aria-label="Reverse calculation audit from treasury revenue">
-    <div class="ra-title">The money path · activity translated into earnings</div>
-    <div class="ra-steps">
-      <div class="ra-step start">
-        <div class="ra-k">1 · Current activity</div>
-        <div class="ra-v" id="raTreasuryDay">—</div>
-        <div class="ra-f">measured treasury revenue / day</div>
-      </div>
-      <div class="ra-step">
-        <div class="ra-k">2 · Trader spread fees</div>
-        <div class="ra-v" id="raSpreadDay">—</div>
-        <div class="ra-f"><b id="raTreasuryShare">10%</b> of spread fees reaches treasury</div>
-      </div>
-      <div class="ra-step volume">
-        <div class="ra-k">3 · Volume required</div>
-        <div class="ra-v" id="raVolumeDay">—</div>
-        <div class="ra-f"><span id="raVolPerSpread">—</span> trading volume per $1 spread</div>
-      </div>
-      <div class="ra-step pass">
-        <div class="ra-k" id="raPeriodK">4 · Lands back at selected period</div>
-        <div class="ra-v" id="raVolume30">—</div>
-        <div class="ra-f" id="raVolumePeriodNote">daily volume × days = selected volume ✓</div>
-      </div>
-    </div>
-  </div>
-  <div class="eff-funnel">
-    <div class="ef-node vol"><div class="ef-k" id="efVolLabel">Perp Volume · 1D</div><div class="ef-v" id="efVol">—</div><div class="ef-s" id="efVolSub">selected window</div></div>
-    <div class="ef-arrow"><b id="efTake">—</b><span>spread take-rate</span></div>
-    <div class="ef-node fee"><div class="ef-k" id="efFeeLabel">Spread payments · 1D</div><div class="ef-v" id="efFee">—</div><div class="ef-s">paid by traders</div></div>
-    <div class="ef-arrow"><b>10%</b><span>→ treasury</span></div>
-    <div class="ef-node rev"><div class="ef-k" id="efRevLabel">Treasury revenue · 1D</div><div class="ef-v" id="efRev">—</div><div class="ef-s" id="efRevDay">—</div></div>
+    <div class="activity-outcome"><b id="fmDailyBurn">—</b><span id="fmBurnLabel">estimated 1D buyback-burn firepower</span><small id="fmDailyBurnFormula">1D treasury × 30%</small></div>
   </div>
   <div class="eff-ratios">
     <div class="er"><div class="er-v" id="erVolFee">—</div><div class="er-l">perp volume makes <b>$1 in fees</b></div></div>
@@ -2062,7 +2063,7 @@
 
 <div class="card cal tsec tg-hide" data-tg="efficiency" style="margin-top:16px">
   <h2><button class="cal-collapse" id="calCollapse" type="button" aria-expanded="true" aria-label="Collapse calendar" title="Collapse calendar">⌃ Collapse</button><span>Total Earnings + Fee/Revenue Calendar <span class="tag" id="calTag">daily totals</span></span></h2>
-  <div class="cap">One calendar for the combined page: <b>completed treasury revenue</b>, implied fee flow, estimated activity, burn firepower, and market events. Today stays pending until the ET day closes.</div>
+  <div class="cap">Completed treasury revenue, implied activity, burn firepower, and market events. Daily view shows history plus pending dates only through the end of next week. Today stays pending until the ET day closes.</div>
   <div class="seg" id="calSeg">
     <button type="button" data-c="day" class="on">Daily</button>
     <button type="button" data-c="week">Weekly</button>
@@ -2106,16 +2107,12 @@
       <div class="play-grid" id="playbook"></div>
     </div>
   </div>
-  <div class="heaven-wrap" id="heaven">
-    <img src="assets/heaven.png" alt="to the moon" onerror="this.closest('.heaven-wrap').classList.add('noimg')">
-    <div class="cap2">💸 stack it till we reach the gates 🪜☁️</div>
-  </div>
 </div>
 
 <div class="card h2h peers-combined comparison-focus tsec tg-hide" data-tg="comparison">
-  <h2>Variational vs the Perp DEX Market <span class="tag">top 15 by OI</span></h2>
-  <div class="cap">See where Variational sits among the largest perpetual DEXs by open interest, with Lighter kept as the direct market comparison. <a href="https://www.perpetualpulse.xyz/" target="_blank" rel="noopener" style="color:var(--cyan)">Source: Perpetual Pulse ↗</a></div>
-  <div class="mini-head">Perpetual DEX market board · top 15 by open interest · <span>Variational highlighted</span></div>
+  <h2>Variational vs the Perp DEX Market <span class="tag">top 13 by OI</span></h2>
+  <div class="cap">See where Variational sits among the largest perpetual DEXs by open interest, with Lighter kept as the direct market comparison. Open interest &amp; 24h volume are pulled live and re-snapshotted on every load. <a href="https://www.coingecko.com/en/derivatives" target="_blank" rel="noopener" style="color:var(--cyan)">Source: CoinGecko derivatives ↗</a></div>
+  <div class="mini-head">Perpetual DEX market board · top 13 by open interest · <span>Variational highlighted</span><span class="live-pill" id="boardLive"><i></i>loading</span></div>
   <div class="pulse-table-wrap"><table class="pulse-table" id="pulseTable"><thead><tr><th>#</th><th>Exchange</th><th>OI</th><th>24H Volume</th><th>TVL</th><th>Pairs</th><th>Maker Fee</th><th>Taker Fee</th><th>Leverage</th><th>Source</th></tr></thead><tbody></tbody></table></div>
   <div class="peer-layout">
     <div class="peer-left">
@@ -2127,7 +2124,7 @@
           <div class="ph-sub"><b id="phShare">5.4%</b> of perp OI (<b id="phTotal">$21.7B</b>) · ranked by current open interest.</div>
         </div>
       </div>
-      <div class="mini-head">Top 15 by open interest · <span id="peersAsOf">Perpetual Pulse snapshot</span></div>
+      <div class="mini-head">Top 13 by open interest · <span id="peersAsOf">loading live snapshot</span></div>
       <div class="rank-list" id="rankList"></div>
       <span id="peersTotal" hidden>22</span>
     </div>
@@ -2179,15 +2176,30 @@
   <div class="rev-callout" id="revCallout"></div>
 </div>
 
-<div class="card soon tsec tg-hide" data-tg="comparison" style="margin-top:16px">
-  <h2>Coming soon <span class="tag">roadmap</span></h2>
-  <div class="cap">Deeper build-outs in progress — inspired by <a href="https://hl.eco/" target="_blank" rel="noopener" style="color:var(--cyan)">hl.eco</a>.</div>
-  <div class="soon-grid">
-    <div class="soon-card"><div class="soon-badge">soon</div><div class="soon-t">🔥 $VAR burn tracker</div><div class="soon-d">Buy-&amp;-burn executed vs firepower loaded · % of supply burnt. <span class="muted">Treasury has 0 outflows so far — burn not yet fired.</span></div></div>
-    <div class="soon-card"><div class="soon-badge">soon</div><div class="soon-t">📊 Gross fees &amp; revenue split</div><div class="soon-d">hl.eco-style Gross Fees → Revenue → Holders/LP split, all-time &amp; annualized.</div></div>
-    <div class="soon-card"><div class="soon-badge">soon</div><div class="soon-t">Editorial redesign</div><div class="soon-d">Geist Sans + Geist Mono type, mint palette, and spacious hl.eco layout across every tab.</div></div>
+<div class="card valmodel tsec tg-hide" data-tg="comparison" style="margin-top:16px">
+  <h2>Implied Valuation <span class="tag">OI → market-cap model</span></h2>
+  <div class="cap">Where $VAR could price at TGE. Every live perp-DEX token is plotted by open interest vs its circulating market cap; a power-law fit turns Variational's current OI into an implied valuation. Model &amp; peer set: <a href="https://www.perpetualpulse.xyz/" target="_blank" rel="noopener" style="color:var(--cyan)">Perpetual Pulse</a>.</div>
+  <div class="val-hero">
+    <div class="val-cell">
+      <div class="vh-k">Predicted circulating market cap</div>
+      <div class="vh-big" id="valMcap">$—</div>
+      <div class="vh-sub">from current OI <b id="valOiBase">$—</b> · fit <span class="mono">MCAP ≈ 10.0 · OI<sup>0.875</sup></span> · R² 0.74</div>
+    </div>
+    <div class="val-cell fdv">
+      <div class="vh-k">Implied FDV</div>
+      <div class="vh-big" id="valFdv">$—</div>
+      <div class="vh-sub">at <b id="valFloat">25%</b> circulating float · range <b id="valFdvRange">—</b> across 20–33%</div>
+    </div>
   </div>
+  <div class="val-grid">
+    <div class="val-chart-wrap">
+      <svg id="valScatter" viewBox="0 0 760 430" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Open interest vs circulating market cap, log-log scatter with power-law fit"></svg>
+    </div>
+    <div class="val-side" id="valSide"></div>
+  </div>
+  <div class="val-note" id="valNote"></div>
 </div>
+
 
 </main>
 
@@ -2225,7 +2237,7 @@ const MKT = {
 };
 /* perp-DEX peer ranking by open interest (Perpetual Pulse snapshot) */
 const PEERS = {
-  asOf:'Perpetual Pulse · live page snapshot', total:16.408469162e9, count:15, varRank:3, varShare:7.4, vsHl:8.9,
+  asOf:'loading live data', snapAsOf:'2026-07-08 board', live:false, total:16.408469162e9, count:15, varRank:3, varShare:7.4, vsHl:8.9,
   list:[
     {n:'Hyperliquid',oi:10684309662,vol:7126971862,tvl:5711017306,pairs:353,maker:'0.01%',taker:'0.045%',lev:'40x',url:'https://app.hyperliquid.xyz/'},
     {n:'Aster',oi:1880005706,vol:1230816436,tvl:1363035561,pairs:514,maker:'0.01%',taker:'0.035%',lev:'100x',url:'https://www.asterdex.com/'},
@@ -2298,8 +2310,13 @@ function computeEffWindow(key=EFF_WINDOW){
   return {...cfg,key,days,cur,rev,spread,vol,volSource,dailyRev,dailySpread,volPerRev,volPerFee,takeBpsRev,takeBpsFee,oiTurnover,oiPerDayRev,annRevYield};
 }
 function setEffWindow(key){
-  EFF_WINDOW=EFF_WINDOWS[key]?key:'1d';
+  const next=EFF_WINDOWS[key]?key:'1d', changed=next!==EFF_WINDOW;
+  EFF_WINDOW=next;
   renderEfficiency();
+  if(changed){
+    const card=document.querySelector('.card.eff');
+    if(card){card.classList.remove('window-changing');void card.offsetWidth;card.classList.add('window-changing');setTimeout(()=>card.classList.remove('window-changing'),420);}
+  }
 }
 function effShiftMonth(ym,delta){
   const dt=new Date(ym+'-01T00:00:00Z');
@@ -2610,7 +2627,7 @@ function renderPeers(){
   if(!$('#rankList'))return;
   const fmtB=v=>v>=1e9?'$'+(v/1e9).toFixed(2)+'B':'$'+fmtK(v);
   const max=PEERS.list[0].oi;
-  $('#rankList').innerHTML=PEERS.list.slice(0,15).map((p,i)=>`
+  $('#rankList').innerHTML=PEERS.list.slice(0,13).map((p,i)=>`
     <div class="rk${p.me?' me':''}">
       <div class="rk-i">${i+1}</div>
       <div class="rk-n">${PLOGO[p.n]?`<img class="rk-logo" src="${PLOGO[p.n]}" alt="" onerror="this.style.visibility='hidden'">`:`<span class="rk-logo ph"></span>`}${p.n}</div>
@@ -2634,13 +2651,165 @@ function fmtPulseMoney(v){
 function renderPulseTable(){
   const body=$('#pulseTable tbody');
   if(!body)return;
-  body.innerHTML=PEERS.list.slice(0,15).map((p,i)=>`<tr class="${p.me?'me':''}">
+  body.innerHTML=PEERS.list.slice(0,13).map((p,i)=>`<tr class="${p.me?'me':''}">
     <td class="rank">${i+1}</td>
     <td><span class="exchange"><img class="table-logo" src="${PLOGO[p.n]||'variational-symbol-transparent.png'}" alt="">${p.n}${p.me?'<span class="rank-badge">Variational</span>':''}</span></td>
-    <td>${fmtPulseMoney(p.oi)}</td><td>${fmtPulseMoney(p.vol)}</td><td>${fmtPulseMoney(p.tvl)}</td><td>${p.pairs??'—'}</td>
+    <td class="${(PEERS.live&&!p.live)?'snap':''}">${fmtPulseMoney(p.oi)}</td><td class="${(PEERS.live&&!p.live)?'snap':''}">${fmtPulseMoney(p.vol)}</td><td>${fmtPulseMoney(p.tvl)}</td><td>${p.pairs??'—'}</td>
     <td class="${p.maker==='0%'?'fee-zero':''}">${p.maker}</td><td class="${p.taker==='0%'?'fee-zero':''}">${p.taker}</td><td>${p.lev}</td>
     <td><a class="source-link" href="${p.url}" target="_blank" rel="noopener">↗</a></td>
   </tr>`).join('');
+}
+/* ---------- king scoreboard (Hyperliquid benchmark) ---------- */
+function renderKing(){
+  const cB=v=>v==null?'—':v>=1e9?'$'+(v/1e9).toFixed(2)+'B':v>=1e6?'$'+(v/1e6).toFixed(1)+'M':'$'+fmtK(v);
+  const hl=PEERS.list.find(p=>p.n==='Hyperliquid');
+  if($('#kingOi'))$('#kingOi').textContent=hl?cB(hl.oi):'—';
+  if($('#kingVol'))$('#kingVol').textContent=hl?cB(hl.vol):'—';
+  if($('#kingRev'))$('#kingRev').textContent=cB(VSL.hl.rev30);
+}
+/* ---------- implied valuation: OI -> circulating market-cap power-law model ----------
+   Peer perp-DEX tokens (OI vs circulating mcap); fit MCAP = A * OI^B by log-least-squares.
+   A/B reproduce the Perpetual Pulse "Circulating MarketCap vs OI" model (R^2~0.74, log-log). */
+const VAL_FIT={A:10.0339,B:0.8753,r2:0.74};
+const VAL_FLOAT=0.25; // assumed circulating float at TGE, for FDV
+const VAL_COMPS=[
+  {n:'Hyperliquid',oi:10650289066,mc:15166202533,big:1},
+  {n:'Aster',oi:1873558499,mc:1688647643,big:1},
+  {n:'Lighter',oi:841224409,mc:623795984,big:1},
+  {n:'Jupiter',oi:231885286,mc:708656055,big:1},
+  {n:'edgeX',oi:297961154,mc:167041481},
+  {n:'dYdX',oi:39069154,mc:113618792},
+  {n:'GMX',oi:45194812,mc:64954468},
+  {n:'ApeX Protocol',oi:113429724,mc:38608839},
+  {n:'Avantis',oi:12551268,mc:31447239},
+  {n:'Orderly',oi:35976834,mc:13473096},
+  {n:'Gains Network',oi:3337198,mc:14491130},
+  {n:'Drift',oi:123964778,mc:9032977}
+];
+const valPred=oi=>VAL_FIT.A*Math.pow(oi,VAL_FIT.B);
+function fmtBig(v){return v>=1e9?'$'+(v/1e9).toFixed(2)+'B':v>=1e6?'$'+(v/1e6).toFixed(0)+'M':'$'+fmtK(v);}
+function renderValuation(){
+  const svg=$('#valScatter'); if(!svg)return;
+  const va=PEERS.list.find(p=>p.me);
+  const oi=va&&va.oi>0?va.oi:1210288593;
+  const mcap=valPred(oi), fdv=mcap/VAL_FLOAT;
+  $('#valMcap')&&($('#valMcap').textContent=fmtBig(mcap));
+  $('#valOiBase')&&($('#valOiBase').textContent=fmtBig(oi)+(PEERS.live?' live':''));
+  $('#valFdv')&&($('#valFdv').textContent=fmtBig(fdv));
+  $('#valFloat')&&($('#valFloat').textContent=Math.round(VAL_FLOAT*100)+'%');
+  $('#valFdvRange')&&($('#valFdvRange').textContent=fmtBig(mcap/0.33)+'–'+fmtBig(mcap/0.20));
+  const W=760,H=430,pl=58,pr=18,pt=22,pb=44;
+  const lx0=Math.log10(2e6),lx1=Math.log10(2.2e10),ly0=Math.log10(4e6),ly1=Math.log10(2.2e10);
+  const X=v=>pl+(Math.log10(v)-lx0)/(lx1-lx0)*(W-pl-pr);
+  const Y=v=>pt+(1-(Math.log10(v)-ly0)/(ly1-ly0))*(H-pt-pb);
+  const lbl=v=>v>=1e9?'$'+(v/1e9)+'B':'$'+(v/1e6)+'M';
+  const ticks=[1e7,1e8,1e9,1e10];
+  let grid='';
+  ticks.forEach(t=>{const x=X(t);
+    grid+=`<line x1="${x.toFixed(1)}" y1="${pt}" x2="${x.toFixed(1)}" y2="${H-pb}" stroke="rgba(85,184,255,.08)"/>`+
+      `<text x="${x.toFixed(1)}" y="${H-pb+16}" fill="#4a5674" font-size="10" text-anchor="middle">${lbl(t)}</text>`;});
+  ticks.forEach(t=>{const y=Y(t);
+    grid+=`<line x1="${pl}" y1="${y.toFixed(1)}" x2="${W-pr}" y2="${y.toFixed(1)}" stroke="rgba(85,184,255,.08)"/>`+
+      `<text x="${pl-8}" y="${(y+3).toFixed(1)}" fill="#4a5674" font-size="10" text-anchor="end">${lbl(t)}</text>`;});
+  grid+=`<text x="${((pl+(W-pr))/2).toFixed(0)}" y="${H-4}" fill="#6b83a8" font-size="10" text-anchor="middle" letter-spacing="1.5">OPEN INTEREST →</text>`;
+  const midY=((pt+(H-pb))/2).toFixed(1);
+  grid+=`<text x="14" y="${midY}" fill="#6b83a8" font-size="10" text-anchor="middle" letter-spacing="1.5" transform="rotate(-90 14 ${midY})">CIRCULATING MCAP →</text>`;
+  let path='';
+  for(let lx=lx0;lx<=lx1+1e-9;lx+=(lx1-lx0)/60){const oiv=Math.pow(10,lx);const x=X(oiv),y=Y(valPred(oiv));path+=(path?'L':'M')+x.toFixed(1)+' '+y.toFixed(1)+' ';}
+  const trend=`<path d="${path}" fill="none" stroke="url(#valTrend)" stroke-width="2.4" opacity=".9"/>`;
+  const premCol=p=>p>=1.08?'#26e6c2':p<=0.92?'#e0728a':'#7f9bc4';
+  // legend (top-left = low-OI / high-mcap, empty region)
+  let legend=`<g transform="translate(${pl+8},${pt+10})" font-family="var(--mono)">`+
+    `<circle cx="4" cy="0" r="3.4" fill="#26e6c2"/><text x="12" y="3.4" fill="#84a2c6" font-size="9">above line · premium</text>`+
+    `<circle cx="4" cy="15" r="3.4" fill="#e0728a"/><text x="12" y="18.4" fill="#84a2c6" font-size="9">below line · discount</text></g>`;
+  let dots='';
+  VAL_COMPS.forEach(c=>{if(c.oi<=0||c.mc<=0)return;
+    const imp=valPred(c.oi), prem=c.mc/imp, col=premCol(prem);
+    const x=X(c.oi), ya=Y(c.mc), yi=Y(imp), logo=PLOGO[c.n], s=c.big?26:22;
+    dots+=`<line x1="${x.toFixed(1)}" y1="${yi.toFixed(1)}" x2="${x.toFixed(1)}" y2="${ya.toFixed(1)}" stroke="${col}" stroke-width="1.3" stroke-dasharray="2 2" opacity=".5"/>`;
+    if(logo){
+      dots+=`<rect x="${(x-s/2).toFixed(1)}" y="${(ya-s/2).toFixed(1)}" width="${s}" height="${s}" rx="6" fill="#0a1220" stroke="${col}" stroke-width="1.5"/>`+
+        `<image href="${logo}" x="${(x-s/2+3).toFixed(1)}" y="${(ya-s/2+3).toFixed(1)}" width="${(s-6)}" height="${(s-6)}" preserveAspectRatio="xMidYMid meet"/>`;
+    }else{
+      dots+=`<circle cx="${x.toFixed(1)}" cy="${ya.toFixed(1)}" r="5" fill="${col}" stroke="#0a1220" stroke-width="1"/>`+
+        `<text x="${x.toFixed(1)}" y="${(ya-9).toFixed(1)}" fill="#9db6da" font-size="8.5" text-anchor="middle">${c.n}</text>`;
+    }});
+  const vx=X(oi),vy=Y(mcap),vs=32;
+  const cxL=Math.min(vx+20,W-pr-108).toFixed(1), cyL=Math.max(vy-50,pt+14).toFixed(1);
+  const vlogo=PLOGO['Variational'];
+  const hero=`<circle cx="${vx.toFixed(1)}" cy="${vy.toFixed(1)}" r="20" fill="rgba(38,230,194,.16)"/>`+
+    `<rect x="${(vx-vs/2).toFixed(1)}" y="${(vy-vs/2).toFixed(1)}" width="${vs}" height="${vs}" rx="9" fill="#061019" stroke="#26e6c2" stroke-width="2.2"/>`+
+    `<image href="${vlogo}" x="${(vx-vs/2+5).toFixed(1)}" y="${(vy-vs/2+5).toFixed(1)}" width="${vs-10}" height="${vs-10}" preserveAspectRatio="xMidYMid meet"/>`+
+    `<line x1="${vx.toFixed(1)}" y1="${(vy-vs/2).toFixed(1)}" x2="${cxL}" y2="${(+cyL+14).toFixed(1)}" stroke="rgba(38,230,194,.5)" stroke-width="1"/>`+
+    `<g transform="translate(${cxL},${cyL})"><text x="0" y="0" fill="#26e6c2" font-size="10.5" font-weight="900" letter-spacing=".5">Variational · implied</text>`+
+    `<text x="0" y="16" fill="#eafff6" font-size="15" font-weight="900">${fmtBig(mcap)}</text></g>`;
+  svg.innerHTML=`<defs>`+
+    `<linearGradient id="valTrend" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#2c4c7f"/><stop offset="1" stop-color="#26e6c2"/></linearGradient></defs>`+
+    grid+trend+dots+legend+hero;
+  const side=$('#valSide');
+  if(side){
+    const rows=VAL_COMPS.map(c=>({n:c.n,mc:c.mc,imp:valPred(c.oi),prem:c.mc/valPred(c.oi)})).sort((a,b)=>b.prem-a.prem);
+    const chip=n=>PLOGO[n]?`<img class="vs-logo" src="${PLOGO[n]}" alt="" onerror="this.style.visibility='hidden'">`:`<span class="vs-dot"></span>`;
+    const pcol=p=>p>=1.08?'var(--grn)':p<=0.92?'#e0728a':'var(--sub)';
+    const pf=p=>p>=1?p.toFixed(1)+'×':p.toFixed(2)+'×';
+    side.innerHTML=`<div class="vs-h">Premium to model <span class="vs-hs">· mkt mcap ÷ implied</span></div>`+
+      `<div class="vs-row me"><span class="n">${chip('Variational')}<span class="vs-nm"><b>Variational</b><small>implied ${fmtBig(mcap)} · pre-TGE</small></span></span><span class="v" style="color:var(--grn)">sets it</span></div>`+
+      rows.map(r=>`<div class="vs-row"><span class="n">${chip(r.n)}<span class="vs-nm"><b>${r.n}</b><small>${fmtBig(r.mc)} vs ${fmtBig(r.imp)}</small></span></span><span class="v" style="color:${pcol(r.prem)}">${pf(r.prem)}</span></div>`).join('');}
+  const note=$('#valNote');
+  if(note)note.innerHTML=`Model: circulating market cap regressed on open interest across ${VAL_COMPS.length} live perp-DEX tokens — MCAP ≈ ${VAL_FIT.A.toFixed(1)} · OI<sup>${VAL_FIT.B}</sup> (R² ${VAL_FIT.r2}, log-log). Variational's OI implies a circulating mcap of <b>${fmtBig(mcap)}</b>; FDV scales that by the assumed circulating float at TGE. Peer OI &amp; market caps: <a href="https://www.perpetualpulse.xyz/" target="_blank" rel="noopener">Perpetual Pulse</a>. A valuation model, not a price target — not financial advice.`;
+}
+/* ---------- live perp-DEX board via CoinGecko (free, CORS-open) ----------
+   OI & 24h volume come back in BTC; multiply by live BTC price for USD.
+   TVL / fees / leverage stay from the maintained snapshot (not on this feed).
+   DEXs CoinGecko doesn't track (Jupiter/Drift/GMX) keep snapshot values, flagged. */
+const CG_NAME={'Hyperliquid':'Hyperliquid','Aster':'Aster','Variational Omni':'Variational','Lighter':'Lighter',
+  'GRVT':'GRVT','Ostium':'Ostium','edgeX':'edgeX','Extended':'Extended','ApeX Omni':'ApeX Protocol',
+  'Pacifica':'Pacifica','Backpack':'Backpack','Vest Exchange':'Vest Exchange'};
+function setBoardLive(state,label){
+  const el=$('#boardLive'); if(!el)return;
+  el.className='live-pill'+(state==='on'?' on':state==='err'?' err':'');
+  el.innerHTML='<i></i>'+label;
+}
+async function refreshPerpBoard(){
+  try{
+    const [exRes,pxRes]=await Promise.all([
+      fetch('https://api.coingecko.com/api/v3/derivatives/exchanges?per_page=100'),
+      fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd')
+    ]);
+    if(!exRes.ok||!pxRes.ok)throw new Error('coingecko http '+exRes.status+'/'+pxRes.status);
+    const ex=await exRes.json(), px=await pxRes.json();
+    const btc=px&&px.bitcoin&&px.bitcoin.usd;
+    if(!btc||!Array.isArray(ex))throw new Error('bad coingecko payload');
+    const live={};
+    ex.forEach(e=>{const nm=String(e.name||'').replace(/\s*\(futures\)\s*$/i,'').trim(); const key=CG_NAME[nm]; if(!key)return;
+      live[key]={oi:(+e.open_interest_btc||0)*btc, vol:(+e.trade_volume_24h_btc||0)*btc, pairs:e.number_of_perpetual_pairs};
+    });
+    let hit=0;
+    PEERS.list.forEach(p=>{const l=live[p.n];
+      if(l&&l.oi>0){p.oi=l.oi; p.vol=l.vol; if(l.pairs!=null)p.pairs=l.pairs; p.live=true; hit++;}
+      else p.live=false;
+    });
+    if(!hit)throw new Error('no exchange matches');
+    PEERS.list.sort((a,b)=>b.oi-a.oi);
+    const total=PEERS.list.reduce((s,p)=>s+(p.oi||0),0);
+    const va=PEERS.list.find(p=>p.me), hl=PEERS.list.find(p=>p.n==='Hyperliquid');
+    PEERS.total=total; PEERS.count=PEERS.list.length;
+    PEERS.varRank=PEERS.list.findIndex(p=>p.me)+1;
+    if(va&&total)PEERS.varShare=+(va.oi/total*100).toFixed(1);
+    if(hl&&va&&va.oi)PEERS.vsHl=+(hl.oi/va.oi).toFixed(1);
+    const li=live['Lighter']; if(li&&li.oi>0){VSL.li.oi=li.oi; VSL.li.vol1d=li.vol;}
+    if(hl){VSL.hl.oi=hl.oi; VSL.hl.vol1d=hl.vol;}
+    PEERS.live=true;
+    const t=new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
+    PEERS.asOf='Live · CoinGecko · '+t;
+    renderPeers(); renderPulseTable(); renderVsLighter(); renderKing(); renderValuation();
+    setBoardLive('on','Live · '+t);
+  }catch(err){
+    console.warn('Perp board live sync fell back to snapshot:',err);
+    if(!PEERS.live){PEERS.asOf='Snapshot · '+(PEERS.snapAsOf||'last saved'); renderPeers(); renderPulseTable(); renderVsLighter(); renderValuation();}
+    renderKing();
+    if(!PEERS.live)setBoardLive('err','Snapshot');
+  }
 }
 
 /* ---------- head-to-head: Variational vs Lighter ---------- */
@@ -2688,7 +2857,7 @@ function renderVsLighter(){
         <td><span class="lead ${lead.c}">${lead.t}</span></td>
       </tr>`;
     }).join('')}</tbody></table>`;
-  $('#h2hNote').innerHTML=`Read: Lighter is the direct market comp. Compare capacity first (OI), then activity (volume), then monetization (spread fees and booked treasury revenue). Variational’s fee pool is implied from its on-chain treasury cut of ${(MKT.spreadShare*100).toFixed(0)}% of spreads. Sources: volume &amp; OI — Perpetual Pulse (${PEERS.asOf}); Variational fees/revenue — treasury wallet on Arbitrum; Lighter fees/revenue — <a href="https://defillama.com/protocol/lighter" target="_blank" rel="noopener">DeFiLlama</a>. ${VSL.note}`;
+  $('#h2hNote').innerHTML=`Read: Lighter is the direct market comp. Compare capacity first (OI), then activity (volume), then monetization (spread fees and booked treasury revenue). Variational’s fee pool is implied from its on-chain treasury cut of ${(MKT.spreadShare*100).toFixed(0)}% of spreads. Sources: OI &amp; volume — ${PEERS.live?'CoinGecko derivatives (live)':'snapshot ('+PEERS.snapAsOf+')'}; Variational fees/revenue — treasury wallet on Arbitrum; Lighter fees/revenue — <a href="https://defillama.com/protocol/lighter" target="_blank" rel="noopener">DeFiLlama</a>. ${VSL.note}`;
   renderRevVs(rev30);
 }
 function renderRevVs(rev30){
@@ -2770,29 +2939,44 @@ function renderMath(){
   $('#mqOiBurn').textContent='$'+fmtK(e.oiPerDayRev/b);
 }
 function renderEfficiency(){
-  if(!$('#efVol'))return;
+  if(!$('#fmDailyVol'))return;
   const e=computeEffWindow(), base=computeEff();
   const fmtBig=n=>n>=1e9?'$'+(n/1e9).toFixed(2)+'B':n>=1e6?'$'+(n/1e6).toFixed(2)+'M':'$'+fmtK(n);
   document.querySelector('.card.eff')?.setAttribute('data-eff-window',e.key);
   document.querySelectorAll('#effWindowTabs button').forEach(b=>b.classList.toggle('on',b.dataset.effWindow===e.key));
-  $('#efVol').textContent=fmtBig(e.vol);
+  const periodLabel=e.key==='month'?'MTD':e.label.toUpperCase();
+  const last=SERIES[SERIES.length-1];
+  const rangeText=e.key==='1d'?'Last 24 hours'
+    :e.key==='7d'?'Trailing 7 days'
+    :e.key==='30d'?'Trailing 30 days'
+    :e.key==='month'?`${resetMonthName(last.d.slice(0,7))} month-to-date · ${e.days} days elapsed`
+    :`Since ${SERIES[0].d} · ${e.days} days`;
+  $('#effWindowTitle') && ($('#effWindowTitle').textContent=periodLabel+' VIEW');
+  $('#effWindowRange') && ($('#effWindowRange').textContent=rangeText);
+  $('#effActivePeriod') && ($('#effActivePeriod').textContent=periodLabel);
+  $('#fmVolLabel') && ($('#fmVolLabel').textContent=periodLabel+' PERP VOLUME');
+  $('#fmOiLabel') && ($('#fmOiLabel').textContent='OPEN INTEREST · LIVE SNAPSHOT');
+  $('#fmFeesLabel') && ($('#fmFeesLabel').textContent=periodLabel+' SPREAD FEES PAID BY TRADERS');
+  $('#fmRevLabel') && ($('#fmRevLabel').textContent=periodLabel+' VARIATIONAL TREASURY REVENUE');
+  $('#fmBurnLabel') && ($('#fmBurnLabel').textContent='estimated '+periodLabel+' buyback-burn firepower');
+  $('#efVol') && ($('#efVol').textContent=fmtBig(e.vol));
   $('#efVolLabel') && ($('#efVolLabel').textContent='Perp volume · '+e.label);
   $('#efVolSub') && ($('#efVolSub').textContent=e.key==='all'?'$168B all-time':e.key==='month'?'MTD proxy volume':'selected window');
-  $('#efTake').textContent=e.takeBpsFee.toFixed(2)+' bps';
-  $('#efFee').textContent=fmtBig(e.spread);
+  $('#efTake') && ($('#efTake').textContent=e.takeBpsFee.toFixed(2)+' bps');
+  $('#efFee') && ($('#efFee').textContent=fmtBig(e.spread));
   $('#efFeeLabel') && ($('#efFeeLabel').textContent='Spread payments · '+e.label);
-  $('#efRev').textContent=fmtBig(e.rev);
+  $('#efRev') && ($('#efRev').textContent=fmtBig(e.rev));
   $('#efRevLabel') && ($('#efRevLabel').textContent='Treasury revenue · '+e.label);
-  $('#efRevDay').textContent='$'+fmtK(e.dailyRev)+'/day';
-  $('#fmDailyRev') && ($('#fmDailyRev').textContent=fmtBig(e.dailyRev));
-  $('#fmDailyFees') && ($('#fmDailyFees').textContent=fmtBig(e.dailySpread));
-  $('#fmDailyVol') && ($('#fmDailyVol').textContent=fmtBig(e.dailySpread*e.volPerFee));
+  $('#efRevDay') && ($('#efRevDay').textContent='$'+fmtK(e.dailyRev)+'/day');
+  $('#fmDailyRev') && ($('#fmDailyRev').textContent=fmtBig(e.rev));
+  $('#fmDailyFees') && ($('#fmDailyFees').textContent=fmtBig(e.spread));
+  $('#fmDailyVol') && ($('#fmDailyVol').textContent=fmtBig(e.vol));
   $('#fmOi') && ($('#fmOi').textContent=fmtBig(MKT.oi));
-  $('#fmDailyBurn') && ($('#fmDailyBurn').textContent=fmtBig(e.dailyRev*MKT.burnShare));
-  $('#fmDailyRevFormula') && ($('#fmDailyRevFormula').textContent=e.label+' treasury ÷ '+e.days+' day'+(e.days===1?'':'s'));
-  $('#fmDailyFeesFormula') && ($('#fmDailyFeesFormula').textContent='daily treasury ÷ 10%');
-  $('#fmDailyVolFormula') && ($('#fmDailyVolFormula').textContent='daily spreads × volume per $1 spread');
-  $('#fmDailyBurnFormula') && ($('#fmDailyBurnFormula').textContent='daily treasury × 30%');
+  $('#fmDailyBurn') && ($('#fmDailyBurn').textContent=fmtBig(e.rev*MKT.burnShare));
+  $('#fmDailyRevFormula') && ($('#fmDailyRevFormula').textContent=periodLabel+' treasury inflow');
+  $('#fmDailyFeesFormula') && ($('#fmDailyFeesFormula').textContent=periodLabel+' treasury ÷ 10%');
+  $('#fmDailyVolFormula') && ($('#fmDailyVolFormula').textContent=e.volSource);
+  $('#fmDailyBurnFormula') && ($('#fmDailyBurnFormula').textContent=periodLabel+' treasury × 30%');
   $('#raTreasuryDay') && ($('#raTreasuryDay').textContent=fmtBig(e.dailyRev));
   $('#raSpreadDay') && ($('#raSpreadDay').textContent=fmtBig(e.dailySpread));
   $('#raVolumeDay') && ($('#raVolumeDay').textContent=fmtBig(e.dailySpread*e.volPerFee));
@@ -2817,6 +3001,8 @@ function renderEfficiency(){
   $('#frReadRevNote') && ($('#frReadRevNote').textContent=e.label+' treasury revenue. If this rises, the venue is earning more real USDC.');
   renderFeeRevenueHistory();
   renderFeeOi();
+  $('#frReadRev') && ($('#frReadRev').textContent=fmtBig(e.rev)+' / '+periodLabel);
+  $('#frReadNeed') && ($('#frReadNeed').textContent='$'+fmtK(e.volPerRev)+' vol / $1');
 
   // ① buy-&-burn engine: burn = burnShare of revenue
   const burn30=base.rev30*MKT.burnShare, dailyBurn=burn30/30;
@@ -3632,7 +3818,10 @@ function renderHistoryMonths(){
   box.innerHTML=months.map(ym=>`<button type="button" class="${ym===CAL.month?'on':''}" data-m="${ym}">${monthName(ym).split(' ')[0]}</button>`).join('');
 }
 function paintCalendar(){
-  const first=CAL.month+'-01', end=monthEnd(first);
+  const pendingCutoff=addDays(weekStart(resetDateKey()),13);
+  if(CALMODE==='day'&&CAL.month>pendingCutoff.slice(0,7))CAL.month=pendingCutoff.slice(0,7);
+  const first=CAL.month+'-01', monthLast=monthEnd(first);
+  const end=CALMODE==='day'&&CAL.month===pendingCutoff.slice(0,7)&&pendingCutoff<monthLast?pendingCutoff:monthLast;
   const firstDow=new Date(first+'T00:00:00Z').getUTCDay();
   const start=addDays(first,-firstDow);
   const lastDow=new Date(end+'T00:00:00Z').getUTCDay();
@@ -3757,7 +3946,10 @@ $('#calSeg').addEventListener('click',e=>{
 });
 $('#calGrid').addEventListener('click',e=>{const c=e.target.closest('[data-d]');if(c)selectCell(c.dataset.d);});
 $('#calPrev').addEventListener('click',()=>{CAL.month=ymAdd(CAL.month,-1);buildCalendar();});
-$('#calNext').addEventListener('click',()=>{CAL.month=ymAdd(CAL.month,1);buildCalendar();});
+$('#calNext').addEventListener('click',()=>{
+  const next=ymAdd(CAL.month,1), maxMonth=addDays(weekStart(resetDateKey()),13).slice(0,7);
+  if(next<=maxMonth){CAL.month=next;buildCalendar();}
+});
 $('#calToday').addEventListener('click',()=>{CAL.month=SERIES[SERIES.length-1].d.slice(0,7);buildCalendar();});
 $('#histMonths').addEventListener('click',e=>{const b=e.target.closest('button[data-m]');if(!b)return;CAL.month=b.dataset.m;buildCalendar();});
 $('#traders')?.addEventListener('input',renderFeePerTrader);
@@ -3805,7 +3997,7 @@ let CUR='week', booted=false;
 function render(){
   const rows=buildPeriods(CUR);
   const total=SERIES[SERIES.length-1].v;
-  if(!booted)countUp($('#totalVal'),total); else {_ctToken++;$('#totalVal').textContent=fmtUSD(total);}
+  _ctToken++;$('#totalVal').textContent=fmtUSD(total);
   renderImpliedSpreadTotal(total);
   if($('#vIntroTotal'))$('#vIntroTotal').textContent=fmtUSD(total);
   $('#rangeBadge').textContent=SERIES[0].d+' → '+SERIES[SERIES.length-1].d;
@@ -3893,9 +4085,23 @@ async function refresh(){
   const btn=$('#refresh'),note=$('#note');btn.classList.add('busy');btn.textContent='↻ syncing…';
   $('#stamp').className='';
   try{
-    // Fill missing ET days. Each date key resets at 00:00 America/New_York.
     const todayET=resetDateKey();
-    let last=SERIES[SERIES.length-1].d, guard=0;
+    const embeddedLast=SERIES[SERIES.length-1].d;
+
+    // Fetch and paint the latest balance first. Historical backfill can finish behind it.
+    const cur=await balAt('latest');
+    LIVE_BASE={balance:cur,at:performance.now()};
+    LIVE_HOUR_BASE={key:resetHourKey(),balance:cur,at:performance.now()};
+    $('#totalVal').textContent=fmtUSD(Math.floor(cur));
+    renderImpliedSpreadTotal(cur);
+    renderActualsFallback(cur);
+    tickLive();
+    $('#stamp').textContent='live · '+resetTimeString()+' ET';
+    $('#stamp').className='live';
+    note.classList.remove('show');
+
+    // Fill missing ET days after the live number is already visible.
+    let last=embeddedLast, guard=0;
     while(last<todayET && guard++<40){
       const nd=addDays(last,1);
       const ts=resetMidnightTs(nd);
@@ -3904,8 +4110,6 @@ async function refresh(){
       if(i>=0)SERIES[i].v=v; else SERIES.push({d:nd,v});
       last=nd;
     }
-    // update current live total (latest block)
-    const cur=await balAt('latest');
     if(SERIES[SERIES.length-1].d===todayET)SERIES[SERIES.length-1].v=cur;
     else SERIES.push({d:todayET,v:cur});
     SERIES.sort((a,b)=>a.d<b.d?-1:1);
@@ -3920,9 +4124,6 @@ async function refresh(){
       $('#pmOlpFormula') && ($('#pmOlpFormula').innerHTML='Formula: <b>read Core OLP Vault USDC balance on Arbiscan</b>');
     }
     await renderHourlyEarnings(cur);
-    $('#stamp').textContent='live · '+resetTimeString()+' ET';
-    $('#stamp').className='live';
-    note.classList.remove('show');
     render();
     renderTwaps();
     renderActuals(cur);
@@ -3934,6 +4135,31 @@ async function refresh(){
     $('#stamp').textContent='snapshot · '+SERIES[SERIES.length-1].d+' ET';
     $('#stamp').className='warn';
   }finally{btn.classList.remove('busy');btn.textContent='↻ Refresh live';}
+}
+let quickSyncBusy=false, lastWindowSync=0;
+async function quickSyncLive(){
+  if(quickSyncBusy||document.visibilityState==='hidden')return;
+  quickSyncBusy=true;
+  try{
+    const cur=await balAt('latest');
+    const today=resetDateKey(), latest=SERIES[SERIES.length-1];
+    if(latest.d===today)latest.v=cur;
+    LIVE_BASE={balance:cur,at:performance.now()};
+    $('#totalVal').textContent=fmtUSD(Math.floor(cur));
+    renderImpliedSpreadTotal(cur);
+    tickLive();
+    renderRunningTotals();
+    renderChanges();
+    renderEfficiency();
+    $('#stamp').textContent='live · '+resetTimeString()+' ET';
+    $('#stamp').className='live';
+    if(Date.now()-lastWindowSync>60000){
+      lastWindowSync=Date.now();
+      renderActuals(cur);
+    }
+  }catch(_){
+    // Keep the last visible value; the full refresh handles status messaging.
+  }finally{quickSyncBusy=false;}
 }
 $('#refresh').addEventListener('click',refresh);
 
@@ -4087,6 +4313,8 @@ try{
   renderPeers();
   renderPulseTable();
   renderVsLighter();
+  renderKing();
+  renderValuation();
 }catch(err){
   console.warn('Dashboard startup render recovered with fallback:',err);
   renderActualsFallback(SERIES[SERIES.length-1].v);
@@ -4099,6 +4327,11 @@ startLive();
 setInterval(renderPointsDeadline,60000);
 // attempt an automatic live sync on load (silent-fail to snapshot)
 refresh();
+setInterval(quickSyncLive,8000);
+// live perp-DEX board (CoinGecko) — refresh on load, then every 3 min
+refreshPerpBoard();
+setInterval(refreshPerpBoard,180000);
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')quickSyncLive();});
 </script>
 </body>
 </html>
