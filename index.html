@@ -822,23 +822,31 @@
   .eff-note b{color:var(--grn)}
   /* official biweekly metrics: official post and on-chain checks stay visibly separate */
   .bw{margin-top:16px}
+  .tsec[data-tg="biweekly"]>h2{font-size:clamp(22px,2.1vw,32px);line-height:1.15}
+  .tsec[data-tg="biweekly"]>.cap{font-size:15px;line-height:1.65;max-width:1200px}
   .bw-source-rail{display:grid;grid-template-columns:1fr 1fr;border-block:1px solid var(--line);margin-bottom:20px}
+  .bw-easy-guide{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border-block:1px solid var(--line);margin:0 0 22px}
+  .bw-easy-guide div{padding:17px 20px 17px 0}
+  .bw-easy-guide div+div{border-left:1px solid var(--line);padding-left:20px}
+  .bw-easy-guide strong{display:block;font:950 18px/1.2 var(--display);color:var(--ink)}
+  .bw-easy-guide span{display:block;margin-top:7px;font:14px/1.55 var(--sans);color:var(--sub)}
+  .bw-easy-guide b{color:var(--grn)}
   .bw-lane{padding:14px 0;display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:start}
   .bw-lane+ .bw-lane{border-left:1px solid var(--line);padding-left:20px;margin-left:20px}
   .bw-lane .n{width:28px;height:28px;border:1px solid var(--line);display:grid;place-items:center;font:900 12px var(--mono);color:var(--grn)}
-  .bw-lane b{display:block;font:900 13px/1.2 var(--display);color:var(--ink)}
-  .bw-lane span{display:block;margin-top:5px;font:12px/1.45 var(--sans);color:var(--sub)}
+  .bw-lane b{display:block;font:900 15px/1.25 var(--display);color:var(--ink)}
+  .bw-lane span{display:block;margin-top:6px;font:13.5px/1.55 var(--sans);color:var(--sub)}
   .bw-lane a{color:var(--cyan);text-decoration:none;border-bottom:1px solid currentColor}
   .bw-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin:22px 0 10px;padding-top:16px;border-top:1px solid var(--line)}
   .bw-head.first{margin-top:0;padding-top:0;border-top:0}
-  .bw-head b{font:900 12px var(--display);letter-spacing:1.4px;text-transform:uppercase;color:var(--ink)}
-  .bw-head span{font:12px var(--sans);color:var(--sub)}
+  .bw-head b{font:900 14px var(--display);letter-spacing:1.2px;text-transform:uppercase;color:var(--ink)}
+  .bw-head span{font:13px/1.45 var(--sans);color:var(--sub)}
   .bw-pnl{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));border-block:1px solid var(--line)}
   .bw-pnl .step{padding:16px 18px 16px 0}
   .bw-pnl .step+ .step{border-left:1px solid var(--line);padding-left:18px}
-  .bw-pnl .step span{display:block;font:800 10px var(--mono);letter-spacing:.8px;text-transform:uppercase;color:var(--dim)}
-  .bw-pnl .step b{display:block;margin-top:7px;font:950 22px var(--mono);letter-spacing:-.6px;color:var(--ink)}
-  .bw-pnl .step small{display:block;margin-top:5px;font:12px/1.35 var(--sans);color:var(--sub)}
+  .bw-pnl .step span{display:block;font:800 11px var(--mono);letter-spacing:.8px;text-transform:uppercase;color:var(--dim)}
+  .bw-pnl .step b{display:block;margin-top:7px;font:950 25px var(--mono);letter-spacing:-.6px;color:var(--ink)}
+  .bw-pnl .step small{display:block;margin-top:6px;font:13px/1.45 var(--sans);color:var(--sub)}
   .bw-pnl .step.neg b{color:#f08aa0}
   .bw-pnl .step.pos b{color:var(--grn)}
   .bw-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-top:1px solid var(--line)}
@@ -876,19 +884,73 @@
   .bw-trend-cap{display:flex;gap:10px;margin-top:7px}
   .bw-trend-cap span{flex:1;text-align:center;font:10px var(--mono);color:var(--dim)}
   .bw-hist{margin-top:12px}
-  .bw-hist .hrow{display:grid;grid-template-columns:130px repeat(4,1fr);gap:12px;padding:12px 0;border-bottom:1px solid var(--line);font:12px var(--mono);color:var(--sub)}
-  .bw-hist .hrow.h{color:var(--dim);font-size:10px;letter-spacing:.8px;text-transform:uppercase}
-  .bw-hist .hrow b{color:var(--ink);font-weight:800}
+  .bw-hist .hrow{display:grid;grid-template-columns:165px repeat(9,minmax(110px,1fr));gap:14px;padding:17px 0;border-bottom:1px solid var(--line);font:14px var(--mono);color:var(--sub);align-items:center}
+  .bw-hist .hrow.h{color:var(--dim);font-size:12px;line-height:1.35;letter-spacing:.55px;text-transform:uppercase}
+  .bw-hist .hrow b{display:block;color:var(--ink);font-size:16px;font-weight:900}
+  .bw-hist .hrow small{display:block;margin-top:5px;font:800 11px/1.3 var(--mono);color:var(--dim)}
+  .bw-hist .hrow small.up{color:var(--grn)}.bw-hist .hrow small.dn{color:#f08aa0}
+  .bw-hist .era{display:block;margin-top:6px;font:800 10px/1.35 var(--mono);letter-spacing:.25px;text-transform:uppercase;color:var(--cyan)}
+  .bw-hist .era.early{color:var(--amber)}
+  .bw-hist-note{margin-top:12px;font:14px/1.65 var(--sans);color:var(--sub)}
   .bw-hist-empty{padding:18px 0;border-block:1px solid var(--line);font:13px/1.55 var(--sans);color:var(--sub)}
+  .bw-verdict{display:grid;grid-template-columns:230px 1fr;gap:24px;padding:18px 0;border-block:1px solid var(--line);margin-bottom:18px}
+  .bw-verdict-score span{display:block;font:800 11px var(--mono);letter-spacing:1px;text-transform:uppercase;color:var(--dim)}
+  .bw-verdict-score strong{display:block;margin-top:5px;font:950 clamp(38px,5vw,66px)/.9 var(--mono);letter-spacing:-3px;color:var(--grn)}
+  .bw-verdict-score b{display:block;margin-top:9px;font:900 15px/1.4 var(--display);color:var(--ink)}
+  .bw-verdict-copy{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;align-content:center}
+  .bw-verdict-copy div{border-left:1px solid var(--line);padding-left:16px}
+  .bw-verdict-copy span{display:block;font:800 11px var(--mono);letter-spacing:.7px;text-transform:uppercase;color:var(--dim)}
+  .bw-verdict-copy b{display:block;margin-top:6px;font:900 19px/1.2 var(--mono);color:var(--ink)}
+  .bw-verdict-copy small{display:block;margin-top:5px;font:13px/1.45 var(--sans);color:var(--sub)}
+  .bw-deltas .d .delta-line{display:flex;justify-content:space-between;gap:8px;margin-top:6px;font:11px var(--mono)}
+  .bw-deltas .d .delta-line em{font-style:normal;color:var(--dim)}
+  .bw-deltas .d .delta-line i{font-style:normal;font-weight:900}
+  .bw-deltas .d .delta-line i.up{color:var(--grn)}.bw-deltas .d .delta-line i.dn{color:#f08aa0}
+  .bw-mini{display:block;width:100%;height:34px;margin-top:8px;overflow:visible}
+  .bw-atlas{border-top:1px solid var(--line)}
+  .bw-atlas-axis{display:grid;grid-template-columns:150px minmax(185px,1.05fr) 140px minmax(360px,2fr) 155px 140px;gap:14px;align-items:end;padding:10px 0 10px;border-bottom:1px solid var(--line);font:800 10px var(--mono);letter-spacing:.65px;text-transform:uppercase;color:var(--dim)}
+  .bw-atlas-axis .trend-axis{display:flex;justify-content:space-between;color:var(--cyan)}
+  .bw-atlas-group{display:grid;grid-template-columns:150px 1fr;border-bottom:1px solid var(--line)}
+  .bw-atlas-group h3{margin:0;padding:16px 14px 16px 0;font:900 13px/1.4 var(--display);letter-spacing:1px;text-transform:uppercase;color:var(--cyan)}
+  .bw-atlas-rows{border-left:1px solid var(--line)}
+  .bw-metric-row{display:grid;grid-template-columns:minmax(185px,1.05fr) 140px minmax(360px,2fr) 155px 140px;gap:14px;align-items:center;padding:13px 0 13px 16px;border-bottom:1px solid rgba(255,255,255,.055)}
+  .bw-metric-row:last-child{border-bottom:0}
+  .bw-metric-row .name{font:800 14px/1.35 var(--sans);color:var(--sub)}
+  .bw-metric-row .latest{font:900 18px var(--mono);color:var(--ink)}
+  .bw-metric-row .change{font:900 14px var(--mono)}
+  .bw-metric-row .change.up{color:var(--grn)}.bw-metric-row .change.dn{color:#f08aa0}.bw-metric-row .change.na{color:var(--dim)}
+  .bw-metric-row .change small{display:block;margin-top:3px;font:10px var(--mono);font-weight:700;color:var(--dim);text-transform:uppercase}
+  .bw-metric-trend{min-width:0}
+  .bw-metric-row svg{display:block;width:100%;height:86px;overflow:visible}
+  .bw-point-value{font:900 11.5px var(--mono);fill:var(--ink);paint-order:stroke;stroke:var(--bg);stroke-width:3px;stroke-linejoin:round}
+  .bw-metric-dates{display:flex;justify-content:space-between;gap:8px;margin-top:3px;font:800 9px var(--mono);color:var(--dim)}
+  .bw-metric-dates span:nth-child(2){color:var(--sub)}
+  .bw-atlas-note{margin:12px 0 0;font:14px/1.65 var(--sans);color:var(--sub)}
+  .bw-report-tools{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+  .bw-report-tools label{font:800 12px var(--mono);letter-spacing:.7px;text-transform:uppercase;color:var(--dim)}
+  .bw-report-tools select{min-width:210px;border:1px solid var(--line);background:var(--panel);color:var(--ink);padding:11px 36px 11px 12px;font:800 14px var(--mono)}
+  .bw-report-detail{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-top:1px solid var(--line)}
+  .bw-report-value{padding:12px 14px 12px 0;border-bottom:1px solid var(--line)}
+  .bw-report-value:not(:nth-child(4n+1)){border-left:1px solid var(--line);padding-left:14px}
+  .bw-report-value span{display:block;font:800 10.5px/1.35 var(--mono);letter-spacing:.65px;text-transform:uppercase;color:var(--dim)}
+  .bw-report-value b{display:block;margin-top:6px;font:900 18px var(--mono);color:var(--ink)}
+  .bw-report-notes{grid-column:1/-1;padding:15px 0;font:13.5px/1.6 var(--sans);color:var(--sub)}
+  .bw-report-notes b{color:var(--amber)}
   @media(max-width:920px){
-    .bw-source-rail{grid-template-columns:1fr}.bw-lane+ .bw-lane{border-left:0;border-top:1px solid var(--line);padding-left:0;margin-left:0}
+    .bw-source-rail{grid-template-columns:1fr}.bw-lane+ .bw-lane{border-left:0;border-top:1px solid var(--line);padding-left:0;margin-left:0}.bw-easy-guide{grid-template-columns:1fr}.bw-easy-guide div+div{border-left:0;border-top:1px solid var(--line);padding-left:0}
     .bw-pnl{grid-template-columns:repeat(2,1fr)}.bw-pnl .step{border-bottom:1px solid var(--line)}
     .bw-pnl .step+ .step{padding-left:14px}.bw-grid,.bw-deltas{grid-template-columns:repeat(2,1fr)}
     .bw-grid .t:not(:nth-child(4n+1)),.bw-deltas .d:not(:nth-child(4n+1)){border-left:0;padding-left:0}
     .bw-grid .t:nth-child(even),.bw-deltas .d:nth-child(even){border-left:1px solid var(--line);padding-left:14px}
     .bw-trend-head{grid-template-columns:1fr 1fr}.bw-trend-head>span:first-child{grid-column:1/-1}
+    .bw-verdict{grid-template-columns:1fr}.bw-verdict-copy{grid-template-columns:repeat(3,1fr)}
+    .bw-atlas-group{grid-template-columns:1fr}.bw-atlas-group h3{padding-bottom:8px}.bw-atlas-rows{border-left:0}
+    .bw-atlas-axis{display:none}
+    .bw-metric-row{grid-template-columns:minmax(150px,1.1fr) 120px minmax(260px,1.8fr) 125px 115px;overflow:auto}
+    .bw-report-detail{grid-template-columns:repeat(2,minmax(0,1fr))}.bw-report-value:not(:nth-child(4n+1)){border-left:0;padding-left:0}.bw-report-value:nth-child(even){border-left:1px solid var(--line);padding-left:14px}
   }
-  @media(max-width:560px){.bw-pnl,.bw-grid,.bw-deltas{grid-template-columns:1fr}.bw-pnl .step+ .step,.bw-grid .t:nth-child(even),.bw-deltas .d:nth-child(even){border-left:0;padding-left:0}.bw-trend-head{gap:14px}.bw-bars{gap:4px}.bw-bars .bar i{font-size:8px}.bw-hist{overflow:auto}.bw-hist .hrow{min-width:650px}}
+  @media(max-width:1600px){.bw-hist{overflow-x:auto}.bw-hist .hrow{min-width:1580px}}
+  @media(max-width:560px){.bw-pnl,.bw-grid,.bw-deltas{grid-template-columns:1fr}.bw-pnl .step+ .step,.bw-grid .t:nth-child(even),.bw-deltas .d:nth-child(even){border-left:0;padding-left:0}.bw-trend-head{gap:14px}.bw-bars{gap:4px}.bw-bars .bar i{font-size:8px}.bw-hist{overflow:auto}.bw-hist .hrow{min-width:1450px}.bw-verdict-copy{grid-template-columns:1fr}.bw-metric-row{grid-template-columns:1.2fr .8fr 1fr 1fr}.bw-metric-trend{grid-column:1/-1;grid-row:2;overflow-x:auto}.bw-metric-row svg{height:76px;min-width:720px}.bw-metric-dates{min-width:720px}.bw-report-detail{grid-template-columns:1fr}.bw-report-value:nth-child(even){border-left:0;padding-left:0}.bw-report-tools{align-items:flex-start;flex-direction:column}.bw-report-tools select{width:100%}}
   /* teaser link inside Fundamentals */
   .bw-link{margin-top:14px}
   .bw-link a{display:flex;align-items:baseline;gap:8px;padding:13px 16px;border:1px solid rgba(255,181,71,.35);border-radius:11px;background:rgba(255,181,71,.06);font:800 11.5px var(--mono);color:var(--sub);text-decoration:none;transition:.15s}
@@ -2865,23 +2927,35 @@
 </div>
 
 <div class="card tsec tg-hide" data-tg="biweekly">
-  <h2>Biweekly Operating Report <span class="tag">official post + on-chain check</span></h2>
-  <div class="cap">Two independent reads of progress: the official operating report explains the business, while the treasury wallet shows cash actually landing on-chain. <span id="bwAsOf" class="muted">—</span></div>
+  <h2>Is Variational Getting Bigger and Making More Money? <span class="tag">official report · every 2 weeks</span></h2>
+  <div class="cap">This page keeps every number Variational published. It shows how many people use the exchange, how much they trade, what it costs to run, and how much money is left. <span id="bwAsOf" class="muted">—</span></div>
   <div class="bw full" id="bwBlock">
+    <div class="bw-easy-guide">
+      <div><strong>1. Is it growing?</strong><span>Look at <b>trading volume, open interest, TVL, and users.</b> Bigger numbers usually mean more people and money are using the exchange.</span></div>
+      <div><strong>2. Is it making money?</strong><span>Traders pay spreads. Subtract market-making costs and rewards. What remains is <b>net profit.</b></span></div>
+      <div><strong>3. Is cash really arriving?</strong><span><b>Treasury</b> means real USDC held by the protocol. The on-chain check verifies that wallet separately.</span></div>
+    </div>
     <div class="bw-source-rail">
       <div class="bw-lane"><span class="n">1</span><div><b>Official report</b><span>Metrics copied from Variational's biweekly X post. New posts are appended, never overwritten. <a href="https://x.com/search?q=from%3Avariational_io%20biweekly%20update!&src=typed_query" target="_blank" rel="noopener">Open official post search</a></span></div></div>
       <div class="bw-lane"><span class="n">2</span><div><b>On-chain check</b><span>Six consecutive 14-day treasury inflow windows calculated from the Arbitrum USDC balance history. This updates without waiting for a post.</span></div></div>
     </div>
-    <div class="bw-head first"><b>Latest official 2-week P&amp;L</b><span>what traders paid → what remains after operating costs</span></div>
+    <div class="bw-verdict" id="bwVerdict"></div>
+    <div class="bw-head first"><b>Money Made in the Latest 2 Weeks</b><span>money traders paid → costs → money left over</span></div>
     <div class="bw-pnl" id="bwPnl"></div>
-    <div class="bw-head"><b>Report-over-report change</b><span>8 metrics · previous official post → latest official post</span></div>
+    <div class="bw-head"><b>The 8 Most Important Numbers</b><span>today · change since the first matching report · change since the last report</span></div>
     <div class="bw-deltas" id="bwDeltas"></div>
-    <div class="bw-head"><b>On-chain 14-day momentum</b><span>the answer available before the next official post</span></div>
+    <div class="bw-head"><b>Real Cash Added Every 14 Days</b><span>USDC entering the treasury wallet before the next report arrives</span></div>
     <div class="bw-trend" id="bwTrend"></div>
-    <div class="bw-head"><b>Latest platform snapshot</b><span>all figures from the same official post</span></div>
+    <div class="bw-head"><b>Latest Exchange Snapshot</b><span>all numbers come from the same official report</span></div>
     <div class="bw-grid" id="bwGrid"></div>
-    <div class="bw-head"><b>Official report history</b><span>newest first · fills automatically as posts are appended</span></div>
+    <div class="bw-head"><b>Every Number Over Time</b><span>every dot is a real official report · every published number is kept</span></div>
+    <div class="bw-atlas" id="bwMetricAtlas"></div>
+    <div class="bw-atlas-note"><b>How to read this:</b> Green ↑ means the number went up. Pink ↓ means it went down. Up is not always good: costs and refunds are better when lower. Older reports used “2-week Revenue”; newer reports show trader spreads, costs, and profit separately, so those lines are not mixed.</div>
+    <div class="bw-head"><b>All Official Reports, Side by Side</b><span>newest first · each value includes its change from the previous matching report</span></div>
     <div class="bw-hist" id="bwHist"></div>
+    <div class="bw-head"><b>Open One Complete Report</b><span>choose a date to see every single number published that day</span></div>
+    <div class="bw-report-tools"><label for="bwReportSelect">Official report date</label><select id="bwReportSelect"></select></div>
+    <div class="bw-report-detail" id="bwReportDetail"></div>
     <div class="bw-note" id="bwNote"></div>
   </div>
 </div>
@@ -3299,7 +3373,11 @@ const RAW = [{"d":"2026-01-23","v":0.0},{"d":"2026-01-24","v":23706.33},{"d":"20
 
 /* on-chain live-refresh anchors */
 const CHAIN = {
-  rpc:"https://arbitrum.gateway.tenderly.co",
+  rpcs:[
+    "https://arb1.arbitrum.io/rpc",
+    "https://arbitrum-one-rpc.publicnode.com",
+    "https://arbitrum.gateway.tenderly.co"
+  ],
   usdc:"0xaf88d065e77c8cC2239327C5EDb3A432268e5831",
   pad:"0000000000000000000000005e91b40467fb8902c46a7b6cb90482363188d645",
   olpPad:"00000000000000000000000074bbbb0e7f0bad6938509dd4b556a39a4db1f2cd",
@@ -3325,6 +3403,351 @@ const MKT = {
    the report; older entries unlock report-over-report progress deltas and the history list.
    Past posts can be backfilled the same way. */
 const BIWEEKLY_HISTORY=[
+{
+  asOf:'2025-11-14', src:'https://x.com/search?q=from%3Avariational_io%20biweekly%20update!&src=typed_query',
+  reportFormat:'early-revenue-allocation',
+  reportEra:'pre-treasury · TVL not disclosed · no referral allocation line',
+  totalVolume:44252040160,   // Total Volume Traded
+  oi:385.35e6,              // Current Dual-Sided OI
+  tvl:null,                 // not reported in this post
+  totalTrades:13270043,     // Total trades placed
+  markets:494,              // Total tokens currently listed in this report
+  listingMetric:'tokens',
+  rewardsClaimed:null,      // not reported in this post
+  lossesRefunded:1955410,   // Total losses refunded (lifetime)
+  lossRefundRate:2.3,       // percent of platform losses refunded since implementation
+  referralClaimed:null,     // not reported in this post
+  dau:3861,                 // Daily active users, avg over past week
+  wau:8054,                 // Weekly active users
+  revenue2w:1044461,        // 2w revenue in this report format
+  avgDailyRevenue:null,     // not reported in this post
+  spreads2w:null,           // not reported as spreads in this post format
+  mmCosts2w:null,           // not reported in this post format
+  netRevenue2w:null,        // not reported in this post format
+  rewards2w:null,           // not reported as one combined line
+  olpAllocation2w:636462,   // revenue directed to OLP
+  lossRefundPool2w:407999,  // revenue directed to loss refund pool
+  referralRewardsPool2w:null, // no referral allocation line reported
+  netProfit2w:null,         // not reported in this post format
+  treasury2w:null,          // protocol treasury allocation not yet reported
+  treasuryStatus:'pre-treasury reporting era',
+  olpPnl2w:null,            // not reported for this window
+  olpPnlLife:6004900,       // total OLP PnL
+  treasuryHoldings:null     // not reported in the supplied post
+},
+{
+  asOf:'2025-11-28', src:'https://x.com/search?q=from%3Avariational_io%20biweekly%20update!&src=typed_query',
+  reportFormat:'early-revenue-allocation',
+  reportEra:'pre-treasury · TVL not disclosed',
+  totalVolume:61054525224,   // Total Volume Traded
+  oi:387.88e6,              // Current Dual-Sided OI
+  tvl:null,                 // not reported in this post
+  totalTrades:23439493,     // Total trades placed
+  markets:489,              // Total tokens currently listed in this report
+  listingMetric:'tokens',
+  rewardsClaimed:null,      // not reported in this post
+  lossesRefunded:2549095,   // Total losses refunded (lifetime)
+  lossRefundRate:2.15,      // percent of platform losses refunded since implementation
+  referralClaimed:null,     // not reported in this post
+  dau:5003,                 // Daily active users, avg over past week
+  wau:12136,                // Weekly active users
+  revenue2w:1498692,        // 2w revenue in this report format
+  avgDailyRevenue:null,     // not reported in this post
+  spreads2w:null,           // not reported as spreads in this post format
+  mmCosts2w:null,           // not reported in this post format
+  netRevenue2w:null,        // not reported in this post format
+  rewards2w:null,           // not reported as one combined line
+  olpAllocation2w:986035,   // revenue directed to OLP
+  lossRefundPool2w:303886,  // revenue directed to loss refund pool
+  referralRewardsPool2w:208771,
+  referralBackfillExcluded:1.1e6, // approximate backfill excluded from reported allocation
+  netProfit2w:null,         // not reported in this post format
+  treasury2w:null,          // protocol treasury allocation not yet reported
+  treasuryStatus:'pre-treasury reporting era',
+  olpPnl2w:null,            // not reported for this window
+  olpPnlLife:6990935,       // total OLP PnL
+  treasuryHoldings:null     // not reported in the supplied post
+},
+{
+  asOf:'2025-12-12', src:'https://x.com/search?q=from%3Avariational_io%20biweekly%20update!&src=typed_query',
+  reportFormat:'early-revenue-allocation',
+  reportEra:'pre-treasury · TVL not disclosed',
+  totalVolume:79363450016,   // Total Volume Traded
+  oi:351.07e6,              // Current Dual-Sided OI
+  tvl:null,                 // not reported in this post
+  totalTrades:39050893,     // Total trades placed
+  markets:485,              // Total tokens currently listed in this report
+  listingMetric:'tokens',
+  rewardsClaimed:3706514,   // Total rewards claimed (lifetime)
+  lossesRefunded:2550044,   // Total losses refunded (lifetime)
+  referralClaimed:1156470,  // Total referral rewards claimed (lifetime)
+  dau:4403,                 // Daily active users, avg over past week
+  wau:10280,                // Weekly active users
+  revenue2w:717249,         // 2w revenue in this report format
+  avgDailyRevenue:null,     // not reported in this post
+  spreads2w:null,           // not reported as spreads in this post format
+  mmCosts2w:null,           // not reported in this post format
+  netRevenue2w:null,        // not reported in this post format
+  rewards2w:null,           // not reported as one combined line
+  olpAllocation2w:349246,   // revenue directed to OLP
+  lossRefundPool2w:221668,  // excludes the manual deposit below
+  lossRefundManualDepositExcluded:100000,
+  referralRewardsPool2w:146335,
+  referralRewardsStatus:'paused for maintenance since 2025-12-05',
+  netProfit2w:null,         // not reported in this post format
+  treasury2w:null,          // protocol treasury allocation not yet reported
+  treasuryStatus:'pre-treasury reporting era',
+  olpPnl2w:null,            // not reported for this window
+  olpPnlLife:7340181,       // total OLP PnL
+  treasuryHoldings:null     // not reported in the supplied post
+},
+{
+  asOf:'2025-12-26', src:'https://x.com/search?q=from%3Avariational_io%20biweekly%20update!&src=typed_query',
+  reportFormat:'early-revenue-allocation',
+  reportEra:'pre-treasury · TVL not disclosed',
+  totalVolume:94062871527,   // Total Volume Traded
+  oi:491.75e6,              // Current Dual-Sided OI
+  tvl:null,                 // not reported in this post
+  totalTrades:48013576,     // Total trades placed
+  markets:483,              // Total tokens currently listed in this report
+  listingMetric:'tokens',
+  rewardsClaimed:4117885,   // Total rewards claimed (lifetime)
+  lossesRefunded:2777658,   // Total losses refunded (lifetime)
+  referralClaimed:1340227,  // Total referral rewards claimed (lifetime)
+  dau:5433,                 // Daily active users, avg over past week
+  wau:11763,                // Weekly active users
+  revenue2w:515800,         // 2w revenue in this report format
+  avgDailyRevenue:null,     // not reported in this post
+  spreads2w:null,           // not reported as spreads in this post format
+  mmCosts2w:null,           // not reported in this post format
+  netRevenue2w:null,        // not reported in this post format
+  rewards2w:null,           // not reported as one combined line
+  olpAllocation2w:265544,   // revenue directed to OLP
+  lossRefundPool2w:162361,  // revenue directed to loss refund pool
+  referralRewardsPool2w:87895, // revenue directed to referral rewards pool
+  netProfit2w:null,         // not reported in this post format
+  treasury2w:null,          // protocol treasury allocation not yet reported
+  treasuryStatus:'pre-treasury reporting era',
+  olpPnl2w:null,            // not reported for this window
+  olpPnlLife:7605725,       // total OLP PnL
+  treasuryHoldings:null     // not reported in the supplied post
+},
+{
+  asOf:'2026-01-09', src:'https://x.com/search?q=from%3Avariational_io%20biweekly%20update!&src=typed_query',
+  reportFormat:'revenue-allocation',
+  totalVolume:113.95e9,      // Total Volume Traded
+  oi:1.03e9,                // Current Dual-Sided OI
+  tvl:119.62e6,             // TVL (excludes some OLP hedging accounts)
+  tvlScope:'excludes some OLP hedging accounts',
+  markets:487,              // Total tokens currently listed in this report
+  listingMetric:'tokens',
+  rewardsClaimed:4526173,   // Total rewards claimed (lifetime)
+  lossesRefunded:3050594,   // Total losses refunded (lifetime)
+  referralClaimed:1475579,  // Total referral rewards claimed (lifetime)
+  dau:10906,                // Daily active users, avg over past week
+  wau:22830,                // Weekly active users
+  revenue2w:1700724,        // 2w revenue in this report format
+  avgDailyRevenue:121480,   // average daily revenue
+  spreads2w:null,           // not reported as spreads in this post format
+  mmCosts2w:null,           // not reported in this post format
+  netRevenue2w:null,        // not reported in this post format
+  rewards2w:null,           // not reported as one combined line
+  olpAllocation2w:1160534,  // revenue directed to OLP
+  lossRefundPool2w:367214,  // revenue directed to loss refund pool
+  referralRewardsPool2w:172976, // revenue directed to referral rewards pool
+  netProfit2w:null,         // not reported in this post format
+  treasury2w:null,          // protocol treasury allocation not yet reported
+  treasuryStatus:'not yet reported',
+  olpPnl2w:null,            // not reported for this window
+  olpPnlLife:8766259,       // total OLP PnL
+  treasuryHoldings:null     // not reported in the supplied post
+},
+{
+  asOf:'2026-01-23', src:'https://x.com/search?q=from%3Avariational_io%20biweekly%20update!&src=typed_query',
+  reportFormat:'revenue-allocation',
+  totalVolume:136.25e9,      // Total Volume Traded
+  oi:1.09e9,                // Current Dual-Sided OI
+  tvl:133.81e6,             // TVL (excludes some OLP hedging accounts)
+  tvlScope:'excludes some OLP hedging accounts',
+  markets:492,              // Total tokens currently listed in this report
+  listingMetric:'tokens',
+  rewardsClaimed:5378024,   // Total rewards claimed (lifetime)
+  lossesRefunded:3671444,   // Total losses refunded (lifetime)
+  referralClaimed:1706580,  // Total referral rewards claimed (lifetime)
+  dau:14016,                // Daily active users, avg over past week
+  wau:28017,                // Weekly active users
+  revenue2w:2729731,        // 2w revenue in this report format
+  avgDailyRevenue:194981,   // average daily revenue
+  spreads2w:null,           // not reported as spreads in this post format
+  mmCosts2w:null,           // not reported in this post format
+  netRevenue2w:null,        // not reported in this post format
+  rewards2w:null,           // not reported as one combined line
+  olpAllocation2w:2034390,  // revenue directed to OLP
+  lossRefundPool2w:457079,  // revenue directed to loss refund pool
+  referralRewardsPool2w:220806, // revenue directed to referral rewards pool
+  netProfit2w:null,         // not reported in this post format
+  treasury2w:17456,         // test treasury allocation reported in the post
+  treasuryStatus:'experimental · deployed one day earlier · numbers under construction',
+  olpPnl2w:null,            // not reported for this window
+  olpPnlLife:10800649,      // total OLP PnL
+  treasuryHoldings:null     // not reported in the supplied post
+},
+{
+  asOf:'2026-02-06', src:'https://x.com/search?q=from%3Avariational_io%20biweekly%20update!&src=typed_query',
+  reportFormat:'revenue-allocation',
+  totalVolume:151.54e9,      // Total Volume Traded
+  oi:590.76e6,              // Current Dual-Sided OI
+  tvl:110.19e6,             // TVL (excludes some OLP hedging accounts)
+  tvlScope:'excludes some OLP hedging accounts',
+  markets:477,              // Total tokens currently listed in this report
+  listingMetric:'tokens',
+  rewardsClaimed:5869951,   // Total rewards claimed (lifetime)
+  lossesRefunded:4013508,   // Total losses refunded (lifetime)
+  referralClaimed:1856443,  // Total referral rewards claimed (lifetime)
+  dau:11504,                // Daily active users, avg over past week
+  wau:22380,                // Weekly active users
+  revenue2w:1732280,        // 2w revenue in this report format
+  avgDailyRevenue:123734,   // average daily revenue
+  spreads2w:null,           // not reported as spreads in this post format
+  mmCosts2w:null,           // not reported in this post format
+  netRevenue2w:null,        // not reported in this post format
+  rewards2w:null,           // not reported as one combined line
+  olpAllocation2w:927837,   // revenue directed to OLP
+  lossRefundPool2w:324614,  // revenue directed to loss refund pool
+  referralRewardsPool2w:155215, // revenue directed to referral rewards pool
+  netProfit2w:null,         // not reported in this post format
+  treasury2w:324614,        // revenue directed to protocol treasury
+  olpPnl2w:null,            // not reported for this window
+  olpPnlLife:11728486,      // total OLP PnL
+  treasuryHoldings:null     // not reported in the supplied post
+},
+{
+  asOf:'2026-02-20', src:'https://x.com/search?q=from%3Avariational_io%20biweekly%20update!&src=typed_query',
+  reportFormat:'net-revenue-allocation',
+  totalVolume:163.58e9,      // Total Volume Traded
+  oi:706.93e6,              // Current Dual-Sided OI
+  tvl:106.10e6,             // TVL (excludes some OLP hedging accounts)
+  tvlScope:'excludes some OLP hedging accounts',
+  markets:469,              // Total tokens currently listed in this report
+  listingMetric:'tokens',
+  rewardsClaimed:6119773,   // Total rewards claimed (lifetime)
+  lossesRefunded:4180266,   // Total losses refunded (lifetime)
+  referralClaimed:1939507,  // Total referral rewards claimed (lifetime)
+  dau:7723,                 // Daily active users, avg over past week
+  wau:15133,                // Weekly active users
+  spreads2w:null,           // not reported in this post format
+  mmCosts2w:null,           // not reported in this post format
+  netRevenue2w:38966,       // 2w net revenue
+  avgDailyNetRevenue:2783,  // average daily net revenue
+  rewards2w:null,           // not reported as one combined line
+  lossRefundPool2w:168634,  // revenue directed to loss refund pool
+  referralRewardsPool2w:81297, // revenue directed to referral rewards pool
+  netProfit2w:null,         // not reported in this post format
+  treasury2w:168634,        // revenue directed to protocol treasury
+  olpPnl2w:-379599,         // 2w OLP loss
+  olpPnlLife:11348887,      // total OLP PnL
+  treasuryHoldings:null     // not reported in the supplied post
+},
+{
+  asOf:'2026-03-06', src:'https://x.com/search?q=from%3Avariational_io%20biweekly%20update!&src=typed_query',
+  totalVolume:178.52e9,      // Total Volume Traded
+  oi:673.07e6,              // Current Dual-Sided OI
+  tvl:106.88e6,             // TVL (excludes some OLP hedging accounts)
+  tvlScope:'excludes some OLP hedging accounts',
+  markets:470,              // Total tokens currently listed in this report
+  listingMetric:'tokens',
+  rewardsClaimed:6392067,   // Total rewards claimed (lifetime)
+  lossesRefunded:4381625,   // Total losses refunded (lifetime)
+  referralClaimed:2010442,  // Total referral rewards claimed (lifetime)
+  dau:10954,                // Daily active users, avg over past week
+  wau:19071,                // Weekly active users
+  spreads2w:1758330,        // 2w spreads paid (gross revenue)
+  mmCosts2w:1140903,        // 2w market making costs (cost of revenue)
+  netRevenue2w:617427,      // 2w net revenue
+  rewards2w:260884,         // total 2w rewards
+  lossRefunds2w:175833,     // 2w loss refunds
+  referralRewards2w:85051,  // 2w referral rewards
+  netProfit2w:356543,       // 2w net profit
+  treasury2w:175833,        // 2w protocol treasury inflow
+  olpPnl2w:180710,          // 2w OLP PnL
+  olpPnlLife:11529597,      // lifetime OLP PnL
+  treasuryHoldings:null     // not reported in the supplied post
+},
+{
+  asOf:'2026-03-20', src:'https://x.com/search?q=from%3Avariational_io%20biweekly%20update!&src=typed_query',
+  totalVolume:189.27e9,      // Total Volume Traded
+  oi:746.87e6,              // Current Dual-Sided OI
+  tvl:111.90e6,             // TVL (excludes some OLP hedging accounts)
+  tvlScope:'excludes some OLP hedging accounts',
+  markets:467,              // Total tokens currently listed in this report
+  listingMetric:'tokens',
+  rewardsClaimed:6653401,   // Total rewards claimed (lifetime)
+  lossesRefunded:4559196,   // Total losses refunded (lifetime)
+  referralClaimed:2094205,  // Total referral rewards claimed (lifetime)
+  dau:11352,                // Daily active users, avg over past week
+  wau:19381,                // Weekly active users
+  spreads2w:1763330,        // 2w spreads paid (gross revenue)
+  mmCosts2w:755767,         // 2w market making costs (cost of revenue)
+  netRevenue2w:1007563,     // 2w net revenue
+  rewards2w:262014,         // total 2w rewards
+  lossRefunds2w:176333,     // 2w loss refunds
+  referralRewards2w:85681,  // 2w referral rewards
+  netProfit2w:745549,       // 2w net profit
+  treasury2w:176333,        // 2w protocol treasury inflow
+  olpPnl2w:569216,          // 2w OLP PnL
+  olpPnlLife:12098813,      // lifetime OLP PnL
+  treasuryHoldings:null     // not reported in the supplied post
+},
+{
+  asOf:'2026-04-03', src:'https://x.com/search?q=from%3Avariational_io%20biweekly%20update!&src=typed_query',
+  totalVolume:197.28e9,      // Total Volume Traded
+  oi:637.77e6,              // Current Dual-Sided OI
+  tvl:108.52e6,             // TVL (excludes some OLP hedging accounts)
+  tvlScope:'excludes some OLP hedging accounts',
+  markets:462,              // Total tokens currently listed in this report
+  listingMetric:'tokens',
+  rewardsClaimed:6728461,   // Total rewards claimed (lifetime)
+  lossesRefunded:4559196,   // Total losses refunded (Sunset)
+  referralClaimed:2169265,  // Total referral rewards claimed (lifetime)
+  dau:10243,                // Daily active users, avg over past week
+  wau:16902,                // Weekly active users
+  spreads2w:1556120,        // 2w spreads paid (gross revenue)
+  mmCosts2w:717916,         // 2w market making costs (cost of revenue)
+  netRevenue2w:838204,      // 2w net revenue
+  rewards2w:122261,         // total 2w rewards
+  lossRefunds2w:47134,      // 2w loss refunds (Sunset)
+  referralRewards2w:75127,  // 2w referral rewards
+  netProfit2w:715943,       // 2w net profit
+  treasury2w:263048,        // 2w protocol treasury inflow
+  olpPnl2w:452895,          // 2w OLP PnL
+  olpPnlLife:12551708,      // lifetime OLP PnL
+  treasuryHoldings:null     // not reported in the supplied post
+},
+{
+  asOf:'2026-04-17', src:'https://x.com/search?q=from%3Avariational_io%20biweekly%20update!&src=typed_query',
+  totalVolume:204.20e9,      // Total Volume Traded
+  oi:733.95e6,              // Current Dual-Sided OI
+  tvl:113.67e6,             // TVL (excludes some OLP hedging accounts)
+  tvlScope:'excludes some OLP hedging accounts',
+  markets:459,              // Total tokens currently listed in this report
+  listingMetric:'tokens',
+  rewardsClaimed:6799825,   // Total rewards claimed (lifetime)
+  lossesRefunded:4559196,   // Total losses refunded (Sunset)
+  referralClaimed:2240629,  // Total referral rewards claimed (lifetime)
+  dau:8259,                 // Daily active users, avg over past week
+  wau:15013,                // Weekly active users
+  spreads2w:1563380,        // 2w spreads paid (gross revenue)
+  mmCosts2w:966025,         // 2w market making costs (cost of revenue)
+  netRevenue2w:597355,      // 2w net revenue
+  rewards2w:75856,          // 2w rewards (all referral rewards in this report)
+  referralRewards2w:75856,  // 2w referral rewards
+  netProfit2w:521499,       // 2w net profit
+  treasury2w:312676,        // 2w protocol treasury inflow
+  olpPnl2w:208823,          // 2w OLP PnL
+  olpPnlLife:12760531,      // lifetime OLP PnL
+  treasuryHoldings:1445862, // total on-chain protocol treasury value
+  treasuryHoldingsLabel:'total on-chain protocol treasury value'
+},
 {
   asOf:'2026-05-01', src:'https://x.com/search?q=from%3Avariational_io%20biweekly%20update!&src=typed_query',
   totalVolume:211.19e9,      // Total Volume Traded
@@ -3677,6 +4100,18 @@ function feeRevenueHistory(){
 
 /* ---------- data prep: dedupe by date, keep last ---------- */
 let SERIES = (()=>{ const m=new Map(); RAW.forEach(r=>m.set(r.d,r.v)); return [...m].map(([d,v])=>({d,v})).sort((a,b)=>a.d<b.d?-1:1); })();
+const LIVE_SERIES_KEY='variationalTreasuryDailyCacheV1';
+try{
+  const cached=JSON.parse(localStorage.getItem(LIVE_SERIES_KEY)||'[]');
+  if(Array.isArray(cached)){
+    const merged=new Map(SERIES.map(x=>[x.d,x.v]));
+    cached.forEach(x=>{if(/^\d{4}-\d{2}-\d{2}$/.test(x?.d)&&Number.isFinite(+x?.v))merged.set(x.d,+x.v);});
+    SERIES=[...merged].map(([d,v])=>({d,v})).sort((a,b)=>a.d<b.d?-1:1);
+  }
+}catch(_){ }
+function persistLiveSeries(){
+  try{localStorage.setItem(LIVE_SERIES_KEY,JSON.stringify(SERIES.slice(-220)));}catch(_){ }
+}
 /* real daily open-interest history (DeFiLlama /summary/open-interest/variational) */
 const OI_HIST = [["2026-01-20",1010898040],["2026-01-21",1025281121],["2026-01-22",1062988512],["2026-01-23",1087239734],["2026-01-24",1112231599],["2026-01-25",1005131096],["2026-01-26",1064748194],["2026-01-27",1080222758],["2026-01-28",1113813695],["2026-01-29",984747821],["2026-01-30",931056969],["2026-01-31",770839703],["2026-02-01",734124210],["2026-02-02",765433172],["2026-02-03",745387666],["2026-02-04",720028892],["2026-02-05",540104191],["2026-02-06",560070011],["2026-02-07",584036388],["2026-02-08",611281745],["2026-02-09",655653428],["2026-02-10",644198539],["2026-02-11",641144646],["2026-02-12",604499908],["2026-02-13",647725796],["2026-02-14",689330657],["2026-02-15",636532341],["2026-02-16",672558839],["2026-02-17",699578282],["2026-02-18",683954859],["2026-02-19",690989110],["2026-02-20",695480248],["2026-02-21",710258454],["2026-02-22",712638927],["2026-02-23",658054176],["2026-02-24",608880664],["2026-02-25",654813409],["2026-02-26",664840622],["2026-02-27",669333377],["2026-02-28",667891590],["2026-03-01",710122232],["2026-03-02",706232117],["2026-03-03",697999233],["2026-03-04",764017364],["2026-03-05",735607841],["2026-03-06",672711462],["2026-03-07",678661039],["2026-03-08",660695120],["2026-03-09",739876788],["2026-03-10",753536963],["2026-03-11",775988528],["2026-03-12",789995939],["2026-03-13",796108195],["2026-03-14",852161852],["2026-03-15",879948945],["2026-03-16",862792908],["2026-03-17",856503479],["2026-03-18",794389289],["2026-03-19",749475211],["2026-03-20",763383942],["2026-03-21",734364089],["2026-03-22",709114714],["2026-03-23",705786258],["2026-03-24",735130439],["2026-03-25",728993366],["2026-03-26",697784838],["2026-03-27",688646910],["2026-03-28",682107168],["2026-03-29",671754783],["2026-03-30",686664795],["2026-03-31",694043577],["2026-04-01",676922296],["2026-04-02",641190200],["2026-04-03",645655020],["2026-04-04",638783377],["2026-04-05",651626558],["2026-04-06",664120764],["2026-04-07",663909436],["2026-04-08",646511341],["2026-04-09",666513956],["2026-04-10",718925868],["2026-04-11",708913878],["2026-04-12",655084003],["2026-04-13",726443173],["2026-04-14",697132300],["2026-04-15",682687923],["2026-04-16",674659447],["2026-04-17",703615776],["2026-04-18",660768940],["2026-04-19",602175881],["2026-04-20",638740112],["2026-04-21",650424374],["2026-04-22",670064023],["2026-04-23",679365739],["2026-04-24",669605385],["2026-04-25",679033408],["2026-04-26",691466117],["2026-04-27",663402485],["2026-04-28",678809512],["2026-04-29",645081949],["2026-04-30",664863541],["2026-05-01",698994239],["2026-05-02",696746883],["2026-05-03",705798001],["2026-05-04",723114060],["2026-05-05",759586247],["2026-05-06",766983192],["2026-05-07",738588447],["2026-05-08",761335934],["2026-05-09",783139969],["2026-05-10",791946285],["2026-05-11",803612278],["2026-05-12",804778674],["2026-05-13",749120720],["2026-05-14",826510916],["2026-05-15",734472038],["2026-05-16",750171714],["2026-05-17",730190348],["2026-05-18",741492240],["2026-05-19",763056302],["2026-05-20",804463658],["2026-05-21",900390296],["2026-05-22",895545947],["2026-05-23",930577815],["2026-05-24",963972743],["2026-05-25",1014869235],["2026-05-26",1005683127],["2026-05-27",953107269],["2026-05-28",952920182],["2026-05-29",1015023614],["2026-05-30",1067011946],["2026-05-31",1081846651],["2026-06-01",1087532926],["2026-06-02",958834540],["2026-06-03",974061275],["2026-06-04",837416037],["2026-06-05",754712005],["2026-06-06",809369591],["2026-06-07",846236759],["2026-06-08",846849465],["2026-06-09",833517549],["2026-06-10",798422710],["2026-06-11",852033529],["2026-06-12",857977989],["2026-06-13",904058197],["2026-06-14",933176673],["2026-06-15",973277657],["2026-06-16",991898261],["2026-06-17",927020720],["2026-06-18",957878127],["2026-06-19",1026646611],["2026-06-20",1080414644],["2026-06-21",1062301467],["2026-06-22",1079830140],["2026-06-23",1056466147],["2026-06-24",1007548046],["2026-06-25",992125325],["2026-06-26",1024008706],["2026-06-27",1021492989],["2026-06-28",1022809618],["2026-06-29",1107185266],["2026-06-30",1145380004],["2026-07-01",1034314261],["2026-07-02",1065730866],["2026-07-03",1140427145],["2026-07-04",1173878655],["2026-07-05",1176041333],["2026-07-06",1196130542],["2026-07-07",1173801147],["2026-07-08",1173970756]];
 const _OIMAP=(()=>{const m=new Map();OI_HIST.forEach(([d,v])=>m.set(d,v));return m;})();
@@ -4245,40 +4680,97 @@ function renderMath(){
   $('#mqOiFee').textContent='$'+fmtK(e.oiPerDayRev*s);
   $('#mqOiBurn').textContent='$'+fmtK(e.oiPerDayRev/b);
 }
+const BW_METRIC_DEFS=[
+  {g:'Exchange size',k:'totalVolume',l:'All trading ever (total volume)',t:'usd'},
+  {g:'Exchange size',k:'oi',l:'Money in open trades (open interest)',t:'usd'},
+  {g:'Exchange size',k:'tvl',l:'Money deposited in the system (TVL)',t:'usd'},
+  {g:'Exchange size',k:'markets',l:'Markets people can trade',t:'int'},
+  {g:'Exchange size',k:'totalTrades',l:'Number of trades placed',t:'int'},
+  {g:'People',k:'dau',l:'People using it each day (7-day average)',t:'int'},
+  {g:'People',k:'wau',l:'People using it each week',t:'int'},
+  {g:'Money and costs',k:'revenue2w',l:'Older 2-week revenue number',t:'usd'},
+  {g:'Money and costs',k:'avgDailyRevenue',l:'Older average revenue per day',t:'usd'},
+  {g:'Money and costs',k:'spreads2w',l:'Money paid by traders in 2 weeks (spreads)',t:'usd'},
+  {g:'Money and costs',k:'mmCosts2w',l:'Cost of running the market for 2 weeks',t:'usd'},
+  {g:'Money and costs',k:'netRevenue2w',l:'Money after market-making costs',t:'usd'},
+  {g:'Money and costs',k:'avgDailyNetRevenue',l:'Average money left per day',t:'usd'},
+  {g:'Money and costs',k:'rewards2w',l:'Rewards paid during the 2 weeks',t:'usd'},
+  {g:'Money and costs',k:'lossRefunds2w',l:'Trading losses refunded during the 2 weeks',t:'usd'},
+  {g:'Money and costs',k:'referralRewards2w',l:'Referral rewards paid during the 2 weeks',t:'usd'},
+  {g:'Money and costs',k:'netProfit2w',l:'Money left after every listed cost (net profit)',t:'usd'},
+  {g:'Money and costs',k:'treasury2w',l:'Money sent to the treasury in 2 weeks',t:'usd'},
+  {g:'Money and costs',k:'olpPnl2w',l:'OLP liquidity-provider profit in 2 weeks',t:'usd'},
+  {g:'Money and costs',k:'olpPnlLife',l:'OLP liquidity-provider profit since launch',t:'usd'},
+  {g:'Money and costs',k:'treasuryHoldings',l:'Real USDC currently held by the treasury',t:'usd'},
+  {g:'Rewards and refunds',k:'rewardsClaimed',l:'All rewards users have claimed',t:'usd'},
+  {g:'Rewards and refunds',k:'lossesRefunded',l:'All trading losses paid back to users',t:'usd'},
+  {g:'Rewards and refunds',k:'lossRefundRate',l:'Share of platform losses paid back',t:'pct'},
+  {g:'Rewards and refunds',k:'referralClaimed',l:'All referral rewards users have claimed',t:'usd'},
+  {g:'Rewards and refunds',k:'olpAllocation2w',l:'Money sent to OLP liquidity providers',t:'usd'},
+  {g:'Rewards and refunds',k:'lossRefundPool2w',l:'Money set aside to repay trading losses',t:'usd'},
+  {g:'Rewards and refunds',k:'referralRewardsPool2w',l:'Money set aside for referral rewards',t:'usd'},
+  {g:'Special notes',k:'lossRefundManualDepositExcluded',l:'Extra manual refund deposit not counted',t:'usd'},
+  {g:'Special notes',k:'referralBackfillExcluded',l:'Older referral payment not counted (about)',t:'usd'}
+];
+const BW_CORE_KEYS=['totalVolume','oi','tvl','dau','wau','netProfit2w','olpPnlLife','treasuryHoldings'];
 function renderBiweekly(){
   if(!$('#bwBlock'))return;
-  const B=BIWEEKLY, M=v=>'$'+(v>=1e9?(v/1e9).toFixed(2)+'B':v>=1e6?(v/1e6).toFixed(2)+'M':fmtK(v));
+  const B=BIWEEKLY, M=v=>Number.isFinite(v)?'$'+(v>=1e9?(v/1e9).toFixed(2)+'B':v>=1e6?(v/1e6).toFixed(2)+'M':fmtK(v)):'—';
+  const fmtMetric=(d,v)=>!Number.isFinite(v)?'—':d.t==='int'?Math.round(v).toLocaleString():d.t==='pct'?v.toFixed(2)+'%':M(v);
+  const pctChange=(a,b)=>Number.isFinite(a)&&Number.isFinite(b)&&a!==0?(b/a-1)*100:null;
+  const signed=p=>p==null?'—':(p>=0?'+':'')+p.toFixed(1)+'%';
+  const pointsFor=k=>BIWEEKLY_HISTORY.map((r,i)=>({r,i,v:r[k]})).filter(x=>Number.isFinite(x.v));
+  const spark=pts=>{
+    if(pts.length<2)return '';
+    const W=170,H=34,P=2, vals=pts.map(x=>x.v), lo=Math.min(...vals), hi=Math.max(...vals), span=hi-lo||1;
+    const xy=vals.map((v,i)=>[P+(W-P*2)*(i/(vals.length-1)),H-P-(H-P*2)*((v-lo)/span)]);
+    const path=xy.map((p,i)=>(i?'L':'M')+p[0].toFixed(1)+' '+p[1].toFixed(1)).join(' '), end=xy[xy.length-1];
+    return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-hidden="true"><path d="${path}" fill="none" stroke="var(--cyan)" stroke-width="2" vector-effect="non-scaling-stroke"/><circle cx="${end[0]}" cy="${end[1]}" r="2.5" fill="var(--grn)"/></svg>`;
+  };
+  const datedSpark=(pts,d)=>{
+    if(pts.length<2)return '<span class="muted">Only one official report</span>';
+    const W=720,H=86,PX=12,top=25,bottom=9,vals=pts.map(x=>x.v),lo=Math.min(...vals),hi=Math.max(...vals),span=hi-lo||1;
+    const xy=vals.map((v,i)=>[PX+(W-PX*2)*(i/(vals.length-1)),H-bottom-(H-top-bottom)*((v-lo)/span)]);
+    const path=xy.map((p,i)=>(i?'L':'M')+p[0].toFixed(1)+' '+p[1].toFixed(1)).join(' ');
+    const dots=xy.map((p,i)=>`<circle cx="${p[0]}" cy="${p[1]}" r="${i===xy.length-1?4:2.5}" fill="${i===xy.length-1?'var(--grn)':'var(--cyan)'}"><title>${pts[i].r.asOf} · ${fmtMetric(d,pts[i].v)}</title></circle>`).join('');
+    const labels=xy.map((p,i)=>{const y=Math.max(10,p[1]-7-(i%2)*7);return `<text class="bw-point-value" x="${p[0]}" y="${y}" text-anchor="start" transform="rotate(-32 ${p[0]} ${y})">${fmtMetric(d,pts[i].v)}</text>`}).join('');
+    const mid=pts[Math.floor((pts.length-1)/2)];
+    return `<div class="bw-metric-trend"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${d.l} by official report date"><path d="${path}" fill="none" stroke="var(--cyan)" stroke-width="2.5" vector-effect="non-scaling-stroke"/>${dots}${labels}</svg><div class="bw-metric-dates"><span>${pts[0].r.asOf}</span><span>${mid.r.asOf}</span><span>${pts[pts.length-1].r.asOf}</span></div></div>`;
+  };
   $('#bwAsOf').textContent='2-week window · posted '+B.asOf;
   const margin=B.netProfit2w/B.spreads2w*100;
   const M0=v=>'$'+(v>=1e6?(v/1e6).toFixed(2)+'M':fmtK(v));
   $('#bwTeaser') && ($('#bwTeaser').textContent=M0(B.netProfit2w)+' / 2w');
   $('#bwPnl').innerHTML=
-    `<div class="step"><span>Spreads paid · gross revenue</span><b>${M(B.spreads2w)}</b><small>what traders paid in 2 weeks</small></div>`+
-    `<div class="step neg"><span>Market making costs</span><b>-${M(B.mmCosts2w)}</b><small>cost of revenue</small></div>`+
-    `<div class="step"><span>Net revenue</span><b>${M(B.netRevenue2w)}</b><small>spreads minus MM costs</small></div>`+
-    `<div class="step neg"><span>Rewards</span><b>-${M(B.rewards2w)}</b><small>incl. referral rewards</small></div>`+
-    `<div class="step pos"><span>Net profit · 2 weeks</span><b>${M(B.netProfit2w)}</b><small>${margin.toFixed(0)}% margin on spreads</small></div>`;
+    `<div class="step"><span>1 · Money paid by traders</span><b>${M(B.spreads2w)}</b><small>spread payments during these 2 weeks</small></div>`+
+    `<div class="step neg"><span>2 · Cost to run the market</span><b>-${M(B.mmCosts2w)}</b><small>market-making cost</small></div>`+
+    `<div class="step"><span>3 · Money after market cost</span><b>${M(B.netRevenue2w)}</b><small>called net revenue</small></div>`+
+    `<div class="step neg"><span>4 · Rewards paid to users</span><b>-${M(B.rewards2w)}</b><small>includes referral rewards</small></div>`+
+    `<div class="step pos"><span>5 · Final money left over</span><b>${M(B.netProfit2w)}</b><small>net profit · ${margin.toFixed(0)} cents kept per $1 of spread payments</small></div>`;
   $('#bwGrid').innerHTML=[
     ['TVL (ex-hedging)',M(B.tvl)],['Dual-sided OI',M(B.oi)],['Total volume traded',M(B.totalVolume)],
     ['Markets listed',B.markets.toLocaleString()],['DAU (7d avg)',B.dau.toLocaleString()],['WAU',B.wau.toLocaleString()],
     ['2w treasury inflow',M(B.treasury2w)],['2w OLP PnL',M(B.olpPnl2w)],['Lifetime OLP PnL',M(B.olpPnlLife)],
     ['Treasury holdings',M(B.treasuryHoldings)],['Rewards claimed · life',M(B.rewardsClaimed)],['Losses refunded · Sunset',M(B.lossesRefunded)]
   ].map(([k,v])=>`<div class="t">${k}<b>${v}</b></div>`).join('');
-  /* progress vs the previous official post (unlocks at 2+ stored posts) */
+  /* long-run direction + latest report-over-report core scorecard */
   const H=BIWEEKLY_HISTORY, prev=H.length>1?H[H.length-2]:null;
+  const core=BW_CORE_KEYS.map(k=>{
+    const d=BW_METRIC_DEFS.find(x=>x.k===k), pts=pointsFor(k), first=pts[0], last=pts[pts.length-1], prior=pts[pts.length-2];
+    return {d,pts,first,last,prior,long:first&&last?pctChange(first.v,last.v):null,recent:prior&&last?pctChange(prior.v,last.v):null};
+  }).filter(x=>x.last);
+  const longUp=core.filter(x=>x.long>0).length, recentUp=core.filter(x=>x.recent>0).length;
+  const recentDown=core.filter(x=>x.recent<0).map(x=>x.d.l.replace(/ ·.*/,''));
+  const volumeCore=core.find(x=>x.d.k==='totalVolume'), profitCore=core.find(x=>x.d.k==='netProfit2w');
+  if($('#bwVerdict'))$('#bwVerdict').innerHTML=
+    `<div class="bw-verdict-score"><span>Long-run direction check</span><strong>${longUp}/${core.length}</strong><b>core metrics are above their first comparable official report</b></div>`+
+    `<div class="bw-verdict-copy"><div><span>Exchange scale</span><b>${signed(volumeCore?.long)}</b><small>Total volume since ${volumeCore?.first?.r.asOf||'first report'}</small></div>`+
+    `<div><span>Latest pulse</span><b>${recentUp}/${core.length} rose</b><small>vs ${prev?.asOf||'previous report'}</small></div>`+
+    `<div><span>Current watchlist</span><b>${recentDown.length?recentDown.join(' · '):'No core declines'}</b><small>${recentDown.length?'fell in the latest official report':'all core metrics increased'}</small></div></div>`;
   if($('#bwDeltas')){
-    if(prev){
-      const items=[['spreads2w','2w spreads'],['netRevenue2w','2w net revenue'],['netProfit2w','2w net profit'],['treasury2w','2w treasury'],['tvl','TVL'],['oi','OI'],['dau','DAU'],['wau','WAU']];
-      $('#bwDeltas').innerHTML=items.map(([k,l])=>{
-        const a=prev[k],b=B[k];
-        if(!(a>0)||!(b>0))return '';
-        const p=(b/a-1)*100, up=p>=0;
-        const fmt=v=>(k==='dau'||k==='wau')?v.toLocaleString():M(v);
-        return `<div class="d ${up?'up':'dn'}"><span>${l}</span><b>${up?'+':''}${p.toFixed(1)}%</b><small>${fmt(a)} → ${fmt(b)}</small></div>`;
-      }).join('');
-    }else{
-      $('#bwDeltas').innerHTML=`<div class="d placeholder"><span>Next post unlocks all 8 deltas</span><b>1 official report stored</b><small>Append the next report to BIWEEKLY_HISTORY, or backfill an older post from the <a href="${B.src}" target="_blank" rel="noopener">official X search</a>. The comparison then renders automatically.</small></div>`;
-    }
+    $('#bwDeltas').innerHTML=core.map(x=>`<div class="d ${x.long>=0?'up':'dn'}"><span>${x.d.l}</span><b>${fmtMetric(x.d,x.last.v)}</b>`+
+      `<div class="delta-line"><em>since ${x.first.r.asOf}</em><i class="${x.long>=0?'up':'dn'}">${signed(x.long)}</i></div>`+
+      `<div class="delta-line"><em>vs ${x.prior?.r.asOf||'prior'}</em><i class="${x.recent>=0?'up':'dn'}">${signed(x.recent)}</i></div>${spark(x.pts).replace('<svg','<svg class="bw-mini"')}</div>`).join('');
   }
   /* on-chain progress available today: treasury inflow per trailing 14-day window */
   if($('#bwTrend')&&typeof cumAt==='function'&&Array.isArray(SERIES)&&SERIES.length){
@@ -4299,10 +4791,70 @@ function renderBiweekly(){
   }
   /* stored report history */
   if($('#bwHist')){
+    const histDelta=(r,k)=>{
+      const at=H.indexOf(r),now=r[k]; if(!Number.isFinite(now))return null;
+      for(let i=at-1;i>=0;i--)if(Number.isFinite(H[i][k]))return pctChange(H[i][k],now);
+      return null;
+    };
+    const histCell=(r,k,d)=>{
+      const v=r[k],p=histDelta(r,k);
+      return `<span><b>${fmtMetric(d,v)}</b><small class="${p==null?'':p>=0?'up':'dn'}">${p==null?'not previously comparable':signed(p)+' vs prior'}</small></span>`;
+    };
+    const defs=Object.fromEntries(BW_METRIC_DEFS.map(d=>[d.k,d]));
     $('#bwHist').innerHTML=H.length>1?
-      `<div class="hrow h"><span>Posted</span><span>2w spreads</span><span>2w net revenue</span><span>2w net profit</span><span>TVL</span></div>`+
-      H.slice().reverse().map(r=>`<div class="hrow"><span>${r.asOf}</span><b>${M(r.spreads2w)}</b><b>${M(r.netRevenue2w)}</b><b>${M(r.netProfit2w)}</b><b>${M(r.tvl)}</b></div>`).join('')
+      `<div class="hrow h"><span>Report date · accounting style</span><span>All trading ever</span><span>Money in open trades</span><span>Money deposited (TVL)</span><span>Daily users</span><span>Weekly users</span><span>Money before costs · 2w</span><span>Money after market cost</span><span>Final money left</span><span>Real USDC held</span></div>`+
+      H.slice().reverse().map(r=>{
+        const pnl=Number.isFinite(r.spreads2w), early=r.reportFormat==='early-revenue-allocation';
+        const model=pnl?'Spreads P&amp;L':r.reportFormat==='net-revenue-allocation'?'Net revenue allocation':early?'Early revenue allocation':'Revenue allocation';
+        const top=pnl?r.spreads2w:Number.isFinite(r.revenue2w)?r.revenue2w:r.netRevenue2w;
+        const topKey=pnl?'spreads2w':Number.isFinite(r.revenue2w)?'revenue2w':'netRevenue2w';
+        return `<div class="hrow"><span><b>${r.asOf}</b><i class="era${early?' early':''}">${model}</i></span>`+
+          histCell(r,'totalVolume',defs.totalVolume)+histCell(r,'oi',defs.oi)+histCell(r,'tvl',defs.tvl)+
+          histCell(r,'dau',defs.dau)+histCell(r,'wau',defs.wau)+histCell(r,topKey,defs[topKey])+ 
+          histCell(r,'netRevenue2w',defs.netRevenue2w)+histCell(r,'netProfit2w',defs.netProfit2w)+histCell(r,'treasuryHoldings',defs.treasuryHoldings)+`</div>`;
+      }).join('')+
+      `<div class="bw-hist-note"><b>Definition break:</b> early “2w Revenue” allocation reports are not the same disclosure as later gross spreads → market-making costs → net profit reports. Dashes mean the metric was not published, not zero.</div>`
       :'<div class="bw-hist-empty">One official report is stored. The table appears as soon as a second dated report is appended; no synthetic history is generated.</div>';
+  }
+  /* every published metric as a definition-safe atlas */
+  if($('#bwMetricAtlas')){
+    const groups=[...new Set(BW_METRIC_DEFS.map(d=>d.g))];
+    $('#bwMetricAtlas').innerHTML=`<div class="bw-atlas-axis"><span></span><span>Metric</span><span>Latest</span><span class="trend-axis"><i>${H[0].asOf}</i><i>Official report timeline</i><i>${H[H.length-1].asOf}</i></span><span>Since first</span><span>Vs previous</span></div>`+groups.map(g=>{
+      const rows=BW_METRIC_DEFS.filter(d=>d.g===g).map(d=>{
+        const pts=pointsFor(d.k); if(!pts.length)return '';
+        const first=pts[0],last=pts[pts.length-1],prior=pts[pts.length-2];
+        const long=pctChange(first.v,last.v), recent=prior?pctChange(prior.v,last.v):null;
+        return `<div class="bw-metric-row"><span class="name">${d.l}</span><b class="latest">${fmtMetric(d,last.v)}</b>${datedSpark(pts,d)}`+
+          `<span class="change ${long==null?'na':long>=0?'up':'dn'}">${signed(long)}<small>since ${first.r.asOf}</small></span>`+
+          `<span class="change ${recent==null?'na':recent>=0?'up':'dn'}">${signed(recent)}<small>${prior?'vs '+prior.r.asOf:pts.length+' report'}</small></span></div>`;
+      }).join('');
+      return rows?`<section class="bw-atlas-group"><h3>${g}</h3><div class="bw-atlas-rows">${rows}</div></section>`:'';
+    }).join('');
+  }
+  /* complete original report explorer, including exceptions and definition changes */
+  const reportSelect=$('#bwReportSelect'), reportDetail=$('#bwReportDetail');
+  if(reportSelect&&reportDetail){
+    const keep=reportSelect.value||B.asOf;
+    reportSelect.innerHTML=H.slice().reverse().map(r=>`<option value="${r.asOf}">${r.asOf} · ${r.reportFormat||'spreads-pnl'}</option>`).join('');
+    reportSelect.value=H.some(r=>r.asOf===keep)?keep:B.asOf;
+    const paintReport=date=>{
+      const r=H.find(x=>x.asOf===date)||B;
+      const values=BW_METRIC_DEFS.filter(d=>Number.isFinite(r[d.k])).map(d=>{
+        const label=d.k==='markets'?(r.listingMetric==='tokens'?'Tokens listed':'Markets listed'):d.l;
+        return `<div class="bw-report-value"><span>${label}</span><b>${fmtMetric(d,r[d.k])}</b></div>`;
+      }).join('');
+      const notes=[];
+      notes.push(`Disclosure model: ${r.reportFormat||'spreads-pnl'}`);
+      if(r.reportEra)notes.push(r.reportEra);
+      if(r.tvlScope)notes.push(`TVL scope: ${r.tvlScope}`);
+      if(r.treasuryStatus)notes.push(`Treasury: ${r.treasuryStatus}`);
+      if(r.referralRewardsStatus)notes.push(`Referral rewards: ${r.referralRewardsStatus}`);
+      const alloc=['olpAllocation2w','lossRefundPool2w','referralRewardsPool2w','treasury2w'].filter(k=>Number.isFinite(r[k])).reduce((s,k)=>s+r[k],0);
+      if(Number.isFinite(r.revenue2w)&&alloc)notes.push(`Allocation check: ${M(alloc)} of ${M(r.revenue2w)} (${Math.abs(alloc-r.revenue2w)<1?'reconciled':'definition differs'})`);
+      reportDetail.innerHTML=values+`<div class="bw-report-notes"><b>Read before comparing:</b> ${notes.join(' · ')}. Dashes and omitted fields mean not published, never zero.</div>`;
+    };
+    paintReport(reportSelect.value);
+    reportSelect.onchange=()=>paintReport(reportSelect.value);
   }
   const share=B.treasury2w/B.spreads2w*100;
   $('#bwNote').innerHTML=`<b>Protocol revenue definition used on this dashboard:</b> USDC that actually lands in Variational's Arbitrum treasury wallet. It is not the same as total trader spreads, OLP revenue, or whole-venue net profit. In this official window, traders paid ${M(B.spreads2w)} in spreads, ${M(B.netProfit2w)} remained as net profit after market-making costs and rewards, and ${M(B.treasury2w)} reached the treasury (${share.toFixed(0)}% of spreads). This separation prevents a false apples-to-apples comparison with fee-based exchanges such as Lighter. Source figures are hand-copied from the <a href="${B.src}" target="_blank" rel="noopener">official biweekly posts on X</a>; the 14-day chart is calculated independently from on-chain treasury history.`;
@@ -5444,34 +5996,61 @@ document.querySelector('.preset-row')?.addEventListener('click',e=>{
   FC.rate=Math.round(rateOf[b.dataset.r]()); $('#rate') && ($('#rate').value=FC.rate); render();
 });
 
-/* ---------- live refresh via Tenderly ---------- */
+/* ---------- live refresh with RPC failover + rate-limit protection ---------- */
+const RPC_STATE={cursor:0,cooldown:new Map(),lastOk:null};
+const BAL_CACHE=new Map();
 async function rpc(method,params){
-  const ctrl=new AbortController();
-  const timeout=setTimeout(()=>ctrl.abort(),10000);
-  const r=await fetch(CHAIN.rpc,{method:'POST',headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({jsonrpc:'2.0',id:1,method,params}),signal:ctrl.signal})
-    .catch(err=>{throw new Error(err.name==='AbortError'?'RPC timed out':err.message);})
-    .finally(()=>clearTimeout(timeout));
-  if(!r.ok) throw new Error('RPC HTTP '+r.status);
-  const j=await r.json(); if(j.error) throw new Error(j.error.message); return j.result;
+  const urls=CHAIN.rpcs||[];
+  const errors=[];
+  for(let n=0;n<urls.length;n++){
+    const i=(RPC_STATE.cursor+n)%urls.length, url=urls[i];
+    if((RPC_STATE.cooldown.get(url)||0)>Date.now())continue;
+    const ctrl=new AbortController();
+    const timeout=setTimeout(()=>ctrl.abort(),9000);
+    try{
+      const r=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({jsonrpc:'2.0',id:Date.now(),method,params}),signal:ctrl.signal});
+      if(r.status===429){
+        RPC_STATE.cooldown.set(url,Date.now()+60000);
+        errors.push('rate limited');
+        continue;
+      }
+      if(!r.ok){errors.push('HTTP '+r.status);continue;}
+      const j=await r.json();
+      if(j.error){errors.push(j.error.message||'RPC error');continue;}
+      RPC_STATE.cursor=i;
+      RPC_STATE.lastOk=url;
+      return j.result;
+    }catch(err){errors.push(err.name==='AbortError'?'timed out':err.message);}
+    finally{clearTimeout(timeout);}
+  }
+  throw new Error(errors.length?'all public RPCs are busy':'RPC providers are cooling down');
+}
+async function cachedBalance(pad,block='latest'){
+  const tag=typeof block==='number'?'0x'+block.toString(16):block;
+  const key=pad+':'+tag, hit=BAL_CACHE.get(key);
+  const ttl=tag==='latest'?12000:Infinity;
+  if(hit&&Date.now()-hit.at<ttl)return hit.v;
+  const r=await rpc('eth_call',[{to:CHAIN.usdc,data:'0x70a08231'+pad},tag]);
+  const v=parseInt(r,16)/1e6;
+  if(!Number.isFinite(v))throw new Error('invalid RPC balance');
+  BAL_CACHE.set(key,{v,at:Date.now()});
+  return v;
 }
 async function balAt(block){
-  const r=await rpc('eth_call',[{to:CHAIN.usdc,data:'0x70a08231'+CHAIN.pad}, typeof block==='number'?'0x'+block.toString(16):block]);
-  return parseInt(r,16)/1e6;
+  return cachedBalance(CHAIN.pad,block);
 }
 async function balAtPad(pad,block='latest'){
-  const r=await rpc('eth_call',[{to:CHAIN.usdc,data:'0x70a08231'+pad}, typeof block==='number'?'0x'+block.toString(16):block]);
-  return parseInt(r,16)/1e6;
+  return cachedBalance(pad,block);
 }
 const blockAt=ts=>Math.round(CHAIN.b0+(ts-CHAIN.t0)*CHAIN.bps);
-async function refresh(){
+async function refresh({deep=false}={}){
   const btn=$('#refresh'),note=$('#note');btn.classList.add('busy');btn.textContent='↻ syncing…';
   $('#stamp').className='';
   try{
     const todayET=resetDateKey();
-    const embeddedLast=SERIES[SERIES.length-1].d;
 
-    // Fetch and paint the latest balance first. Historical backfill can finish behind it.
+    // One lightweight request paints the live total first.
     const cur=await balAt('latest');
     LIVE_BASE={balance:cur,at:performance.now()};
     LIVE_HOUR_BASE={key:resetHourKey(),balance:cur,at:performance.now()};
@@ -5483,19 +6062,22 @@ async function refresh(){
     $('#stamp').className='live';
     note.classList.remove('show');
 
-    // Fill missing ET days after the live number is already visible.
-    let last=embeddedLast, guard=0;
-    while(last<todayET && guard++<40){
-      const nd=addDays(last,1);
-      const ts=resetMidnightTs(nd);
-      const v=await balAt(blockAt(ts));
-      const i=SERIES.findIndex(x=>x.d===nd);
-      if(i>=0)SERIES[i].v=v; else SERIES.push({d:nd,v});
-      last=nd;
+    // Daily history is independent: a rate limit here never downgrades the live total.
+    try{
+      let last=SERIES[SERIES.length-1].d, guard=0;
+      while(last<todayET && guard++<(deep?40:8)){
+        const nd=addDays(last,1);
+        const v=nd===todayET?cur:await balAt(blockAt(resetMidnightTs(nd)));
+        const i=SERIES.findIndex(x=>x.d===nd);
+        if(i>=0)SERIES[i].v=v; else SERIES.push({d:nd,v});
+        last=nd;
+      }
+      SERIES.sort((a,b)=>a.d<b.d?-1:1);
+      persistLiveSeries();
+    }catch(_){
+      note.textContent='Live balance synced. Daily history backfill is paused while public RPC capacity recovers.';
+      note.classList.add('show');
     }
-    if(SERIES[SERIES.length-1].d===todayET)SERIES[SERIES.length-1].v=cur;
-    else SERIES.push({d:todayET,v:cur});
-    SERIES.sort((a,b)=>a.d<b.d?-1:1);
     LIVE_BASE={balance:cur,at:performance.now()};
     LIVE_HOUR_BASE={key:resetHourKey(),balance:cur,at:performance.now()};
     try{
@@ -5507,14 +6089,14 @@ async function refresh(){
       $('#pmOlpBalance') && ($('#pmOlpBalance').textContent='check Arbiscan');
       $('#pmOlpFormula') && ($('#pmOlpFormula').innerHTML='Formula: <b>read Core OLP Vault USDC balance on Arbiscan</b>');
     }
-    await renderHourlyEarnings(cur);
+    if(deep)await renderHourlyEarnings(cur); else renderProjectedHourlyEarnings(cur);
     render();
     renderTwaps();
-    renderActuals(cur);
+    if(deep)await renderActuals(cur);
     buildCalendar();
     renderVsLighter();
   }catch(err){
-    note.textContent='Live sync unavailable ('+err.message+'). Showing embedded ET snapshot through '+SERIES[SERIES.length-1].d+'.';
+    note.textContent='Public Arbitrum RPCs are temporarily busy. Keeping the latest saved ET snapshot through '+SERIES[SERIES.length-1].d+'.';
     note.classList.add('show');
     $('#stamp').textContent='snapshot · '+SERIES[SERIES.length-1].d+' ET';
     $('#stamp').className='warn';
@@ -5537,7 +6119,7 @@ async function quickSyncLive(){
     renderEfficiency();
     $('#stamp').textContent='live · '+resetTimeString()+' ET';
     $('#stamp').className='live';
-    if(Date.now()-lastWindowSync>60000){
+    if(Date.now()-lastWindowSync>300000){
       lastWindowSync=Date.now();
       renderActuals(cur);
     }
@@ -5545,7 +6127,7 @@ async function quickSyncLive(){
     // Keep the last visible value; the full refresh handles status messaging.
   }finally{quickSyncBusy=false;}
 }
-$('#refresh').addEventListener('click',refresh);
+$('#refresh').addEventListener('click',()=>refresh({deep:true}));
 
 /* ---------- tweet share ---------- */
 $('#tweet').addEventListener('click',()=>{
@@ -5709,9 +6291,9 @@ updateCalendarCountdowns();
 setInterval(updateCalendarCountdowns,30000);
 startLive();
 setInterval(renderPointsDeadline,60000);
-// attempt an automatic live sync on load (silent-fail to snapshot)
-refresh();
-setInterval(quickSyncLive,8000);
+// Lightweight automatic sync; deeper archive reads happen only on manual refresh.
+refresh({deep:false});
+setInterval(quickSyncLive,30000);
 // live perp-DEX board (CoinGecko) — refresh on load, then every 3 min
 refreshPerpBoard();
 refreshValuationMcaps();
