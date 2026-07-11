@@ -650,6 +650,9 @@
   .cal-pending-meta{display:flex;justify-content:space-between;align-items:baseline;gap:6px;margin-top:8px;padding-top:7px;border-top:1px solid rgba(85,184,255,.12);color:var(--dim);font:8px/1.3 var(--mono);letter-spacing:.2px}
   .cal-pending-meta b{color:var(--cyan);font-weight:900;white-space:nowrap}
   .cal-pending-meta .countdown{color:var(--grn)}
+  .cal-dual.pending-only{min-height:70px;display:grid;place-items:center;margin-top:4px}
+  .cal-countdown-card{display:grid;place-items:center;width:100%;min-height:64px;border-top:1px solid rgba(85,184,255,.12)}
+  .cal-countdown-card strong{font:950 clamp(22px,2vw,30px)/1 var(--mono);letter-spacing:-1px;color:var(--grn);white-space:nowrap}
   .cal-flow-mini{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;position:relative;z-index:1}
   .cal-flow-mini div{border:1px solid rgba(85,184,255,.12);border-radius:6px;padding:5px 5px;background:rgba(5,12,20,.35);min-width:0}
   .cal-flow-mini b{display:block;font:950 clamp(10px,.86vw,13px)/1 var(--mono);letter-spacing:-.4px;color:var(--cyan);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -727,6 +730,13 @@
   .activity-outcome{display:flex;align-items:baseline;gap:9px;margin-top:11px;padding-top:10px;border-top:1px solid rgba(34,230,160,.16);color:var(--sub);font:10px var(--mono)}
   .activity-outcome b{font:950 22px var(--mono)}
   .activity-outcome small{color:var(--dim);font:9px var(--mono)}
+  .activity-valuation{display:flex;flex-wrap:wrap;align-items:baseline;gap:10px;margin-top:11px;padding:12px 14px;border:1px solid rgba(255,181,71,.3);border-radius:11px;background:rgba(255,181,71,.055);font:10px var(--mono);color:var(--sub)}
+  .activity-valuation>span{font:950 9.5px var(--mono);letter-spacing:1.4px;color:var(--amber)}
+  .activity-valuation>b{font:950 24px var(--mono);color:var(--ink);letter-spacing:-.4px}
+  .activity-valuation>small{color:var(--sub);font:9.5px var(--mono)}
+  .activity-valuation em{font-style:normal;color:var(--sub);font:10.5px/1.5 var(--mono);margin-left:auto;text-align:right}
+  .activity-valuation em b{font:950 15px var(--mono);color:var(--amber)}
+  @media(max-width:620px){.activity-valuation em{margin-left:0;text-align:left}}
   @media(max-width:1080px){.activity-read-flow{grid-template-columns:1fr 18px 1fr;}.activity-result:nth-of-type(5){grid-column:1 / 2}.activity-result.treasury{grid-column:3 / 4}.activity-arrow:nth-of-type(6){display:none}}
   @media(max-width:620px){.activity-read-flow{grid-template-columns:1fr}.activity-plus,.activity-arrow{display:none}.activity-result:nth-of-type(5),.activity-result.treasury{grid-column:auto}.activity-outcome{flex-wrap:wrap}}
   @media(max-width:900px){.formula-strip{grid-template-columns:1fr 1fr}}
@@ -810,6 +820,80 @@
   @media(max-width:820px){.eff-ratios.unit-core{grid-template-columns:1fr}}
   .eff-note{margin-top:14px;font:11.5px var(--mono);color:var(--sub);line-height:1.6}
   .eff-note b{color:var(--grn)}
+  /* official biweekly metrics: official post and on-chain checks stay visibly separate */
+  .bw{margin-top:16px}
+  .bw-source-rail{display:grid;grid-template-columns:1fr 1fr;border-block:1px solid var(--line);margin-bottom:20px}
+  .bw-lane{padding:14px 0;display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:start}
+  .bw-lane+ .bw-lane{border-left:1px solid var(--line);padding-left:20px;margin-left:20px}
+  .bw-lane .n{width:28px;height:28px;border:1px solid var(--line);display:grid;place-items:center;font:900 12px var(--mono);color:var(--grn)}
+  .bw-lane b{display:block;font:900 13px/1.2 var(--display);color:var(--ink)}
+  .bw-lane span{display:block;margin-top:5px;font:12px/1.45 var(--sans);color:var(--sub)}
+  .bw-lane a{color:var(--cyan);text-decoration:none;border-bottom:1px solid currentColor}
+  .bw-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin:22px 0 10px;padding-top:16px;border-top:1px solid var(--line)}
+  .bw-head.first{margin-top:0;padding-top:0;border-top:0}
+  .bw-head b{font:900 12px var(--display);letter-spacing:1.4px;text-transform:uppercase;color:var(--ink)}
+  .bw-head span{font:12px var(--sans);color:var(--sub)}
+  .bw-pnl{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));border-block:1px solid var(--line)}
+  .bw-pnl .step{padding:16px 18px 16px 0}
+  .bw-pnl .step+ .step{border-left:1px solid var(--line);padding-left:18px}
+  .bw-pnl .step span{display:block;font:800 10px var(--mono);letter-spacing:.8px;text-transform:uppercase;color:var(--dim)}
+  .bw-pnl .step b{display:block;margin-top:7px;font:950 22px var(--mono);letter-spacing:-.6px;color:var(--ink)}
+  .bw-pnl .step small{display:block;margin-top:5px;font:12px/1.35 var(--sans);color:var(--sub)}
+  .bw-pnl .step.neg b{color:#f08aa0}
+  .bw-pnl .step.pos b{color:var(--grn)}
+  .bw-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-top:1px solid var(--line)}
+  .bw-grid .t{padding:13px 14px 13px 0;border-bottom:1px solid var(--line);font:12px var(--sans);color:var(--sub);display:flex;justify-content:space-between;gap:10px;align-items:baseline}
+  .bw-grid .t:not(:nth-child(4n+1)){border-left:1px solid var(--line);padding-left:14px}
+  .bw-grid .t b{font:850 15px var(--mono);color:var(--ink);letter-spacing:-.2px}
+  .bw-note{margin-top:20px;padding:16px 18px;border-left:3px solid var(--grn);background:rgba(199,242,132,.045);font:13px/1.6 var(--sans);color:var(--sub)}
+  .bw-note b{color:var(--amber)}
+  .bw-note a{color:var(--cyan);border-bottom:1px dashed rgba(56,225,255,.4)}
+  /* full-tab variant */
+  .bw.full{border:0;background:none;padding:2px 0 0}
+  .bw.full .bw-pnl .step b{font-size:clamp(22px,2vw,30px)}
+  /* progress deltas + on-chain trend + history list */
+  .bw-deltas{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-top:1px solid var(--line)}
+  .bw-deltas .d{padding:13px 14px 13px 0;border-bottom:1px solid var(--line);font:12px var(--sans);color:var(--dim)}
+  .bw-deltas .d:not(:nth-child(4n+1)){border-left:1px solid var(--line);padding-left:14px}
+  .bw-deltas .d span{display:block;font:800 10px var(--mono);letter-spacing:.7px;text-transform:uppercase}
+  .bw-deltas .d b{display:block;margin-top:5px;font:950 19px var(--mono);color:var(--ink)}
+  .bw-deltas .d.up b{color:var(--grn)} .bw-deltas .d.dn b{color:#f08aa0}
+  .bw-deltas .d small{display:block;margin-top:4px;font-size:12px;color:var(--sub)}
+  .bw-deltas .d.placeholder{grid-column:1/-1;padding:18px 0}
+  .bw-deltas .d.placeholder a{color:var(--cyan)}
+  .bw-trend{padding:2px 0 0}
+  .bw-trend-head{display:grid;grid-template-columns:1fr auto auto;gap:28px;align-items:end;margin-bottom:16px}
+  .bw-trend-head>span:first-child{font:800 12px/1.4 var(--sans);color:var(--sub)}
+  .bw-trend-stat{display:grid;gap:3px}
+  .bw-trend-stat b{font:950 clamp(23px,2.6vw,38px)/1 var(--mono);letter-spacing:-1px}
+  .bw-trend-stat small{font:800 10px var(--mono);letter-spacing:.7px;text-transform:uppercase;color:var(--dim)}
+  .bw-trend-head b.up{color:var(--grn)} .bw-trend-head b.dn{color:#f08aa0}
+  .bw-bars{display:flex;align-items:flex-end;gap:10px;height:136px;border-bottom:1px solid var(--line)}
+  .bw-bars .bar{flex:1;height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:stretch;position:relative}
+  .bw-bars .bar i{font:800 11px var(--mono);font-style:normal;color:var(--sub);white-space:nowrap;text-align:center;margin-bottom:6px}
+  .bw-bars .bar span{background:var(--cyan);min-height:6px;opacity:.58}
+  .bw-bars .bar.cur span{background:var(--grn);opacity:1}
+  .bw-trend-cap{display:flex;gap:10px;margin-top:7px}
+  .bw-trend-cap span{flex:1;text-align:center;font:10px var(--mono);color:var(--dim)}
+  .bw-hist{margin-top:12px}
+  .bw-hist .hrow{display:grid;grid-template-columns:130px repeat(4,1fr);gap:12px;padding:12px 0;border-bottom:1px solid var(--line);font:12px var(--mono);color:var(--sub)}
+  .bw-hist .hrow.h{color:var(--dim);font-size:10px;letter-spacing:.8px;text-transform:uppercase}
+  .bw-hist .hrow b{color:var(--ink);font-weight:800}
+  .bw-hist-empty{padding:18px 0;border-block:1px solid var(--line);font:13px/1.55 var(--sans);color:var(--sub)}
+  @media(max-width:920px){
+    .bw-source-rail{grid-template-columns:1fr}.bw-lane+ .bw-lane{border-left:0;border-top:1px solid var(--line);padding-left:0;margin-left:0}
+    .bw-pnl{grid-template-columns:repeat(2,1fr)}.bw-pnl .step{border-bottom:1px solid var(--line)}
+    .bw-pnl .step+ .step{padding-left:14px}.bw-grid,.bw-deltas{grid-template-columns:repeat(2,1fr)}
+    .bw-grid .t:not(:nth-child(4n+1)),.bw-deltas .d:not(:nth-child(4n+1)){border-left:0;padding-left:0}
+    .bw-grid .t:nth-child(even),.bw-deltas .d:nth-child(even){border-left:1px solid var(--line);padding-left:14px}
+    .bw-trend-head{grid-template-columns:1fr 1fr}.bw-trend-head>span:first-child{grid-column:1/-1}
+  }
+  @media(max-width:560px){.bw-pnl,.bw-grid,.bw-deltas{grid-template-columns:1fr}.bw-pnl .step+ .step,.bw-grid .t:nth-child(even),.bw-deltas .d:nth-child(even){border-left:0;padding-left:0}.bw-trend-head{gap:14px}.bw-bars{gap:4px}.bw-bars .bar i{font-size:8px}.bw-hist{overflow:auto}.bw-hist .hrow{min-width:650px}}
+  /* teaser link inside Fundamentals */
+  .bw-link{margin-top:14px}
+  .bw-link a{display:flex;align-items:baseline;gap:8px;padding:13px 16px;border:1px solid rgba(255,181,71,.35);border-radius:11px;background:rgba(255,181,71,.06);font:800 11.5px var(--mono);color:var(--sub);text-decoration:none;transition:.15s}
+  .bw-link a:hover{border-color:var(--amber);color:var(--ink)}
+  .bw-link a b{color:var(--amber);font:950 15px var(--mono)}
   .spread-circuit{position:relative;overflow:hidden;border:1px solid rgba(85,184,255,.22);border-radius:14px;padding:16px;margin-top:14px;background:
     radial-gradient(460px 210px at 18% 0,rgba(85,184,255,.12),transparent 64%),
     radial-gradient(420px 180px at 90% 12%,rgba(34,230,160,.10),transparent 64%),
@@ -1040,6 +1124,14 @@
   .h2h-tbl td.win.cva b{color:var(--grn);text-shadow:0 0 14px rgba(34,230,160,.3)}
   .h2h-tbl td.win.cli b{color:#7fa8e8;text-shadow:0 0 14px rgba(85,144,232,.3)}
   .h2h-tbl td .sub{display:block;font:9.5px var(--mono);color:var(--dim);margin-top:4px;white-space:nowrap}
+  .h2h-tbl td .src{display:inline-flex;align-items:center;gap:5px;margin-top:5px;padding:2px 8px;border-radius:999px;border:1px solid;font:800 8.5px/1.4 var(--mono);letter-spacing:.7px;text-transform:uppercase}
+  .h2h-tbl td .src i{width:5px;height:5px;border-radius:50%;background:currentColor;flex:none}
+  .src.src-cg{color:#55b8ff;border-color:rgba(85,184,255,.32);background:rgba(85,184,255,.06)}
+  .src.src-chain{color:var(--grn);border-color:rgba(34,230,160,.32);background:rgba(34,230,160,.06)}
+  .src.src-llama{color:#b79bff;border-color:rgba(139,108,255,.38);background:rgba(139,108,255,.07)}
+  .h2h-src-legend{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:0 0 10px;font:800 9px var(--mono);letter-spacing:.6px;color:var(--dim);text-transform:uppercase}
+  .h2h-src-legend .src{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:999px;border:1px solid;font:800 8.5px/1.4 var(--mono);letter-spacing:.7px}
+  .h2h-src-legend .src i{width:5px;height:5px;border-radius:50%;background:currentColor;flex:none}
   .h2h-tbl tbody tr:hover td{background:rgba(56,225,255,.03)}
   .h2h-head.three{grid-template-columns:1fr auto 1fr auto 1fr}
   .h2h-side.mid{text-align:center}
@@ -1101,14 +1193,18 @@
   .fs-row b{font:800 17px var(--mono);letter-spacing:-.4px;color:var(--ink);white-space:nowrap}
   .fs-row b.g{color:var(--grn)} .fs-row b.v{color:var(--vio)} .fs-row b.b{color:#7fa8e8}
   .fs-row.dim span,.fs-row.dim b{color:var(--dim)}
-  .comparison-revenue-card{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(340px,.8fr);gap:12px 20px;align-items:start}
-  .comparison-revenue-card>h2,.comparison-revenue-card>.cap,.comparison-revenue-card>.legend{grid-column:1 / -1}
-  .comparison-revenue-card>svg{grid-column:1;width:100%;min-height:260px;margin:0}
-  .comparison-revenue-card>.rev-callout{grid-column:2;grid-row:4;align-self:stretch;margin:0;padding:16px}
-  .comparison-revenue-card .fs-grid{grid-template-columns:1fr;gap:14px}
-  .comparison-revenue-card .fs-big{font-size:clamp(28px,3.2vw,40px)}
-  @media(max-width:980px){.comparison-revenue-card{display:block}.comparison-revenue-card>svg{margin-top:10px}.comparison-revenue-card>.rev-callout{margin-top:14px}.comparison-revenue-card .fs-grid{grid-template-columns:1.15fr 1fr}}
-  @media(max-width:720px){.comparison-revenue-card .fs-grid{grid-template-columns:1fr}}
+  .comp-revenue-merge{margin-top:14px;border-top:1px solid rgba(85,184,255,.14);padding-top:14px}
+  .comp-rev-head{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin-bottom:8px}
+  .comp-rev-head>div:first-child b{display:block;font:950 12px var(--display);letter-spacing:1.2px;text-transform:uppercase;color:var(--ink)}
+  .comp-rev-head>div:first-child span{display:block;margin-top:4px;font:900 9px var(--mono);letter-spacing:1.2px;text-transform:uppercase;color:var(--dim)}
+  .comp-rev-head .legend{margin:0;justify-content:flex-end}
+  .comp-rev-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(270px,.72fr);gap:12px;align-items:stretch}
+  .comp-rev-grid>svg{height:260px;min-height:240px;margin:0}
+  .comp-rev-grid>.rev-callout{margin:0;padding:14px;align-self:stretch}
+  .comp-rev-grid .fs-grid{grid-template-columns:1fr;gap:12px}
+  .comp-rev-grid .fs-big{font-size:clamp(26px,3vw,38px)}
+  .comp-rev-grid .fs-row{padding:8px 0}
+  @media(max-width:1120px){.comp-rev-grid{grid-template-columns:1fr}.comp-rev-grid>svg{height:250px}}
   .h2h-track{position:relative;display:flex;height:26px;border-radius:8px;overflow:hidden;background:#0d1522}
   .h2h-track .va{background:linear-gradient(90deg,var(--grn),var(--cyan));box-shadow:0 0 16px rgba(34,230,160,.3)}
   .h2h-track .li{background:linear-gradient(90deg,#2c4c7f,#3f74c9)}
@@ -1119,14 +1215,14 @@
   .h2h-note{margin-top:16px;border-top:1px solid rgba(85,184,255,.12);padding-top:12px;font:11px/1.65 var(--mono);color:var(--dim)}
   /* ---- implied valuation (OI -> market-cap model) ---- */
   .valmodel{overflow:hidden}
-  .val-hero{display:grid;grid-template-columns:1.08fr .78fr 1fr;gap:10px;margin:14px 0 18px}
+  .val-hero{display:grid;grid-template-columns:1.05fr .95fr 1fr;gap:10px;margin:14px 0 12px}
   .val-cell{position:relative;border:1px solid rgba(85,184,255,.16);border-radius:16px;padding:clamp(16px,2.2vw,22px);overflow:hidden;
     background:radial-gradient(560px 240px at 8% -20%,rgba(38,230,194,.08),transparent 60%),linear-gradient(180deg,rgba(10,22,40,.7),rgba(5,12,22,.55))}
   .val-cell.fdv{background:radial-gradient(560px 240px at 92% -20%,rgba(85,184,255,.09),transparent 60%),linear-gradient(180deg,rgba(10,22,40,.7),rgba(5,12,22,.55))}
   .val-cell::before{content:"";position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--grn),transparent 78%)}
   .val-cell.fdv::before{background:linear-gradient(90deg,var(--cyan),transparent 78%)}
   .val-cell.actual::before{background:linear-gradient(90deg,var(--sub),transparent 78%)}
-  .val-cell.actual .vh-big{background:none;color:var(--sub);-webkit-text-fill-color:var(--sub);filter:none}
+  .val-cell.actual .vh-big{background:none;color:#f08aa0;-webkit-text-fill-color:#f08aa0;filter:none}
   .vh-k{font:950 9.5px var(--mono);letter-spacing:1.6px;text-transform:uppercase;color:var(--sub)}
   .vh-big{font:950 clamp(38px,6vw,64px)/.92 var(--mono);letter-spacing:-2.4px;margin:8px 0 8px;
     background:linear-gradient(92deg,#eafff6,var(--grn),var(--cyan));-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 0 22px rgba(38,230,194,.28))}
@@ -1135,24 +1231,43 @@
   .vh-sub b{color:var(--ink)} .vh-sub sup{font-size:.7em}
   .vh-sub .mono{color:var(--grn);white-space:nowrap}
   .val-cell.fdv .vh-sub .mono{color:var(--cyan)}
+  .val-benchmark{display:grid;grid-template-columns:1fr 1fr 1.15fr;margin:0 0 16px;border-top:1px solid rgba(85,184,255,.2);border-bottom:1px solid rgba(85,184,255,.2);background:rgba(4,12,21,.45)}
+  .val-bench-item{min-width:0;padding:14px 16px;border-right:1px solid rgba(85,184,255,.14)}
+  .val-bench-item:last-child{border-right:0}
+  .val-bench-k{display:block;font:950 10px/1.2 var(--mono);letter-spacing:1.15px;text-transform:uppercase;color:var(--sub)}
+  .val-bench-v{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin-top:7px;font:950 clamp(20px,2.35vw,30px)/1 var(--mono);letter-spacing:-.8px;color:var(--ink)}
+  .val-bench-v.premium{color:var(--grn)}
+  .val-bench-v.discount{color:#f08aa0}
+  .val-bench-v.fair{color:var(--cyan)}
+  .val-bench-v small{font:900 10.5px/1.2 var(--mono);letter-spacing:.3px;color:inherit}
+  .val-bench-sub{display:block;margin-top:7px;font:700 11.5px/1.45 var(--mono);color:var(--sub)}
   .val-grid{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(220px,.75fr);gap:18px;align-items:stretch}
-  .val-chart-wrap{border:1px solid rgba(85,184,255,.14);border-radius:14px;padding:10px 8px 4px;background:rgba(3,10,18,.5);min-width:0}
+  .val-chart-wrap{border:1px solid rgba(85,184,255,.18);border-radius:14px;padding:10px 8px 4px;background:rgba(3,10,18,.58);min-width:0}
   #valScatter{width:100%;height:auto;display:block}
   #valScatter text{font-family:var(--mono)}
   .val-side{display:flex;flex-direction:column;gap:9px}
-  .val-side .vs-h{display:flex;align-items:center;justify-content:space-between;gap:10px;font:950 9.5px var(--mono);letter-spacing:1.3px;text-transform:uppercase;color:var(--sub);margin-bottom:2px}
-  .val-side .vs-hs{color:var(--dim);font-size:8.5px;letter-spacing:.5px;text-transform:none;text-align:right}
-  .vs-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid rgba(27,37,54,.6);font:11.5px var(--mono)}
+  .val-side .vs-h{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;font:950 10.5px/1.35 var(--mono);letter-spacing:1.1px;text-transform:uppercase;color:var(--ink);margin-bottom:4px}
+  .val-side .vs-hs{color:var(--dim);font-size:9.5px;letter-spacing:.2px;text-transform:none;text-align:right}
+  .vs-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid rgba(27,37,54,.72);font:12.5px var(--mono)}
   .vs-row:last-child{border-bottom:0}
-  .vs-row .n{color:var(--sub);display:flex;align-items:center;gap:7px}
+  .vs-row .n{min-width:0;color:var(--sub);display:flex;align-items:center;gap:7px}
+  .vs-row .vs-nm{min-width:0}
   .vs-row .n i{width:8px;height:8px;border-radius:50%;flex:none}
-  .vs-row .v{color:var(--ink);font-weight:800;letter-spacing:-.3px}
-  .vs-row .vs-nm small{display:block;margin-top:3px;color:var(--dim);font-size:9.5px;line-height:1.35}
+  .vs-row .v{display:flex;flex:none;min-width:96px;flex-direction:column;align-items:flex-end;gap:4px;color:var(--ink);font-weight:900;letter-spacing:-.3px;white-space:nowrap;text-align:right}
+  .vs-row .v b{font:950 16px/1 var(--mono);letter-spacing:-.2px}
+  .vs-row .v small{font:800 9.5px/1 var(--mono);color:var(--sub);letter-spacing:.5px}
+  .vs-row .vs-mcap{display:flex;flex:none;min-width:88px;flex-direction:column;align-items:flex-end;gap:4px;white-space:nowrap;text-align:right;margin-left:auto}
+  .vs-row .vs-mcap b{font:950 17px/1 var(--mono);letter-spacing:-.4px;color:var(--ink)}
+  .vs-row .vs-mcap small{font:800 8.5px/1 var(--mono);color:var(--dim);letter-spacing:.8px;text-transform:uppercase}
+  .vs-row .v.premium b{color:var(--grn)}
+  .vs-row .v.discount b{color:#f08aa0}
+  .vs-row .v.fair b{color:var(--cyan)}
+  .vs-row .vs-nm small{display:block;margin-top:4px;color:var(--dim);font-size:10px;line-height:1.4}
   .vs-row .vs-nm small b{color:var(--sub);font-weight:800}
   .vs-row.me{margin-top:2px;padding:11px 12px;border:1px solid rgba(38,230,194,.35);border-radius:11px;background:rgba(38,230,194,.06)}
   .vs-row.me .n{color:var(--grn);font-weight:900} .vs-row.me .v{color:var(--grn)}
   .val-note{margin-top:15px;border-top:1px solid rgba(85,184,255,.12);padding-top:12px;font:10.5px/1.65 var(--mono);color:var(--dim)}
-  @media(max-width:900px){.val-hero{grid-template-columns:1fr}.val-grid{grid-template-columns:1fr}}
+  @media(max-width:900px){.val-hero,.val-benchmark{grid-template-columns:1fr}.val-grid{grid-template-columns:1fr}.val-bench-item{border-right:0;border-bottom:1px solid rgba(85,184,255,.14)}.val-bench-item:last-child{border-bottom:0}}
   .h2h-note a{color:var(--cyan);border-bottom:1px dashed rgba(56,225,255,.4)}
   .comparison-focus .peer-left,.comparison-focus .king-card{display:none}
   .comparison-focus .peer-layout{display:block}
@@ -1266,8 +1381,12 @@
   /* ---- live time log ---- */
   .tlog{grid-column:1/-1;margin-top:16px;border-top:1px solid var(--line);padding-top:12px}
   .tlog-h{font:700 10px var(--mono);letter-spacing:1.5px;color:var(--cyan);text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:7px}
-  .tlog-list{display:flex;flex-direction:column;gap:0;max-height:260px;overflow:auto;font:12px var(--mono)}
-  .tlog-row{display:grid;grid-template-columns:92px repeat(6,minmax(118px,1fr)) minmax(130px,auto);gap:10px;align-items:center;min-width:980px;padding:7px 2px;border-top:1px solid rgba(27,37,54,.45);position:relative}
+  .tlog-scroll{width:100%;overflow-x:auto;overscroll-behavior-inline:contain;scrollbar-color:rgba(199,242,132,.35) transparent}
+  .tlog-cols,.tlog-row{display:grid;grid-template-columns:96px repeat(5,minmax(126px,1fr)) minmax(190px,220px);gap:10px;align-items:center;min-width:1080px}
+  .tlog-cols{padding:5px 2px 8px;font:800 9px/1 var(--mono);letter-spacing:1px;text-transform:uppercase;color:var(--dim);border-bottom:1px solid rgba(27,37,54,.65)}
+  .tlog-cols span:last-child{text-align:right;padding-left:18px;color:var(--grn);font-size:10px;border-left:1px solid rgba(199,242,132,.22)}
+  .tlog-list{display:flex;flex-direction:column;gap:0;width:100%;min-width:1080px;max-height:280px;overflow-x:hidden;overflow-y:auto;font:12px var(--mono)}
+  .tlog-row{padding:8px 2px;border-top:1px solid rgba(27,37,54,.45);position:relative}
   .tlog-row::before{content:"";position:absolute;left:0;top:4px;bottom:4px;width:var(--heat,0%);max-width:100%;border-radius:6px;background:linear-gradient(90deg,rgba(34,230,160,.15),rgba(56,225,255,.05));z-index:-1}
   .tlog-row.hot .tlog-b{color:var(--grn);text-shadow:0 0 14px rgba(34,230,160,.45)}
   .tlog-row:first-child{border-top:0}
@@ -1280,7 +1399,8 @@
   .tlog-country small{display:inline-flex;margin-left:5px;color:#06110d;background:var(--grn);border-radius:999px;padding:1px 5px;font:900 8px var(--mono);letter-spacing:.7px;vertical-align:middle}
   .tlog-country em{font-style:normal;color:var(--dim);margin-left:5px}
   .tlog-a{color:#9db0d2}
-  .tlog-b{color:var(--ink);font-weight:800;text-align:right}
+  .tlog-b{display:flex;align-items:center;justify-content:flex-end;gap:8px;min-height:30px;padding-left:18px;border-left:1px solid rgba(199,242,132,.22);color:var(--ink);font-weight:800;text-align:right}
+  .tlog-b strong{font:950 18px/1 var(--mono);letter-spacing:-.5px;color:inherit}
   .tlog-b small{display:inline-flex;color:#120900;background:var(--amber);border-radius:999px;padding:2px 5px;font:900 9px var(--mono);letter-spacing:1px;margin-left:8px;vertical-align:middle}
   .tlog-b small.proj{color:#07111c;background:#8fd7ff}
   .tlog-d{display:none}
@@ -2322,6 +2442,138 @@
       gap:1px!important;
     }
   }
+
+  /* ---- comparison report: conclusion first, details on demand ---- */
+  .comparison-report,
+  .valuation-report{
+    margin-top:14px;
+    padding:22px 0 0;
+    border-top:1px solid var(--line);
+  }
+  .cmp-heading{max-width:840px;margin-bottom:18px}
+  .cmp-heading h2{font:760 clamp(22px,2.4vw,30px)/1.1 var(--sans);letter-spacing:-1px;color:var(--ink)}
+  .cmp-heading p{margin-top:7px;font:13px/1.55 var(--sans);color:var(--sub)}
+  .cmp-summary{display:grid;grid-template-columns:minmax(280px,.82fr) minmax(0,1.35fr);gap:24px;padding:20px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+  .cmp-verdict{padding-left:16px;border-left:3px solid var(--grn)}
+  .cmp-verdict>span{display:block;font:800 9px/1 var(--mono);letter-spacing:1.4px;text-transform:uppercase;color:var(--grn)}
+  .cmp-verdict h3{max-width:620px;margin-top:9px;font:760 clamp(24px,3vw,38px)/1.06 var(--sans);letter-spacing:-1.5px;color:var(--ink)}
+  .cmp-verdict p{max-width:650px;margin-top:10px;font:13px/1.55 var(--sans);color:var(--sub)}
+  .cmp-key-metrics{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));border-left:1px solid var(--line);border-top:1px solid var(--line)}
+  .cmp-kpi{min-width:0;padding:15px 16px;border-right:1px solid var(--line);border-bottom:1px solid var(--line)}
+  .cmp-kpi span{display:block;font:750 10px/1.25 var(--mono);letter-spacing:.7px;text-transform:uppercase;color:var(--sub)}
+  .cmp-kpi strong{display:block;margin-top:8px;font:760 clamp(25px,3vw,38px)/1 var(--sans);letter-spacing:-1.5px;color:var(--ink)}
+  .cmp-kpi.var strong{color:var(--grn)}
+  .cmp-kpi.lighter strong{color:var(--cyan)}
+  .cmp-kpi small{display:block;margin-top:6px;font:11px/1.35 var(--sans);color:var(--dim)}
+  .cmp-hl-strip{display:grid;grid-template-columns:minmax(240px,1.25fr) repeat(3,minmax(130px,.55fr));align-items:center;margin-top:14px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:var(--panel)}
+  .cmp-hl-strip>div{min-height:74px;padding:13px 16px;border-left:1px solid var(--line)}
+  .cmp-hl-strip>div:first-child{border-left:0}
+  .cmp-hl-brand{display:flex;align-items:center;gap:10px}
+  .cmp-hl-brand span b{display:block;font:760 15px/1.2 var(--sans);color:var(--ink)}
+  .cmp-hl-brand span small{display:block;margin-top:4px;font:11px/1.35 var(--sans);color:var(--sub)}
+  .cmp-hl-strip>div:not(:first-child) strong{display:block;font:760 21px/1 var(--sans);letter-spacing:-.8px;color:var(--ink)}
+  .cmp-hl-strip>div:not(:first-child) span{display:block;margin-top:5px;font:10px/1.2 var(--mono);letter-spacing:.6px;text-transform:uppercase;color:var(--dim)}
+  .cmp-direct{margin-top:26px;padding-top:2px}
+  .cmp-section-head{margin-bottom:14px}
+  .cmp-section-head h3{font:760 20px/1.2 var(--sans);letter-spacing:-.5px;color:var(--ink)}
+  .cmp-section-head p{margin-top:5px;font:12.5px/1.45 var(--sans);color:var(--sub)}
+  .cmp-direct-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+  .cmp-table-pane{min-width:0;padding:8px 22px 16px 0}
+  .cmp-revenue-pane{min-width:0;padding:16px 0 16px 22px;border-left:1px solid var(--line)}
+  .cmp-revenue-pane .chart{display:block;width:100%;height:280px;margin:6px 0 0}
+  .cmp-revenue-pane .comp-rev-head{align-items:flex-start;flex-direction:column;gap:8px;margin-bottom:4px}
+  .cmp-revenue-pane .comp-rev-head .legend{justify-content:flex-start}
+  .cmp-revenue-pane .comp-rev-head>div:first-child b{font:760 14px/1.2 var(--sans);letter-spacing:0;text-transform:none}
+  .cmp-revenue-pane .comp-rev-head>div:first-child span{font-size:9px;letter-spacing:.8px}
+  .lighter-sw{background:#4f7fc4!important}
+  .comparison-report .h2h-rows{overflow-x:visible}
+  .comparison-report .h2h-tbl{width:100%;min-width:0;table-layout:fixed;font-size:12px}
+  .comparison-report .h2h-tbl th:first-child{width:25%}
+  .comparison-report .h2h-tbl th:nth-child(2),
+  .comparison-report .h2h-tbl th:nth-child(3){width:24%}
+  .comparison-report .h2h-tbl th:last-child{width:27%}
+  .comparison-report .h2h-tbl th{padding:10px 8px;font-size:9px}
+  .comparison-report .h2h-tbl td{padding:13px 8px}
+  .comparison-report .h2h-tbl td:first-child{font-size:10.5px;letter-spacing:.5px}
+  .comparison-report .h2h-tbl td b{font-size:14px}
+  .comparison-report .h2h-tbl td.win.cva b,
+  .comparison-report .h2h-tbl td.win.cli b{text-shadow:none}
+  .cmp-sources{margin-top:12px;border-top:1px solid var(--line)}
+  .cmp-sources summary,
+  .val-method summary{cursor:pointer;padding:11px 0;font:750 11px/1.3 var(--sans);color:var(--sub)}
+  .cmp-sources summary:hover,
+  .val-method summary:hover{color:var(--ink)}
+  .cmp-sources .h2h-note{margin:0;padding:0 0 8px;border:0;font:11px/1.6 var(--sans);color:var(--dim)}
+  .comparison-report .rev-callout{margin:10px 0 0;padding:12px 0 0;border:0;border-top:1px solid var(--line);border-radius:0;background:transparent!important}
+  .rev-explain>strong{display:block;font:760 13px/1.25 var(--sans);color:var(--ink)}
+  .rev-explain>p{margin-top:5px;font:11.5px/1.5 var(--sans);color:var(--sub)}
+  .rev-explain-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));margin-top:11px;border-top:1px solid var(--line)}
+  .rev-explain-grid span{padding:10px 10px 0 0;font:10px/1.4 var(--sans);color:var(--dim)}
+  .rev-explain-grid b{display:block;margin-top:4px;font:760 17px/1 var(--sans);color:var(--ink)}
+  .rev-explain-grid span:first-child b{color:var(--grn)}
+  .rev-explain-grid span:nth-child(2) b{color:var(--cyan)}
+  .cmp-market{margin-top:20px;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+  .cmp-market>summary{cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:15px 2px;list-style:none;font:750 14px/1.3 var(--sans);color:var(--ink)}
+  .cmp-market>summary::-webkit-details-marker{display:none}
+  .cmp-market>summary small{font:700 10px/1 var(--mono);letter-spacing:.7px;text-transform:uppercase;color:var(--grn)}
+  .cmp-market[open]>summary{border-bottom:1px solid var(--line)}
+  .cmp-market-inner{padding:12px 0 4px}
+  .cmp-market-meta{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px;font:11px/1.4 var(--sans);color:var(--sub)}
+  .cmp-market-meta a{margin-left:auto;color:var(--cyan)}
+  .cmp-market .pulse-table-wrap{overflow-x:auto}
+  .cmp-market .pulse-table{width:100%;min-width:560px;table-layout:fixed}
+  .cmp-market .pulse-table th:nth-child(1){width:52px}
+  .cmp-market .pulse-table th:nth-child(2){width:40%}
+  .cmp-market .pulse-table th,
+  .cmp-market .pulse-table td{padding:11px 12px}
+  .cmp-market .pulse-table tbody tr.me td{background:rgba(199,242,132,.055)}
+
+  .valuation-report{padding-bottom:4px}
+  .valuation-report .val-hero{margin:0 0 16px}
+  .valuation-report .val-cell{padding:18px;border-color:var(--line);border-radius:8px;background:var(--panel)!important;box-shadow:none}
+  .valuation-report .val-cell::before{display:none}
+  .valuation-report .vh-k{font-size:9px;letter-spacing:1.1px;color:var(--sub)}
+  .valuation-report .vh-big{margin:9px 0 8px;background:none;color:var(--grn);-webkit-text-fill-color:var(--grn);filter:none;font-family:var(--sans);font-weight:760}
+  .valuation-report .val-cell.actual .vh-big{color:#f08aa0;-webkit-text-fill-color:#f08aa0}
+  .valuation-report .val-cell.fdv .vh-big{background:none;color:var(--cyan);-webkit-text-fill-color:var(--cyan);filter:none}
+  .valuation-report .vh-sub{font:11.5px/1.5 var(--sans)}
+  .valuation-report .val-grid{grid-template-columns:minmax(0,1.4fr) minmax(300px,.6fr);gap:20px}
+  .valuation-report .val-chart-wrap{padding:8px;border-color:var(--line);border-radius:8px;background:var(--panel)}
+  .valuation-report .val-side{gap:0}
+  .valuation-report .val-side .vs-h{padding-bottom:9px;border-bottom:1px solid var(--line);font-family:var(--sans);font-size:11px;letter-spacing:.5px}
+  .valuation-report .vs-row{padding:11px 0;font-family:var(--sans);font-size:12px;border-color:var(--line)}
+  .valuation-report .vs-row.me{margin:0;padding:11px 8px;border:0;border-bottom:1px solid var(--line);border-radius:0;background:rgba(199,242,132,.045)}
+  .valuation-report .vs-row .v b,
+  .valuation-report .vs-row .v small,
+  .valuation-report .vs-row .vs-nm small{font-family:var(--sans)}
+  .val-method{margin-top:12px;border-top:1px solid var(--line)}
+  .val-method .val-note{margin:0;padding:0 0 10px;border:0;font:11px/1.6 var(--sans)}
+  @media(max-width:1080px){
+    .cmp-summary,.cmp-direct-grid{grid-template-columns:1fr}
+    .cmp-table-pane{padding-right:0}
+    .cmp-revenue-pane{padding:18px 0 14px;border-left:0;border-top:1px solid var(--line)}
+    .valuation-report .val-grid{grid-template-columns:1fr}
+  }
+  @media(max-width:760px){
+    .comparison-report,.valuation-report{padding-top:18px}
+    .cmp-key-metrics{grid-template-columns:1fr 1fr}
+    .cmp-hl-strip{grid-template-columns:1fr 1fr}
+    .cmp-hl-strip>div{border-left:0;border-top:1px solid var(--line)}
+    .cmp-hl-strip>div:nth-child(even){border-left:1px solid var(--line)}
+    .cmp-hl-brand{grid-column:1/-1;border-top:0!important}
+    .rev-explain-grid{grid-template-columns:1fr}
+    .cmp-market>summary{align-items:flex-start;flex-direction:column;gap:5px}
+    .comparison-report .h2h-rows{overflow-x:auto}
+    .comparison-report .h2h-tbl{min-width:540px}
+  }
+  @media(max-width:520px){
+    .cmp-key-metrics{grid-template-columns:1fr}
+    .cmp-verdict h3{font-size:25px}
+    .cmp-hl-strip{grid-template-columns:1fr}
+    .cmp-hl-strip>div:nth-child(even){border-left:0}
+    .cmp-hl-brand{grid-column:auto}
+    .cmp-revenue-pane .comp-rev-head{align-items:flex-start;flex-direction:column}
+  }
 </style>
 </head>
 <body>
@@ -2373,9 +2625,10 @@
   <button id="tab-implied" type="button" role="tab" aria-selected="false" data-tab="implied">Mechanic</button>
   <button id="tab-historical" type="button" role="tab" aria-selected="false" data-tab="historical">Historical Data</button>
   <button id="tab-efficiency" type="button" role="tab" aria-selected="false" data-tab="efficiency">Fundamentals</button>
+  <button id="tab-biweekly" type="button" role="tab" aria-selected="false" data-tab="biweekly">Biweekly Report</button>
   <button id="tab-roadmap" type="button" role="tab" aria-selected="false" data-tab="roadmap">Roadmap</button>
   <button id="tab-points" type="button" role="tab" aria-selected="false" data-tab="points">Points</button>
-  <button id="tab-comparison" type="button" role="tab" aria-selected="false" data-tab="comparison">Comparison <span class="tab-new">#5</span></button>
+  <button id="tab-comparison" type="button" role="tab" aria-selected="false" data-tab="comparison">Comparison</button>
 </nav>
 
 <main id="main">
@@ -2503,7 +2756,7 @@
   </div>
 </div>
 
-<div class="protocol-map tsec" data-tg="overview">
+<div class="protocol-map tsec tg-hide" data-tg="efficiency">
   <div class="pm-panel">
     <div class="pm-title">Protocol money map</div>
     <svg class="pm-sankey" id="pmSankey" viewBox="0 0 720 230" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Income flow: spreads split to OLP vault and protocol treasury, treasury splits to buyback firepower and dry powder"></svg>
@@ -2557,7 +2810,10 @@
     </div>
     <div class="tlog">
       <div class="tlog-h"><span class="live-dot"></span> Hourly earnings · local daytime map</div>
-      <div class="tlog-list" id="tlogList"><div class="tlog-row"><span class="tlog-t">ET hour</span><span class="tlog-country">🇺🇸 US</span><span class="tlog-country">🇸🇬 SG</span><span class="tlog-country">🇪🇸 ES</span><span class="tlog-country">🇩🇪 DE</span><span class="tlog-country">🇰🇷 KR</span><span class="tlog-country">🇯🇵 JP</span><span class="tlog-b">syncing…</span></div></div>
+      <div class="tlog-scroll">
+        <div class="tlog-cols" aria-hidden="true"><span>ET window</span><span>🇺🇸 United States</span><span>🇸🇬 Singapore</span><span>🇩🇪 Germany</span><span>🇪🇸 Spain</span><span>🇰🇷 Korea</span><span>Earned / hour</span></div>
+        <div class="tlog-list" id="tlogList"><div class="tlog-row"><span class="tlog-t">ET hour</span><span class="tlog-country">loading</span><span class="tlog-country">loading</span><span class="tlog-country">loading</span><span class="tlog-country">loading</span><span class="tlog-country">loading</span><span class="tlog-b"><strong>syncing…</strong></span></div></div>
+      </div>
     </div>
   </div>
 </div>
@@ -2565,11 +2821,17 @@
 <div class="note tsec" id="note" data-tg="overview"></div>
 
 <div class="card eff tsec tg-hide" data-tg="efficiency">
-  <h2>Monthly Fundamentals <span class="tag">activity → revenue</span></h2>
-  <div class="cap">One month-to-date view of how trading activity becomes spread fees, treasury revenue, and buyback-burn firepower. <span id="effAsOf" class="muted"></span></div>
-  <div class="eff-window-status monthly-only"><b id="effWindowTitle">MTD VIEW</b><span id="effWindowRange">Current month-to-date</span></div>
+  <h2>Revenue Run-Rate <span class="tag">FDV / MCAP input</span></h2>
+  <div class="cap">How much real USDC this venue earns per day, week, and month. Annualize the pace and you have the revenue leg of any FDV or MCAP multiple. <span id="effAsOf" class="muted"></span></div>
+  <div class="eff-window-tabs" id="effWindowTabs" role="tablist" aria-label="Time window">
+    <button type="button" data-eff-window="1d">1D</button>
+    <button type="button" data-eff-window="7d">1W</button>
+    <button type="button" data-eff-window="30d">30D</button>
+    <button type="button" data-eff-window="month">MTD</button>
+  </div>
+  <div class="eff-window-status"><b id="effWindowTitle">MTD VIEW</b><span id="effWindowRange">Current month-to-date</span></div>
   <div class="activity-read" aria-label="Current activity and earnings summary">
-    <div class="activity-read-head"><span class="live-dot"></span><b>READ THIS FIRST</b><span>Monthly activity → implied money earned</span><strong class="activity-period" id="effActivePeriod">MTD</strong></div>
+    <div class="activity-read-head"><span class="live-dot"></span><b>READ THIS FIRST</b><span>Window activity → real money earned → valuation fuel</span><strong class="activity-period" id="effActivePeriod">MTD</strong></div>
     <div class="activity-read-flow">
       <div class="activity-input"><span id="fmVolLabel">1D PERP VOLUME</span><strong id="fmDailyVol">—</strong><small id="fmDailyVolFormula">selected trading flow</small></div>
       <div class="activity-plus">+</div>
@@ -2580,14 +2842,16 @@
       <div class="activity-result treasury"><span id="fmRevLabel">1D VARIATIONAL TREASURY REVENUE</span><strong id="fmDailyRev">—</strong><small id="fmDailyRevFormula">selected treasury inflow</small></div>
     </div>
     <div class="activity-outcome"><b id="fmDailyBurn">—</b><span id="fmBurnLabel">estimated 1D buyback-burn firepower</span><small id="fmDailyBurnFormula">1D treasury × 30%</small></div>
+    <div class="activity-valuation" id="fmValLine"></div>
   </div>
   <div class="eff-ratios">
     <div class="er"><div class="er-v" id="erVolFee">—</div><div class="er-l">perp volume makes <b>$1 in fees</b></div></div>
     <div class="er"><div class="er-v" id="erVolRev">—</div><div class="er-l">volume makes <b>$1 to treasury</b></div></div>
-    <div class="er"><div class="er-v" id="erOi">—</div><div class="er-l">open interest makes <b>$1/day</b></div></div>
+    <div class="er"><div class="er-v" id="erTvl">—</div><div class="er-l"><b>TVL</b> ex-hedging · official biweekly</div></div>
     <div class="er"><div class="er-v" id="erTurn">—</div><div class="er-l">OI turns over <b>per day</b></div></div>
   </div>
-  <div class="eff-note">Open interest <b id="efOi">—</b> · treasury earns <b id="efYield">—</b>/yr on that OI · take-rate holds ~flat across 24h/7d/30d → <b>fee capture scales linearly with volume</b>. <span class="muted">Snapshot; not financial advice.</span></div>
+  <div class="eff-note">TVL <b id="efTvl">—</b> backs <b id="efOi">—</b> OI → <b id="efCapEff">—</b> capital efficiency · $1 of TVL supports <b id="efVolSupport">—</b> of daily volume · selected-window fee pool = <b id="efFeeVsTvl">—</b> of TVL → <b>fee capture scales with volume, not with parked capital</b>. <span class="muted">TVL from the official biweekly post (cross-check: <a href="https://dune.com/entropy_advisors/variational-protocol" target="_blank" rel="noopener">Dune · Entropy Advisors</a>). Not financial advice.</span></div>
+  <div class="bw-link"><a href="#biweekly" onclick="showTab('biweekly');return false">Official biweekly P&amp;L: net profit <b id="bwTeaser">—</b> after all costs → open the full report</a></div>
   <div class="fr-chart-head">
     <b>Is the exchange getting better at making money?</b>
     <span>Green up is good. Purple down is good. Together they show whether trading activity is turning into treasury revenue more efficiently.</span>
@@ -2598,6 +2862,28 @@
     <div class="box"><b>What to watch</b><strong id="frReadSignal">—</strong><span>Best setup: green line rising while purple line falls.</span></div>
   </div>
   <svg class="chart" id="frHist" viewBox="0 0 720 260"></svg>
+</div>
+
+<div class="card tsec tg-hide" data-tg="biweekly">
+  <h2>Biweekly Operating Report <span class="tag">official post + on-chain check</span></h2>
+  <div class="cap">Two independent reads of progress: the official operating report explains the business, while the treasury wallet shows cash actually landing on-chain. <span id="bwAsOf" class="muted">—</span></div>
+  <div class="bw full" id="bwBlock">
+    <div class="bw-source-rail">
+      <div class="bw-lane"><span class="n">1</span><div><b>Official report</b><span>Metrics copied from Variational's biweekly X post. New posts are appended, never overwritten. <a href="https://x.com/search?q=from%3Avariational_io%20biweekly%20update!&src=typed_query" target="_blank" rel="noopener">Open official post search</a></span></div></div>
+      <div class="bw-lane"><span class="n">2</span><div><b>On-chain check</b><span>Six consecutive 14-day treasury inflow windows calculated from the Arbitrum USDC balance history. This updates without waiting for a post.</span></div></div>
+    </div>
+    <div class="bw-head first"><b>Latest official 2-week P&amp;L</b><span>what traders paid → what remains after operating costs</span></div>
+    <div class="bw-pnl" id="bwPnl"></div>
+    <div class="bw-head"><b>Report-over-report change</b><span>8 metrics · previous official post → latest official post</span></div>
+    <div class="bw-deltas" id="bwDeltas"></div>
+    <div class="bw-head"><b>On-chain 14-day momentum</b><span>the answer available before the next official post</span></div>
+    <div class="bw-trend" id="bwTrend"></div>
+    <div class="bw-head"><b>Latest platform snapshot</b><span>all figures from the same official post</span></div>
+    <div class="bw-grid" id="bwGrid"></div>
+    <div class="bw-head"><b>Official report history</b><span>newest first · fills automatically as posts are appended</span></div>
+    <div class="bw-hist" id="bwHist"></div>
+    <div class="bw-note" id="bwNote"></div>
+  </div>
 </div>
 
 <div class="card tsec tg-hide" data-tg="implied" style="margin-top:16px">
@@ -2858,7 +3144,7 @@
   </div>
 </div>
 
-<div class="card cal tsec tg-hide" data-tg="efficiency" style="margin-top:16px">
+<div class="card cal tsec tg-hide" data-tg="overview" style="margin-top:16px">
   <h2><button class="cal-collapse" id="calCollapse" type="button" aria-expanded="true" aria-label="Collapse calendar" title="Collapse calendar">⌃ Collapse</button><span>Total Earnings + Fee/Revenue Calendar <span class="tag" id="calTag">daily totals</span></span></h2>
   <div class="cap">Completed treasury revenue, implied activity, burn firepower, and market events. Daily view shows history plus pending dates only through the end of next week. Today stays pending until the ET day closes.</div>
   <div class="seg" id="calSeg">
@@ -2906,91 +3192,86 @@
   </div>
 </div>
 
-<div class="card h2h peers-combined comparison-focus tsec tg-hide" data-tg="comparison">
-  <h2>Variational vs the Perp DEX Market <span class="tag">top 13 by OI</span></h2>
-  <div class="cap">See where Variational sits among the largest perpetual DEXs by open interest, with Lighter kept as the direct market comparison. Open interest &amp; 24h volume are pulled live and re-snapshotted on every load. <a href="https://www.coingecko.com/en/derivatives" target="_blank" rel="noopener" style="color:var(--cyan)">Source: CoinGecko derivatives ↗</a></div>
-  <div class="mini-head">Perpetual DEX market board · top 13 by open interest · <span>Variational highlighted</span><span class="live-pill" id="boardLive"><i></i>loading</span></div>
-  <div class="pulse-table-wrap"><table class="pulse-table" id="pulseTable"><thead><tr><th>#</th><th>Exchange</th><th>OI</th><th>24H Volume</th><th>TVL</th><th>Pairs</th><th>Maker Fee</th><th>Taker Fee</th><th>Leverage</th><th>Source</th></tr></thead><tbody></tbody></table></div>
-  <div class="peer-layout">
-    <div class="peer-left">
-      <div class="peer-rank-hero">
-        <div class="ph-rank"><span class="ph-hash">#</span><span id="phRank">5</span></div>
-        <div>
-          <div class="ph-k">Variational rank <span class="beta">Closed Beta</span></div>
-          <div class="ph-title">#<span id="phRank2">5</span> of <span id="phCount">87</span> by OI</div>
-          <div class="ph-sub"><b id="phShare">5.4%</b> of perp OI (<b id="phTotal">$21.7B</b>) · ranked by current open interest.</div>
+<section class="comparison-report tsec tg-hide" data-tg="comparison">
+  <div class="cmp-heading">
+    <h2>Perp DEX Positioning</h2>
+    <p>Variational is compared with Lighter on the same current windows. Hyperliquid is shown separately as the market ceiling.</p>
+  </div>
+
+  <div class="cmp-summary">
+    <div class="cmp-verdict">
+      <span>Bottom line</span>
+      <h3 id="cmpVerdict">Capacity favors Variational. Revenue favors Lighter.</h3>
+      <p id="cmpVerdictSub">Booked revenue reflects each protocol's payout split, not earning power. Variational keeps 10% of trader spreads and routes 90% to OLP liquidity providers. Lighter keeps about 78% of the fees it collects.</p>
+    </div>
+    <div class="cmp-key-metrics">
+      <div class="cmp-kpi"><span>Market rank</span><strong id="cmpRank">#-</strong><small id="cmpRankSub">loading market data</small></div>
+      <div class="cmp-kpi var"><span>Open interest</span><strong id="valOiEdge">-</strong><small id="valOiEdgeSub">loading</small></div>
+      <div class="cmp-kpi var"><span>30D fee pool</span><strong id="valFeeEdge">-</strong><small id="valFeeEdgeSub">loading</small></div>
+      <div class="cmp-kpi lighter"><span>30D booked revenue</span><strong id="cmpRevenueEdge">-</strong><small id="cmpRevenueEdgeSub">current monetization lead</small></div>
+    </div>
+  </div>
+
+  <div class="cmp-hl-strip">
+    <div class="cmp-hl-brand"><img class="cmp-logo lg" src="logo-hyperliquid.png" alt="Hyperliquid" width="20" height="20"><span><b>Hyperliquid benchmark</b><small>Scale ceiling, not a direct peer</small></span></div>
+    <div><strong id="kingOi">-</strong><span>open interest</span></div>
+    <div><strong id="kingVol">-</strong><span>24H volume</span></div>
+    <div><strong id="kingRev">-</strong><span>30D revenue</span></div>
+  </div>
+
+  <section class="cmp-direct">
+    <div class="cmp-section-head">
+      <h3>Variational vs Lighter</h3>
+      <p>Capacity, activity, fee pool, and booked revenue. No mixed all-time windows.</p>
+    </div>
+    <div class="cmp-direct-grid">
+      <div class="cmp-table-pane">
+        <div class="h2h-rows" id="h2hRows"></div>
+        <details class="cmp-sources"><summary>How these numbers are calculated</summary><div class="h2h-note" id="h2hNote"></div></details>
+      </div>
+      <div class="cmp-revenue-pane">
+        <div class="comp-rev-head">
+          <div><b>Weekly protocol revenue</b><span>Trailing 8 matched weeks</span></div>
+          <div class="legend">
+            <b><img class="cmp-logo" src="variational-symbol-transparent.png" alt="" width="20" height="20"><span class="sw act"></span>Variational</b>
+            <b><img class="cmp-logo" src="lighter-logo.png" alt="" width="20" height="20"><span class="sw lighter-sw"></span>Lighter</b>
+          </div>
         </div>
-      </div>
-      <div class="mini-head">Top 13 by open interest · <span id="peersAsOf">loading live snapshot</span></div>
-      <div class="rank-list" id="rankList"></div>
-      <span id="peersTotal" hidden>22</span>
-    </div>
-    <div class="peer-right">
-  <div class="king-frame">
-    <div class="king-card">
-      <div class="king-crown">♕</div>
-      <div>
-        <b><img class="cmp-logo lg" src="logo-hyperliquid.png" alt="" width="20" height="20">Hyperliquid is the king</b>
-        <span>The benchmark ceiling: deepest OI, largest volume, biggest protocol revenue. Variational and Lighter are not compared as equals to HL — they are challengers priced by how close they can get.</span>
-      </div>
-      <div class="king-score">
-        <div><strong id="kingOi">—</strong><small>open interest</small></div>
-        <div><strong id="kingVol">—</strong><small>24h volume</small></div>
-        <div><strong id="kingRev">—</strong><small>30D revenue</small></div>
+        <svg class="chart" id="revVs" viewBox="0 0 720 250" preserveAspectRatio="none"></svg>
+        <div class="rev-callout" id="revCallout"></div>
       </div>
     </div>
-    <div class="challenger-duel">
-      <div class="challenger var">
-        <div class="challenger-name"><b><img class="cmp-logo lg" src="variational-symbol-transparent.png" alt="" width="20" height="20">Variational</b><span>challenger A</span></div>
-        <div class="challenger-thesis" id="varThesis">Higher OI and larger spread-fee pool than Lighter; lower realized protocol revenue today because only the treasury cut is counted.</div>
-      </div>
-      <div class="duel-vs">vs comp</div>
-      <div class="challenger ltr">
-        <div class="challenger-name"><b><img class="cmp-logo lg" src="lighter-logo.png" alt="" width="20" height="20">Lighter</b><span>market comp</span></div>
-        <div class="challenger-thesis" id="lighterThesis">Useful TGE comp: higher current booked revenue, but smaller OI and much smaller fee pool than Variational in this snapshot.</div>
-      </div>
-    </div>
-    <div class="valuation-strip">
-      <div><b id="valOiEdge">—</b><span>Variational OI vs Lighter</span></div>
-      <div><b id="valFeeEdge">—</b><span>Variational fee pool vs Lighter</span></div>
-      <div><b id="valTgeRead">Near / premium</b><span>TGE argument if market values venue capacity + fee potential</span></div>
-    </div>
-  </div>
-  <div class="h2h-rows" id="h2hRows"></div>
-  <div class="h2h-note" id="h2hNote"></div>
-    </div>
-  </div>
-</div>
+  </section>
 
-<div class="card comparison-revenue-card tsec tg-hide" data-tg="comparison" style="margin-top:16px">
-  <h2>Variational Revenue vs Lighter Revenue <span class="tag">weekly · trailing 8 weeks</span></h2>
-  <div class="cap">Weekly protocol revenue, same 7-day windows. Variational = USDC actually landing in the on-chain treasury (verifiable). Lighter = daily revenue on DeFiLlama.</div>
-  <div class="legend">
-    <b><img class="cmp-logo" src="variational-symbol-transparent.png" alt="" width="20" height="20"><span class="sw act"></span>Variational · on-chain</b>
-    <b><img class="cmp-logo" src="lighter-logo.png" alt="" width="20" height="20"><span class="sw" style="background:linear-gradient(90deg,#2c4c7f,#3f74c9)"></span>Lighter · DeFiLlama</b>
-  </div>
-  <svg class="chart" id="revVs" viewBox="0 0 720 250" preserveAspectRatio="none"></svg>
-  <div class="rev-callout" id="revCallout"></div>
-</div>
+  <details class="cmp-market">
+    <summary><span>Market rank: <b id="cmpRankLine">loading</b></span><small>Show top 13 by open interest</small></summary>
+    <div class="cmp-market-inner">
+      <div class="cmp-market-meta"><span id="peersAsOf">loading market snapshot</span><span class="live-pill" id="boardLive"><i></i>loading</span><a href="https://www.coingecko.com/en/derivatives" target="_blank" rel="noopener">CoinGecko source ↗</a></div>
+      <div class="pulse-table-wrap"><table class="pulse-table" id="pulseTable"><thead><tr><th>#</th><th>Exchange</th><th>Open interest</th><th>24H volume</th></tr></thead><tbody></tbody></table></div>
+    </div>
+  </details>
+</section>
 
-<div class="card valmodel tsec tg-hide" data-tg="comparison" style="margin-top:16px">
-  <h2>Model MCAP vs Current Market <span class="tag">actual · model · gap</span></h2>
-  <div class="cap">The model converts Variational's current OI into an implied circulating market cap. <b>$VAR is still pre-TGE, so Variational has no current market cap yet.</b> Listed peer market caps update from CoinGecko and are compared against the same model. <a href="https://docs.variational.io/roadmap" target="_blank" rel="noopener" style="color:var(--cyan)">Token status ↗</a></div>
+<section class="valmodel valuation-report tsec tg-hide" data-tg="comparison">
+  <div class="cmp-heading">
+    <h2>Implied Valuation</h2>
+    <p>The model estimates circulating market cap from open interest. Listed tokens reveal the premium or discount investors currently pay.</p>
+  </div>
   <div class="val-hero">
     <div class="val-cell">
       <div class="vh-k">Model-implied Variational MCAP</div>
       <div class="vh-big" id="valMcap">$—</div>
-      <div class="vh-sub">from current OI <b id="valOiBase">$—</b> · fit <span class="mono">MCAP ≈ 10.0 · OI<sup>0.875</sup></span> · R² 0.74</div>
+      <div class="vh-sub">Based on current OI <b id="valOiBase">$—</b>. $VAR is pre-TGE, so this is not a traded value.</div>
     </div>
     <div class="val-cell actual">
-      <div class="vh-k">Current Variational MCAP</div>
-      <div class="vh-big" id="valCurrentMcap">N/A</div>
-      <div class="vh-sub" id="valMcapStatus">No traded $VAR market · pre-TGE</div>
+      <div class="vh-k">Gap to Hyperliquid</div>
+      <div class="vh-big" id="valVsHl">-</div>
+      <div class="vh-sub" id="valVsHlSub">Comparing Variational's model value with Hyperliquid's current market cap</div>
     </div>
     <div class="val-cell fdv">
       <div class="vh-k">Model-implied FDV</div>
       <div class="vh-big" id="valFdv">$—</div>
-      <div class="vh-sub">at <b id="valFloat">25%</b> circulating float · range <b id="valFdvRange">—</b> across 20–33%</div>
+      <div class="vh-sub">Assumes <b id="valFloat">25%</b> circulating float. Range <b id="valFdvRange">—</b> across 20-33%.</div>
     </div>
   </div>
   <div class="val-grid">
@@ -2999,8 +3280,8 @@
     </div>
     <div class="val-side" id="valSide"></div>
   </div>
-  <div class="val-note" id="valNote"></div>
-</div>
+  <details class="val-method"><summary>Model, sources, and limitations</summary><div class="val-note" id="valNote"></div></details>
+</section>
 
 
 </main>
@@ -3037,6 +3318,153 @@ const MKT = {
   hlOi:10.286e9,     // Hyperliquid OI (DeFiLlama, live-ish)
   hlVol30:255e9      // Hyperliquid ~30d perp volume (est.; DeFiLlama gates volume)
 };
+/* ---------- official biweekly metrics ----------
+   Source: Variational's biweekly metrics post on X (x.com/variational_io).
+   UPDATE ROUTINE: when a new post drops (~every 2 weeks), APPEND a new object to
+   BIWEEKLY_HISTORY (keep chronological order, oldest first). The newest entry drives
+   the report; older entries unlock report-over-report progress deltas and the history list.
+   Past posts can be backfilled the same way. */
+const BIWEEKLY_HISTORY=[
+{
+  asOf:'2026-05-01', src:'https://x.com/search?q=from%3Avariational_io%20biweekly%20update!&src=typed_query',
+  totalVolume:211.19e9,      // Total Volume Traded
+  oi:674.88e6,              // Current Dual-Sided OI
+  tvl:109.13e6,             // TVL (excludes some OLP hedging accounts)
+  tvlScope:'excludes some OLP hedging accounts',
+  markets:456,              // Total tokens currently listed in this report
+  listingMetric:'tokens',
+  rewardsClaimed:6871220,   // Total rewards claimed (lifetime)
+  lossesRefunded:4559196,   // Total losses refunded (Sunset)
+  referralClaimed:2312024,  // Total referral rewards claimed (lifetime)
+  dau:7139,                 // Daily active users, avg over past week
+  wau:12723,                // Weekly active users
+  spreads2w:1426600,        // 2w spreads paid (gross revenue)
+  mmCosts2w:1108556,        // 2w market making costs (cost of revenue)
+  netRevenue2w:318044,      // 2w net revenue
+  rewards2w:69545,          // 2w rewards (all referral rewards in this report)
+  referralRewards2w:69545,  // 2w referral rewards
+  netProfit2w:248499,       // 2w net profit
+  treasury2w:285320,        // 2w protocol treasury inflow
+  olpPnl2w:-36821,          // 2w OLP loss
+  olpPnlLife:12723710,      // lifetime OLP PnL
+  treasuryHoldings:null     // not reported in the supplied post
+},
+{
+  asOf:'2026-05-15', src:'https://x.com/search?q=from%3Avariational_io%20biweekly%20update!&src=typed_query',
+  totalVolume:219.08e9,      // Total Volume Traded
+  oi:740.07e6,              // Current Dual-Sided OI
+  tvl:104.0e6,              // TVL (excludes some OLP hedging accounts)
+  tvlScope:'excludes some OLP hedging accounts',
+  markets:456,              // Total tokens currently listed in this report
+  listingMetric:'tokens',
+  rewardsClaimed:6945522,   // Total rewards claimed (lifetime)
+  lossesRefunded:4559196,   // Total losses refunded (Sunset)
+  referralClaimed:2386326,  // Total referral rewards claimed (lifetime)
+  dau:8389,                 // Daily active users, avg over past week
+  wau:14773,                // Weekly active users
+  spreads2w:1687700,        // 2w spreads paid (gross revenue)
+  mmCosts2w:1011619,        // 2w market making costs (cost of revenue)
+  netRevenue2w:676081,      // 2w net revenue
+  rewards2w:81710,          // 2w rewards (all referral rewards in this report)
+  referralRewards2w:81710,  // 2w referral rewards
+  netProfit2w:594371,       // 2w net profit
+  treasury2w:337540,        // 2w protocol treasury inflow
+  olpPnl2w:256831,          // 2w OLP PnL
+  olpPnlLife:12980541,      // lifetime OLP PnL
+  treasuryHoldings:2070935  // current protocol treasury holdings (USDC)
+},
+{
+  asOf:'2026-05-29', src:'https://x.com/search?q=from%3Avariational_io%20biweekly%20update!&src=typed_query',
+  totalVolume:229.8e9,       // Total Volume Traded
+  oi:992.75e6,              // Current Dual-Sided OI
+  tvl:122.77e6,             // TVL (excludes some OLP hedging accounts)
+  tvlScope:'excludes some OLP hedging accounts',
+  markets:465,              // Total tokens currently listed in this report
+  listingMetric:'tokens',
+  rewardsClaimed:7042844,   // Total rewards claimed (lifetime)
+  lossesRefunded:4559196,   // Total losses refunded (Sunset)
+  referralClaimed:2483648,  // Total referral rewards claimed (lifetime)
+  dau:10805,                // Daily active users, avg over past week
+  wau:20082,                // Weekly active users
+  spreads2w:2243040,        // 2w spreads paid (gross revenue)
+  mmCosts2w:1272376,        // 2w market making costs (cost of revenue)
+  netRevenue2w:970664,      // 2w net revenue
+  rewards2w:107553,         // 2w rewards (all referral rewards in this report)
+  referralRewards2w:107553, // 2w referral rewards
+  netProfit2w:863111,       // 2w net profit
+  treasury2w:448608,        // 2w protocol treasury inflow
+  olpPnl2w:414503,          // 2w OLP PnL
+  olpPnlLife:13395044,      // lifetime OLP PnL
+  treasuryHoldings:2522857  // current protocol treasury holdings (USDC)
+},
+{
+  asOf:'2026-06-12', src:'https://x.com/search?q=from%3Avariational_io%20biweekly%20update!&src=typed_query',
+  totalVolume:244.2e9,       // Total Volume Traded
+  oi:858.6e6,               // Current Dual-Sided OI
+  tvl:137.8e6,              // TVL (excludes OLP hedging accounts)
+  markets:478,              // Total markets currently listed
+  rewardsClaimed:7238105,   // Total rewards claimed (lifetime)
+  lossesRefunded:4559196,   // Total losses refunded (Sunset)
+  referralClaimed:2678909,  // Total referral rewards claimed (lifetime)
+  dau:10858,                // Daily active users, avg over past week
+  wau:19456,                // Weekly active users
+  spreads2w:4332160,        // 2w spreads paid (gross revenue)
+  mmCosts2w:2156274,        // 2w market making costs (cost of revenue)
+  netRevenue2w:2175886,     // 2w net revenue
+  rewards2w:209668,         // 2w rewards (all referral rewards in this report)
+  referralRewards2w:209668, // 2w referral rewards
+  netProfit2w:1966218,      // 2w net profit
+  treasury2w:866432,        // 2w protocol treasury inflow
+  olpPnl2w:1099786,         // 2w OLP PnL
+  olpPnlLife:14494830,      // lifetime OLP PnL
+  treasuryHoldings:3400937  // current protocol treasury holdings (USDC)
+},
+{
+  asOf:'2026-06-26', src:'https://x.com/search?q=from%3Avariational_io%20biweekly%20update!&src=typed_query',
+  totalVolume:255.8e9,       // Total Volume Traded
+  oi:1.1e9,                 // Current Dual-Sided OI
+  tvl:150.3e6,              // TVL (excludes OLP hedging accounts)
+  markets:491,              // Total markets currently listed
+  rewardsClaimed:7366115,   // Total rewards claimed (lifetime)
+  lossesRefunded:4559196,   // Total losses refunded (Sunset)
+  referralClaimed:2806919,  // Total referral rewards claimed (lifetime)
+  dau:10603,                // Daily active users, avg over past week
+  wau:17610,                // Weekly active users
+  spreads2w:3216760,        // 2w spreads paid (gross revenue)
+  mmCosts2w:1947440,        // 2w market making costs (cost of revenue)
+  netRevenue2w:1269320,     // 2w net revenue
+  rewards2w:155995,         // 2w rewards (all referral rewards in this report)
+  referralRewards2w:155995, // 2w referral rewards
+  netProfit2w:1113325,      // 2w net profit
+  treasury2w:643352,        // 2w protocol treasury inflow
+  olpPnl2w:469973,          // 2w OLP PnL
+  olpPnlLife:14964803,      // lifetime OLP PnL
+  treasuryHoldings:4073913  // current protocol treasury holdings (USDC)
+},
+{
+  asOf:'2026-07-11', src:'https://x.com/search?q=from%3Avariational_io%20biweekly%20update!&src=typed_query',
+  totalVolume:266.99e9,      // Total Volume Traded
+  oi:1.26e9,                 // Current Dual-Sided OI
+  tvl:160.50e6,              // TVL (excludes OLP hedging accounts)
+  markets:506,               // Total markets currently listed
+  rewardsClaimed:7507896,    // Total rewards claimed (lifetime)
+  lossesRefunded:4559196,    // Total losses refunded (Sunset)
+  referralClaimed:2948700,   // Total referral rewards claimed (lifetime)
+  dau:9820,                  // Daily active users, avg over past week
+  wau:16636,                 // Weekly active users
+  spreads2w:3069800,         // 2w spreads paid (gross revenue)
+  mmCosts2w:1652505,         // 2w market making costs (cost of revenue)
+  netRevenue2w:1417295,      // 2w net revenue
+  rewards2w:148583,          // 2w rewards
+  netProfit2w:1268712,       // 2w net profit
+  treasury2w:613960,         // 2w protocol treasury inflow
+  olpPnl2w:654752,           // 2w OLP PnL
+  olpPnlLife:15619555,       // lifetime OLP PnL
+  treasuryHoldings:4662552   // current protocol treasury holdings (USDC)
+}
+];
+const BIWEEKLY=BIWEEKLY_HISTORY[BIWEEKLY_HISTORY.length-1];
+
 /* perp-DEX peer ranking by open interest (Perpetual Pulse snapshot) */
 const PEERS = {
   asOf:'loading live data', snapAsOf:'2026-07-08 board', live:false, total:16.408469162e9, count:15, varRank:3, varShare:7.4, vsHl:8.9,
@@ -3075,6 +3503,12 @@ function computeEff(){
   return {cur,rev30,dailyRev,volPerRev,volPerFee,takeBpsRev,takeBpsFee,oiPerDayRev,oiTurnover,annRevYield,feesCum};
 }
 let EFF_WINDOW='month';
+let OLP_TVL=13339570.5, OLP_TVL_LIVE=false; // USDC balanceOf(Core OLP vault 0x74bbbb...1f2cd), snapshot 2026-07-11; live read overrides on load
+const OLP_TVL_ASOF='2026-07-11';
+/* Optional manual override: paste the OLP TVL shown on dune.com/entropy_advisors/variational-protocol
+   (Dune has no free client-side API, so this is a hand-refreshed snapshot; on-chain vault read stays the live default) */
+const DUNE_TVL_SNAP={v:null,asOf:'',src:'Dune · Entropy Advisors'};
+let OI_SRC='cg'; // 'llama' once DeFiLlama open-interest sync lands
 const EFF_WINDOWS={
   '1d':{label:'1D',days:1,volKey:'d1'},
   '7d':{label:'1W',days:7,volKey:'d7'},
@@ -3264,10 +3698,9 @@ const ASIA_TZ={tz:'Asia/Singapore',label:'SGT'};
 const SESSION_TZS=[
   {flag:'🇺🇸',code:'US',tz:'America/New_York'},
   {flag:'🇸🇬',code:'SG',tz:'Asia/Singapore'},
-  {flag:'🇪🇸',code:'ES',tz:'Europe/Madrid'},
   {flag:'🇩🇪',code:'DE',tz:'Europe/Berlin'},
-  {flag:'🇰🇷',code:'KR',tz:'Asia/Seoul'},
-  {flag:'🇯🇵',code:'JP',tz:'Asia/Tokyo'}
+  {flag:'🇪🇸',code:'ES',tz:'Europe/Madrid'},
+  {flag:'🇰🇷',code:'KR',tz:'Asia/Seoul'}
 ];
 function tzParts(date,tz=RESET_TZ.tz){
   const parts=new Intl.DateTimeFormat('en-US',{timeZone:tz,year:'numeric',month:'2-digit',day:'2-digit',
@@ -3327,7 +3760,7 @@ function hourlyRow(h,earned,{current=false,max=1,date=resetDateKey(),projected=f
   return `<div class="tlog-row ${current?'new live-hour':''} ${hot?'hot':''}" data-hour="${h}" style="--heat:${heat.toFixed(1)}%">
     <span class="tlog-t">${String(h).padStart(2,'0')}-${String((h+1)%24).padStart(2,'0')} ET${current?' · live':''}</span>
     ${countries}
-    <span class="tlog-b">+${fmtUSD(Math.max(0,earned),2)}${projected?'<small class="proj">PROJ</small>':hot?'<small>HOT</small>':''}</span>
+    <span class="tlog-b"><strong>+${fmtUSD(Math.max(0,earned),2)}</strong>${projected?'<small class="proj">PROJ</small>':hot?'<small>HOT</small>':''}</span>
     <span class="tlog-d"></span>
   </div>`;
 }
@@ -3426,22 +3859,26 @@ function shiftYear(dstr,delta){
 }
 const PLOGO={'Hyperliquid':'logo-hyperliquid.png','Aster':'logo-aster.png','Variational':'variational-symbol-transparent.png','Lighter':'lighter-logo.png','GRVT':'logo-grvt.png','edgeX':'logo-edgex.png','Jupiter':'logo-jupiter.png','Extended':'logo-extended.png','Ostium':'logo-ostium.png','Drift':'logo-drift.png','ApeX Protocol':'logo-apex-protocol.png','Pacifica':'logo-pacifica.png','Backpack':'logo-backpack.png','Vest Exchange':'logo-vest-exchange.png','GMX':'logo-gmx.png'};
 function renderPeers(){
-  if(!$('#rankList'))return;
   const fmtB=v=>v>=1e9?'$'+(v/1e9).toFixed(2)+'B':'$'+fmtK(v);
-  const max=PEERS.list[0].oi;
-  $('#rankList').innerHTML=PEERS.list.slice(0,13).map((p,i)=>`
-    <div class="rk${p.me?' me':''}">
-      <div class="rk-i">${i+1}</div>
-      <div class="rk-n">${PLOGO[p.n]?`<img class="rk-logo" src="${PLOGO[p.n]}" alt="" width="20" height="20" style="width:20px!important;height:20px!important;min-width:20px!important;max-width:20px!important;min-height:20px!important;max-height:20px!important;object-fit:contain!important" onerror="this.style.visibility='hidden'">`:`<span class="rk-logo ph"></span>`}${p.n}</div>
-      <div class="rk-bar"><i style="width:${(p.oi/max*100).toFixed(1)}%"></i></div>
-      <div class="rk-v">${fmtB(p.oi)}</div>
-    </div>`).join('');
+  const rankList=$('#rankList'), max=PEERS.list[0]?.oi||1;
+  if(rankList)rankList.innerHTML=PEERS.list.slice(0,13).map((p,i)=>`
+      <div class="rk${p.me?' me':''}">
+        <div class="rk-i">${i+1}</div>
+        <div class="rk-n">${PLOGO[p.n]?`<img class="rk-logo" src="${PLOGO[p.n]}" alt="" width="20" height="20" style="width:20px!important;height:20px!important;min-width:20px!important;max-width:20px!important;min-height:20px!important;max-height:20px!important;object-fit:contain!important" onerror="this.style.visibility='hidden'">`:`<span class="rk-logo ph"></span>`}${p.n}</div>
+        <div class="rk-bar"><i style="width:${(p.oi/max*100).toFixed(1)}%"></i></div>
+        <div class="rk-v">${fmtB(p.oi)}</div>
+      </div>`).join('');
   if($('#peersTotal'))$('#peersTotal').textContent=PEERS.count;
-  $('#phRank').textContent=PEERS.varRank; $('#phRank2').textContent=PEERS.varRank;
-  $('#phCount').textContent=PEERS.count; $('#phShare').textContent=PEERS.varShare+'%';
-  $('#phTotal').textContent='$'+(PEERS.total/1e9).toFixed(1)+'B';
+  if($('#phRank'))$('#phRank').textContent=PEERS.varRank;
+  if($('#phRank2'))$('#phRank2').textContent=PEERS.varRank;
+  if($('#phCount'))$('#phCount').textContent=PEERS.count;
+  if($('#phShare'))$('#phShare').textContent=PEERS.varShare+'%';
+  if($('#phTotal'))$('#phTotal').textContent='$'+(PEERS.total/1e9).toFixed(1)+'B';
   if($('#phVsHl'))$('#phVsHl').textContent=PEERS.vsHl+'×';
-  $('#peersAsOf').textContent=PEERS.asOf;
+  if($('#peersAsOf'))$('#peersAsOf').textContent=PEERS.asOf;
+  if($('#cmpRank'))$('#cmpRank').textContent='#'+PEERS.varRank;
+  if($('#cmpRankSub'))$('#cmpRankSub').textContent='Variational is #'+PEERS.varRank+' of '+PEERS.count+' venues by open interest';
+  if($('#cmpRankLine'))$('#cmpRankLine').textContent='#'+PEERS.varRank+' of '+PEERS.count+' by OI';
 }
 function fmtPulseMoney(v){
   if(v==null)return '—';
@@ -3455,10 +3892,9 @@ function renderPulseTable(){
   if(!body)return;
   body.innerHTML=PEERS.list.slice(0,13).map((p,i)=>`<tr class="${p.me?'me':''}">
     <td class="rank">${i+1}</td>
-    <td><span class="exchange"><img class="table-logo" src="${PLOGO[p.n]||'variational-symbol-transparent.png'}" alt="" width="20" height="20" style="width:20px!important;height:20px!important;min-width:20px!important;max-width:20px!important;min-height:20px!important;max-height:20px!important;object-fit:contain!important">${p.n}${p.me?'<span class="rank-badge">Variational</span>':''}</span></td>
-    <td class="${(PEERS.live&&!p.live)?'snap':''}">${fmtPulseMoney(p.oi)}</td><td class="${(PEERS.live&&!p.live)?'snap':''}">${fmtPulseMoney(p.vol)}</td><td>${fmtPulseMoney(p.tvl)}</td><td>${p.pairs??'—'}</td>
-    <td class="${p.maker==='0%'?'fee-zero':''}">${p.maker}</td><td class="${p.taker==='0%'?'fee-zero':''}">${p.taker}</td><td>${p.lev}</td>
-    <td><a class="source-link" href="${p.url}" target="_blank" rel="noopener">↗</a></td>
+    <td><span class="exchange"><img class="table-logo" src="${PLOGO[p.n]||'variational-symbol-transparent.png'}" alt="" width="20" height="20" style="width:20px!important;height:20px!important;min-width:20px!important;max-width:20px!important;min-height:20px!important;max-height:20px!important;object-fit:contain!important">${p.n}</span></td>
+    <td class="${(PEERS.live&&!p.live)?'snap':''}">${fmtPulseMoney(p.oi)}</td>
+    <td class="${(PEERS.live&&!p.live)?'snap':''}">${fmtPulseMoney(p.vol)}</td>
   </tr>`).join('');
 }
 /* ---------- king scoreboard (Hyperliquid benchmark) ---------- */
@@ -3500,13 +3936,16 @@ function renderValuation(){
   const va=PEERS.list.find(p=>p.me);
   const oi=va&&va.oi>0?va.oi:1210288593;
   const mcap=valPred(oi), fdv=mcap/VAL_FLOAT;
+  const hlComp=VAL_COMPS.find(c=>c.n==='Hyperliquid');
+  const hlVsVar=hlComp&&mcap>0?hlComp.mc/mcap:0;
+  const varBelowHl=hlComp&&hlComp.mc>0?(1-mcap/hlComp.mc)*100:0;
   $('#valMcap')&&($('#valMcap').textContent=fmtBig(mcap));
-  $('#valCurrentMcap')&&($('#valCurrentMcap').textContent='N/A');
-  $('#valMcapStatus')&&($('#valMcapStatus').textContent='No traded $VAR market · pre-TGE');
+  $('#valVsHl')&&($('#valVsHl').textContent=hlVsVar.toFixed(1)+'x');
+  $('#valVsHlSub')&&($('#valVsHlSub').innerHTML=`Hyperliquid is <b>${hlVsVar.toFixed(1)}x larger</b>. Variational implied is <b>${varBelowHl.toFixed(1)}% below</b> its current ${fmtBig(hlComp.mc)} market cap.`);
   $('#valOiBase')&&($('#valOiBase').textContent=fmtBig(oi)+(PEERS.live?' live':''));
   $('#valFdv')&&($('#valFdv').textContent=fmtBig(fdv));
   $('#valFloat')&&($('#valFloat').textContent=Math.round(VAL_FLOAT*100)+'%');
-  $('#valFdvRange')&&($('#valFdvRange').textContent=fmtBig(mcap/0.33)+'–'+fmtBig(mcap/0.20));
+  $('#valFdvRange')&&($('#valFdvRange').textContent=fmtBig(mcap/0.33)+' - '+fmtBig(mcap/0.20));
   const W=760,H=430,pl=58,pr=18,pt=22,pb=44;
   const lx0=Math.log10(2e6),lx1=Math.log10(2.2e10),ly0=Math.log10(4e6),ly1=Math.log10(2.2e10);
   const X=v=>pl+(Math.log10(v)-lx0)/(lx1-lx0)*(W-pl-pr);
@@ -3526,11 +3965,11 @@ function renderValuation(){
   let path='';
   for(let lx=lx0;lx<=lx1+1e-9;lx+=(lx1-lx0)/60){const oiv=Math.pow(10,lx);const x=X(oiv),y=Y(valPred(oiv));path+=(path?'L':'M')+x.toFixed(1)+' '+y.toFixed(1)+' ';}
   const trend=`<path d="${path}" fill="none" stroke="url(#valTrend)" stroke-width="2.4" opacity=".9"/>`;
-  const premCol=p=>p>=1.08?'#26e6c2':p<=0.92?'#e0728a':'#7f9bc4';
-  // legend (top-left = low-OI / high-mcap, empty region)
+  const premCol=p=>p>=1.08?'#c7f284':p<=0.92?'#f08aa0':'#72cdf7';
+  // Clear legend: the line is the model's fair-value estimate.
   let legend=`<g transform="translate(${pl+8},${pt+10})" font-family="var(--mono)">`+
-    `<circle cx="4" cy="0" r="3.4" fill="#26e6c2"/><text x="12" y="3.4" fill="#84a2c6" font-size="9">above line · premium</text>`+
-    `<circle cx="4" cy="15" r="3.4" fill="#e0728a"/><text x="12" y="18.4" fill="#84a2c6" font-size="9">below line · discount</text></g>`;
+    `<circle cx="4" cy="0" r="3.8" fill="#c7f284"/><text x="13" y="3.8" fill="#b7c9df" font-size="10" font-weight="800">PREMIUM: market cap above model</text>`+
+    `<circle cx="4" cy="17" r="3.8" fill="#e0728a"/><text x="13" y="20.8" fill="#b7c9df" font-size="10" font-weight="800">DISCOUNT: market cap below model</text></g>`;
   let dots='';
   VAL_COMPS.forEach(c=>{if(c.oi<=0||c.mc<=0)return;
     const imp=valPred(c.oi), prem=c.mc/imp, col=premCol(prem);
@@ -3542,30 +3981,38 @@ function renderValuation(){
     }else{
       dots+=`<circle cx="${x.toFixed(1)}" cy="${ya.toFixed(1)}" r="5" fill="${col}" stroke="#0a1220" stroke-width="1"/>`+
         `<text x="${x.toFixed(1)}" y="${(ya-9).toFixed(1)}" fill="#9db6da" font-size="8.5" text-anchor="middle">${c.n}</text>`;
+    }
+    if(c.n==='Hyperliquid'){
+      const callX=Math.max(pl+180,x-142),callY=Math.min(H-pb-38,ya+18);
+      const word=prem>=1?'PREMIUM':'DISCOUNT';
+      dots+=`<line x1="${(x-3).toFixed(1)}" y1="${(ya+8).toFixed(1)}" x2="${(callX+126).toFixed(1)}" y2="${(callY+4).toFixed(1)}" stroke="${col}" stroke-width="1" opacity=".75"/>`+
+        `<g transform="translate(${callX.toFixed(1)},${callY.toFixed(1)})"><rect x="0" y="0" width="130" height="34" rx="7" fill="#07111d" stroke="${col}" stroke-width="1.2"/>`+
+        `<text x="8" y="13" fill="${col}" font-size="9.5" font-weight="900">HL ${word} ${prem>=1?'+':''}${((prem-1)*100).toFixed(0)}%</text>`+
+        `<text x="8" y="26" fill="#b7c9df" font-size="9">${prem.toFixed(2)}x model value</text></g>`;
     }});
   const vx=X(oi),vy=Y(mcap),vs=20;
   const cxL=Math.min(vx+20,W-pr-108).toFixed(1), cyL=Math.max(vy-50,pt+14).toFixed(1);
   const vlogo=PLOGO['Variational'];
-  const hero=`<circle cx="${vx.toFixed(1)}" cy="${vy.toFixed(1)}" r="14" fill="rgba(38,230,194,.16)"/>`+
-    `<rect x="${(vx-vs/2).toFixed(1)}" y="${(vy-vs/2).toFixed(1)}" width="${vs}" height="${vs}" rx="9" fill="#061019" stroke="#26e6c2" stroke-width="2.2"/>`+
+  const hero=`<circle cx="${vx.toFixed(1)}" cy="${vy.toFixed(1)}" r="14" fill="rgba(199,242,132,.13)"/>`+
+    `<rect x="${(vx-vs/2).toFixed(1)}" y="${(vy-vs/2).toFixed(1)}" width="${vs}" height="${vs}" rx="7" fill="#111413" stroke="#c7f284" stroke-width="2.2"/>`+
     `<image href="${vlogo}" x="${(vx-vs/2+5).toFixed(1)}" y="${(vy-vs/2+5).toFixed(1)}" width="${vs-10}" height="${vs-10}" preserveAspectRatio="xMidYMid meet"/>`+
-    `<line x1="${vx.toFixed(1)}" y1="${(vy-vs/2).toFixed(1)}" x2="${cxL}" y2="${(+cyL+14).toFixed(1)}" stroke="rgba(38,230,194,.5)" stroke-width="1"/>`+
-    `<g transform="translate(${cxL},${cyL})"><text x="0" y="0" fill="#26e6c2" font-size="10.5" font-weight="900" letter-spacing=".5">Variational · implied</text>`+
+    `<line x1="${vx.toFixed(1)}" y1="${(vy-vs/2).toFixed(1)}" x2="${cxL}" y2="${(+cyL+14).toFixed(1)}" stroke="rgba(199,242,132,.55)" stroke-width="1"/>`+
+    `<g transform="translate(${cxL},${cyL})"><text x="0" y="0" fill="#c7f284" font-size="10.5" font-weight="900" letter-spacing=".5">Variational implied</text>`+
     `<text x="0" y="16" fill="#eafff6" font-size="15" font-weight="900">${fmtBig(mcap)}</text></g>`;
   svg.innerHTML=`<defs>`+
-    `<linearGradient id="valTrend" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#2c4c7f"/><stop offset="1" stop-color="#26e6c2"/></linearGradient></defs>`+
+    `<linearGradient id="valTrend" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#4f7fc4"/><stop offset="1" stop-color="#c7f284"/></linearGradient></defs>`+
     grid+trend+dots+legend+hero;
   const side=$('#valSide');
   if(side){
-    const rows=VAL_COMPS.map(c=>({n:c.n,mc:c.mc,imp:valPred(c.oi),prem:c.mc/valPred(c.oi)})).sort((a,b)=>b.prem-a.prem);
+    const keyPeers=['Hyperliquid','Lighter','Aster','Jupiter','edgeX','dYdX'];
+    const rows=keyPeers.map(n=>VAL_COMPS.find(c=>c.n===n)).filter(Boolean).map(c=>({n:c.n,mc:c.mc,imp:valPred(c.oi),prem:c.mc/valPred(c.oi)}));
     const chip=n=>PLOGO[n]?`<img class="vs-logo" src="${PLOGO[n]}" alt="" width="20" height="20" style="width:20px!important;height:20px!important;min-width:20px!important;max-width:20px!important;min-height:20px!important;max-height:20px!important;object-fit:contain!important" onerror="this.style.visibility='hidden'">`:`<span class="vs-dot"></span>`;
-    const pcol=p=>p>=1.08?'var(--grn)':p<=0.92?'#e0728a':'var(--sub)';
-    const gap=p=>`${p>=1?'+':''}${((p-1)*100).toFixed(0)}%`;
-    side.innerHTML=`<div class="vs-h"><span>Actual vs model MCAP</span><span class="vs-hs">${VAL_MCAP_ASOF}</span></div>`+
-      `<div class="vs-row me"><span class="n">${chip('Variational')}<span class="vs-nm"><b>Variational</b><small><b>Actual N/A</b> · Model ${fmtBig(mcap)} · pre-TGE</small></span></span><span class="v" style="color:var(--sub)">N/A</span></div>`+
-      rows.map(r=>`<div class="vs-row"><span class="n">${chip(r.n)}<span class="vs-nm"><b>${r.n}</b><small><b>Actual ${fmtBig(r.mc)}</b> · Model ${fmtBig(r.imp)}</small></span></span><span class="v" title="Actual market cap minus model-implied market cap" style="color:${pcol(r.prem)}">${gap(r.prem)}</span></div>`).join('');}
+    const status=p=>p>=1.08?{cls:'premium',word:'PREMIUM'}:p<=0.92?{cls:'discount',word:'DISCOUNT'}:{cls:'fair',word:'NEAR MODEL'};
+    side.innerHTML=`<div class="vs-h"><span>Key peers vs model</span><span class="vs-hs">${VAL_MCAP_ASOF}</span></div>`+
+      `<div class="vs-row me"><span class="n">${chip('Variational')}<span class="vs-nm"><b>Variational</b><small>no traded MCAP yet</small></span></span><span class="vs-mcap"><b>${fmtBig(mcap)}</b><small>model est.</small></span><span class="v fair"><b>PRE-TGE</b><small>not priced</small></span></div>`+
+      rows.map(r=>{const s=status(r.prem),pct=(r.prem-1)*100;return `<div class="vs-row"><span class="n">${chip(r.n)}<span class="vs-nm"><b>${r.n}</b><small>Model ${fmtBig(r.imp)}</small></span></span><span class="vs-mcap"><b>${fmtBig(r.mc)}</b><small>actual MCAP</small></span><span class="v ${s.cls}" title="Actual market cap divided by model-implied market cap"><b>${pct>=0?'+':''}${pct.toFixed(0)}%</b><small>${s.word} · ${r.prem.toFixed(2)}x</small></span></div>`}).join('');}
   const note=$('#valNote');
-  if(note)note.innerHTML=`<b>Read this correctly:</b> Variational current MCAP = <b>N/A</b> because $VAR is not yet trading. The model-implied circulating MCAP is <b>${fmtBig(mcap)}</b>; it is an estimate, not a current market value. Peer actual MCAP updates from <a href="https://www.coingecko.com/" target="_blank" rel="noopener">CoinGecko</a> (${VAL_MCAP_ASOF}); OI updates from CoinGecko derivatives where available. Model: MCAP ≈ ${VAL_FIT.A.toFixed(1)} · OI<sup>${VAL_FIT.B}</sup> (R² ${VAL_FIT.r2}, log-log). Model framework: <a href="https://www.perpetualpulse.xyz/" target="_blank" rel="noopener">Perpetual Pulse</a>. Not financial advice.`;
+  if(note)note.innerHTML=`$VAR has no traded market cap before TGE. The ${fmtBig(mcap)} figure is a model estimate, not a current price. Model: MCAP ≈ ${VAL_FIT.A.toFixed(1)} × OI<sup>${VAL_FIT.B}</sup>, R² ${VAL_FIT.r2}. Market caps and available OI update from <a href="https://www.coingecko.com/" target="_blank" rel="noopener">CoinGecko</a>. Framework reference: <a href="https://www.perpetualpulse.xyz/" target="_blank" rel="noopener">Perpetual Pulse</a>. Not financial advice.`;
 }
 
 async function refreshValuationMcaps(){
@@ -3640,12 +4087,35 @@ async function refreshPerpBoard(){
     PEERS.asOf='Live · CoinGecko · '+t;
     renderPeers(); renderPulseTable(); renderVsLighter(); renderKing(); renderValuation();
     setBoardLive('on','Live · '+t);
+    refreshLlamaOi();
   }catch(err){
     console.warn('Perp board live sync fell back to snapshot:',err);
     if(!PEERS.live){PEERS.asOf='Snapshot · '+(PEERS.snapAsOf||'last saved'); renderPeers(); renderPulseTable(); renderVsLighter(); renderValuation();}
     renderKing();
     if(!PEERS.live)setBoardLive('err','Snapshot');
+    refreshLlamaOi();
   }
+}
+
+/* OI override from DeFiLlama open-interest (free endpoint, CORS-enabled).
+   Volume intentionally stays on CoinGecko: DeFiLlama's derivatives volume API requires a paid key. */
+async function refreshLlamaOi(){
+  try{
+    const get=async s=>{const r=await fetch('https://api.llama.fi/summary/open-interest/'+s);if(!r.ok)throw new Error(s+' http '+r.status);return r.json()};
+    const [vaOi,liOi]=await Promise.all([get('variational'),get('lighter')]);
+    let hit=false;
+    if(vaOi&&vaOi.total24h>0){const p=PEERS.list.find(x=>x.me); if(p)p.oi=vaOi.total24h; MKT.oi=vaOi.total24h; hit=true;}
+    if(liOi&&liOi.total24h>0){const p=PEERS.list.find(x=>x.n==='Lighter'); if(p)p.oi=liOi.total24h; VSL.li.oi=liOi.total24h; hit=true;}
+    if(!hit)return;
+    OI_SRC='llama';
+    PEERS.list.sort((a,b)=>b.oi-a.oi);
+    PEERS.total=PEERS.list.reduce((s,p)=>s+(p.oi||0),0);
+    PEERS.varRank=PEERS.list.findIndex(p=>p.me)+1;
+    const vp=PEERS.list.find(p=>p.me), hl=PEERS.list.find(p=>p.n==='Hyperliquid');
+    if(vp&&PEERS.total)PEERS.varShare=+(vp.oi/PEERS.total*100).toFixed(1);
+    if(hl&&vp&&vp.oi)PEERS.vsHl=+(hl.oi/vp.oi).toFixed(1);
+    renderPeers(); renderPulseTable(); renderVsLighter(); renderKing(); renderValuation(); renderEfficiency();
+  }catch(err){console.warn('DeFiLlama OI sync failed, keeping previous OI source:',err)}
 }
 
 /* ---------- head-to-head: Variational vs Lighter ---------- */
@@ -3653,7 +4123,7 @@ const VSL={
   // volume & OI: Perpetual Pulse snapshot (2026-07-08) · fees & revenue: DeFiLlama + app.lighter.xyz/stats (2026-07-08)
   li:{ vol1d:1465961931.57, oi:810022995.62, fees30:2975571, rev30:2321912, feesAll:69683968, revAll:53652406 },
   hl:{ vol1d:8112902385.84, oi:10133720905.35, fees30:65130968, rev30:46828446, feesAll:1418488399, revAll:1153924947 },
-  note:'Lighter standard accounts trade fee-free, but premium/institutional accounts pay trade fees — plus withdraw &amp; transfer fees — so Lighter books real protocol revenue (visible on <a href="https://app.lighter.xyz/stats" target="_blank" rel="noopener">app.lighter.xyz/stats</a>). Variational works differently: traders pay spreads, ~90% flows to OLP liquidity providers, and only the treasury cut counts as protocol revenue here.'
+  note:'Read the revenue row carefully: it measures what each protocol KEEPS, not what traders pay. Variational routes about 90% of every spread dollar to OLP liquidity providers by design and books only the 10% treasury cut as protocol revenue. Lighter keeps about 78% of the fees it collects (standard accounts trade fee-free; premium and institutional accounts pay trading, withdrawal, and transfer fees). Same dollar paid by a trader, opposite payout policy, so a lower booked-revenue line does not mean Variational earns less.'
 };
 /* Lighter daily protocol revenue — DeFiLlama totalDataChart snapshot (last 70 days, retrieved 2026-07-08) */
 const LREV=[{"d":"2026-04-30","v":58526},{"d":"2026-05-01","v":61102},{"d":"2026-05-02","v":30662},{"d":"2026-05-03","v":45338},{"d":"2026-05-04","v":102673},{"d":"2026-05-05","v":80540},{"d":"2026-05-06","v":92873},{"d":"2026-05-07","v":85086},{"d":"2026-05-08","v":71735},{"d":"2026-05-09","v":33817},{"d":"2026-05-10","v":51198},{"d":"2026-05-11","v":73638},{"d":"2026-05-12","v":94042},{"d":"2026-05-13","v":81824},{"d":"2026-05-14","v":68538},{"d":"2026-05-15","v":73810},{"d":"2026-05-16","v":37478},{"d":"2026-05-17","v":42600},{"d":"2026-05-18","v":70164},{"d":"2026-05-19","v":72272},{"d":"2026-05-20","v":83957},{"d":"2026-05-21","v":83480},{"d":"2026-05-22","v":73985},{"d":"2026-05-23","v":37862},{"d":"2026-05-24","v":40732},{"d":"2026-05-25","v":57998},{"d":"2026-05-26","v":78983},{"d":"2026-05-27","v":81009},{"d":"2026-05-28","v":86039},{"d":"2026-05-29","v":74981},{"d":"2026-05-30","v":40895},{"d":"2026-05-31","v":46853},{"d":"2026-06-01","v":72508},{"d":"2026-06-02","v":95970},{"d":"2026-06-03","v":115572},{"d":"2026-06-04","v":121003},{"d":"2026-06-05","v":109944},{"d":"2026-06-06","v":59967},{"d":"2026-06-07","v":58201},{"d":"2026-06-08","v":227921},{"d":"2026-06-09","v":132873},{"d":"2026-06-10","v":125872},{"d":"2026-06-11","v":110290},{"d":"2026-06-12","v":91264},{"d":"2026-06-13","v":47280},{"d":"2026-06-14","v":49093},{"d":"2026-06-15","v":78248},{"d":"2026-06-16","v":85183},{"d":"2026-06-17","v":92159},{"d":"2026-06-18","v":119439},{"d":"2026-06-19","v":85809},{"d":"2026-06-20","v":45095},{"d":"2026-06-21","v":48774},{"d":"2026-06-22","v":73362},{"d":"2026-06-23","v":80605},{"d":"2026-06-24","v":83029},{"d":"2026-06-25","v":81158},{"d":"2026-06-26","v":74519},{"d":"2026-06-27","v":40645},{"d":"2026-06-28","v":42999},{"d":"2026-06-29","v":66084},{"d":"2026-06-30","v":76169},{"d":"2026-07-01","v":85172},{"d":"2026-07-02","v":74282},{"d":"2026-07-03","v":66684},{"d":"2026-07-04","v":41835},{"d":"2026-07-05","v":41312},{"d":"2026-07-06","v":93944},{"d":"2026-07-07","v":78245},{"d":"2026-07-08","v":97075}];
@@ -3668,19 +4138,32 @@ function renderVsLighter(){
   const oiEdge=li.oi?va.oi/li.oi:0;
   const feeEdge=li.fees30?fees30/li.fees30:0;
   const revGap=rev30?li.rev30/rev30:0;
-  $('#valOiEdge') && ($('#valOiEdge').textContent=oiEdge.toFixed(1)+'×');
-  $('#valFeeEdge') && ($('#valFeeEdge').textContent=feeEdge.toFixed(1)+'×');
-  $('#valTgeRead') && ($('#valTgeRead').textContent=(oiEdge>1&&feeEdge>1?'Lighter+ range':'comp range'));
+  $('#valOiEdge') && ($('#valOiEdge').textContent='Variational '+oiEdge.toFixed(1)+'×');
+  $('#valOiEdgeSub') && ($('#valOiEdgeSub').textContent='Variational holds '+oiEdge.toFixed(1)+'× more open positions than Lighter');
+  $('#valFeeEdge') && ($('#valFeeEdge').textContent='Variational '+feeEdge.toFixed(1)+'×');
+  $('#valFeeEdgeSub') && ($('#valFeeEdgeSub').textContent='traders paid Variational '+feeEdge.toFixed(1)+'× more than Lighter in 30 days');
+  if($('#cmpRevenueEdge'))$('#cmpRevenueEdge').textContent=revGap>=1?'Lighter '+revGap.toFixed(1)+'×':'Variational '+(1/revGap).toFixed(1)+'×';
+  if($('#cmpRevenueEdgeSub'))$('#cmpRevenueEdgeSub').textContent=revGap>=1
+    ?'Lighter kept '+revGap.toFixed(1)+'× more, because it keeps 78% of fees vs Variational 10%'
+    :'Variational kept '+(1/revGap).toFixed(1)+'× more booked revenue than Lighter';
+  if($('#cmpVerdict'))$('#cmpVerdict').textContent=`Variational leads Lighter on OI and fee pool. ${revGap>=1?'Lighter':'Variational'} leads on booked revenue.`;
+  if($('#cmpVerdictSub'))$('#cmpVerdictSub').textContent=`Variational has ${oiEdge.toFixed(1)}× Lighter OI and ${feeEdge.toFixed(1)}× its 30D fee pool. Lighter books ${revGap.toFixed(1)}× more revenue only because it keeps about 78% of fees while Variational keeps 10% and pays 90% to OLP.`;
   $('#varThesis') && ($('#varThesis').innerHTML=`<b>${oiEdge.toFixed(1)}× Lighter OI</b> and <b>${feeEdge.toFixed(1)}× Lighter 30D fee pool</b>. The current revenue line is lower because Variational only books the treasury cut, not the OLP side.`);
   $('#lighterThesis') && ($('#lighterThesis').innerHTML=`Lighter is the clean market comp: <b>${revGap.toFixed(1)}× Variational 30D booked revenue</b>, but smaller OI and fee pool in this snapshot.`);
+  const SRC={
+    cg:{cls:'src-cg',label:PEERS.live?'CoinGecko live':'Pulse snapshot'},
+    chain:{cls:'src-chain',label:'On-chain wallet'},
+    llama:{cls:'src-llama',label:'DeFiLlama'}
+  };
+  const srcChip=s=>`<span class="src ${SRC[s].cls}" title="Data source: ${SRC[s].label}"><i></i>${SRC[s].label}</span>`;
   const rows=[
-    {k:'Trading volume · 24h', a:va.vol, b:li.vol1d, an:'', bn:''},
-    {k:'Open interest · live', a:va.oi, b:li.oi, an:'', bn:''},
-    {k:'Trading fees · 30d', a:fees30, b:li.fees30, an:'spreads paid by traders', bn:'premium accs + wd/tx fees'},
-    {k:'Protocol revenue · 30d', a:rev30, b:li.rev30, an:'treasury cut · on-chain', bn:'~78% of its fees'},
-    {k:'Protocol revenue · all-time', a:SERIES[SERIES.length-1].v, b:li.revAll, an:'since 2026-01-23', bn:'all listed history'},
+    {k:'Open interest', a:va.oi, b:li.oi, an:'live venue capacity', bn:'live venue capacity', as:OI_SRC, bs:OI_SRC},
+    {k:'24H trading volume', a:va.vol, b:li.vol1d, an:'current activity', bn:'current activity', as:'cg', bs:'cg'},
+    {k:'30D fee pool', a:fees30, b:li.fees30, an:'spreads paid by traders', bn:'premium accounts and transfer fees', as:'chain', bs:'llama'},
+    {k:'30D booked revenue', a:rev30, b:li.rev30, an:'keeps 10%, 90% paid to OLP', bn:'keeps about 78% of fees', as:'chain', bs:'llama'},
   ];
-  $('#h2hRows').innerHTML=`<table class="h2h-tbl">
+  $('#h2hRows').innerHTML=`<div class="h2h-src-legend"><span>Sources</span>${srcChip('cg')}${srcChip('chain')}${srcChip('llama')}<span style="text-transform:none;letter-spacing:0">same badge = same source, comparable · different badges = different measurement</span></div>
+  <table class="h2h-tbl">
     <thead><tr><th>Metric</th><th class="cva"><img class="cmp-logo" src="variational-symbol-transparent.png" alt="" width="20" height="20">Variational</th><th class="cli"><img class="cmp-logo" src="lighter-logo.png" alt="" width="20" height="20">Lighter</th><th>Lead</th></tr></thead>
     <tbody>${rows.map(r=>{
       const vals=[{c:'var',n:'Variational',v:r.a},{c:'ltr',n:'Lighter',v:r.b}].sort((x,y)=>y.v-x.v);
@@ -3688,12 +4171,12 @@ function renderVsLighter(){
       const win=x=>vals[0].v===x?' win':'';
       return `<tr>
         <td>${r.k}</td>
-        <td class="cva${win(r.a)}"><b>${cB(r.a)}</b>${r.an?`<span class="sub">${r.an}</span>`:''}</td>
-        <td class="cli${win(r.b)}"><b>${cB(r.b)}</b>${r.bn?`<span class="sub">${r.bn}</span>`:''}</td>
+        <td class="cva${win(r.a)}"><b>${cB(r.a)}</b>${r.an?`<span class="sub">${r.an}</span>`:''}${srcChip(r.as)}</td>
+        <td class="cli${win(r.b)}"><b>${cB(r.b)}</b>${r.bn?`<span class="sub">${r.bn}</span>`:''}${srcChip(r.bs)}</td>
         <td><span class="lead ${lead.c}">${lead.t}</span></td>
       </tr>`;
     }).join('')}</tbody></table>`;
-  $('#h2hNote').innerHTML=`Read: Lighter is the direct market comp. Compare capacity first (OI), then activity (volume), then monetization (spread fees and booked treasury revenue). Variational’s fee pool is implied from its on-chain treasury cut of ${(MKT.spreadShare*100).toFixed(0)}% of spreads. Sources: OI &amp; volume — ${PEERS.live?'CoinGecko derivatives (live)':'snapshot ('+PEERS.snapAsOf+')'}; Variational fees/revenue — treasury wallet on Arbitrum; Lighter fees/revenue — <a href="https://defillama.com/protocol/lighter" target="_blank" rel="noopener">DeFiLlama</a>. ${VSL.note}`;
+  $('#h2hNote').innerHTML=`Variational fee pool = on-chain treasury revenue divided by the ${(MKT.spreadShare*100).toFixed(0)}% protocol share. OI uses ${OI_SRC==='llama'?'<a href="https://defillama.com/protocol/variational" target="_blank" rel="noopener">DeFiLlama open-interest</a> for both venues':(PEERS.live?'live CoinGecko derivatives data':'the '+PEERS.snapAsOf+' snapshot')}. Volume uses ${PEERS.live?'live CoinGecko data':'the '+PEERS.snapAsOf+' snapshot'} (DeFiLlama volume requires a paid API key). Variational revenue comes from the Arbitrum treasury wallet. Lighter revenue comes from <a href="https://defillama.com/protocol/lighter" target="_blank" rel="noopener">DeFiLlama</a>. ${VSL.note} Same-basis check: traders paid ${cB(fees30)} on Variational vs ${cB(li.fees30)} on Lighter over the last 30 days (${feeEdge.toFixed(1)}× more). If Variational booked revenue at Lighter's 78% keep-rate, its 30D revenue line would read about ${cB(fees30*0.78)}.`;
   renderRevVs(rev30);
 }
 function renderRevVs(rev30){
@@ -3733,28 +4216,16 @@ function renderRevVs(rev30){
     </defs>
     ${grid}${bars}
     <line x1="${pl}" y1="${Y(0)}" x2="${W-pr}" y2="${Y(0)}" stroke="#22304a" stroke-width="1"/>`;
-  const cM=v=>v>=1e9?'$'+(v/1e9).toFixed(2)+'B':'$'+(v/1e6).toFixed(2)+'M';
-  const fees=rev30/MKT.spreadShare, olp=fees-rev30, burn=rev30*MKT.burnShare;
   const liKept=VSL.li.rev30/VSL.li.fees30*100;
+  const revenueLead=rev30>0?VSL.li.rev30/rev30:0;
   $('#revCallout').innerHTML=`
-    <div class="fs-title">Where the money goes · last 30 days</div>
-    <div class="fs-grid">
-      <div class="fs-col cva2">
-        <div class="fs-h"><img class="cmp-logo" src="variational-symbol-transparent.png" alt="" width="20" height="20">Variational</div>
-        <div class="fs-big grn">${cM(fees)}</div>
-        <div class="fs-sub">traders paid in spreads — ${ (fees/VSL.li.fees30).toFixed(1) }× Lighter</div>
-        <div class="fs-bar"><i class="olp" style="width:${(100-MKT.spreadShare*100).toFixed(0)}%"></i><i class="tre" style="width:${(MKT.spreadShare*100).toFixed(0)}%"></i></div>
-        <div class="fs-row"><span>→ OLP liquidity providers · ${(100-MKT.spreadShare*100).toFixed(0)}%</span><b>${cM(olp)}</b></div>
-        <div class="fs-row"><span>→ Treasury · ${(MKT.spreadShare*100).toFixed(0)}%</span><b class="g">${cM(rev30)}</b></div>
-        <div class="fs-row"><span>→ of treasury, ≥30% buys &amp; burns $VAR</span><b class="v">≥ ${cM(burn)}</b></div>
-      </div>
-      <div class="fs-col cli2">
-        <div class="fs-h"><img class="cmp-logo" src="lighter-logo.png" alt="" width="20" height="20">Lighter</div>
-        <div class="fs-big bl">${cM(VSL.li.fees30)}</div>
-        <div class="fs-sub">fees collected · premium accs + wd/tx</div>
-        <div class="fs-bar"><i class="lir" style="width:${liKept.toFixed(0)}%"></i></div>
-        <div class="fs-row"><span>→ protocol revenue · ~${liKept.toFixed(0)}% of fees</span><b class="b">${cM(VSL.li.rev30)}</b></div>
-        <div class="fs-row dim"><span>no LP payout leg — different engine</span><b>—</b></div>
+    <div class="rev-explain">
+      <strong>Why the fee-pool lead does not equal a revenue lead</strong>
+      <p>This is a payout-policy gap, not an earnings gap. Variational chooses to pay 90% of spreads to OLP liquidity providers and books only the treasury cut. Lighter retains most of what it collects.</p>
+      <div class="rev-explain-grid">
+        <span>Variational capture<b>${(MKT.spreadShare*100).toFixed(0)}% of spreads</b></span>
+        <span>Lighter capture<b>about ${liKept.toFixed(0)}% of fees</b></span>
+        <span>30D revenue leader<b>${revenueLead>=1?'Lighter '+revenueLead.toFixed(1)+'×':'Variational '+(1/revenueLead).toFixed(1)+'×'}</b></span>
       </div>
     </div>`;
 }
@@ -3773,6 +4244,68 @@ function renderMath(){
   $('#mqVolBurn').textContent='$'+fmtK(e.volPerRev/b);
   $('#mqOiFee').textContent='$'+fmtK(e.oiPerDayRev*s);
   $('#mqOiBurn').textContent='$'+fmtK(e.oiPerDayRev/b);
+}
+function renderBiweekly(){
+  if(!$('#bwBlock'))return;
+  const B=BIWEEKLY, M=v=>'$'+(v>=1e9?(v/1e9).toFixed(2)+'B':v>=1e6?(v/1e6).toFixed(2)+'M':fmtK(v));
+  $('#bwAsOf').textContent='2-week window · posted '+B.asOf;
+  const margin=B.netProfit2w/B.spreads2w*100;
+  const M0=v=>'$'+(v>=1e6?(v/1e6).toFixed(2)+'M':fmtK(v));
+  $('#bwTeaser') && ($('#bwTeaser').textContent=M0(B.netProfit2w)+' / 2w');
+  $('#bwPnl').innerHTML=
+    `<div class="step"><span>Spreads paid · gross revenue</span><b>${M(B.spreads2w)}</b><small>what traders paid in 2 weeks</small></div>`+
+    `<div class="step neg"><span>Market making costs</span><b>-${M(B.mmCosts2w)}</b><small>cost of revenue</small></div>`+
+    `<div class="step"><span>Net revenue</span><b>${M(B.netRevenue2w)}</b><small>spreads minus MM costs</small></div>`+
+    `<div class="step neg"><span>Rewards</span><b>-${M(B.rewards2w)}</b><small>incl. referral rewards</small></div>`+
+    `<div class="step pos"><span>Net profit · 2 weeks</span><b>${M(B.netProfit2w)}</b><small>${margin.toFixed(0)}% margin on spreads</small></div>`;
+  $('#bwGrid').innerHTML=[
+    ['TVL (ex-hedging)',M(B.tvl)],['Dual-sided OI',M(B.oi)],['Total volume traded',M(B.totalVolume)],
+    ['Markets listed',B.markets.toLocaleString()],['DAU (7d avg)',B.dau.toLocaleString()],['WAU',B.wau.toLocaleString()],
+    ['2w treasury inflow',M(B.treasury2w)],['2w OLP PnL',M(B.olpPnl2w)],['Lifetime OLP PnL',M(B.olpPnlLife)],
+    ['Treasury holdings',M(B.treasuryHoldings)],['Rewards claimed · life',M(B.rewardsClaimed)],['Losses refunded · Sunset',M(B.lossesRefunded)]
+  ].map(([k,v])=>`<div class="t">${k}<b>${v}</b></div>`).join('');
+  /* progress vs the previous official post (unlocks at 2+ stored posts) */
+  const H=BIWEEKLY_HISTORY, prev=H.length>1?H[H.length-2]:null;
+  if($('#bwDeltas')){
+    if(prev){
+      const items=[['spreads2w','2w spreads'],['netRevenue2w','2w net revenue'],['netProfit2w','2w net profit'],['treasury2w','2w treasury'],['tvl','TVL'],['oi','OI'],['dau','DAU'],['wau','WAU']];
+      $('#bwDeltas').innerHTML=items.map(([k,l])=>{
+        const a=prev[k],b=B[k];
+        if(!(a>0)||!(b>0))return '';
+        const p=(b/a-1)*100, up=p>=0;
+        const fmt=v=>(k==='dau'||k==='wau')?v.toLocaleString():M(v);
+        return `<div class="d ${up?'up':'dn'}"><span>${l}</span><b>${up?'+':''}${p.toFixed(1)}%</b><small>${fmt(a)} → ${fmt(b)}</small></div>`;
+      }).join('');
+    }else{
+      $('#bwDeltas').innerHTML=`<div class="d placeholder"><span>Next post unlocks all 8 deltas</span><b>1 official report stored</b><small>Append the next report to BIWEEKLY_HISTORY, or backfill an older post from the <a href="${B.src}" target="_blank" rel="noopener">official X search</a>. The comparison then renders automatically.</small></div>`;
+    }
+  }
+  /* on-chain progress available today: treasury inflow per trailing 14-day window */
+  if($('#bwTrend')&&typeof cumAt==='function'&&Array.isArray(SERIES)&&SERIES.length){
+    const lastD=SERIES[SERIES.length-1].d;
+    const wins=[];
+    for(let k=5;k>=0;k--){
+      const end=addDays(lastD,-14*k), start=addDays(end,-14);
+      wins.push({end,v:Math.max(0,cumAt(end)-cumAt(start))});
+    }
+    const mx=Math.max(...wins.map(w=>w.v))||1;
+    const cur=wins[wins.length-1].v, prv=wins[wins.length-2]?wins[wins.length-2].v:0;
+    const g=prv>0?(cur/prv-1)*100:0;
+    const first=wins[0].v, tot=first>0?(cur/first-1)*100:0;
+    $('#bwTrend').innerHTML=
+      `<div class="bw-trend-head"><span>Each bar is real USDC added to the protocol treasury during one completed 14-day window.</span><span class="bw-trend-stat"><b class="${g>=0?'up':'dn'}">${g>=0?'+':''}${g.toFixed(1)}%</b><small>vs previous 14 days</small></span><span class="bw-trend-stat"><b class="${tot>=0?'up':'dn'}">${tot>=0?'+':''}${tot.toFixed(0)}%</b><small>vs 12 weeks ago</small></span></div>`+
+      `<div class="bw-bars">${wins.map((w,i)=>`<div class="bar${i===wins.length-1?' cur':''}" title="14d ending ${w.end} · $${fmtK(w.v)}"><i>$${fmtK(w.v)}</i><span style="display:block;height:${Math.max(6,w.v/mx*96)}px"></span></div>`).join('')}</div>`+
+      `<div class="bw-trend-cap">${wins.map(w=>`<span>${w.end.slice(5)}</span>`).join('')}</div>`;
+  }
+  /* stored report history */
+  if($('#bwHist')){
+    $('#bwHist').innerHTML=H.length>1?
+      `<div class="hrow h"><span>Posted</span><span>2w spreads</span><span>2w net revenue</span><span>2w net profit</span><span>TVL</span></div>`+
+      H.slice().reverse().map(r=>`<div class="hrow"><span>${r.asOf}</span><b>${M(r.spreads2w)}</b><b>${M(r.netRevenue2w)}</b><b>${M(r.netProfit2w)}</b><b>${M(r.tvl)}</b></div>`).join('')
+      :'<div class="bw-hist-empty">One official report is stored. The table appears as soon as a second dated report is appended; no synthetic history is generated.</div>';
+  }
+  const share=B.treasury2w/B.spreads2w*100;
+  $('#bwNote').innerHTML=`<b>Protocol revenue definition used on this dashboard:</b> USDC that actually lands in Variational's Arbitrum treasury wallet. It is not the same as total trader spreads, OLP revenue, or whole-venue net profit. In this official window, traders paid ${M(B.spreads2w)} in spreads, ${M(B.netProfit2w)} remained as net profit after market-making costs and rewards, and ${M(B.treasury2w)} reached the treasury (${share.toFixed(0)}% of spreads). This separation prevents a false apples-to-apples comparison with fee-based exchanges such as Lighter. Source figures are hand-copied from the <a href="${B.src}" target="_blank" rel="noopener">official biweekly posts on X</a>; the 14-day chart is calculated independently from on-chain treasury history.`;
 }
 function renderEfficiency(){
   if(!$('#fmDailyVol'))return;
@@ -3809,6 +4342,13 @@ function renderEfficiency(){
   $('#fmDailyVol') && ($('#fmDailyVol').textContent=fmtBig(e.vol));
   $('#fmOi') && ($('#fmOi').textContent=fmtBig(MKT.oi));
   $('#fmDailyBurn') && ($('#fmDailyBurn').textContent=fmtBig(e.rev*MKT.burnShare));
+  if($('#fmValLine')){
+    const annRev=e.dailyRev*365, annSpread=e.dailySpread*365;
+    const modelM=typeof valPred==='function'&&MKT.oi>0?valPred(MKT.oi):0;
+    $('#fmValLine').innerHTML=modelM?
+      `<span>VALUATION LENS</span><b>${fmtBig(annRev)}</b><small>annualized treasury run-rate at ${e.label} pace · gross spreads ${fmtBig(annSpread)}/yr</small><em>model MCAP ${fmtBig(modelM)} prices in <b>${(modelM/annRev).toFixed(0)}x</b> this run-rate</em>`
+      :`<span>VALUATION LENS</span><b>${fmtBig(annRev)}</b><small>annualized treasury run-rate at ${e.label} pace</small>`;
+  }
   $('#fmDailyRevFormula') && ($('#fmDailyRevFormula').textContent=periodLabel+' treasury inflow');
   $('#fmDailyFeesFormula') && ($('#fmDailyFeesFormula').textContent=periodLabel+' treasury ÷ 10%');
   $('#fmDailyVolFormula') && ($('#fmDailyVolFormula').textContent=e.volSource);
@@ -3827,10 +4367,17 @@ function renderEfficiency(){
   renderDailyRevenueCalendar(e);
   $('#erVolFee').textContent='$'+fmtK(e.volPerFee);
   $('#erVolRev').textContent='$'+fmtK(e.volPerRev);
-  $('#erOi').textContent='$'+fmtK(e.oiPerDayRev);
   $('#erTurn').textContent=e.oiTurnover.toFixed(2)+'×';
   $('#efOi').textContent=fmtBig(MKT.oi);
-  $('#efYield').textContent=e.annRevYield.toFixed(1)+'%';
+  const tvlV=DUNE_TVL_SNAP.v>0?DUNE_TVL_SNAP.v:(BIWEEKLY.tvl>0?BIWEEKLY.tvl:OLP_TVL);
+  const tvlOk=tvlV>0;
+  const tvlTag=DUNE_TVL_SNAP.v>0?' (Dune '+DUNE_TVL_SNAP.asOf+')':(BIWEEKLY.tvl>0?' (official '+BIWEEKLY.asOf+')':(OLP_TVL_LIVE?' (live on-chain)':' (on-chain '+OLP_TVL_ASOF+')'));
+  $('#erTvl') && ($('#erTvl').textContent=tvlOk?fmtBig(tvlV):'—');
+  $('#efTvl') && ($('#efTvl').textContent=tvlOk?fmtBig(tvlV)+tvlTag:'loading');
+  $('#efCapEff') && ($('#efCapEff').textContent=tvlOk?(MKT.oi/tvlV).toFixed(0)+'×':'—');
+  $('#efVolSupport') && ($('#efVolSupport').textContent=tvlOk?'$'+fmtK((e.vol/e.days)/tvlV):'—');
+  $('#efFeeVsTvl') && ($('#efFeeVsTvl').textContent=tvlOk?(e.spread/tvlV*100).toFixed(0)+'%':'—');
+  $('#efYield') && ($('#efYield').textContent=e.annRevYield.toFixed(1)+'%');
   $('#effAsOf').textContent=e.key==='month'
     ? 'Month uses exact wallet inflow; volume is a 30D average proxy. OI snapshot '+MKT.asOf+'.'
     : 'Volume & OI snapshot '+MKT.asOf+'.';
@@ -4039,6 +4586,7 @@ function renderChanges(){
   const r7=dailyRate(7), r30=dailyRate(30);
   const rollPct=pctChange(r7,r30);
   renderEfficiency();
+  renderBiweekly();
   renderMath();
   renderPointsCalc();
   const eff=computeEff();
@@ -4607,30 +5155,29 @@ function calImpliedActivity(earn){
 }
 const calMiniMoney=n=>n>=1e9?'$'+(n/1e9).toFixed(1)+'B':n>=1e6?'$'+(n/1e6).toFixed(1)+'M':n>=1e3?'$'+(n/1e3).toFixed(0)+'K':fmtUSD(n);
 function pending24Meta(dateStr){
-  const today=resetDateKey(), nextTs=resetMidnightTs(addDays(today,1))*1000;
-  if(dateStr===today){
-    const nextLabel=new Date(nextTs).toLocaleDateString('en-US',{month:'short',day:'numeric',timeZone:RESET_TZ.tz});
-    return `<div class="cal-pending-meta"><span>24H closes <b>${nextLabel} · 00:00 ET</b></span><b class="countdown" data-countdown="${dateStr}">—</b></div>`;
-  }
-  if(dateStr>today)return `<div class="cal-pending-meta"><span>24H window</span><b>closes 00:00 ET</b></div>`;
-  return `<div class="cal-pending-meta"><span>24H snapshot</span><b>not available</b></div>`;
+  const closeTs=resetMidnightTs(addDays(dateStr,1))*1000;
+  return `<div class="cal-countdown-card"><strong class="countdown" data-countdown="${closeTs}">${calendarTimeLeftLabel(closeTs)}</strong></div>`;
+}
+function calendarTimeLeftLabel(closeTs){
+  const left=Math.max(0,closeTs-Date.now());
+  const h=Math.floor(left/36e5),m=Math.floor((left%36e5)/6e4);
+  return `${h}h ${String(m).padStart(2,'0')}m left`;
 }
 function updateCalendarCountdowns(){
-  const today=resetDateKey(), nextTs=resetMidnightTs(addDays(today,1))*1000, left=Math.max(0,nextTs-Date.now());
-  const h=Math.floor(left/36e5),m=Math.floor((left%36e5)/6e4),s=Math.floor((left%6e4)/1e3);
-  document.querySelectorAll('[data-countdown]').forEach(el=>{el.textContent=`${String(h).padStart(2,'0')}h ${String(m).padStart(2,'0')}m ${String(s).padStart(2,'0')}s`;});
+  document.querySelectorAll('[data-countdown]').forEach(el=>{el.textContent=calendarTimeLeftLabel(+el.dataset.countdown);});
 }
 function calendarEarnHtml(dateStr,disp){
   if(CALMODE!=='day')return `<div class="cal-earn ${disp.span?'span':(disp.v?'':'zero')}">${disp.label}</div>`;
   const closed=isClosedDailyTotal(dateStr), total=CAL.eMap.get(dateStr)||0;
   const a=closed?calImpliedActivity(total):null;
+  if(!closed)return `<div class="cal-dual pending-only" title="Time remaining until this ET daily total closes.">${pending24Meta(dateStr)}</div>`;
   return `<div class="cal-dual" title="Completed daily total only. Current/future dates stay pending until the day closes.">
-    <div class="cal-money-row total ${closed?'':'pending'}"><span class="tz">Total</span><span class="money">${closed?('+'+fmtUSD(total)):'pending'}</span></div>
-    ${closed?`<div class="cal-flow-mini" title="Implied from 30D fee efficiency, not raw reported daily volume/OI">
+    <div class="cal-money-row total"><span class="tz">Total</span><span class="money">+${fmtUSD(total)}</span></div>
+    <div class="cal-flow-mini" title="Implied from 30D fee efficiency, not raw reported daily volume/OI">
       <div><b>${calMiniMoney(a.volume)}</b><span>Est Vol</span></div>
       <div><b>${calMiniMoney(a.oi)}</b><span>OI needed</span></div>
       <div class="burn"><b>${calMiniMoney(a.burn)}</b><span>Burn</span></div>
-    </div>`:pending24Meta(dateStr)}
+    </div>
   </div>`;
 }
 function calendarDisplay(dateStr){
@@ -4955,6 +5502,7 @@ async function refresh(){
       const olpBal=await balAtPad(CHAIN.olpPad,'latest');
       $('#pmOlpBalance') && ($('#pmOlpBalance').textContent=fmtUSD(olpBal));
       $('#pmOlpFormula') && ($('#pmOlpFormula').innerHTML=`Formula: <b>USDC balanceOf(0x74bbbb...1f2cd) = ${fmtUSD(olpBal)}</b>`);
+      if(olpBal>0){OLP_TVL=olpBal;OLP_TVL_LIVE=true;renderEfficiency();}
     }catch(_){
       $('#pmOlpBalance') && ($('#pmOlpBalance').textContent='check Arbiscan');
       $('#pmOlpFormula') && ($('#pmOlpFormula').innerHTML='Formula: <b>read Core OLP Vault USDC balance on Arbiscan</b>');
@@ -5042,12 +5590,12 @@ $('#refCodeCopy')?.addEventListener('click',copyReferralCode);
 /* ---------- tabs ---------- */
 const TABS=$('#tabs');
 const TAB_ORDER_KEY='variationalTabOrder';
-const VALID_TABS=['overview','implied','historical','efficiency','roadmap','points','comparison'];
+const VALID_TABS=['overview','implied','historical','efficiency','biweekly','roadmap','points','comparison'];
 const normalizeTabName=name=>{
   if(name==='charts'||name==='interval')return 'historical';
   if(name==='peers')return 'comparison';
   if(name==='spreads'||name==='implied-fees')return 'implied';
-  if(name==='calendar'||name==='total-earnings'||name==='earnings')return 'efficiency';
+  if(name==='calendar'||name==='total-earnings'||name==='earnings')return 'overview';
   return name;
 };
 function saveTabOrder(){
@@ -5158,7 +5706,7 @@ try{
 booted=true;
 try{buildCalendar();}catch(err){console.warn('Calendar startup render recovered:',err);}
 updateCalendarCountdowns();
-setInterval(updateCalendarCountdowns,1000);
+setInterval(updateCalendarCountdowns,30000);
 startLive();
 setInterval(renderPointsDeadline,60000);
 // attempt an automatic live sync on load (silent-fail to snapshot)
