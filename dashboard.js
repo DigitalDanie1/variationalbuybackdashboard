@@ -19,10 +19,10 @@ const CHAIN = {
   b0:424000000, t0:1769076491, bps:3.9958149219963364
 };
 
-/* ---------- Variational market data (DeFiLlama /protocol/perps/variational, snapshot) ----------
-   Perp volume is paywalled on DeFiLlama's live API, so these are embedded snapshots.
-   OI is available free; treasury revenue is measured on-chain. The latest official
-   reports imply a 20% treasury share, while the current OLP docs still state 10%. */
+/* ---------- Variational market data ----------
+   These values are offline fallbacks only. Public DeFiLlama v2 daily chart endpoints
+   and Variational's official live stats endpoint replace them after page load.
+   Treasury revenue remains measured independently on-chain. */
 const MKT = {
   asOf:'2026-07-06', src:'DeFiLlama · omni.variational.io (Arbitrum)',
   vol:{ d1:929.89e6, d7:6.001e9, d30:24.295e9, cum:167.984e9 },
@@ -599,7 +599,7 @@ function computeEffWindow(key=EFF_WINDOW){
   const first=SERIES[0], cur=currentTreasuryBalance(), asOf=currentTreasuryDate();
   const allDays=Math.max(1,Math.round((new Date(asOf+'T00:00:00Z')-new Date(first.d+'T00:00:00Z'))/86400000)+1);
   let days=cfg.days||allDays;
-  let rev,vol,volSource='embedded snapshot';
+  let rev,vol,volSource='DeFiLlama exact daily series';
   if(key==='month'){
     const monthStart=asOf.slice(0,7)+'-01';
     days=Math.max(1,Math.round((new Date(asOf+'T00:00:00Z')-new Date(monthStart+'T00:00:00Z'))/86400000)+1);
@@ -697,7 +697,52 @@ function renderImpliedSpreadTotal(treasuryTotal){
   $('#pmTreasuryFormula') && ($('#pmTreasuryFormula').innerHTML=`Formula: <b>USDC balanceOf(0x5e91...d645) = ${fmtUSD(treasuryTotal)}</b>`);
   $('#pmDailyFormula') && ($('#pmDailyFormula').innerHTML=days?`Formula: <b>(${fmtUSD(treasuryTotal)} - ${fmtUSD(start30)}) / ${days}D = ${fmtUSD(avg30)}/day</b>`:'Formula: <b>waiting for historical treasury series</b>');
   $('#pmFeesFormula') && ($('#pmFeesFormula').innerHTML=`Formula: <b>${fmtUSD(treasuryTotal)} / ${(MKT.spreadShare*100).toFixed(0)}% = ${compact(totalFees)}</b>`);
+  renderPmDailyMonitor();
   renderMoneyMap(treasuryTotal);
+}
+function renderPmDailyMonitor(){
+  const monitor=$('#pmDailyMonitor');
+  if(!monitor)return;
+  const rows=dailyEarn().slice(1).filter(x=>x.d<resetDateKey()&&Number.isFinite(x.e));
+  if(rows.length<2){
+    $('#pmDailyHeadline').textContent='Not enough completed ET days yet';
+    $('#pmDailyContext').textContent='The monitor appears after two verified daily treasury closes.';
+    $('#pmDailyBadge').textContent='WAITING';
+    return;
+  }
+  const latest=rows[rows.length-1], previous=rows[rows.length-2];
+  const baselineRows=rows.slice(Math.max(0,rows.length-8),-1);
+  const average=baselineRows.reduce((sum,x)=>sum+x.e,0)/Math.max(1,baselineRows.length);
+  const pct=(value,base)=>base>0?(value/base-1)*100:null;
+  const vsPrevious=pct(latest.e,previous.e), vsAverage=pct(latest.e,average);
+  const signals=[
+    {basis:'the previous day',pct:vsPrevious,delta:latest.e-previous.e},
+    {basis:'the prior 7-day average',pct:vsAverage,delta:latest.e-average}
+  ].filter(x=>Number.isFinite(x.pct)&&Math.abs(x.pct)>=25&&Math.abs(x.delta)>=5000)
+   .sort((a,b)=>Math.abs(b.pct)-Math.abs(a.pct));
+  const signal=signals[0]||null;
+  const tone=signal?(signal.delta>=0?'alert-up':'alert-down'):'alert-normal';
+  monitor.classList.remove('alert-up','alert-down','alert-normal');
+  monitor.classList.add(tone);
+  const signedMoney=n=>(n>=0?'+':'−')+fmtUSD(Math.abs(n));
+  const signedPct=n=>Number.isFinite(n)?`${n>=0?'+':'−'}${Math.abs(n).toFixed(1)}%`:'—';
+  const prettyDate=d=>new Date(`${d}T12:00:00Z`).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric',timeZone:'UTC'});
+  if(signal){
+    const direction=signal.delta>=0?'increase':'drop';
+    $('#pmDailyHeadline').textContent=`Large treasury inflow ${direction}`;
+    $('#pmDailyContext').textContent=`${prettyDate(latest.d)} closed ${Math.abs(signal.pct).toFixed(1)}% ${signal.delta>=0?'above':'below'} ${signal.basis}.`;
+    $('#pmDailyBadge').textContent=signal.delta>=0?'LARGE INCREASE':'LARGE DROP';
+  }else{
+    $('#pmDailyHeadline').textContent='Daily inflow is within its normal range';
+    $('#pmDailyContext').textContent='No move crossed both the 25% and $5K alert thresholds.';
+    $('#pmDailyBadge').textContent='NORMAL';
+  }
+  $('#pmDailyEarn').textContent=signedMoney(latest.e);
+  $('#pmDailyDate').textContent=`${prettyDate(latest.d)} ET day · final ${prettyDate(addDays(latest.d,1))} 00:00 ET`;
+  $('#pmDailyVsPrev').textContent=signedPct(vsPrevious);
+  $('#pmDailyPrev').textContent=`${prettyDate(previous.d)}: ${signedMoney(previous.e)}`;
+  $('#pmDailyVsAvg').textContent=signedPct(vsAverage);
+  $('#pmDailyAvg').textContent=`Prior ${baselineRows.length}D average: ${signedMoney(average)}`;
 }
 /* income-flow sankey: gross spreads -> non-treasury pool / treasury -> burn / dry powder */
 function renderMoneyMap(T){
@@ -978,212 +1023,8 @@ function renderPeers(){
   if($('#cmpRank'))$('#cmpRank').textContent='#'+PEERS.varRank;
   if($('#cmpRankSub'))$('#cmpRankSub').textContent='Variational is #'+PEERS.varRank+' of '+PEERS.count+' venues by open interest';
   if($('#cmpRankLine'))$('#cmpRankLine').textContent='#'+PEERS.varRank+' of '+PEERS.count+' by OI';
-  renderEmpire();
 }
 
-/* ============================================================
-   The Perp DEX Map — ranks drawn as kingdoms & territory.
-   Deterministic hex-cluster layout: area ∝ OI share (PEERS),
-   capitals fly logo banners, top-5 get rank crowns, Variational
-   glows mint. Re-renders whenever renderPeers refreshes.
-   ============================================================ */
-const EMP_COLORS={
-  'Hyperliquid':['#0b3d3a','#5ffbdf'],'Aster':['#2a2320','#f2d79b'],'Variational':['#141a3a','#4d8dff'],
-  'Lighter':['#15171a','#e9edf2'],'GRVT':['#0d1b2a','#c6ff3d'],'Ostium':['#1a1410','#ff7a1a'],
-  'Jupiter':['#0c2a2a','#57e0a0'],'edgeX':['#14161a','#c9d0d8'],'Extended':['#0b1a12','#25d07a'],
-  'Drift':['#161033','#c86bff'],'ApeX Protocol':['#171406','#ffd21a'],'Pacifica':['#0a1c2e','#31d7ff'],
-  'Backpack':['#170a0a','#ff4b4b'],'Vest Exchange':['#1a1414','#ff6a5a'],'GMX':['#0a1424','#4ad6ff'],
-  'dYdX':['#12172a','#6f7dfb'],'Orderly':['#141a26','#8f5cf0'],'Reya':['#101c22','#38d3c0'],
-  'Avantis':['#101828','#5aa2ff'],'Byreal':['#161320','#c8a2ff'],'Paradex':['#131722','#9aa8ff'],
-  'Gains Network':['#131f18','#4ee6a4']};
-function empMix(a,b,t){
-  const h=x=>[parseInt(x.slice(1,3),16),parseInt(x.slice(3,5),16),parseInt(x.slice(5,7),16)];
-  const A=h(a),B=h(b);
-  return 'rgb('+A.map((v,i)=>Math.round(v+(B[i]-v)*t)).join(',')+')';
-}
-function empRng(seed){let a=seed>>>0;return()=>{a|=0;a=(a+0x6d2b79f5)|0;let t=Math.imul(a^(a>>>15),1|a);t=(t+Math.imul(t^(t>>>7),61|t))^t;return((t^(t>>>14))>>>0)/4294967296;};}
-function empHash(s){let h=2166136261>>>0;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619);}return h>>>0;}
-
-function renderEmpire(){
-  const svg=document.getElementById('empireMap'); if(!svg)return;
-  const list=PEERS.list.filter(p=>p.oi>0);
-  if(!list.length)return;
-  const totalOi=list.reduce((s,p)=>s+Math.max(0,p.oi),0)||1;
-  const rankOf=n=>list.findIndex(p=>p.n===n)+1;
-
-  /* --- hex disc (pointy-top axial), radius 7 = 169 provinces --- */
-  const R=7,S=25,SQ3=Math.sqrt(3),CX=490,CY=324;
-  const key=(q,r)=>q+','+r;
-  const cells=[];
-  for(let q=-R;q<=R;q++)for(let r=Math.max(-R,-q-R);r<=Math.min(R,-q+R);r++)cells.push({q,r});
-  const px=(q,r)=>[CX+S*SQ3*(q+r/2),CY+S*1.5*r];
-  const DIRS=[[1,0],[1,-1],[0,-1],[-1,0],[-1,1],[0,1]];
-
-  /* --- province targets: largest remainder, ≥2 per kingdom --- */
-  const N=cells.length;
-  const ks=list.map(p=>({p,exact:Math.max(0,p.oi)/totalOi*N}));
-  ks.forEach(k=>{k.t=Math.max(2,Math.floor(k.exact));k.rem=k.exact-Math.floor(k.exact);});
-  let used=ks.reduce((s,k)=>s+k.t,0);
-  ks.sort((a,b)=>b.rem-a.rem);
-  let gi=0;
-  while(used<N){ks[gi%ks.length].t++;used++;gi++;}
-  gi=ks.length-1;
-  while(used>N&&gi>-ks.length*4){const k=ks[((gi%ks.length)+ks.length)%ks.length];if(k.t>2){k.t--;used--;}gi--;}
-  ks.sort((a,b)=>b.p.oi-a.p.oi);
-
-  /* --- capitals: #1 centered, the rest ring the map --- */
-  const owner=new Map(),caps=new Map(),rng=empRng(20260712);
-  const free=new Set(cells.map(c=>key(c.q,c.r)));
-  ks.forEach((k,idx)=>{
-    let q=0,r=0;
-    if(idx>0){
-      const ang=-Math.PI/2+(idx-1)/Math.max(1,ks.length-1)*Math.PI*2+((empHash(k.p.n)%100)/100-.5)*.25;
-      const rr=R*.82,x=Math.cos(ang)*rr,z=Math.sin(ang)*rr;
-      r=Math.round(z/1.5);q=Math.round(x/SQ3-r/2);
-    }
-    let kk=key(q,r);
-    if(!free.has(kk)){
-      let best=null,bd=1e9;
-      for(const c of free){const[q2,r2]=c.split(',').map(Number);const d=(Math.abs(q2-q)+Math.abs(q2+r2-q-r)+Math.abs(r2-r))/2;if(d<bd){bd=d;best=c;}}
-      kk=best;
-    }
-    free.delete(kk);owner.set(kk,k.p.n);caps.set(k.p.n,kk);k.claimed=1;
-    const[q2,r2]=kk.split(',').map(Number);
-    k.frontier=DIRS.map(d=>key(q2+d[0],r2+d[1]));
-  });
-
-  /* --- round-robin frontier growth toward targets --- */
-  let guard=N*6;
-  while(free.size>0&&guard-->0){
-    let did=false;
-    for(const k of ks){
-      if(k.claimed>=k.t||!k.frontier.length)continue;
-      let pick=null;
-      const start=Math.floor(rng()*k.frontier.length);
-      for(let j=0;j<k.frontier.length;j++){const c=k.frontier[(start+j)%k.frontier.length];if(free.has(c)){pick=c;break;}}
-      k.frontier=k.frontier.filter(c=>free.has(c));
-      if(!pick)continue;
-      free.delete(pick);owner.set(pick,k.p.n);k.claimed++;did=true;
-      const[q2,r2]=pick.split(',').map(Number);
-      DIRS.forEach(d=>{const nk=key(q2+d[0],r2+d[1]);if(free.has(nk))k.frontier.push(nk);});
-    }
-    if(!did)break;
-  }
-  for(const c of[...free]){
-    const[q,r]=c.split(',').map(Number);
-    for(const d of DIRS){const o=owner.get(key(q+d[0],r+d[1]));if(o){owner.set(c,o);free.delete(c);break;}}
-  }
-
-  /* --- build SVG: ocean plate, routes, kingdom fills, borders, banners --- */
-  const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;');
-  const groups=new Map();
-  list.forEach(p=>groups.set(p.n,{polys:[],borders:[]}));
-  cells.forEach(({q,r})=>{
-    const o=owner.get(key(q,r)),g=groups.get(o);if(!g)return;
-    const[x,y]=px(q,r);
-    let pts='';
-    for(let c=0;c<6;c++){const a=Math.PI/180*(60*c+30);pts+=(x+S*1.045*Math.cos(a)).toFixed(1)+','+(y+S*1.045*Math.sin(a)).toFixed(1)+' ';}
-    g.polys.push(pts.trim());
-    DIRS.forEach(d=>{
-      if(owner.get(key(q+d[0],r+d[1]))===o)return;
-      const[ex,ey]=px(q+d[0],r+d[1]),th=Math.atan2(ey-y,ex-x);
-      const c1x=x+S*Math.cos(th-Math.PI/6),c1y=y+S*Math.sin(th-Math.PI/6);
-      const c2x=x+S*Math.cos(th+Math.PI/6),c2y=y+S*Math.sin(th+Math.PI/6);
-      g.borders.push('M'+c1x.toFixed(1)+' '+c1y.toFixed(1)+'L'+c2x.toFixed(1)+' '+c2y.toFixed(1));
-    });
-  });
-  const flags=ks.map(k=>{const[q,r]=caps.get(k.p.n).split(',').map(Number);const[x,y]=px(q,r);return{k,x,y};}).sort((a,b)=>a.y-b.y);
-  const king=flags.find(f=>rankOf(f.k.p.n)===1)||flags[0];
-  const routeTargets=flags
-    .filter(f=>f!==king&&(rankOf(f.k.p.n)<=7||f.k.p.me))
-    .sort((a,b)=>rankOf(a.k.p.n)-rankOf(b.k.p.n));
-  const routePath=(a,b,i)=>{
-    const mx=(a.x+b.x)/2,my=(a.y+b.y)/2;
-    const dx=b.x-a.x,dy=b.y-a.y,len=Math.max(1,Math.hypot(dx,dy));
-    const bend=(i%2?1:-1)*(34+Math.min(54,len*.09));
-    const cx=mx+(-dy/len)*bend,cy=my+(dx/len)*bend;
-    return 'M'+a.x.toFixed(1)+' '+a.y.toFixed(1)+'Q'+cx.toFixed(1)+' '+cy.toFixed(1)+' '+b.x.toFixed(1)+' '+b.y.toFixed(1);
-  };
-  let out='<defs>'
-    +'<radialGradient id="empOcean" cx="50%" cy="42%" r="72%"><stop offset="0%" stop-color="#102644"/><stop offset="58%" stop-color="#071321"/><stop offset="100%" stop-color="#02060c"/></radialGradient>'
-    +'<linearGradient id="empRoute" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#4d90ff" stop-opacity=".1"/><stop offset="48%" stop-color="#55b8ff" stop-opacity=".92"/><stop offset="100%" stop-color="#26e6c2" stop-opacity=".18"/></linearGradient>'
-    +'<filter id="empGlow" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>'
-    +'<filter id="empFlagGlow" x="-35%" y="-55%" width="190%" height="210%"><feDropShadow dx="0" dy="0" stdDeviation="3" flood-color="#4d90ff" flood-opacity=".42"/></filter>'
-    +'<filter id="empKingGlow" x="-28%" y="-28%" width="156%" height="156%"><feDropShadow dx="0" dy="0" stdDeviation="5" flood-color="#55b8ff" flood-opacity=".22"/></filter>'
-    +'<filter id="empMintGlow" x="-35%" y="-35%" width="170%" height="170%"><feDropShadow dx="0" dy="0" stdDeviation="5" flood-color="#26e6c2" flood-opacity=".55"/></filter>'
-    +'</defs>'
-    +'<rect class="emp-ocean" x="0" y="0" width="980" height="660" rx="18"/>'
-    +'<path class="emp-depth" d="M114 132C246 68 418 83 518 136S785 126 884 86M80 518C238 456 322 563 486 508S708 444 886 512M182 318C275 258 391 274 504 320S728 378 834 304"/>';
-  ks.forEach(k=>{
-    const n=k.p.n,g=groups.get(n),me=!!k.p.me;
-    const rk=rankOf(n);
-    const col=EMP_COLORS[n]||['#152238','#7aa0c8'];
-    out+='<g class="emp-k'+(me?' me':'')+(rk===1?' top1':'')+'" data-n="'+esc(n)+'">'
-      +g.polys.map(pts=>'<polygon points="'+pts+'" fill="'+empMix(col[0],col[1],.42)+'"/>').join('')
-      +'<path d="'+g.borders.join('')+'" fill="none" stroke="'+(me?'#26e6c2':'#020814')+'" stroke-width="'+(me?3:2.4)+'" stroke-linecap="round"'+(me?' class="emp-me-border"':'')+'/>'
-      +'</g>';
-  });
-  out+='<g class="emp-routes">'+routeTargets.map((f,i)=>'<path class="emp-route'+(rankOf(f.k.p.n)<=3?' major':'')+'" d="'+routePath(king,f,i)+'"/>').join('')+'</g>';
-  out+='<g class="emp-labels">';
-  flags.filter(f=>rankOf(f.k.p.n)<=5||f.k.p.me).forEach(({k,x,y})=>{
-    const n=k.p.n,rk=rankOf(n),me=!!k.p.me,col=EMP_COLORS[n]||['#152238','#7aa0c8'];
-    const dy=rk===1?64:(me?48:42);
-    out+='<g class="emp-label" transform="translate('+x.toFixed(1)+','+(y+dy).toFixed(1)+')">'
-      +'<text text-anchor="middle" font-size="'+(rk===1?14:11)+'" font-weight="950" fill="'+(me?'#7dffe3':col[1])+'">'+esc(n)+'</text>'
-      +'<text y="15" text-anchor="middle" font-size="8.5" font-weight="800" fill="#84a2c6">#'+rk+' · '+(k.p.oi/totalOi*100).toFixed(1)+'% OI</text>'
-      +'</g>';
-  });
-  out+='</g>';
-  flags.forEach(({k,x,y})=>{
-    const n=k.p.n,rk=rankOf(n),major=rk<=5,me=!!k.p.me,logo=PLOGO[n];
-    const col=EMP_COLORS[n]||['#152238','#7aa0c8'];
-    const w=major?Math.round(n.length*7.4+42):26,h=major?26:21;
-    out+='<g class="emp-flag'+(major?' major':'')+(me?' me':'')+'" data-n="'+esc(n)+'" transform="translate('+x.toFixed(1)+','+y.toFixed(1)+')">'
-      +'<circle class="emp-cap-ring'+(me?' me':'')+'" cx="0" cy="5" r="'+(major?18:13)+'"/>'
-      +'<ellipse cx="0" cy="5" rx="8" ry="3" fill="rgba(2,8,20,.55)"/>'
-      +'<line x1="0" y1="5" x2="0" y2="'+(-(h+13))+'" stroke="#0a1220" stroke-width="3" stroke-linecap="round"/>'
-      +'<line x1="0" y1="5" x2="0" y2="'+(-(h+13))+'" stroke="#3b4c66" stroke-width="1.3" stroke-linecap="round"/>'
-      +'<rect x="1.5" y="'+(-(h+12))+'" width="'+w+'" height="'+h+'" rx="5" fill="'+col[0]+'" stroke="'+(me?'#26e6c2':'rgba(122,160,200,.55)')+'" stroke-width="'+(me?1.6:1)+'"/>'
-      +(logo?'<image href="'+logo+'" x="'+(major?6:4)+'" y="'+(-(h+12)+(major?4:3))+'" width="'+(major?18:15)+'" height="'+(major?18:15)+'"/>':'')
-      +(major?'<text x="29" y="'+(-(h+12)+17.5)+'" font-size="12" font-weight="700" fill="'+(me?'#7dffe3':col[1])+'">'+esc(n)+'</text>':'')
-      +(major?'<circle cx="1" cy="'+(-(h+15))+'" r="8.6" fill="#0b1424" stroke="#4d90ff" stroke-width="1.2"/><text x="1" y="'+(-(h+11.4))+'" text-anchor="middle" font-size="10" font-weight="800" fill="#9fc4ff">'+rk+'</text>':'')
-      +'</g>';
-  });
-  out+='<g class="emp-compass" transform="translate(74,82)">'
-    +'<circle r="34" fill="rgba(3,8,20,.58)" stroke="rgba(85,184,255,.28)"/>'
-    +'<path d="M0 -25L7 0L0 25L-7 0Z" fill="rgba(85,184,255,.22)" stroke="#55b8ff"/>'
-    +'<path d="M-25 0L0 -7L25 0L0 7Z" fill="rgba(38,230,194,.12)" stroke="rgba(38,230,194,.55)"/>'
-    +'<text y="-42" text-anchor="middle" font-size="9" font-weight="900" fill="#84a2c6">OI NORTH</text>'
-    +'</g>'
-    +'<g class="emp-scale" transform="translate(738,602)">'
-    +'<rect x="-10" y="-24" width="198" height="40" rx="8" fill="rgba(3,8,20,.58)" stroke="rgba(85,184,255,.22)"/>'
-    +'<path d="M8 0H68M68 0H128" stroke="#55b8ff" stroke-width="3" stroke-linecap="round"/><path d="M68 0H128" stroke="#26e6c2" stroke-width="3" stroke-linecap="round"/>'
-    +'<text x="8" y="-8" font-size="9" font-weight="900" fill="#84a2c6">TERRITORY = OPEN INTEREST</text>'
-    +'<text x="8" y="14" font-size="8.5" font-weight="800" fill="#4f6f98">routes mark the top liquidity corridors</text>'
-    +'</g>';
-  svg.innerHTML=out;
-  const meta=document.getElementById('empireMeta');
-  if(meta)meta.textContent=list.length+' kingdoms · $'+(totalOi/1e9).toFixed(1)+'B total OI · '+PEERS.asOf;
-
-  /* --- hover: dim the rest, tooltip via the shared #tt --- */
-  const tt=document.getElementById('tt');
-  const clear=()=>{if(tt)tt.style.opacity=0;svg.classList.remove('emp-hovering');svg.querySelectorAll('.hot').forEach(x=>x.classList.remove('hot'));};
-  svg.querySelectorAll('.emp-k, .emp-flag').forEach(g=>{
-    const n=g.getAttribute('data-n'),p=list.find(pp=>pp.n===n);
-    if(!p)return;
-    g.addEventListener('mousemove',e=>{
-      if(tt){
-        const share=(p.oi/totalOi*100).toFixed(1);
-        tt.innerHTML='<b>#'+rankOf(n)+' '+esc(n)+'</b><br>OI $'+(p.oi/1e9).toFixed(2)+'B · '+share+'% of the realm'+(p.vol?'<br>24H volume $'+(p.vol/1e9).toFixed(2)+'B':'');
-        placeTT(e);
-      }
-      svg.classList.add('emp-hovering');
-      svg.querySelectorAll('.hot').forEach(x=>x.classList.remove('hot'));
-      svg.querySelectorAll('[data-n="'+CSS.escape(n)+'"]').forEach(x=>x.classList.add('hot'));
-    });
-    g.addEventListener('mouseleave',clear);
-  });
-}
 function fmtPulseMoney(v){
   if(v==null)return '—';
   if(v>=1e9)return '$'+(v/1e9).toFixed(2)+'B';
@@ -1194,12 +1035,19 @@ function fmtPulseMoney(v){
 function renderPulseTable(){
   const body=$('#pulseTable tbody');
   if(!body)return;
-  body.innerHTML=PEERS.list.slice(0,13).map((p,i)=>`<tr class="${p.me?'me':''}">
-    <td class="rank">${i+1}</td>
-    <td><span class="exchange"><img class="table-logo" src="${PLOGO[p.n]||'variational-symbol-transparent.png'}" alt="" width="20" height="20" style="width:20px!important;height:20px!important;min-width:20px!important;max-width:20px!important;min-height:20px!important;max-height:20px!important;object-fit:contain!important">${escapeHTML(p.n)}</span></td>
-    <td class="${(PEERS.live&&!p.live)?'snap':''}">${fmtPulseMoney(p.oi)}</td>
-    <td class="${(PEERS.live&&!p.live)?'snap':''}">${fmtPulseMoney(p.vol)}</td>
-  </tr>`).join('');
+  const total=PEERS.total||PEERS.list.reduce((sum,p)=>sum+(p.oi||0),0)||1;
+  const max=PEERS.list[0]?.oi||1;
+  body.innerHTML=PEERS.list.slice(0,15).map((p,i)=>{
+    const share=(p.oi||0)/total*100,relative=(p.oi||0)/max*100;
+    const classes=[p.me?'me':'',i<3?'top-'+(i+1):''].filter(Boolean).join(' ');
+    return `<tr class="${classes}">
+      <td class="rank"><span class="rank-number">#${i+1}</span></td>
+      <td><span class="exchange"><img class="table-logo" src="${PLOGO[p.n]||'variational-symbol-transparent.png'}" alt="" width="20" height="20" style="width:20px!important;height:20px!important;min-width:20px!important;max-width:20px!important;min-height:20px!important;max-height:20px!important;object-fit:contain!important"><span class="exchange-copy"><b>${escapeHTML(p.n)}</b>${p.me?'<small>Variational · current position</small>':''}</span></span></td>
+      <td class="oi-cell ${(PEERS.live&&!p.live)?'snap':''}"><div class="oi-read"><strong>${fmtPulseMoney(p.oi)}</strong></div><span class="oi-track" title="${relative.toFixed(1)}% of the #1 venue's OI"><i style="width:${relative.toFixed(2)}%"></i></span></td>
+      <td class="share-cell"><strong>${share.toFixed(2)}%</strong></td>
+      <td class="volume-cell ${(PEERS.live&&!p.live)?'snap':''}"><strong>${fmtPulseMoney(p.vol)}</strong></td>
+    </tr>`;
+  }).join('');
 }
 /* ---------- king scoreboard (Hyperliquid benchmark) ---------- */
 function renderKing(){
@@ -1401,26 +1249,165 @@ async function refreshPerpBoard(){
   }
 }
 
-/* OI override from DeFiLlama open-interest (free endpoint, CORS-enabled).
-   Volume intentionally stays on CoinGecko: DeFiLlama's derivatives volume API requires a paid key. */
-async function refreshLlamaOi(){
+/* Exact market activity. DeFiLlama exposes both protocol histories through its
+   public v2 chart routes; the official Variational endpoint supplies the live
+   rolling-24h volume and current OI used by the same DeFiLlama adapter. */
+const MARKET_URLS={
+  volume:'https://api.llama.fi/v2/chart/derivatives/protocol/variational',
+  oi:'https://api.llama.fi/v2/chart/open-interest/protocol/variational?dataType=openInterestAtEnd',
+  live:'https://omni-client-api.prod.ap-northeast-1.variational.io/metadata/stats'
+};
+const MARKET_ACTIVITY={volume:[],oi:[],live:null,days:90,historyAt:null,liveAt:null,errors:{history:'',live:''}};
+let MARKET_HISTORY_SYNCING=false,MARKET_LIVE_SYNCING=false;
+const marketDay=ts=>new Date(Number(ts)*1000).toISOString().slice(0,10);
+const marketBig=n=>n>=1e9?'$'+(n/1e9).toFixed(2)+'B':n>=1e6?'$'+(n/1e6).toFixed(2)+'M':n>=1e3?'$'+(n/1e3).toFixed(1)+'K':fmtUSD(n);
+const marketExact=(n,dp=0)=>Number.isFinite(+n)?fmtUSD(+n,dp):'—';
+async function fetchMarketJson(url,timeout=12000){
+  const ctrl=new AbortController(),timer=setTimeout(()=>ctrl.abort(),timeout);
   try{
-    const get=async s=>{const r=await fetch('https://api.llama.fi/summary/open-interest/'+s);if(!r.ok)throw new Error(s+' http '+r.status);return r.json()};
-    const [vaOi,liOi]=await Promise.all([get('variational'),get('lighter')]);
-    let hit=false;
-    if(vaOi&&vaOi.total24h>0){const p=PEERS.list.find(x=>x.me); if(p)p.oi=vaOi.total24h; MKT.oi=vaOi.total24h; hit=true;}
-    if(liOi&&liOi.total24h>0){const p=PEERS.list.find(x=>x.n==='Lighter'); if(p)p.oi=liOi.total24h; VSL.li.oi=liOi.total24h; hit=true;}
-    if(!hit)return;
-    OI_SRC='llama';
-    PEERS.list.sort((a,b)=>b.oi-a.oi);
-    PEERS.total=PEERS.list.reduce((s,p)=>s+(p.oi||0),0);
-    PEERS.varRank=PEERS.list.findIndex(p=>p.me)+1;
-    const vp=PEERS.list.find(p=>p.me), hl=PEERS.list.find(p=>p.n==='Hyperliquid');
-    if(vp&&PEERS.total)PEERS.varShare=+(vp.oi/PEERS.total*100).toFixed(1);
-    if(hl&&vp&&vp.oi)PEERS.vsHl=+(hl.oi/vp.oi).toFixed(1);
-    renderPeers(); renderPulseTable(); renderVsLighter(); renderKing(); renderValuation(); renderEfficiency();
-  }catch(err){console.warn('DeFiLlama OI sync failed, keeping previous OI source:',err)}
+    const r=await fetch(url,{signal:ctrl.signal,cache:'no-store'});
+    if(!r.ok)throw new Error('HTTP '+r.status);
+    return await r.json();
+  }finally{clearTimeout(timer)}
 }
+function recalcVariationalPeer(){
+  const vp=PEERS.list.find(p=>p.me);
+  if(vp){vp.oi=MKT.oi;vp.vol=MKT.vol.d1;vp.live=true;}
+  OI_SRC='llama';
+  PEERS.list.sort((a,b)=>b.oi-a.oi);
+  PEERS.total=PEERS.list.reduce((s,p)=>s+(p.oi||0),0);
+  PEERS.varRank=PEERS.list.findIndex(p=>p.me)+1;
+  const va=PEERS.list.find(p=>p.me),hl=PEERS.list.find(p=>p.n==='Hyperliquid');
+  if(va&&PEERS.total)PEERS.varShare=+(va.oi/PEERS.total*100).toFixed(1);
+  if(hl&&va&&va.oi)PEERS.vsHl=+(hl.oi/va.oi).toFixed(1);
+}
+function applyMarketModels(){
+  const vols=MARKET_ACTIVITY.volume,ois=MARKET_ACTIVITY.oi,live=MARKET_ACTIVITY.live;
+  const sumLast=n=>vols.slice(-n).reduce((s,x)=>s+x.v,0);
+  if(vols.length){
+    MKT.vol.d7=sumLast(7);
+    MKT.vol.d30=sumLast(30);
+    MKT.vol.cum=live?.cumulativeVolume||vols.reduce((s,x)=>s+x.v,0);
+  }
+  if(live?.volume24h>0)MKT.vol.d1=live.volume24h;
+  if(live?.oi>0)MKT.oi=live.oi;
+  else if(ois.length)MKT.oi=ois[ois.length-1].v;
+  MKT.asOf=MARKET_ACTIVITY.liveAt
+    ?MARKET_ACTIVITY.liveAt.toLocaleString('en-US',{timeZone:'UTC',month:'short',day:'2-digit',hour:'2-digit',minute:'2-digit',hour12:false})+' UTC'
+    :(ois[ois.length-1]?.d||MKT.asOf);
+  MKT.src='DeFiLlama v2 daily series + Variational official live stats';
+  if(ois.length){
+    OI_HIST.splice(0,OI_HIST.length,...ois.map(x=>[x.d,x.v]));
+    _OIMAP.clear();OI_HIST.forEach(([d,v])=>_OIMAP.set(d,v));
+  }
+  recalcVariationalPeer();
+}
+function renderMarketConsumers(){
+  renderMarketActivity();
+  renderPeers();renderPulseTable();renderVsLighter();renderKing();renderValuation();
+  renderEfficiency();renderFeeOi();
+}
+function renderMarketActivity(){
+  const svg=$('#marketActivityChart');if(!svg)return;
+  const vols=MARKET_ACTIVITY.volume,ois=MARKET_ACTIVITY.oi,live=MARKET_ACTIVITY.live;
+  const put=(main,exact,value,dp=0)=>{
+    const valid=value!==null&&value!==undefined&&Number.isFinite(Number(value));
+    const a=$(main),b=$(exact);if(a)a.textContent=valid?marketBig(Number(value)):'—';
+    if(b){
+      b.textContent=valid?marketExact(Number(value),dp):'waiting for source';
+      b.title=valid?b.textContent:'';
+    }
+  };
+  put('#marketLiveVol','#marketLiveVolExact',live?.volume24h,2);
+  put('#marketLiveOi','#marketLiveOiExact',live?.oi,2);
+  put('#marketVol7d','#marketVol7dExact',vols.length?vols.slice(-7).reduce((s,x)=>s+x.v,0):null);
+  put('#marketVol30d','#marketVol30dExact',vols.length?vols.slice(-30).reduce((s,x)=>s+x.v,0):null);
+  const sync=$('#marketSync');
+  if(sync){
+    const errors=Object.values(MARKET_ACTIVITY.errors).filter(Boolean);
+    const dailyThrough=vols.at(-1)?.d;
+    sync.classList.toggle('error',errors.length>0);
+    sync.textContent=errors.length
+      ?errors.join(' · ')+' · showing last exact observation'
+      :MARKET_ACTIVITY.liveAt
+        ?'Live synced '+MARKET_ACTIVITY.liveAt.toLocaleTimeString('en-US',{timeZone:'UTC',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false})+' UTC'+(dailyThrough?' · daily through '+dailyThrough:'')
+        :'Syncing exact data…';
+  }
+  if(!vols.length||!ois.length){
+    svg.innerHTML='<text x="50%" y="50%" fill="#7d8aa5" text-anchor="middle" font-family="monospace" font-size="12">Loading exact DeFiLlama daily series…</text>';
+    return;
+  }
+  const vm=new Map(vols.map(x=>[x.d,x.v])),om=new Map(ois.map(x=>[x.d,x.v]));
+  let rows=[...new Set([...vm.keys(),...om.keys()])].sort().map(d=>({d,vol:vm.get(d),oi:om.get(d)})).filter(x=>Number.isFinite(x.vol)&&Number.isFinite(x.oi));
+  if(MARKET_ACTIVITY.days)rows=rows.slice(-MARKET_ACTIVITY.days);
+  if(rows.length<2)return;
+  const {W,H}=chartDims(svg,960,330),pl=74,pr=78,pt=26,pb=42,n=rows.length;
+  const X=i=>pl+i/Math.max(1,n-1)*(W-pl-pr);
+  const step=(W-pl-pr)/Math.max(1,n),bw=Math.max(2,Math.min(14,step*.66));
+  const vMax=Math.max(...rows.map(x=>x.vol))*1.12,oMax=Math.max(...rows.map(x=>x.oi))*1.12;
+  const YV=v=>pt+(1-v/Math.max(1,vMax))*(H-pt-pb);
+  const YO=v=>pt+(1-v/Math.max(1,oMax))*(H-pt-pb);
+  let grid='';
+  for(let i=0;i<=4;i++){
+    const y=pt+(H-pt-pb)*i/4,v=vMax*(1-i/4),o=oMax*(1-i/4);
+    grid+=`<line x1="${pl}" y1="${y}" x2="${W-pr}" y2="${y}" stroke="#243244" stroke-opacity=".55"/>`+
+      `<text class="axis" x="${pl-9}" y="${y+4}" text-anchor="end">${marketBig(v).replace('$','')}</text>`+
+      `<text class="axis" x="${W-pr+9}" y="${y+4}">${marketBig(o).replace('$','')}</text>`;
+  }
+  const bars=rows.map((x,i)=>`<rect x="${(X(i)-bw/2).toFixed(1)}" y="${YV(x.vol).toFixed(1)}" width="${bw.toFixed(1)}" height="${(H-pb-YV(x.vol)).toFixed(1)}" rx="${Math.min(2,bw/3)}" fill="url(#marketVolBar)"/>`).join('');
+  const line=rows.map((x,i)=>`${i?'L':'M'}${X(i).toFixed(1)} ${YO(x.oi).toFixed(1)}`).join(' ');
+  const area=line+`L${X(n-1).toFixed(1)} ${H-pb} L${X(0).toFixed(1)} ${H-pb} Z`;
+  const ticks=Math.min(7,n),tickEvery=Math.max(1,Math.floor((n-1)/Math.max(1,ticks-1)));
+  let dates='';
+  rows.forEach((x,i)=>{if(i%tickEvery===0||i===n-1)dates+=`<text class="axis-date" x="${X(i)}" y="${H-14}" text-anchor="${i===0?'start':i===n-1?'end':'middle'}">${mdShort(x.d)}</text>`;});
+  const last=rows[n-1],lx=X(n-1);
+  svg.innerHTML=`
+    <defs>
+      <linearGradient id="marketVolBar" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4c9eff"/><stop offset="1" stop-color="#244c82"/></linearGradient>
+      <linearGradient id="marketOiArea" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff4d83" stop-opacity=".28"/><stop offset="1" stop-color="#ff4d83" stop-opacity="0"/></linearGradient>
+      <filter id="marketOiGlow"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    </defs>
+    <text class="axis" x="${pl}" y="${pt-10}" fill="#55a8ff">DAILY PERP VOLUME</text>
+    <text class="axis" x="${W-pr}" y="${pt-10}" fill="#ff7ba0" text-anchor="end">OPEN INTEREST · DAILY CLOSE</text>
+    ${grid}${bars}<path d="${area}" fill="url(#marketOiArea)"/>
+    <path d="${line}" fill="none" stroke="#ff4d83" stroke-width="2.4" stroke-linejoin="round" filter="url(#marketOiGlow)"/>
+    <circle cx="${lx}" cy="${YO(last.oi)}" r="4" fill="#ff4d83"/>
+    ${dates}<rect x="${pl}" y="${pt}" width="${W-pl-pr}" height="${H-pt-pb}" fill="transparent"/>`;
+  const tt=$('#tt');
+  svg.onmousemove=e=>{
+    const rc=svg.getBoundingClientRect();
+    let i=Math.round((((e.clientX-rc.left)/rc.width*W)-pl)/(W-pl-pr)*(n-1));i=clamp(i,0,n-1);
+    const d=rows[i];
+    tt.innerHTML=`<b>${d.d} · UTC daily observation</b><br>Perp Volume <b>${marketExact(d.vol)}</b><br>Open Interest <b>${marketExact(d.oi)}</b>`;
+    placeTT(e);
+  };
+  svg.onmouseleave=()=>{tt.style.opacity=0;};
+}
+async function refreshMarketHistory(){
+  if(MARKET_HISTORY_SYNCING)return;MARKET_HISTORY_SYNCING=true;
+  try{
+    const [volRaw,oiRaw]=await Promise.all([fetchMarketJson(MARKET_URLS.volume),fetchMarketJson(MARKET_URLS.oi)]);
+    const normalize=a=>(Array.isArray(a)?a:[]).map(x=>({d:marketDay(x[0]),v:Number(x[1])})).filter(x=>/^\d{4}-\d{2}-\d{2}$/.test(x.d)&&Number.isFinite(x.v)&&x.v>=0).sort((a,b)=>a.d.localeCompare(b.d));
+    const volume=normalize(volRaw),oi=normalize(oiRaw);
+    if(volume.length<2||oi.length<2)throw new Error('daily series incomplete');
+    MARKET_ACTIVITY.volume=volume;MARKET_ACTIVITY.oi=oi;MARKET_ACTIVITY.historyAt=new Date();MARKET_ACTIVITY.errors.history='';
+    applyMarketModels();renderMarketConsumers();
+  }catch(err){MARKET_ACTIVITY.errors.history='Daily history delayed';console.warn('Exact DeFiLlama market history sync failed:',err);renderMarketActivity()}
+  finally{MARKET_HISTORY_SYNCING=false}
+}
+async function refreshMarketLive(){
+  if(MARKET_LIVE_SYNCING)return;MARKET_LIVE_SYNCING=true;
+  try{
+    const s=await fetchMarketJson(MARKET_URLS.live,15000);
+    const volume24h=Number(s?.total_volume_24h),oi=Number(s?.open_interest),cumulativeVolume=Number(s?.cumulative_volume);
+    if(!(volume24h>0&&oi>0))throw new Error('live fields missing');
+    MARKET_ACTIVITY.live={volume24h,oi,cumulativeVolume};MARKET_ACTIVITY.liveAt=new Date();MARKET_ACTIVITY.errors.live='';
+    applyMarketModels();renderMarketConsumers();
+  }catch(err){MARKET_ACTIVITY.errors.live='Live stats delayed';console.warn('Variational live market sync failed:',err);renderMarketActivity()}
+  finally{MARKET_LIVE_SYNCING=false}
+}
+async function refreshMarketActivity(){await Promise.allSettled([refreshMarketHistory(),refreshMarketLive()])}
+async function refreshLlamaOi(){await refreshMarketLive()}
 
 /* ---------- head-to-head: Variational vs Lighter ---------- */
 const VSL={
@@ -2819,6 +2806,7 @@ function render(){
   renderTable(CUR,rows);
   renderRunningTotals();
   renderHeaderDeltasFallback();
+  renderMarketActivity();
 }
 let _chartResizeTimer=0;
 window.addEventListener('resize',()=>{
@@ -2829,13 +2817,20 @@ window.addEventListener('resize',()=>{
 });
 /* today-so-far / this-month / all-time — ET daily reset derived from the series */
 function renderRunningTotals(){
-  if(!$('#tToday'))return;
   const asOf=currentTreasuryDate(), cur=currentTreasuryBalance();
   const today=cur-cumAt(addDays(asOf,-1));
   const monthBase=cumAt(addDays(asOf.slice(0,7)+'-01',-1));
-  $('#tToday').textContent='+'+fmtUSD(Math.max(0,today));
-  $('#tMonth').textContent='+'+fmtUSD(Math.max(0,cur-monthBase));
-  $('#tAll').textContent=fmtUSD(cur);
+  const earned7=Math.max(0,cur-cumAt(addDays(asOf,-7)));
+  const earned30=Math.max(0,cur-cumAt(addDays(asOf,-30)));
+  const earnedMtd=Math.max(0,cur-monthBase);
+  if($('#tToday'))$('#tToday').textContent='+'+fmtUSD(Math.max(0,today));
+  if($('#tMonth'))$('#tMonth').textContent='+'+fmtUSD(earnedMtd);
+  if($('#tAll'))$('#tAll').textContent=fmtUSD(cur);
+  if($('#marketEarn7'))$('#marketEarn7').textContent='+'+fmtUSD(earned7);
+  if($('#marketEarn30'))$('#marketEarn30').textContent='+'+fmtUSD(earned30);
+  if($('#marketEarnMtd'))$('#marketEarnMtd').textContent='+'+fmtUSD(earnedMtd);
+  if($('#marketEarnAll'))$('#marketEarnAll').textContent=fmtUSD(cur);
+  if($('#marketEarnMtdRange'))$('#marketEarnMtdRange').textContent=resetMonthName(asOf.slice(0,7))+' 1-'+Number(asOf.slice(8))+' · ET calendar month';
 }
 $('#seg').addEventListener('click',e=>{
   const b=e.target.closest('button');if(!b)return;
@@ -2846,6 +2841,12 @@ $('#curveZoom')?.addEventListener('click',e=>{
   const b=e.target.closest('button[data-z]');if(!b)return;
   CHART.curveZoom=b.dataset.z;
   render();
+});
+$('#marketRange')?.addEventListener('click',e=>{
+  const b=e.target.closest('button[data-market-days]');if(!b)return;
+  MARKET_ACTIVITY.days=Number(b.dataset.marketDays);
+  document.querySelectorAll('#marketRange button').forEach(x=>x.classList.toggle('on',x===b));
+  renderMarketActivity();
 });
 
 /* ---------- forecast controls ---------- */
@@ -3050,7 +3051,10 @@ async function quickSyncLive(){
     // Keep the last visible value; the full refresh handles status messaging.
   }finally{quickSyncBusy=false;}
 }
-$('#refresh').addEventListener('click',()=>refresh({deep:true}));
+$('#refresh').addEventListener('click',()=>{
+  refresh({deep:true});
+  refreshMarketActivity();
+});
 
 /* ---------- tweet share ---------- */
 $('#tweet').addEventListener('click',()=>{
@@ -3224,9 +3228,16 @@ setInterval(quickSyncLive,30000);
 // live perp-DEX board (CoinGecko) — refresh on load, then every 3 min
 refreshPerpBoard();
 refreshValuationMcaps();
+refreshMarketActivity();
 setInterval(refreshPerpBoard,180000);
 setInterval(refreshValuationMcaps,180000);
-document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')quickSyncLive();});
+setInterval(refreshMarketLive,60000);
+setInterval(refreshMarketHistory,900000);
+document.addEventListener('visibilitychange',()=>{
+  if(document.visibilityState!=='visible')return;
+  quickSyncLive();
+  refreshMarketLive();
+});
 
 /* ---------- donation address (hardcoded, never from fetched data) ----------
    EIP-55 checksum verified. The address is a literal constant; the displayed text
