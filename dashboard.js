@@ -1,6 +1,9 @@
 /* ---------- embedded snapshot data ---------- */
-const RAW = [{"d":"2026-01-23","v":0.0},{"d":"2026-01-24","v":23706.33},{"d":"2026-01-25","v":41927.09},{"d":"2026-01-26","v":66649.93},{"d":"2026-01-27","v":87872.5},{"d":"2026-01-28","v":111377.16},{"d":"2026-01-29","v":136903.55},{"d":"2026-01-30","v":164875.64},{"d":"2026-01-31","v":186039.26},{"d":"2026-02-01","v":211164.05},{"d":"2026-02-02","v":232497.4},{"d":"2026-02-03","v":254228.81},{"d":"2026-02-04","v":277052.34},{"d":"2026-02-05","v":295061.69},{"d":"2026-02-06","v":323531.62},{"d":"2026-02-07","v":347133.93},{"d":"2026-02-08","v":364201.23},{"d":"2026-02-09","v":374008.77},{"d":"2026-02-10","v":387930.33},{"d":"2026-02-11","v":398762.96},{"d":"2026-02-12","v":410491.45},{"d":"2026-02-13","v":420611.31},{"d":"2026-02-14","v":429708.75},{"d":"2026-02-15","v":439870.28},{"d":"2026-02-16","v":452553.64},{"d":"2026-02-17","v":464938.74},{"d":"2026-02-18","v":479148.84},{"d":"2026-02-19","v":491703.45},{"d":"2026-02-20","v":500545.7},{"d":"2026-02-21","v":512441.8},{"d":"2026-02-22","v":521582.54},{"d":"2026-02-23","v":528333.68},{"d":"2026-02-24","v":543476.24},{"d":"2026-02-25","v":556464.73},{"d":"2026-02-26","v":569910.36},{"d":"2026-02-27","v":581517.03},{"d":"2026-02-28","v":595234.92},{"d":"2026-03-01","v":606315.91},{"d":"2026-03-02","v":618346.95},{"d":"2026-03-03","v":635711.39},{"d":"2026-03-04","v":649868.71},{"d":"2026-03-05","v":664237.59},{"d":"2026-03-06","v":675936.98},{"d":"2026-03-07","v":688101.39},{"d":"2026-03-08","v":694423.04},{"d":"2026-03-09","v":702015.89},{"d":"2026-03-10","v":714095.74},{"d":"2026-03-11","v":731071.34},{"d":"2026-03-12","v":745220.57},{"d":"2026-03-13","v":756305.19},{"d":"2026-03-14","v":775519.38},{"d":"2026-03-15","v":783551.21},{"d":"2026-03-16","v":791800.32},{"d":"2026-03-17","v":810205.24},{"d":"2026-03-18","v":825333.77},{"d":"2026-03-19","v":839706.51},{"d":"2026-03-20","v":852208.8},{"d":"2026-03-21","v":865420.63},{"d":"2026-03-22","v":870066.19},{"d":"2026-03-23","v":878964.14},{"d":"2026-03-24","v":897890.84},{"d":"2026-03-25","v":909425.49},{"d":"2026-03-26","v":932970.57},{"d":"2026-03-27","v":952995.71},{"d":"2026-03-28","v":975968.73},{"d":"2026-03-29","v":994205.91},{"d":"2026-03-30","v":1005595.12},{"d":"2026-03-31","v":1029204.17},{"d":"2026-04-01","v":1052596.87},{"d":"2026-04-02","v":1079928.62},{"d":"2026-04-03","v":1112243.78},{"d":"2026-04-04","v":1130942.67},{"d":"2026-04-05","v":1141753.21},{"d":"2026-04-06","v":1154938.25},{"d":"2026-04-07","v":1176810.8},{"d":"2026-04-08","v":1199731.02},{"d":"2026-04-09","v":1230147.71},{"d":"2026-04-10","v":1251549.21},{"d":"2026-04-11","v":1276221.01},{"d":"2026-04-12","v":1289059.16},{"d":"2026-04-13","v":1306820.43},{"d":"2026-04-14","v":1326350.3},{"d":"2026-04-15","v":1362960.74},{"d":"2026-04-16","v":1380610.95},{"d":"2026-04-17","v":1409158.55},{"d":"2026-04-18","v":1449068.03},{"d":"2026-04-19","v":1468909.01},{"d":"2026-04-20","v":1486886.65},{"d":"2026-04-21","v":1511186.37},{"d":"2026-04-22","v":1531565.37},{"d":"2026-04-23","v":1555438.56},{"d":"2026-04-24","v":1579550.01},{"d":"2026-04-25","v":1599008.2},{"d":"2026-04-26","v":1613081.9},{"d":"2026-04-27","v":1626685.01},{"d":"2026-04-28","v":1653130.45},{"d":"2026-04-29","v":1672191.34},{"d":"2026-04-30","v":1698305.85},{"d":"2026-05-01","v":1717540.62},{"d":"2026-05-02","v":1735805.49},{"d":"2026-05-03","v":1756472.33},{"d":"2026-05-04","v":1769897.44},{"d":"2026-05-05","v":1798088.08},{"d":"2026-05-06","v":1820801.79},{"d":"2026-05-07","v":1854525.18},{"d":"2026-05-08","v":1881322.12},{"d":"2026-05-09","v":1903199.37},{"d":"2026-05-10","v":1920509.15},{"d":"2026-05-11","v":1948091.62},{"d":"2026-05-12","v":1977332.81},{"d":"2026-05-13","v":2002406.49},{"d":"2026-05-14","v":2028172.94},{"d":"2026-05-15","v":2051671.69},{"d":"2026-05-16","v":2075426.81},{"d":"2026-05-17","v":2091557.22},{"d":"2026-05-18","v":2104806.61},{"d":"2026-05-19","v":2130135.51},{"d":"2026-05-20","v":2155000.99},{"d":"2026-05-21","v":2183496.49},{"d":"2026-05-22","v":2227026.38},{"d":"2026-05-23","v":2271753.2},{"d":"2026-05-24","v":2307878.55},{"d":"2026-05-25","v":2338082.25},{"d":"2026-05-26","v":2366325.86},{"d":"2026-05-27","v":2410525.81},{"d":"2026-05-28","v":2447361.05},{"d":"2026-05-29","v":2496203.12},{"d":"2026-05-30","v":2544270.77},{"d":"2026-05-31","v":2576706.8},{"d":"2026-06-01","v":2611871.56},{"d":"2026-06-02","v":2685645.84},{"d":"2026-06-03","v":2785986.17},{"d":"2026-06-04","v":2876625.14},{"d":"2026-06-05","v":2982895.69},{"d":"2026-06-06","v":3091894.16},{"d":"2026-06-07","v":3139507.04},{"d":"2026-06-08","v":3181401.6},{"d":"2026-06-09","v":3223358.84},{"d":"2026-06-10","v":3278138.33},{"d":"2026-06-11","v":3329583.16},{"d":"2026-06-12","v":3367593.66},{"d":"2026-06-13","v":3412833.43},{"d":"2026-06-14","v":3442548.46},{"d":"2026-06-15","v":3473511.33},{"d":"2026-06-16","v":3530870.3},{"d":"2026-06-17","v":3603531.63},{"d":"2026-06-18","v":3661007.04},{"d":"2026-06-19","v":3703678.69},{"d":"2026-06-20","v":3738786.0},{"d":"2026-06-21","v":3768101.21},{"d":"2026-06-22","v":3801659.12},{"d":"2026-06-23","v":3845258.9},{"d":"2026-06-24","v":3885403.85},{"d":"2026-06-25","v":3941837.59},{"d":"2026-06-26","v":4004947.49},{"d":"2026-06-27","v":4060645.95},{"d":"2026-06-28","v":4086201.55},{"d":"2026-06-29","v":4119188.21},{"d":"2026-06-30","v":4177689.34},{"d":"2026-07-01","v":4224124.69},{"d":"2026-07-02","v":4290470.62},{"d":"2026-07-03","v":4343005.02},{"d":"2026-07-04","v":4380454.83},{"d":"2026-07-05","v":4409440.01},{"d":"2026-07-06","v":4450488.66}];
+const RAW = [{"d":"2026-01-23","v":0.0},{"d":"2026-01-24","v":23706.33},{"d":"2026-01-25","v":41927.09},{"d":"2026-01-26","v":66649.93},{"d":"2026-01-27","v":87872.5},{"d":"2026-01-28","v":111377.16},{"d":"2026-01-29","v":136903.55},{"d":"2026-01-30","v":164875.64},{"d":"2026-01-31","v":186039.26},{"d":"2026-02-01","v":211164.05},{"d":"2026-02-02","v":232497.4},{"d":"2026-02-03","v":254228.81},{"d":"2026-02-04","v":277052.34},{"d":"2026-02-05","v":295061.69},{"d":"2026-02-06","v":323531.62},{"d":"2026-02-07","v":347133.93},{"d":"2026-02-08","v":364201.23},{"d":"2026-02-09","v":374008.77},{"d":"2026-02-10","v":387930.33},{"d":"2026-02-11","v":398762.96},{"d":"2026-02-12","v":410491.45},{"d":"2026-02-13","v":420611.31},{"d":"2026-02-14","v":429708.75},{"d":"2026-02-15","v":439870.28},{"d":"2026-02-16","v":452553.64},{"d":"2026-02-17","v":464938.74},{"d":"2026-02-18","v":479148.84},{"d":"2026-02-19","v":491703.45},{"d":"2026-02-20","v":500545.7},{"d":"2026-02-21","v":512441.8},{"d":"2026-02-22","v":521582.54},{"d":"2026-02-23","v":528333.68},{"d":"2026-02-24","v":543476.24},{"d":"2026-02-25","v":556464.73},{"d":"2026-02-26","v":569910.36},{"d":"2026-02-27","v":581517.03},{"d":"2026-02-28","v":595234.92},{"d":"2026-03-01","v":606315.91},{"d":"2026-03-02","v":618346.95},{"d":"2026-03-03","v":635711.39},{"d":"2026-03-04","v":649868.71},{"d":"2026-03-05","v":664237.59},{"d":"2026-03-06","v":675936.98},{"d":"2026-03-07","v":688101.39},{"d":"2026-03-08","v":694423.04},{"d":"2026-03-09","v":702015.89},{"d":"2026-03-10","v":714095.74},{"d":"2026-03-11","v":731071.34},{"d":"2026-03-12","v":745220.57},{"d":"2026-03-13","v":756305.19},{"d":"2026-03-14","v":775519.38},{"d":"2026-03-15","v":783551.21},{"d":"2026-03-16","v":791800.32},{"d":"2026-03-17","v":810205.24},{"d":"2026-03-18","v":825333.77},{"d":"2026-03-19","v":839706.51},{"d":"2026-03-20","v":852208.8},{"d":"2026-03-21","v":865420.63},{"d":"2026-03-22","v":870066.19},{"d":"2026-03-23","v":878964.14},{"d":"2026-03-24","v":897890.84},{"d":"2026-03-25","v":909425.49},{"d":"2026-03-26","v":932970.57},{"d":"2026-03-27","v":952995.71},{"d":"2026-03-28","v":975968.73},{"d":"2026-03-29","v":994205.91},{"d":"2026-03-30","v":1005595.12},{"d":"2026-03-31","v":1029204.17},{"d":"2026-04-01","v":1052596.87},{"d":"2026-04-02","v":1079928.62},{"d":"2026-04-03","v":1112243.78},{"d":"2026-04-04","v":1130942.67},{"d":"2026-04-05","v":1141753.21},{"d":"2026-04-06","v":1154938.25},{"d":"2026-04-07","v":1176810.8},{"d":"2026-04-08","v":1199731.02},{"d":"2026-04-09","v":1230147.71},{"d":"2026-04-10","v":1251549.21},{"d":"2026-04-11","v":1276221.01},{"d":"2026-04-12","v":1289059.16},{"d":"2026-04-13","v":1306820.43},{"d":"2026-04-14","v":1326350.3},{"d":"2026-04-15","v":1362960.74},{"d":"2026-04-16","v":1380610.95},{"d":"2026-04-17","v":1409158.55},{"d":"2026-04-18","v":1449068.03},{"d":"2026-04-19","v":1468909.01},{"d":"2026-04-20","v":1486886.65},{"d":"2026-04-21","v":1511186.37},{"d":"2026-04-22","v":1531565.37},{"d":"2026-04-23","v":1555438.56},{"d":"2026-04-24","v":1579550.01},{"d":"2026-04-25","v":1599008.2},{"d":"2026-04-26","v":1613081.9},{"d":"2026-04-27","v":1626685.01},{"d":"2026-04-28","v":1653130.45},{"d":"2026-04-29","v":1672191.34},{"d":"2026-04-30","v":1698305.85},{"d":"2026-05-01","v":1717540.62},{"d":"2026-05-02","v":1735805.49},{"d":"2026-05-03","v":1756472.33},{"d":"2026-05-04","v":1769897.44},{"d":"2026-05-05","v":1798088.08},{"d":"2026-05-06","v":1820801.79},{"d":"2026-05-07","v":1854525.18},{"d":"2026-05-08","v":1881322.12},{"d":"2026-05-09","v":1903199.37},{"d":"2026-05-10","v":1920509.15},{"d":"2026-05-11","v":1948091.62},{"d":"2026-05-12","v":1977332.81},{"d":"2026-05-13","v":2002406.49},{"d":"2026-05-14","v":2028172.94},{"d":"2026-05-15","v":2051671.69},{"d":"2026-05-16","v":2075426.81},{"d":"2026-05-17","v":2091557.22},{"d":"2026-05-18","v":2104806.61},{"d":"2026-05-19","v":2130135.51},{"d":"2026-05-20","v":2155000.99},{"d":"2026-05-21","v":2183496.49},{"d":"2026-05-22","v":2227026.38},{"d":"2026-05-23","v":2271753.2},{"d":"2026-05-24","v":2307878.55},{"d":"2026-05-25","v":2338082.25},{"d":"2026-05-26","v":2366325.86},{"d":"2026-05-27","v":2410525.81},{"d":"2026-05-28","v":2447361.05},{"d":"2026-05-29","v":2496203.12},{"d":"2026-05-30","v":2544270.77},{"d":"2026-05-31","v":2576706.8},{"d":"2026-06-01","v":2611871.56},{"d":"2026-06-02","v":2685645.84},{"d":"2026-06-03","v":2785986.17},{"d":"2026-06-04","v":2876625.14},{"d":"2026-06-05","v":2982895.69},{"d":"2026-06-06","v":3091894.16},{"d":"2026-06-07","v":3139507.04},{"d":"2026-06-08","v":3181401.6},{"d":"2026-06-09","v":3223358.84},{"d":"2026-06-10","v":3278138.33},{"d":"2026-06-11","v":3329583.16},{"d":"2026-06-12","v":3367593.66},{"d":"2026-06-13","v":3412833.43},{"d":"2026-06-14","v":3442548.46},{"d":"2026-06-15","v":3473511.33},{"d":"2026-06-16","v":3530870.3},{"d":"2026-06-17","v":3603531.63},{"d":"2026-06-18","v":3661007.04},{"d":"2026-06-19","v":3703678.69},{"d":"2026-06-20","v":3738786.0},{"d":"2026-06-21","v":3768101.21},{"d":"2026-06-22","v":3801659.12},{"d":"2026-06-23","v":3845258.9},{"d":"2026-06-24","v":3885403.85},{"d":"2026-06-25","v":3941837.59},{"d":"2026-06-26","v":4004947.49},{"d":"2026-06-27","v":4060645.95},{"d":"2026-06-28","v":4086201.55},{"d":"2026-06-29","v":4119188.21},{"d":"2026-06-30","v":4233393.043065},{"d":"2026-07-01","v":4299277.38961},{"d":"2026-07-02","v":4348311.638263},{"d":"2026-07-03","v":4384717.360158},{"d":"2026-07-04","v":4413014.980669},{"d":"2026-07-05","v":4444846.907316},{"d":"2026-07-06","v":4502444.532293},{"d":"2026-07-07","v":4560622.912428},{"d":"2026-07-08","v":4606782.983054},{"d":"2026-07-09","v":4641407.981825},{"d":"2026-07-10","v":4675860.346893},{"d":"2026-07-11","v":4703316.878678},{"d":"2026-07-12","v":4732840.399557},{"d":"2026-07-13","v":4770938.511947}];
 
+/* Jun 30 onward is reconciled to the treasury balance at the exact next
+   00:00 ET boundary, so each date is a completed ET day rather than a
+   browser-specific estimate. Future completed days use the same convention. */
 /* on-chain live-refresh anchors */
 const CHAIN = {
   rpcs:[
@@ -8,6 +11,8 @@ const CHAIN = {
     "https://arbitrum-one-rpc.publicnode.com",
     "https://arbitrum.gateway.tenderly.co"
   ],
+  headerRpc:"https://arb1.arbitrum.io/rpc",
+  archiveRpc:"https://arbitrum.gateway.tenderly.co",
   usdc:"0xaf88d065e77c8cC2239327C5EDb3A432268e5831",
   pad:"0000000000000000000000005e91b40467fb8902c46a7b6cb90482363188d645",
   olpPad:"00000000000000000000000074bbbb0e7f0bad6938509dd4b556a39a4db1f2cd",
@@ -561,8 +566,8 @@ const PEERS = {
 /* the fee-efficiency thesis: how much volume / OI does it take to make $1?
    revenue = treasury inflow (on-chain, live); total fees (spreads) = revenue / spreadShare */
 function computeEff(){
-  const last=SERIES[SERIES.length-1], cur=last.v;
-  const rev30=Math.max(1,cur-cumAt(addDays(last.d,-30)));   // treasury revenue, trailing 30d (live)
+  const cur=currentTreasuryBalance(), asOf=currentTreasuryDate();
+  const rev30=Math.max(1,cur-cumAt(addDays(asOf,-30)));     // treasury revenue, trailing 30d (live)
   const dailyRev=rev30/30;
   const volPerRev=MKT.vol.d30/rev30;                        // $ volume per $1 treasury revenue
   const volPerFee=volPerRev*MKT.spreadShare;                // $ volume per $1 total fee (spread)
@@ -591,18 +596,18 @@ const EFF_WINDOWS={
 let EFF_CAL_MONTH=null;
 function computeEffWindow(key=EFF_WINDOW){
   const cfg=EFF_WINDOWS[key]||EFF_WINDOWS['1d'];
-  const first=SERIES[0], last=SERIES[SERIES.length-1], cur=last.v;
-  const allDays=Math.max(1,Math.round((new Date(last.d+'T00:00:00Z')-new Date(first.d+'T00:00:00Z'))/86400000)+1);
+  const first=SERIES[0], cur=currentTreasuryBalance(), asOf=currentTreasuryDate();
+  const allDays=Math.max(1,Math.round((new Date(asOf+'T00:00:00Z')-new Date(first.d+'T00:00:00Z'))/86400000)+1);
   let days=cfg.days||allDays;
   let rev,vol,volSource='embedded snapshot';
   if(key==='month'){
-    const monthStart=last.d.slice(0,7)+'-01';
-    days=Math.max(1,Math.round((new Date(last.d+'T00:00:00Z')-new Date(monthStart+'T00:00:00Z'))/86400000)+1);
+    const monthStart=asOf.slice(0,7)+'-01';
+    days=Math.max(1,Math.round((new Date(asOf+'T00:00:00Z')-new Date(monthStart+'T00:00:00Z'))/86400000)+1);
     rev=Math.max(1,cur-cumAt(addDays(monthStart,-1)));
     vol=(MKT.vol.d30/30)*days;
     volSource='30D avg daily volume × month elapsed days';
   }else{
-    rev=cfg.days?Math.max(1,cur-cumAt(addDays(last.d,-cfg.days))):cur;
+    rev=cfg.days?Math.max(1,cur-cumAt(addDays(asOf,-cfg.days))):cur;
     vol=MKT.vol[cfg.volKey];
   }
   const dailyRev=rev/days;
@@ -750,18 +755,24 @@ function feeRevenueHistory(){
 
 /* ---------- data prep: dedupe by date, keep last ---------- */
 let SERIES = (()=>{ const m=new Map(); RAW.forEach(r=>m.set(r.d,r.v)); return [...m].map(([d,v])=>({d,v})).sort((a,b)=>a.d<b.d?-1:1); })();
-const LIVE_SERIES_KEY='variationalTreasuryDailyCacheV1';
+// V2 stores completed ET days only. V1 mixed provisional balances with estimated
+// historical blocks, so file:// and https:// origins could permanently disagree.
+const LIVE_SERIES_KEY='variationalTreasuryDailyCacheV2';
+try{localStorage.removeItem('variationalTreasuryDailyCacheV1');}catch(_){ }
 try{
   const cached=JSON.parse(localStorage.getItem(LIVE_SERIES_KEY)||'[]');
   if(Array.isArray(cached)){
     const merged=new Map(SERIES.map(x=>[x.d,x.v]));
-    cached.forEach(x=>{if(/^\d{4}-\d{2}-\d{2}$/.test(x?.d)&&Number.isFinite(+x?.v))merged.set(x.d,+x.v);});
+    cached.forEach(x=>{if(/^\d{4}-\d{2}-\d{2}$/.test(x?.d)&&Number.isFinite(+x?.v)&&x?.closed===true)merged.set(x.d,+x.v);});
     SERIES=[...merged].map(([d,v])=>({d,v})).sort((a,b)=>a.d<b.d?-1:1);
   }
 }catch(_){ }
 function persistLiveSeries(){
-  try{localStorage.setItem(LIVE_SERIES_KEY,JSON.stringify(SERIES.slice(-220)));}catch(_){ }
+  try{localStorage.setItem(LIVE_SERIES_KEY,JSON.stringify(SERIES.slice(-220).map(x=>({d:x.d,v:x.v,closed:true}))));}catch(_){ }
 }
+let LIVE_TOTAL=null;
+const currentTreasuryBalance=()=>Number.isFinite(LIVE_TOTAL)?LIVE_TOTAL:SERIES[SERIES.length-1].v;
+const currentTreasuryDate=()=>Number.isFinite(LIVE_TOTAL)?resetDateKey():SERIES[SERIES.length-1].d;
 /* real daily open-interest history (DeFiLlama /summary/open-interest/variational) */
 const OI_HIST = [["2026-01-20",1010898040],["2026-01-21",1025281121],["2026-01-22",1062988512],["2026-01-23",1087239734],["2026-01-24",1112231599],["2026-01-25",1005131096],["2026-01-26",1064748194],["2026-01-27",1080222758],["2026-01-28",1113813695],["2026-01-29",984747821],["2026-01-30",931056969],["2026-01-31",770839703],["2026-02-01",734124210],["2026-02-02",765433172],["2026-02-03",745387666],["2026-02-04",720028892],["2026-02-05",540104191],["2026-02-06",560070011],["2026-02-07",584036388],["2026-02-08",611281745],["2026-02-09",655653428],["2026-02-10",644198539],["2026-02-11",641144646],["2026-02-12",604499908],["2026-02-13",647725796],["2026-02-14",689330657],["2026-02-15",636532341],["2026-02-16",672558839],["2026-02-17",699578282],["2026-02-18",683954859],["2026-02-19",690989110],["2026-02-20",695480248],["2026-02-21",710258454],["2026-02-22",712638927],["2026-02-23",658054176],["2026-02-24",608880664],["2026-02-25",654813409],["2026-02-26",664840622],["2026-02-27",669333377],["2026-02-28",667891590],["2026-03-01",710122232],["2026-03-02",706232117],["2026-03-03",697999233],["2026-03-04",764017364],["2026-03-05",735607841],["2026-03-06",672711462],["2026-03-07",678661039],["2026-03-08",660695120],["2026-03-09",739876788],["2026-03-10",753536963],["2026-03-11",775988528],["2026-03-12",789995939],["2026-03-13",796108195],["2026-03-14",852161852],["2026-03-15",879948945],["2026-03-16",862792908],["2026-03-17",856503479],["2026-03-18",794389289],["2026-03-19",749475211],["2026-03-20",763383942],["2026-03-21",734364089],["2026-03-22",709114714],["2026-03-23",705786258],["2026-03-24",735130439],["2026-03-25",728993366],["2026-03-26",697784838],["2026-03-27",688646910],["2026-03-28",682107168],["2026-03-29",671754783],["2026-03-30",686664795],["2026-03-31",694043577],["2026-04-01",676922296],["2026-04-02",641190200],["2026-04-03",645655020],["2026-04-04",638783377],["2026-04-05",651626558],["2026-04-06",664120764],["2026-04-07",663909436],["2026-04-08",646511341],["2026-04-09",666513956],["2026-04-10",718925868],["2026-04-11",708913878],["2026-04-12",655084003],["2026-04-13",726443173],["2026-04-14",697132300],["2026-04-15",682687923],["2026-04-16",674659447],["2026-04-17",703615776],["2026-04-18",660768940],["2026-04-19",602175881],["2026-04-20",638740112],["2026-04-21",650424374],["2026-04-22",670064023],["2026-04-23",679365739],["2026-04-24",669605385],["2026-04-25",679033408],["2026-04-26",691466117],["2026-04-27",663402485],["2026-04-28",678809512],["2026-04-29",645081949],["2026-04-30",664863541],["2026-05-01",698994239],["2026-05-02",696746883],["2026-05-03",705798001],["2026-05-04",723114060],["2026-05-05",759586247],["2026-05-06",766983192],["2026-05-07",738588447],["2026-05-08",761335934],["2026-05-09",783139969],["2026-05-10",791946285],["2026-05-11",803612278],["2026-05-12",804778674],["2026-05-13",749120720],["2026-05-14",826510916],["2026-05-15",734472038],["2026-05-16",750171714],["2026-05-17",730190348],["2026-05-18",741492240],["2026-05-19",763056302],["2026-05-20",804463658],["2026-05-21",900390296],["2026-05-22",895545947],["2026-05-23",930577815],["2026-05-24",963972743],["2026-05-25",1014869235],["2026-05-26",1005683127],["2026-05-27",953107269],["2026-05-28",952920182],["2026-05-29",1015023614],["2026-05-30",1067011946],["2026-05-31",1081846651],["2026-06-01",1087532926],["2026-06-02",958834540],["2026-06-03",974061275],["2026-06-04",837416037],["2026-06-05",754712005],["2026-06-06",809369591],["2026-06-07",846236759],["2026-06-08",846849465],["2026-06-09",833517549],["2026-06-10",798422710],["2026-06-11",852033529],["2026-06-12",857977989],["2026-06-13",904058197],["2026-06-14",933176673],["2026-06-15",973277657],["2026-06-16",991898261],["2026-06-17",927020720],["2026-06-18",957878127],["2026-06-19",1026646611],["2026-06-20",1080414644],["2026-06-21",1062301467],["2026-06-22",1079830140],["2026-06-23",1056466147],["2026-06-24",1007548046],["2026-06-25",992125325],["2026-06-26",1024008706],["2026-06-27",1021492989],["2026-06-28",1022809618],["2026-06-29",1107185266],["2026-06-30",1145380004],["2026-07-01",1034314261],["2026-07-02",1065730866],["2026-07-03",1140427145],["2026-07-04",1173878655],["2026-07-05",1176041333],["2026-07-06",1196130542],["2026-07-07",1173801147],["2026-07-08",1173970756]];
 const _OIMAP=(()=>{const m=new Map();OI_HIST.forEach(([d,v])=>m.set(d,v));return m;})();
@@ -2341,7 +2352,7 @@ function setDeltaPill(sel,cur,base){
   b.textContent=(pct>=0?'+':'')+pct.toFixed(2)+'%';
 }
 function renderHeaderDeltasFallback(){
-  const n=SERIES.length, cur=SERIES[n-1].v;
+  const n=SERIES.length, cur=currentTreasuryBalance();
   setDeltaPill('#hd7d',cur,SERIES[Math.max(0,n-8)].v);
 }
 /* actual on-chain added over trailing windows (12h / 24h / 7d) */
@@ -2792,11 +2803,11 @@ $('#calCopy').addEventListener('click',async()=>{
 let CUR='week', booted=false;
 function render(){
   const rows=buildPeriods(CUR);
-  const total=SERIES[SERIES.length-1].v;
+  const total=currentTreasuryBalance();
   _ctToken++;$('#totalVal').textContent=fmtUSD(total);
   renderImpliedSpreadTotal(total);
   if($('#vIntroTotal'))$('#vIntroTotal').textContent=fmtUSD(total);
-  $('#rangeBadge').textContent=SERIES[0].d+' → '+SERIES[SERIES.length-1].d;
+  $('#rangeBadge').textContent=SERIES[0].d+' → '+currentTreasuryDate();
   $('#resetBadge').textContent='Daily reset 00:00 ET';
   $('#tblTag').textContent=intMeta[CUR].lbl;
   renderKPIs(CUR,rows);
@@ -2819,9 +2830,9 @@ window.addEventListener('resize',()=>{
 /* today-so-far / this-month / all-time — ET daily reset derived from the series */
 function renderRunningTotals(){
   if(!$('#tToday'))return;
-  const last=SERIES[SERIES.length-1], cur=last.v;
-  const today=cur-cumAt(addDays(last.d,-1));
-  const monthBase=cumAt(addDays(last.d.slice(0,7)+'-01',-1));
+  const asOf=currentTreasuryDate(), cur=currentTreasuryBalance();
+  const today=cur-cumAt(addDays(asOf,-1));
+  const monthBase=cumAt(addDays(asOf.slice(0,7)+'-01',-1));
   $('#tToday').textContent='+'+fmtUSD(Math.max(0,today));
   $('#tMonth').textContent='+'+fmtUSD(Math.max(0,cur-monthBase));
   $('#tAll').textContent=fmtUSD(cur);
@@ -2899,12 +2910,18 @@ async function rpc(method,params){
   RPC_STATE.lastOk=match.map(x=>new URL(x.url).hostname).join(' + ');
   return match[0].result;
 }
+async function rpcSingle(url,method,params){
+  return (await rpcFrom(url,-1,method,params)).result;
+}
 async function cachedBalance(pad,block='latest'){
   const tag=typeof block==='number'?'0x'+block.toString(16):block;
   const key=pad+':'+tag, hit=BAL_CACHE.get(key);
   const ttl=tag==='latest'?12000:Infinity;
   if(hit&&Date.now()-hit.at<ttl)return hit.v;
-  const r=await rpc('eth_call',[{to:CHAIN.usdc,data:'0x70a08231'+pad},tag]);
+  // Most public Arbitrum endpoints prune historical state. Use the archive
+  // endpoint for fixed blocks and retain quorum reads for the live balance.
+  const params=[{to:CHAIN.usdc,data:'0x70a08231'+pad},tag];
+  const r=tag==='latest'?await rpc('eth_call',params):await rpcSingle(CHAIN.archiveRpc,'eth_call',params);
   const v=parseInt(r,16)/1e6;
   if(!Number.isFinite(v))throw new Error('invalid RPC balance');
   BAL_CACHE.set(key,{v,at:Date.now()});
@@ -2917,6 +2934,38 @@ async function balAtPad(pad,block='latest'){
   return cachedBalance(pad,block);
 }
 const blockAt=ts=>Math.round(CHAIN.b0+(ts-CHAIN.t0)*CHAIN.bps);
+const BLOCK_HEADER_CACHE=new Map();
+async function blockHeader(number){
+  const hit=BLOCK_HEADER_CACHE.get(number);if(hit)return hit;
+  const raw=await rpcSingle(CHAIN.headerRpc,'eth_getBlockByNumber',['0x'+number.toString(16),false]);
+  if(!raw)throw new Error('block header unavailable');
+  const out={number:parseInt(raw.number,16),timestamp:parseInt(raw.timestamp,16)};
+  BLOCK_HEADER_CACHE.set(number,out);return out;
+}
+async function exactBlockAtTimestamp(ts){
+  const latestRaw=await rpcSingle(CHAIN.headerRpc,'eth_getBlockByNumber',['latest',false]);
+  if(!latestRaw)throw new Error('latest block header unavailable');
+  const latestNumber=parseInt(latestRaw.number,16);
+  let guess=Math.min(latestNumber,Math.max(1,blockAt(ts)));
+  for(let i=0;i<7;i++){
+    const h=await blockHeader(guess),delta=ts-h.timestamp;
+    if(Math.abs(delta)<=1)break;
+    guess=Math.max(1,guess+Math.round(delta*CHAIN.bps));
+  }
+  let lo=Math.max(1,guess-64),hi=guess+64,guard=0;
+  while((await blockHeader(lo)).timestamp>=ts&&guard++<12){hi=lo;lo=Math.max(1,lo-256*Math.pow(2,guard-1));}
+  guard=0;
+  while((await blockHeader(hi)).timestamp<ts&&guard++<12){lo=hi;hi+=256*Math.pow(2,guard-1);}
+  while(lo+1<hi){
+    const mid=Math.floor((lo+hi)/2);
+    if((await blockHeader(mid)).timestamp>=ts)hi=mid;else lo=mid;
+  }
+  return hi;
+}
+async function balanceAtEtDayEnd(dateStr){
+  const closeTs=resetMidnightTs(addDays(dateStr,1));
+  return balAt(await exactBlockAtTimestamp(closeTs));
+}
 async function refresh({deep=false}={}){
   const btn=$('#refresh'),note=$('#note');btn.classList.add('busy');btn.textContent='↻ syncing…';
   $('#stamp').className='';
@@ -2925,6 +2974,7 @@ async function refresh({deep=false}={}){
 
     // One lightweight request paints the live total first.
     const cur=await balAt('latest');
+    LIVE_TOTAL=cur;
     LIVE_BASE={balance:cur,at:performance.now()};
     LIVE_HOUR_BASE={key:resetHourKey(),balance:cur,at:performance.now()};
     $('#totalVal').textContent=fmtUSD(Math.floor(cur));
@@ -2938,9 +2988,10 @@ async function refresh({deep=false}={}){
     // Daily history is independent: a rate limit here never downgrades the live total.
     try{
       let last=SERIES[SERIES.length-1].d, guard=0;
-      while(last<todayET && guard++<(deep?40:8)){
+      const closedThrough=addDays(todayET,-1);
+      while(last<closedThrough && guard++<(deep?40:8)){
         const nd=addDays(last,1);
-        const v=nd===todayET?cur:await balAt(blockAt(resetMidnightTs(nd)));
+        const v=await balanceAtEtDayEnd(nd);
         const i=SERIES.findIndex(x=>x.d===nd);
         if(i>=0)SERIES[i].v=v; else SERIES.push({d:nd,v});
         last=nd;
@@ -2981,8 +3032,7 @@ async function quickSyncLive(){
   quickSyncBusy=true;
   try{
     const cur=await balAt('latest');
-    const today=resetDateKey(), latest=SERIES[SERIES.length-1];
-    if(latest.d===today)latest.v=cur;
+    LIVE_TOTAL=cur;
     LIVE_BASE={balance:cur,at:performance.now()};
     $('#totalVal').textContent=fmtUSD(Math.floor(cur));
     renderImpliedSpreadTotal(cur);
@@ -3004,8 +3054,8 @@ $('#refresh').addEventListener('click',()=>refresh({deep:true}));
 
 /* ---------- tweet share ---------- */
 $('#tweet').addEventListener('click',()=>{
-  const total=SERIES[SERIES.length-1].v;
-  const days=Math.round((new Date(SERIES[SERIES.length-1].d)-new Date(SERIES[0].d))/864e5);
+  const total=currentTreasuryBalance();
+  const days=Math.round((new Date(currentTreasuryDate())-new Date(SERIES[0].d))/864e5);
   const url=shareUrl();
   const text=
 `Variational's buyback treasury has quietly stacked ${fmtUSD(total)} USDC in ${days} days 👀
@@ -3127,7 +3177,7 @@ TABS.addEventListener('keydown',e=>{
 });
 
 /* ---------- init ---------- */
-$('#genstamp').textContent='Snapshot generated 2026-07-06 ET · daily reset 00:00 ET · click Refresh live to sync on-chain';
+$('#genstamp').textContent='Exact ET closes reconciled through 2026-07-13 · daily reset 00:00 ET · click Refresh live to sync on-chain';
 const combinedCal=document.querySelector('.card.cal[data-tg="efficiency"]');
 const feeRevenueCard=document.querySelector('.card.eff[data-tg="efficiency"]');
 if(combinedCal&&feeRevenueCard)feeRevenueCard.before(combinedCal);
