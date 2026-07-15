@@ -11,7 +11,7 @@
 
 <!-- ============================================================
      TWITTER / LINK PREVIEW  —  ⚠️ AFTER YOU HOST THIS, replace
-     every "https://REPLACE-WITH-YOUR-URL" below with your real
+     every "https://variationalbuybackdashboard.vercel.app" below with your real
      public URL (e.g. https://variational-buyback.netlify.app).
      Keep og-card.png sitting next to this file on the host.
      ============================================================ -->
@@ -20,7 +20,8 @@
 <meta property="og:site_name" content="KoreanDaniel · On-chain Radar">
 <meta property="og:title" content="Variational Scanner — Live USDC Treasury Tracker">
 <meta property="og:description" content="10% of every spread paid to OLP flows into Variational's treasury per the OLP docs. Tracking it live on-chain — day / week / 2-week / month growth.">
-<meta property="og:url" content="https://REPLACE-WITH-YOUR-URL/">
+<meta property="og:url" content="https://variationalbuybackdashboard.vercel.app/">
+<meta property="og:image" content="https://variationalbuybackdashboard.vercel.app/og-card.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
@@ -28,6 +29,7 @@
 <meta name="twitter:creator" content="@0xdefidaniel">
 <meta name="twitter:title" content="Variational Scanner — Live USDC Treasury Tracker">
 <meta name="twitter:description" content="10% of every spread paid to OLP flows into Variational's treasury per the OLP docs. Tracking it live on-chain.">
+<meta name="twitter:image" content="https://variationalbuybackdashboard.vercel.app/og-card.png">
 <style>
   :root{
     --bg:#030814; --panel:#07101f; --panel2:#0a1628; --line:#16345c;
@@ -4100,9 +4102,10 @@ function feeRevenueHistory(){
 
 /* ---------- data prep: dedupe by date, keep last ---------- */
 let SERIES = (()=>{ const m=new Map(); RAW.forEach(r=>m.set(r.d,r.v)); return [...m].map(([d,v])=>({d,v})).sort((a,b)=>a.d<b.d?-1:1); })();
-const LIVE_SERIES_KEY='variationalTreasuryDailyCacheV1';
+const LIVE_SERIES_KEY='variationalTreasuryDailyCacheV2'; // V2: V1 entries could hold frozen mid-day samples as daily closes
 try{
-  const cached=JSON.parse(localStorage.getItem(LIVE_SERIES_KEY)||'[]');
+  // migrate V1 → V2 so old sessions keep their history; refresh() re-verifies recent closes anyway
+  const cached=JSON.parse(localStorage.getItem(LIVE_SERIES_KEY)||localStorage.getItem('variationalTreasuryDailyCacheV1')||'[]');
   if(Array.isArray(cached)){
     const merged=new Map(SERIES.map(x=>[x.d,x.v]));
     cached.forEach(x=>{if(/^\d{4}-\d{2}-\d{2}$/.test(x?.d)&&Number.isFinite(+x?.v))merged.set(x.d,+x.v);});
@@ -5098,7 +5101,7 @@ function ptsShareText(){
   const fdv=parseFloat($('#ptsFdv').value)||0;
   const share=mine/pool, val=fdv*0.25*share, pv=mine>0?val/mine:0;
   const fdvStr='$'+(fdv/1e9).toFixed(fdv>=1e9?1:3)+'B';
-  const url=location.href.startsWith('http')?location.href.split('#')[0]+'#points':'https://REPLACE-WITH-YOUR-URL/#points';
+  const url=location.href.startsWith('http')?location.href.split('#')[0]+'#points':'https://variationalbuybackdashboard.vercel.app/#points';
   return {t:`If Variational's FDV hits ${fdvStr} and airdrops 25% of supply, my ${mine.toLocaleString('en-US')} points ≈ ${fmtUSD(val)} (${fmtUSD(pv,2)}/pt) 🪂\n\nLive points→FDV calculator on the buyback tracker 👇`,url};
 }
 function renderPointsDeadline(){
@@ -5722,7 +5725,11 @@ function calendarEarnHtml(dateStr,disp){
   if(CALMODE!=='day')return `<div class="cal-earn ${disp.span?'span':(disp.v?'':'zero')}">${disp.label}</div>`;
   const closed=isClosedDailyTotal(dateStr), total=CAL.eMap.get(dateStr)||0;
   const a=closed?calImpliedActivity(total):null;
-  if(!closed)return `<div class="cal-dual pending-only" title="Time remaining until this ET daily total closes.">${pending24Meta(dateStr)}</div>`;
+  if(!closed){
+    const past=dateStr<resetDateKey();
+    if(past)return `<div class="cal-dual pending-only" title="This day has closed; waiting for the on-chain history sync."><div class="cal-countdown-card"><strong>syncing…</strong></div></div>`;
+    return `<div class="cal-dual pending-only" title="Time remaining until this ET daily total closes.">${pending24Meta(dateStr)}</div>`;
+  }
   return `<div class="cal-dual" title="Completed daily total only. Current/future dates stay pending until the day closes.">
     <div class="cal-money-row total"><span class="tz">Total</span><span class="money">+${fmtUSD(total)}</span></div>
     <div class="cal-flow-mini" title="Implied from 30D fee efficiency, not raw reported daily volume/OI">
@@ -6044,6 +6051,15 @@ async function balAtPad(pad,block='latest'){
   return cachedBalance(pad,block);
 }
 const blockAt=ts=>Math.round(CHAIN.b0+(ts-CHAIN.t0)*CHAIN.bps);
+/* Re-fit blocks/sec against the live chain head so historical block estimates
+   stay accurate as Arbitrum's block production drifts from the embedded slope. */
+async function calibrateBlocks(){
+  try{
+    const blk=await rpc('eth_getBlockByNumber',['latest',false]);
+    const bn=parseInt(blk.number,16), ts=parseInt(blk.timestamp,16);
+    if(bn>CHAIN.b0&&ts>CHAIN.t0)CHAIN.bps=(bn-CHAIN.b0)/(ts-CHAIN.t0);
+  }catch(_){/* keep the embedded slope */}
+}
 async function refresh({deep=false}={}){
   const btn=$('#refresh'),note=$('#note');btn.classList.add('busy');btn.textContent='↻ syncing…';
   $('#stamp').className='';
@@ -6064,16 +6080,31 @@ async function refresh({deep=false}={}){
 
     // Daily history is independent: a rate limit here never downgrades the live total.
     try{
-      let last=SERIES[SERIES.length-1].d, guard=0;
-      while(last<todayET && guard++<(deep?40:8)){
-        const nd=addDays(last,1);
-        const v=nd===todayET?cur:await balAt(blockAt(resetMidnightTs(nd)));
-        const i=SERIES.findIndex(x=>x.d===nd);
-        if(i>=0)SERIES[i].v=v; else SERIES.push({d:nd,v});
-        last=nd;
+      await calibrateBlocks();
+      // Re-verify recent daily closes on every refresh: cached values may be frozen
+      // mid-day samples or off-by-one boundaries left behind by older builds.
+      const EMBED_END=RAW[RAW.length-1].d;
+      let from=addDays(todayET,-(deep?40:14));
+      if(from<EMBED_END)from=EMBED_END;
+      let prevV=cumAt(addDays(from,-1)), synced=0, failed=false;
+      for(let d=from;d<todayET;d=addDays(d,1)){
+        try{
+          // v(d) = balance at the CLOSE of day d (00:00 ET of d+1), matching todayBaseBalance()
+          const v=await balAt(blockAt(resetMidnightTs(addDays(d,1))));
+          const vv=Math.max(v,prevV); // balance is monotonic; guard block-estimate noise
+          const i=SERIES.findIndex(x=>x.d===d);
+          if(i>=0)SERIES[i].v=vv; else SERIES.push({d,v:vv});
+          prevV=vv; synced++;
+        }catch(_){failed=true;break;}
       }
+      const ti=SERIES.findIndex(x=>x.d===todayET);
+      if(ti>=0)SERIES[ti].v=cur; else SERIES.push({d:todayET,v:cur});
       SERIES.sort((a,b)=>a.d<b.d?-1:1);
       persistLiveSeries();
+      if(failed){
+        note.textContent='Live balance synced. '+synced+' daily closes re-verified; the rest resume when public RPC capacity recovers.';
+        note.classList.add('show');
+      }
     }catch(_){
       note.textContent='Live balance synced. Daily history backfill is paused while public RPC capacity recovers.';
       note.classList.add('show');
