@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <!-- Security hardening. connect-src lists ONLY the read-only data APIs this page calls;
      any injected external script src or exfiltration to another host is blocked. -->
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'none'; object-src 'none'; form-action 'none'; frame-src 'none'; script-src 'self'; script-src-attr 'none'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src 'self' https://api.coingecko.com https://api.llama.fi https://arb1.arbitrum.io https://arbitrum-one-rpc.publicnode.com https://arbitrum.gateway.tenderly.co; upgrade-insecure-requests">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'none'; object-src 'none'; form-action 'none'; frame-src 'none'; script-src 'self'; script-src-attr 'none'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src 'self' https://api.coingecko.com https://api.llama.fi https://omni-client-api.prod.ap-northeast-1.variational.io https://arb1.arbitrum.io https://arbitrum-one-rpc.publicnode.com https://arbitrum.gateway.tenderly.co; upgrade-insecure-requests">
 <meta name="referrer" content="no-referrer">
 <meta name="robots" content="index,follow">
 <title>Variational Scanner — Live USDC Treasury Tracker</title>
@@ -1093,44 +1093,6 @@
   .peer-rank-hero .ph-sub{font-size:11px;line-height:1.45}
   .mini-head{font:950 9.5px var(--mono);letter-spacing:1.4px;text-transform:uppercase;color:var(--sub);margin:4px 0 8px}
 
-  /* ---- Perp DEX Empire map (comparison tab) ---- */
-  .cmp-empire{margin:26px 0 8px}
-  .empire-wrap{position:relative;border:1px solid rgba(85,184,255,.26);border-radius:16px;padding:8px;overflow:hidden;
-    background:
-      radial-gradient(760px 380px at 48% 10%,rgba(77,144,255,.16),transparent 66%),
-      radial-gradient(520px 300px at 78% 86%,rgba(38,230,194,.12),transparent 70%),
-      radial-gradient(520px 260px at 10% 88%,rgba(255,181,71,.08),transparent 70%),
-      linear-gradient(180deg,rgba(10,20,34,.72),rgba(2,6,12,.96))}
-  .empire-wrap::before{content:"";position:absolute;inset:8px;border-radius:12px;pointer-events:none;background:
-    repeating-linear-gradient(90deg,transparent 0 54px,rgba(85,184,255,.045) 55px 56px,transparent 57px 108px),
-    repeating-linear-gradient(0deg,transparent 0 54px,rgba(85,184,255,.03) 55px 56px,transparent 57px 108px);
-    mask:linear-gradient(180deg,rgba(0,0,0,.9),rgba(0,0,0,.44));z-index:1}
-  .empire-wrap::after{content:"PERP DEX CARTOGRAPHY";position:absolute;right:18px;top:16px;z-index:2;pointer-events:none;
-    font:950 9px var(--display);letter-spacing:2.2px;color:rgba(85,184,255,.42);font-stretch:125%}
-  #empireMap{position:relative;z-index:2;display:block;width:100%;height:auto;filter:drop-shadow(0 24px 44px rgba(0,0,0,.34))}
-  #empireMap .emp-ocean{fill:url(#empOcean)}
-  #empireMap .emp-depth{fill:none;stroke:rgba(85,184,255,.08);stroke-width:1.1;stroke-dasharray:3 9}
-  #empireMap .emp-route{fill:none;stroke:url(#empRoute);stroke-width:1.7;stroke-linecap:round;stroke-dasharray:7 10;opacity:.58;filter:url(#empGlow)}
-  #empireMap .emp-route.major{stroke-width:2.2;opacity:.82}
-  #empireMap .emp-k polygon{stroke:rgba(255,255,255,.05);stroke-width:.65;transition:opacity .18s ease,filter .18s ease,transform .18s ease}
-  #empireMap .emp-k.top1 polygon{filter:url(#empKingGlow)}
-  #empireMap .emp-k.me polygon{filter:url(#empMintGlow)}
-  #empireMap.emp-hovering .emp-k:not(.hot) polygon{opacity:.22;filter:saturate(.42) brightness(.75)}
-  #empireMap .emp-k.hot polygon{opacity:1;filter:saturate(1.28) brightness(1.18)}
-  #empireMap .emp-label text{font-family:var(--display);font-stretch:125%;letter-spacing:1.6px;text-transform:uppercase;paint-order:stroke;stroke:#020814;stroke-width:4px;stroke-linejoin:round}
-  #empireMap .emp-cap-ring{fill:none;stroke:rgba(255,255,255,.34);stroke-width:1.2;stroke-dasharray:3 4}
-  #empireMap .emp-cap-ring.me{stroke:#26e6c2;filter:url(#empGlow)}
-  #empireMap .emp-compass text,#empireMap .emp-scale text{font-family:var(--mono);letter-spacing:1.3px}
-  #empireMap .emp-flag{cursor:default}
-  #empireMap .emp-flag text{font-family:var(--sans);letter-spacing:.2px}
-  #empireMap .emp-flag.major rect{filter:url(#empFlagGlow)}
-  #empireMap .emp-flag.me rect{filter:url(#empMintGlow)}
-  #empireMap .emp-me-border{filter:url(#empGlow);animation:empPulse 2.6s ease-in-out infinite}
-  @keyframes empPulse{0%,100%{stroke-opacity:1;stroke-width:3}50%{stroke-opacity:.52;stroke-width:4.1}}
-  @media(prefers-reduced-motion:reduce){#empireMap .emp-me-border{animation:none}#empireMap .emp-route{stroke-dasharray:none}}
-  .empire-foot{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:8px;font:10.5px var(--mono);color:var(--dim)}
-  .empire-foot b{color:var(--sub);font-weight:600}
-
   .rank-list{display:flex;flex-direction:column;gap:5px;margin-top:6px}
   .rk{display:grid;grid-template-columns:22px minmax(118px,1.2fr) minmax(82px,.9fr) auto;align-items:center;gap:8px;padding:5px 7px;border-radius:8px}
   .rk.me{background:linear-gradient(90deg,rgba(34,230,160,.12),transparent);box-shadow:inset 0 0 0 1px rgba(34,230,160,.35)}
@@ -1685,7 +1647,8 @@
     grid-template-areas:
       "title title"
       "flow caps"
-      "flow metrics";
+      "flow metrics"
+      "monitor monitor";
     gap:10px 18px;
     align-items:start;
   }
@@ -1698,7 +1661,7 @@
   @media(max-width:1100px){
     .protocol-map .pm-panel{
       grid-template-columns:1fr;
-      grid-template-areas:"title" "flow" "metrics" "caps";
+      grid-template-areas:"title" "flow" "metrics" "caps" "monitor";
     }
     .protocol-map .pm-sankey{max-height:260px!important}
   }
@@ -2297,6 +2260,161 @@
     text-shadow:none;
   }
 
+  /* exact DeFiLlama market activity */
+  .market-activity{
+    border-color:rgba(85,184,255,.22)!important;
+    box-shadow:none!important;
+  }
+  .market-head{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:18px;
+  }
+  .market-head .cap{max-width:920px}
+  .market-sync{
+    display:inline-flex;
+    align-items:center;
+    gap:7px;
+    flex:none;
+    color:var(--sub);
+    font:700 10px/1.4 var(--mono);
+    white-space:nowrap;
+  }
+  .market-sync::before{
+    width:7px;
+    height:7px;
+    border-radius:50%;
+    background:var(--grn);
+    box-shadow:0 0 10px rgba(34,230,160,.7);
+    content:"";
+  }
+  .market-sync.error::before{background:var(--red);box-shadow:none}
+  .market-kpis{
+    display:grid;
+    grid-template-columns:repeat(4,minmax(0,1fr));
+    gap:1px;
+    margin:14px 0 12px;
+    overflow:hidden;
+    border:1px solid var(--line);
+    border-radius:8px;
+    background:var(--line);
+  }
+  .market-kpi{
+    min-width:0;
+    padding:14px 15px 13px;
+    background:var(--panel);
+  }
+  .market-kpi span{
+    display:block;
+    margin-bottom:7px;
+    color:var(--dim);
+    font:800 9px/1.2 var(--mono);
+    letter-spacing:1.2px;
+    text-transform:uppercase;
+  }
+  .market-kpi strong{
+    display:block;
+    overflow:hidden;
+    color:var(--ink);
+    font:730 clamp(24px,2.5vw,39px)/1 var(--sans);
+    font-variant-numeric:tabular-nums;
+    letter-spacing:-1.2px;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
+  .market-kpi.volume strong{color:#55a8ff}
+  .market-kpi.oi strong{color:#ff5b88}
+  .market-kpi small{
+    display:block;
+    margin-top:7px;
+    overflow:hidden;
+    color:var(--sub);
+    font:700 10px/1.3 var(--mono);
+    font-variant-numeric:tabular-nums;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
+  .market-earnings-label{
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    gap:14px;
+    margin:16px 0 8px;
+  }
+  .market-earnings-label b{color:var(--grn);font:800 10px/1.2 var(--mono);letter-spacing:1.2px;text-transform:uppercase}
+  .market-earnings-label span{color:var(--dim);font:650 10px/1.35 var(--mono)}
+  .market-earnings{
+    display:grid;
+    grid-template-columns:repeat(4,minmax(0,1fr));
+    gap:1px;
+    margin-bottom:14px;
+    overflow:hidden;
+    border:1px solid rgba(34,230,160,.28);
+    border-radius:8px;
+    background:rgba(34,230,160,.2);
+  }
+  .market-earning{min-width:0;padding:13px 15px;background:linear-gradient(180deg,rgba(34,230,160,.045),rgba(7,16,31,.98))}
+  .market-earning span{display:block;color:var(--sub);font:800 8.5px/1.2 var(--mono);letter-spacing:1px;text-transform:uppercase}
+  .market-earning strong{display:block;margin-top:8px;color:var(--grn);font:740 clamp(21px,2.1vw,31px)/1 var(--sans);font-variant-numeric:tabular-nums;letter-spacing:-.8px;white-space:nowrap}
+  .market-earning small{display:block;margin-top:6px;overflow:hidden;color:var(--dim);font:650 9.5px/1.35 var(--mono);text-overflow:ellipsis;white-space:nowrap}
+  .market-chart-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    margin:2px 0 0;
+  }
+  .market-legend{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+  .market-legend b{color:var(--sub);font:700 10px/1 var(--mono)}
+  .market-legend i{display:inline-block;width:16px;height:7px;margin-right:6px;border-radius:2px;vertical-align:1px}
+  .market-legend .vol{background:#3f8ff0}
+  .market-legend .oi{height:3px;background:#ff4d83;box-shadow:0 0 8px rgba(255,77,131,.35)}
+  .market-range{
+    display:flex;
+    gap:2px;
+    padding:2px;
+    border:1px solid var(--line);
+    border-radius:6px;
+    background:var(--bg);
+  }
+  .market-range button{
+    min-width:48px;
+    padding:6px 9px;
+    border:0;
+    border-radius:4px;
+    color:var(--sub);
+    background:transparent;
+    font:800 9px/1 var(--mono);
+    letter-spacing:.6px;
+    cursor:pointer;
+  }
+  .market-range button.on{color:#071018;background:#55a8ff}
+  #marketActivityChart{min-height:300px;margin-top:4px}
+  .market-source{
+    display:flex;
+    justify-content:space-between;
+    gap:12px;
+    margin-top:4px;
+    padding-top:10px;
+    border-top:1px solid var(--line);
+    color:var(--dim);
+    font:650 10px/1.55 var(--mono);
+  }
+  .market-source a{color:var(--cyan);border-bottom:1px dashed rgba(56,225,255,.35)}
+  @media(max-width:900px){
+    .market-kpis,.market-earnings{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .market-head,.market-source{align-items:flex-start;flex-direction:column}
+    .market-sync{white-space:normal}
+  }
+  @media(max-width:560px){
+    .market-kpis,.market-earnings{grid-template-columns:1fr}
+    .market-earnings-label{align-items:flex-start;flex-direction:column;gap:4px}
+    .market-earning small{white-space:normal}
+    .market-chart-head{align-items:flex-start;flex-direction:column}
+    #marketActivityChart{min-height:260px}
+  }
+
   /* fundamentals: one quiet monthly story */
   .card.eff[data-eff-window]{
     border-color:var(--line)!important;
@@ -2643,21 +2761,43 @@
   .rev-explain-grid b{display:block;margin-top:4px;font:760 17px/1 var(--sans);color:var(--ink)}
   .rev-explain-grid span:first-child b{color:var(--grn)}
   .rev-explain-grid span:nth-child(2) b{color:var(--cyan)}
-  .cmp-market{margin-top:20px;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
-  .cmp-market>summary{cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:15px 2px;list-style:none;font:750 14px/1.3 var(--sans);color:var(--ink)}
-  .cmp-market>summary::-webkit-details-marker{display:none}
-  .cmp-market>summary small{font:700 10px/1 var(--mono);letter-spacing:.7px;text-transform:uppercase;color:var(--grn)}
-  .cmp-market[open]>summary{border-bottom:1px solid var(--line)}
-  .cmp-market-inner{padding:12px 0 4px}
-  .cmp-market-meta{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px;font:11px/1.4 var(--sans);color:var(--sub)}
-  .cmp-market-meta a{margin-left:auto;color:var(--cyan)}
-  .cmp-market .pulse-table-wrap{overflow-x:auto}
-  .cmp-market .pulse-table{width:100%;min-width:560px;table-layout:fixed}
-  .cmp-market .pulse-table th:nth-child(1){width:52px}
-  .cmp-market .pulse-table th:nth-child(2){width:40%}
-  .cmp-market .pulse-table th,
-  .cmp-market .pulse-table td{padding:11px 12px}
-  .cmp-market .pulse-table tbody tr.me td{background:rgba(199,242,132,.055)}
+  .cmp-leaderboard{margin-top:20px;padding-top:18px;border-top:1px solid var(--line)}
+  .cmp-leaderboard-head{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;margin-bottom:15px}
+  .cmp-leaderboard-head h3{font:760 21px/1.2 var(--sans);letter-spacing:-.6px;color:var(--ink)}
+  .cmp-leaderboard-head p{max-width:700px;margin-top:5px;font:12.5px/1.45 var(--sans);color:var(--sub)}
+  .cmp-rank-current{flex:none;min-width:210px;padding:11px 14px;border:1px solid rgba(34,230,160,.32);border-radius:7px;background:rgba(34,230,160,.045);text-align:right}
+  .cmp-rank-current span{display:block;font:800 8.5px/1 var(--mono);letter-spacing:1.2px;text-transform:uppercase;color:var(--grn)}
+  .cmp-rank-current strong{display:block;margin-top:6px;font:760 18px/1.1 var(--sans);color:var(--ink)}
+  .cmp-rank-toolbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 12px;border:1px solid var(--line);border-bottom:0;border-radius:7px 7px 0 0;background:var(--panel);font:11px/1.4 var(--sans);color:var(--sub)}
+  .cmp-rank-toolbar a{margin-left:auto;color:var(--cyan)}
+  .cmp-leaderboard .pulse-table-wrap{margin:0;border-color:var(--line);border-radius:0 0 7px 7px;overflow-x:auto;background:rgba(3,10,18,.5)}
+  .cmp-leaderboard .pulse-table{width:100%;min-width:760px;table-layout:fixed}
+  .cmp-leaderboard .pulse-table th{padding:11px 14px;background:rgba(85,184,255,.035)}
+  .cmp-leaderboard .pulse-table td{height:58px;padding:10px 14px;font-family:var(--sans);font-size:12px}
+  .cmp-leaderboard .pulse-table th:nth-child(1){width:74px}
+  .cmp-leaderboard .pulse-table th:nth-child(2){width:24%;text-align:left}
+  .cmp-leaderboard .pulse-table th:nth-child(3){width:34%}
+  .cmp-leaderboard .pulse-table th:nth-child(4){width:16%}
+  .cmp-leaderboard .pulse-table th:nth-child(5){width:20%}
+  .cmp-leaderboard .pulse-table th:first-child,
+  .cmp-leaderboard .pulse-table td:first-child{text-align:center}
+  .cmp-leaderboard .pulse-table tr.me{background:linear-gradient(90deg,rgba(34,230,160,.14),rgba(34,230,160,.025) 55%,transparent)}
+  .cmp-leaderboard .pulse-table tr.me td:first-child{box-shadow:inset 3px 0 0 var(--grn)}
+  .rank-number{display:inline-flex;align-items:center;justify-content:center;min-width:38px;height:26px;border:1px solid var(--line);border-radius:5px;color:var(--sub);font:760 11px/1 var(--mono)}
+  tr.top-1 .rank-number{border-color:rgba(255,181,71,.45);color:var(--amber);background:rgba(255,181,71,.06)}
+  tr.top-2 .rank-number,tr.top-3 .rank-number{border-color:rgba(85,184,255,.3);color:var(--ink)}
+  tr.me .rank-number{border-color:rgba(34,230,160,.5);color:var(--grn);background:rgba(34,230,160,.07)}
+  .cmp-leaderboard .exchange{justify-content:flex-start}
+  .exchange-copy{display:flex;min-width:0;flex-direction:column;align-items:flex-start;gap:3px}
+  .exchange-copy b{overflow:hidden;max-width:180px;color:var(--ink);font:700 12.5px/1.15 var(--sans);text-overflow:ellipsis;white-space:nowrap}
+  .exchange-copy small{color:var(--grn);font:750 8px/1 var(--mono);letter-spacing:.8px;text-transform:uppercase}
+  .oi-cell strong,.volume-cell strong,.share-cell strong{font:720 12.5px/1 var(--sans);font-variant-numeric:tabular-nums;color:var(--ink)}
+  .oi-read{display:flex;align-items:center;justify-content:flex-end;gap:8px}
+  .oi-read small{color:var(--dim);font:9px/1 var(--mono);white-space:nowrap}
+  .oi-track{display:block;width:100%;height:3px;margin-top:7px;border-radius:2px;overflow:hidden;background:rgba(85,184,255,.09)}
+  .oi-track i{display:block;height:100%;border-radius:2px;background:#4f7fc4}
+  tr.me .oi-track i{background:var(--grn)}
+  tr.me .oi-cell strong,tr.me .share-cell strong{color:var(--grn)}
 
   .valuation-report{padding-bottom:4px}
   .valuation-report .val-hero{margin:0 0 16px}
@@ -2679,6 +2819,30 @@
   .valuation-report .vs-row .vs-nm small{font-family:var(--sans)}
   .val-method{margin-top:12px;border-top:1px solid var(--line)}
   .val-method .val-note{margin:0;padding:0 0 10px;border:0;font:11px/1.6 var(--sans)}
+
+  /* exact daily treasury move monitor */
+  .pm-daily-monitor{grid-area:monitor;display:grid;grid-template-columns:minmax(270px,.9fr) minmax(0,1.65fr);align-items:stretch;gap:16px;margin-top:2px;padding-top:12px;border-top:1px solid var(--line)}
+  .pm-daily-alert{display:grid;grid-template-columns:8px minmax(0,1fr) auto;align-items:center;gap:10px;padding:8px 12px;border-left:3px solid var(--cyan);background:rgba(85,184,255,.035)}
+  .pm-alert-dot{width:7px;height:7px;border-radius:50%;background:var(--cyan);box-shadow:0 0 12px rgba(85,184,255,.55)}
+  .pm-daily-copy{min-width:0}
+  .pm-daily-copy>span{display:block;font:820 8.5px/1 var(--mono);letter-spacing:1.25px;text-transform:uppercase;color:var(--sub)}
+  .pm-daily-copy>strong{display:block;margin-top:5px;font:730 15px/1.2 var(--sans);color:var(--ink)}
+  .pm-daily-copy>small{display:block;margin-top:4px;font:10.5px/1.35 var(--sans);color:var(--sub)}
+  .pm-daily-badge{align-self:start;padding:5px 7px;border:1px solid rgba(85,184,255,.28);border-radius:5px;font:850 8px/1 var(--mono);letter-spacing:.8px;white-space:nowrap;color:var(--cyan);background:rgba(85,184,255,.055)}
+  .pm-daily-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border:1px solid var(--line);border-radius:7px;overflow:hidden;background:rgba(3,8,15,.24)}
+  .pm-daily-item{min-width:0;padding:9px 12px}
+  .pm-daily-item+.pm-daily-item{border-left:1px solid var(--line)}
+  .pm-daily-item>span{display:block;font:800 8px/1 var(--mono);letter-spacing:1px;text-transform:uppercase;color:var(--sub)}
+  .pm-daily-item>b{display:block;margin-top:7px;font:740 clamp(16px,1.45vw,23px)/1 var(--sans);font-variant-numeric:tabular-nums;color:var(--ink);white-space:nowrap}
+  .pm-daily-item>small{display:block;overflow:hidden;margin-top:6px;font:10px/1.25 var(--sans);color:var(--dim);text-overflow:ellipsis;white-space:nowrap}
+  .pm-daily-monitor.alert-up .pm-daily-alert{border-left-color:var(--grn);background:rgba(34,230,160,.055)}
+  .pm-daily-monitor.alert-up .pm-alert-dot{background:var(--grn);box-shadow:0 0 12px rgba(34,230,160,.65)}
+  .pm-daily-monitor.alert-up .pm-daily-badge{border-color:rgba(34,230,160,.4);color:var(--grn);background:rgba(34,230,160,.07)}
+  .pm-daily-monitor.alert-up #pmDailyEarn,.pm-daily-monitor.alert-up #pmDailyVsPrev,.pm-daily-monitor.alert-up #pmDailyVsAvg{color:var(--grn)}
+  .pm-daily-monitor.alert-down .pm-daily-alert{border-left-color:#ef7180;background:rgba(239,113,128,.055)}
+  .pm-daily-monitor.alert-down .pm-alert-dot{background:#ef7180;box-shadow:0 0 12px rgba(239,113,128,.65)}
+  .pm-daily-monitor.alert-down .pm-daily-badge{border-color:rgba(239,113,128,.4);color:#f08a98;background:rgba(239,113,128,.07)}
+  .pm-daily-monitor.alert-down #pmDailyVsPrev,.pm-daily-monitor.alert-down #pmDailyVsAvg{color:#f08a98}
   @media(max-width:1080px){
     .cmp-summary,.cmp-direct-grid{grid-template-columns:1fr}
     .cmp-table-pane{padding-right:0}
@@ -2693,9 +2857,13 @@
     .cmp-hl-strip>div:nth-child(even){border-left:1px solid var(--line)}
     .cmp-hl-brand{grid-column:1/-1;border-top:0!important}
     .rev-explain-grid{grid-template-columns:1fr}
-    .cmp-market>summary{align-items:flex-start;flex-direction:column;gap:5px}
+    .cmp-leaderboard-head{align-items:flex-start;flex-direction:column}
+    .cmp-rank-current{width:100%;text-align:left}
     .comparison-report .h2h-rows{overflow-x:auto}
     .comparison-report .h2h-tbl{min-width:540px}
+    .pm-daily-monitor{grid-template-columns:1fr;gap:10px}
+    .pm-daily-grid{grid-template-columns:1fr}
+    .pm-daily-item+.pm-daily-item{border-left:0;border-top:1px solid var(--line)}
   }
   @media(max-width:520px){
     .cmp-key-metrics{grid-template-columns:1fr}
@@ -2924,6 +3092,22 @@
         <small class="pm-formula" id="pmFeesFormula">Formula: <b>treasury accumulated / observed revenue cut</b></small>
       </div>
     </div>
+    <div class="pm-daily-monitor alert-normal" id="pmDailyMonitor" aria-live="polite">
+      <div class="pm-daily-alert">
+        <i class="pm-alert-dot" aria-hidden="true"></i>
+        <div class="pm-daily-copy">
+          <span>Daily treasury change</span>
+          <strong id="pmDailyHeadline">Checking the latest completed ET day</strong>
+          <small id="pmDailyContext">Large-move alert: ±25% and at least $5K versus the prior day or prior 7-day average.</small>
+        </div>
+        <b class="pm-daily-badge" id="pmDailyBadge">CHECKING</b>
+      </div>
+      <div class="pm-daily-grid">
+        <div class="pm-daily-item"><span>Latest completed day</span><b id="pmDailyEarn">—</b><small id="pmDailyDate">Waiting for daily close</small></div>
+        <div class="pm-daily-item"><span>Vs previous day</span><b id="pmDailyVsPrev">—</b><small id="pmDailyPrev">—</small></div>
+        <div class="pm-daily-item"><span>Vs prior 7D average</span><b id="pmDailyVsAvg">—</b><small id="pmDailyAvg">—</small></div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -2960,7 +3144,43 @@
 
 <div class="note tsec" id="note" data-tg="overview"></div>
 
-<div class="card eff tsec tg-hide" data-tg="efficiency">
+<div class="card market-activity tsec" data-tg="overview">
+  <div class="market-head">
+    <div>
+      <h2>Market Activity → Actual Treasury Earnings <span class="tag">exact DeFiLlama series</span></h2>
+      <div class="cap">Volume and open interest show how active and deep the venue is. The green row connects that activity to real USDC received by Variational's on-chain treasury.</div>
+    </div>
+    <div class="market-sync" id="marketSync">Syncing exact data…</div>
+  </div>
+  <div class="market-kpis" aria-label="Variational market activity metrics">
+    <div class="market-kpi volume"><span>Live rolling 24h volume</span><strong id="marketLiveVol">—</strong><small id="marketLiveVolExact">official Variational API</small></div>
+    <div class="market-kpi oi"><span>Live open interest</span><strong id="marketLiveOi">—</strong><small id="marketLiveOiExact">official Variational API</small></div>
+    <div class="market-kpi volume"><span>7 daily volume observations</span><strong id="marketVol7d">—</strong><small id="marketVol7dExact">DeFiLlama daily UTC</small></div>
+    <div class="market-kpi volume"><span>30 daily volume observations</span><strong id="marketVol30d">—</strong><small id="marketVol30dExact">DeFiLlama daily UTC</small></div>
+  </div>
+  <div class="market-earnings-label"><b>Actual treasury earnings</b><span>On-chain USDC balance deltas · not gross trader spreads or modeled revenue</span></div>
+  <div class="market-earnings" aria-label="Actual Variational treasury earnings">
+    <div class="market-earning"><span>Trailing 7 days</span><strong id="marketEarn7">—</strong><small>current balance minus 7 ET days ago</small></div>
+    <div class="market-earning"><span>Trailing 30 days</span><strong id="marketEarn30">—</strong><small>actual USDC received</small></div>
+    <div class="market-earning"><span>Month to date</span><strong id="marketEarnMtd">—</strong><small id="marketEarnMtdRange">current ET calendar month</small></div>
+    <div class="market-earning"><span>All-time treasury held</span><strong id="marketEarnAll">—</strong><small>current on-chain USDC balance</small></div>
+  </div>
+  <div class="market-chart-head">
+    <div class="market-legend"><b><i class="vol"></i>Perp Volume · daily</b><b><i class="oi"></i>Open Interest · daily close</b></div>
+    <div class="market-range" id="marketRange" aria-label="Market activity chart range">
+      <button type="button" data-market-days="30">30D</button>
+      <button type="button" data-market-days="90" class="on">90D</button>
+      <button type="button" data-market-days="0">All</button>
+    </div>
+  </div>
+  <svg class="chart" id="marketActivityChart" viewBox="0 0 960 330" preserveAspectRatio="none" role="img" aria-label="Variational daily perp volume bars and open interest line"></svg>
+  <div class="market-source">
+    <span><b>Exact values:</b> hover any date for the full USD figures. Historical observations are grouped at UTC day boundaries; live volume is a rolling 24-hour value and is intentionally labeled separately.</span>
+    <span>Sources: <a href="https://defillama.com/protocol/variational?openInterest=true&amp;groupBy=daily" target="_blank" rel="noopener">DeFiLlama chart ↗</a> · <a href="https://github.com/DefiLlama/dimension-adapters/blob/master/dexs/variational-omni/index.ts" target="_blank" rel="noopener">adapter code ↗</a></span>
+  </div>
+</div>
+
+<div class="card eff tsec tg-hide" data-tg="efficiency" style="margin-top:16px">
   <h2>Revenue Run-Rate <span class="tag">FDV / MCAP input</span></h2>
   <div class="cap">How much real USDC this venue earns per day, week, and month. Annualize the pace and you have the revenue leg of any FDV or MCAP multiple. <span id="effAsOf" class="muted"></span></div>
   <div class="eff-window-tabs" id="effWindowTabs" role="tablist" aria-label="Time window">
@@ -3216,7 +3436,7 @@
   <div class="cap">Every number above is derived from two public sources — verify each step:</div>
   <div class="method">
     <div class="mrow"><span class="ms">Fees / revenue</span><span class="mf">Treasury balance on-chain (Arbitrum USDC <code>0x5e91…d645</code>), sampled daily via archive RPC. The latest three official reports show treasury = exactly 20% of gross spreads, so current spread estimates use revenue ÷ 0.20. The docs page currently says 10% and subject to change; that conflict is disclosed rather than averaged away.</span></div>
-    <div class="mrow"><span class="ms">Perp volume &amp; OI</span><span class="mf">DeFiLlama — OI live from <code>/overview/open-interest</code>; volume is a dated snapshot (DeFiLlama paywalls per-protocol volume).</span></div>
+    <div class="mrow"><span class="ms">Perp volume &amp; OI</span><span class="mf">Historical daily values come directly from DeFiLlama's public <code>/v2/chart/derivatives/protocol/variational</code> and <code>/v2/chart/open-interest/protocol/variational</code> series. Live rolling-24h volume and OI come from Variational's official <code>/metadata/stats</code> endpoint, which is also the source used by DeFiLlama's adapter.</span></div>
     <div class="mrow"><span class="ms">Volume → $1 spread</span><span class="mf"><code>volume_30d ÷ spreads_30d</code> where <code>spreads_30d = revenue_30d ÷ 0.20</code> using the latest observed share. Take-rate (bps) = <code>spreads ÷ volume × 10000</code>.</span></div>
     <div class="mrow"><span class="ms">Volume → $1 burned</span><span class="mf"><code>volume_30d ÷ (revenue_30d × 0.30)</code> — burn is ≥30% of revenue.</span></div>
     <div class="mrow"><span class="ms">OI → $1/day</span><span class="mf"><code>OI ÷ (revenue_30d ÷ 30)</code>. Annual yield on OI = <code>daily_rev × 365 ÷ OI</code>.</span></div>
@@ -3395,24 +3615,18 @@
     </div>
   </section>
 
-  <section class="cmp-empire">
-    <div class="cmp-section-head">
-      <h3>The Perp DEX Map</h3>
-      <p>Every venue becomes a realm. Territory scales with open interest, capitals connect by liquidity routes, and Variational's frontier glows mint.</p>
+  <section class="cmp-leaderboard">
+    <div class="cmp-leaderboard-head">
+      <div>
+        <h3>Open Interest Leaderboard</h3>
+        <p>Top 15 perpetual DEXs ranked by current open interest. Variational is highlighted so its market position is visible immediately.</p>
+      </div>
+      <div class="cmp-rank-current"><span>Variational position</span><strong id="cmpRankLine">loading</strong></div>
     </div>
-    <div class="empire-wrap">
-      <svg id="empireMap" viewBox="0 0 980 660" role="img" aria-label="Perp DEX open-interest market share drawn as a kingdom map"></svg>
-    </div>
-    <div class="empire-foot"><span id="empireMeta">drawing the realm...</span><span><b>area = OI share</b> · routes link the dominant capital to rival liquidity centers</span></div>
+    <div class="cmp-rank-toolbar"><span id="peersAsOf">loading market snapshot</span><span class="live-pill" id="boardLive"><i></i>loading</span><a href="https://www.coingecko.com/en/derivatives" target="_blank" rel="noopener">CoinGecko source ↗</a></div>
+    <div class="pulse-table-wrap"><table class="pulse-table" id="pulseTable"><thead><tr><th>Rank</th><th>Exchange</th><th>Open interest</th><th>Listed OI share</th><th>24H volume</th></tr></thead><tbody></tbody></table></div>
   </section>
 
-  <details class="cmp-market">
-    <summary><span>Market rank: <b id="cmpRankLine">loading</b></span><small>Show top 13 by open interest</small></summary>
-    <div class="cmp-market-inner">
-      <div class="cmp-market-meta"><span id="peersAsOf">loading market snapshot</span><span class="live-pill" id="boardLive"><i></i>loading</span><a href="https://www.coingecko.com/en/derivatives" target="_blank" rel="noopener">CoinGecko source ↗</a></div>
-      <div class="pulse-table-wrap"><table class="pulse-table" id="pulseTable"><thead><tr><th>#</th><th>Exchange</th><th>Open interest</th><th>24H volume</th></tr></thead><tbody></tbody></table></div>
-    </div>
-  </details>
 </section>
 
 <section class="valmodel valuation-report tsec tg-hide" data-tg="comparison">
