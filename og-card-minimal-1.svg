@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <radialGradient id="wash" cx="50%" cy="42%" r="72%"><stop stop-color="#1768cf"/><stop offset=".58" stop-color="#0d4da9"/><stop offset="1" stop-color="#072c6c"/></radialGradient>
+    <filter id="soft" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="10"/></filter>
+    <g id="stageMark" fill="none" stroke="currentColor" stroke-width="11" stroke-linecap="square" stroke-linejoin="round">
+      <path d="M7 112H28C39 112 43 104 48 91L76 20C83 2 102 2 109 20L145 112H166"/>
+      <path d="M55 112H75C85 112 89 104 94 91L108 57C115 40 133 40 140 57L161 112H178"/>
+      <path d="M105 112H119C129 112 133 104 138 91L143 79C150 63 167 63 174 79L187 112H193"/>
+    </g>
+  </defs>
+  <rect width="1200" height="630" fill="url(#wash)"/>
+  <ellipse cx="600" cy="326" rx="430" ry="220" fill="#a8d7ff" opacity=".075" filter="url(#soft)"/>
+  <text x="600" y="292" text-anchor="middle" fill="#f8fbff" font-family="Georgia,serif" font-size="102" letter-spacing="-4">revenue radar</text>
+  <text x="600" y="342" text-anchor="middle" fill="#d9eaff" font-family="Arial,sans-serif" font-size="14" font-weight="700" letter-spacing="4">VARIATIONAL SCANNER</text>
+
+  <path d="M215 436H1050" fill="none" stroke="#dcecff" stroke-opacity=".13" stroke-width="2" stroke-linecap="round"/>
+  <g fill="none" stroke="#f8fbff" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="225" cy="436" r="8" fill="#f8fbff" stroke="none"/>
+    <path d="M346 436H355Q363 436 367 427L371 419Q375 411 379 419L383 427Q387 436 395 436H404" stroke-width="9"/>
+    <path d="M482 436H494Q505 436 510 424L523 391Q529 377 536 391L554 436H568" stroke-width="10"/>
+    <path d="M622 436H634Q645 436 650 424L666 384Q673 367 680 384L700 436H714M662 436H674Q683 436 687 426L694 409Q700 395 706 409L717 436H728" stroke-width="10"/>
+  </g>
+  <g transform="translate(767 369) scale(.6)" color="#f8fbff"><use href="#stageMark"/></g>
+  <image href="variational-symbol-transparent.png" x="900" y="339" width="150" height="110" preserveAspectRatio="xMidYMid meet"/>
+  <text x="600" y="550" text-anchor="middle" fill="#c5ddf7" font-family="Arial,sans-serif" font-size="13" font-weight="700" letter-spacing="2">TREASURY / VOLUME / OPEN INTEREST / BUYBACK</text>
+</svg>
