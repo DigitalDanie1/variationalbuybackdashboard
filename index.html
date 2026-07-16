@@ -8,7 +8,7 @@
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'none'; object-src 'none'; form-action 'none'; frame-src 'none'; script-src 'self'; script-src-attr 'none'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src 'self' https://api.coingecko.com https://api.llama.fi https://omni-client-api.prod.ap-northeast-1.variational.io https://arb1.arbitrum.io https://arbitrum-one-rpc.publicnode.com https://arbitrum.gateway.tenderly.co; upgrade-insecure-requests">
 <meta name="referrer" content="no-referrer">
 <meta name="robots" content="index,follow">
-<title>Variational Scanner — Live USDC Treasury Tracker</title>
+<title>Revenue Radar | Variational On-chain Data</title>
 <link rel="icon" href="variational-scanner-logo-transparent.png?v=2">
 <link rel="stylesheet" href="fonts.css">
 
@@ -16,19 +16,26 @@
      TWITTER / LINK PREVIEW  —  canonical public URL below.
      Keep og-card.png sitting next to this file on the host.
      ============================================================ -->
-<meta name="description" content="Variational Scanner tracks the protocol treasury live on-chain: USDC stack, velocity, forecasts, and growth by day, week, 2-week, and month.">
+<meta name="description" content="Live Variational treasury revenue, volume, open interest, buyback capacity, and market position in one dashboard.">
+<link rel="canonical" href="https://variationalbuybackdashboard.vercel.app/">
 <meta property="og:type" content="website">
-<meta property="og:site_name" content="KoreanDaniel · On-chain Radar">
-<meta property="og:title" content="Variational Scanner — Live USDC Treasury Tracker">
-<meta property="og:description" content="Tracks Variational treasury revenue on-chain. The latest three official updates show treasury receiving 20% of gross spreads, implying a 6% minimum buyback-burn floor.">
+<meta property="og:site_name" content="Revenue Radar">
+<meta property="og:title" content="Revenue Radar | Variational">
+<meta property="og:description" content="Live treasury revenue, market activity, buyback capacity, and Perp DEX positioning.">
 <meta property="og:url" content="https://variationalbuybackdashboard.vercel.app/">
+<meta property="og:image" content="https://variationalbuybackdashboard.vercel.app/og-card.png?v=5">
+<meta property="og:image:secure_url" content="https://variationalbuybackdashboard.vercel.app/og-card.png?v=5">
+<meta property="og:image:type" content="image/png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Revenue Radar — Variational treasury, volume, open interest, and buyback data">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:site" content="@0xdefidaniel">
 <meta name="twitter:creator" content="@0xdefidaniel">
-<meta name="twitter:title" content="Variational Scanner — Live USDC Treasury Tracker">
-<meta name="twitter:description" content="On-chain treasury tracker with official biweekly P&amp;L. Latest reports imply 20% treasury capture and a 6% minimum buyback-burn floor.">
+<meta name="twitter:title" content="Revenue Radar | Variational">
+<meta name="twitter:description" content="Live treasury revenue, market activity, buyback capacity, and Perp DEX positioning.">
+<meta name="twitter:image" content="https://variationalbuybackdashboard.vercel.app/og-card.png?v=5">
+<meta name="twitter:image:alt" content="Revenue Radar — Variational treasury, volume, open interest, and buyback data">
 <style>
   :root{
     --bg:#030814; --panel:#07101f; --panel2:#0a1628; --line:#16345c;
@@ -1206,11 +1213,13 @@
   .lead{font:800 10.5px var(--mono);padding:3px 9px;border-radius:999px;white-space:nowrap}
   .lead.var{color:var(--grn);border:1px solid rgba(34,230,160,.35);background:rgba(34,230,160,.06)}
   .lead.ltr{color:#7fa8e8;border:1px solid rgba(85,144,232,.4);background:rgba(63,116,201,.08)}
+  .lead.ext{color:var(--amber);border:1px solid rgba(255,181,71,.38);background:rgba(255,181,71,.06)}
   .h2h-tbl{width:100%;min-width:560px;border-collapse:collapse;font:12px var(--mono)}
   .h2h-tbl th{font:950 9.5px var(--mono);letter-spacing:1.4px;text-transform:uppercase;color:var(--sub);
     text-align:right;padding:10px 12px;border-bottom:1px solid rgba(85,184,255,.2)}
   .h2h-tbl th:first-child{text-align:left}
-  .h2h-tbl th.cva{color:var(--grn)} .h2h-tbl th.cli{color:#7fa8e8}
+  .h2h-tbl th.cva{color:var(--grn)} .h2h-tbl th.cli{color:#7fa8e8} .h2h-tbl th.cex{color:var(--amber)}
+  .h2h-tbl th a{color:inherit;text-decoration:none}
   .h2h-tbl td{padding:13px 12px;border-bottom:1px solid rgba(27,37,54,.6);text-align:right;vertical-align:top;white-space:nowrap}
   .h2h-tbl tr:last-child td{border-bottom:0}
   .h2h-tbl td:first-child{text-align:left;font:800 11px var(--mono);letter-spacing:1px;text-transform:uppercase;color:var(--ink);white-space:normal}
@@ -1218,12 +1227,16 @@
   .h2h-tbl td.win b{color:var(--ink)}
   .h2h-tbl td.win.cva b{color:var(--grn);text-shadow:0 0 14px rgba(34,230,160,.3)}
   .h2h-tbl td.win.cli b{color:#7fa8e8;text-shadow:0 0 14px rgba(85,144,232,.3)}
+  .h2h-tbl td.win.cex b{color:var(--amber);text-shadow:0 0 14px rgba(255,181,71,.24)}
+  .h2h-tbl td.is-na b{color:var(--dim)}
   .h2h-tbl td .sub{display:block;font:9.5px var(--mono);color:var(--dim);margin-top:4px;white-space:nowrap}
   .h2h-tbl td .src{display:inline-flex;align-items:center;gap:5px;margin-top:5px;padding:2px 8px;border-radius:999px;border:1px solid;font:800 8.5px/1.4 var(--mono);letter-spacing:.7px;text-transform:uppercase}
   .h2h-tbl td .src i{width:5px;height:5px;border-radius:50%;background:currentColor;flex:none}
   .src.src-cg{color:#55b8ff;border-color:rgba(85,184,255,.32);background:rgba(85,184,255,.06)}
   .src.src-chain{color:var(--grn);border-color:rgba(34,230,160,.32);background:rgba(34,230,160,.06)}
   .src.src-llama{color:#b79bff;border-color:rgba(139,108,255,.38);background:rgba(139,108,255,.07)}
+  .src.src-dune{color:var(--amber);border-color:rgba(255,181,71,.38);background:rgba(255,181,71,.06)}
+  .src.src-dune{color:var(--amber);border-color:rgba(255,181,71,.38);background:rgba(255,181,71,.06)}
   .h2h-src-legend{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:0 0 10px;font:800 9px var(--mono);letter-spacing:.6px;color:var(--dim);text-transform:uppercase}
   .h2h-src-legend .src{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:999px;border:1px solid;font:800 8.5px/1.4 var(--mono);letter-spacing:.7px}
   .h2h-src-legend .src i{width:5px;height:5px;border-radius:50%;background:currentColor;flex:none}
@@ -1440,9 +1453,6 @@
   .pts-perpt b{color:var(--grn);font-weight:800}
   .cal>h2{display:flex;align-items:center;justify-content:flex-start;gap:10px;min-width:0}
   .cal>h2>span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  .cal-collapse{cursor:pointer;display:inline-flex;align-items:center;justify-content:center;flex:none;min-width:98px;height:29px;padding:0 10px;border:1px solid rgba(85,184,255,.45);border-radius:8px;background:rgba(85,184,255,.1);color:var(--cyan);font:900 9px/1 var(--mono);letter-spacing:1px;text-transform:uppercase;transition:.15s}
-  .cal-collapse:hover{background:rgba(85,184,255,.16);box-shadow:0 0 15px rgba(85,184,255,.18)}
-  .earnings-workspace.is-collapsed .earnings-collapse-body{display:none}
   .pts-card.base{border-color:rgba(34,230,160,.5);background:radial-gradient(300px 120px at 50% 0,rgba(34,230,160,.1),transparent 70%),var(--panel);position:relative}
   .pts-card.base::after{content:"BASE CASE";position:absolute;top:-8px;left:50%;transform:translateX(-50%);
     font:800 8px var(--mono);letter-spacing:1px;color:#04120c;background:linear-gradient(92deg,var(--grn),var(--cyan));padding:2px 7px;border-radius:999px}
@@ -1962,8 +1972,7 @@
   }
   #tweet,
   #refresh,
-  .share-btn,
-  .cal-collapse{
+  .share-btn{
     border-radius:5px;
     box-shadow:none!important;
     text-shadow:none!important;
@@ -2738,18 +2747,21 @@
   .cmp-revenue-pane .comp-rev-head>div:first-child b{font:760 14px/1.2 var(--sans);letter-spacing:0;text-transform:none}
   .cmp-revenue-pane .comp-rev-head>div:first-child span{font-size:9px;letter-spacing:.8px}
   .lighter-sw{background:#4f7fc4!important}
+  .extended-sw{background:var(--amber)!important}
   .comparison-report .h2h-rows{overflow-x:visible}
   .comparison-report .h2h-tbl{width:100%;min-width:0;table-layout:fixed;font-size:12px}
-  .comparison-report .h2h-tbl th:first-child{width:25%}
+  .comparison-report .h2h-tbl th:first-child{width:18%}
   .comparison-report .h2h-tbl th:nth-child(2),
-  .comparison-report .h2h-tbl th:nth-child(3){width:24%}
-  .comparison-report .h2h-tbl th:last-child{width:27%}
+  .comparison-report .h2h-tbl th:nth-child(3),
+  .comparison-report .h2h-tbl th:nth-child(4){width:20%}
+  .comparison-report .h2h-tbl th:last-child{width:22%}
   .comparison-report .h2h-tbl th{padding:10px 8px;font-size:9px}
   .comparison-report .h2h-tbl td{padding:13px 8px}
   .comparison-report .h2h-tbl td:first-child{font-size:10.5px;letter-spacing:.5px}
   .comparison-report .h2h-tbl td b{font-size:14px}
   .comparison-report .h2h-tbl td.win.cva b,
-  .comparison-report .h2h-tbl td.win.cli b{text-shadow:none}
+  .comparison-report .h2h-tbl td.win.cli b,
+  .comparison-report .h2h-tbl td.win.cex b{text-shadow:none}
   .cmp-sources{margin-top:12px;border-top:1px solid var(--line)}
   .cmp-sources summary,
   .val-method summary{cursor:pointer;padding:11px 0;font:750 11px/1.3 var(--sans);color:var(--sub)}
@@ -2996,7 +3008,7 @@
     .cmp-leaderboard-head{align-items:flex-start;flex-direction:column}
     .cmp-rank-current{width:100%;text-align:left}
     .comparison-report .h2h-rows{overflow-x:auto}
-    .comparison-report .h2h-tbl{min-width:540px}
+    .comparison-report .h2h-tbl{min-width:720px}
     .pm-daily-monitor{grid-template-columns:1fr;gap:10px}
     .pm-daily-grid{grid-template-columns:1fr}
     .pm-daily-item+.pm-daily-item{border-left:0;border-top:1px solid var(--line)}
@@ -3042,12 +3054,6 @@
   .earnings-workspace-head .cap{margin:0;max-width:880px}
   .earnings-controls{display:flex;align-items:center;gap:8px;flex:none}
   .earnings-controls .seg{margin:0}
-  .earnings-controls .cal-collapse{
-    min-width:34px;
-    width:34px;
-    padding:0;
-    font-size:13px;
-  }
   .earnings-summary{
     display:grid;
     grid-template-columns:minmax(260px,1.45fr) repeat(3,minmax(170px,1fr));
@@ -3221,7 +3227,6 @@
   .earnings-context .macro-panel{display:block;margin:0;padding:0 17px 16px;border:0}
   .earnings-context .macro-box{margin-top:8px;padding:10px}
   .earnings-context .play-grid{grid-template-columns:1fr}
-  .earnings-workspace.is-collapsed>.earnings-workspace-head{display:flex!important;border-bottom:0}
   @media(max-width:1180px){
     .earnings-main{grid-template-columns:minmax(0,1fr) 330px}
     .earnings-summary{grid-template-columns:repeat(2,minmax(0,1fr))}
@@ -3901,7 +3906,6 @@
         <button type="button" data-c="week">Weekly</button>
         <button type="button" data-c="month">Monthly</button>
       </div>
-      <button class="cal-collapse" id="calCollapse" type="button" aria-expanded="true" aria-label="Collapse earnings workspace" title="Collapse earnings workspace">⌃</button>
     </div>
   </div>
 
@@ -4355,7 +4359,7 @@
 <section class="comparison-report tsec tg-hide" data-tg="comparison">
   <div class="cmp-heading">
     <h2>Perp DEX Positioning</h2>
-    <p>Variational is compared with Lighter on the same current windows. Hyperliquid is shown separately as the market ceiling.</p>
+    <p>Variational, Lighter, and Extended are compared on matched windows. Hyperliquid is shown separately as the market ceiling.</p>
   </div>
 
   <div class="cmp-summary">
@@ -4381,8 +4385,8 @@
 
   <section class="cmp-direct">
     <div class="cmp-section-head">
-      <h3>Variational vs Lighter</h3>
-      <p>Capacity, activity, fee pool, and booked revenue. No mixed all-time windows.</p>
+      <h3>Variational vs Lighter vs Extended</h3>
+      <p>Capacity, activity, fee pool, and booked revenue on matched windows. Extended's Dune total is a source check, not a 30D input.</p>
     </div>
     <div class="cmp-direct-grid">
       <div class="cmp-table-pane">
@@ -4391,10 +4395,11 @@
       </div>
       <div class="cmp-revenue-pane">
         <div class="comp-rev-head">
-          <div><b>Weekly protocol revenue</b><span>Trailing 8 matched weeks</span></div>
+          <div><b>Weekly fee pool</b><span>Trailing 8 matched 7-day windows</span></div>
           <div class="legend">
             <b><img class="cmp-logo" src="variational-symbol-transparent.png" alt="" width="20" height="20"><span class="sw act"></span>Variational</b>
             <b><img class="cmp-logo" src="lighter-logo.png" alt="" width="20" height="20"><span class="sw lighter-sw"></span>Lighter</b>
+            <b><img class="cmp-logo" src="logo-extended.png" alt="" width="20" height="20"><span class="sw extended-sw"></span>Extended</b>
           </div>
         </div>
         <svg class="chart" id="revVs" viewBox="0 0 720 250" preserveAspectRatio="none"></svg>
