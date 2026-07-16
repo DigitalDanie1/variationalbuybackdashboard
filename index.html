@@ -447,7 +447,7 @@
   .road-progress-head strong{font:950 42px/.9 var(--mono);letter-spacing:-2px;color:var(--grn);text-shadow:0 0 18px rgba(38,230,194,.22)}
   .road-progress-head span{font:950 9px var(--mono);letter-spacing:1.5px;text-transform:uppercase;color:var(--sub);text-align:right;line-height:1.5}
   .road-meter{position:relative;height:12px;border-radius:999px;background:rgba(85,184,255,.09);overflow:hidden;border:1px solid rgba(85,184,255,.16)}
-  .road-meter span{display:block;height:100%;width:63%;border-radius:999px;background:linear-gradient(90deg,var(--grn),var(--cyan));
+  .road-meter span{display:block;height:100%;width:67%;border-radius:999px;background:linear-gradient(90deg,var(--grn),var(--cyan));
     box-shadow:0 0 16px rgba(38,230,194,.4);animation:roadFill 1.1s cubic-bezier(.2,.8,.2,1) both}
   @keyframes roadFill{from{width:0}}
   .road-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
@@ -520,13 +520,15 @@
   .ry-q li.ok{color:#cfe0f5}
   .ry-q li.ok::before{content:"✓";display:grid;place-items:center;font:900 9.5px var(--mono);color:#03120f;
     background:linear-gradient(135deg,var(--grn),var(--cyan));border-color:transparent;box-shadow:0 0 9px rgba(38,230,194,.35)}
-  .ry-col.ahead li:first-child{color:var(--ink)}
-  .ry-col.ahead li:first-child::before{border:1px solid var(--grn);animation:gatePulse 2.4s ease-out infinite}
-  .ry-col.ahead li:first-child::after{content:"UP NEXT";margin-left:8px;font:950 8px var(--mono);letter-spacing:1.2px;
+  .ry-col.ahead li.ok::after{content:"COMPLETE";margin-left:8px;font:950 8px var(--mono);letter-spacing:1.2px;
+    color:var(--grn);border:1px solid rgba(38,230,194,.4);border-radius:999px;padding:2px 7px;vertical-align:1px}
+  .ry-col.ahead li.ok + li:not(.ok){color:var(--ink)}
+  .ry-col.ahead li.ok + li:not(.ok)::before{border:1px solid var(--grn);animation:gatePulse 2.4s ease-out infinite}
+  .ry-col.ahead li.ok + li:not(.ok)::after{content:"UP NEXT";margin-left:8px;font:950 8px var(--mono);letter-spacing:1.2px;
     color:var(--grn);border:1px solid rgba(38,230,194,.4);border-radius:999px;padding:2px 7px;vertical-align:1px}
   .ry-note{font:10.5px/1.65 var(--mono);color:var(--dim);margin-top:13px;border-top:1px dashed rgba(85,184,255,.16);padding-top:11px}
   @media(max-width:880px){.road-years{grid-template-columns:1fr}.ry-qgrid{grid-template-columns:1fr}}
-  @media(prefers-reduced-motion:reduce){.ry-col.ahead li:first-child::before{animation:none}}
+  @media(prefers-reduced-motion:reduce){.ry-col.ahead li.ok + li:not(.ok)::before{animation:none}}
   .road-source{margin-top:13px;font:11px/1.5 var(--mono);color:var(--dim)}
   .road-source a{color:var(--cyan);border-bottom:1px dashed rgba(85,184,255,.4)}
   @media(max-width:980px){
@@ -1440,7 +1442,7 @@
   .cal>h2>span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .cal-collapse{cursor:pointer;display:inline-flex;align-items:center;justify-content:center;flex:none;min-width:98px;height:29px;padding:0 10px;border:1px solid rgba(85,184,255,.45);border-radius:8px;background:rgba(85,184,255,.1);color:var(--cyan);font:900 9px/1 var(--mono);letter-spacing:1px;text-transform:uppercase;transition:.15s}
   .cal-collapse:hover{background:rgba(85,184,255,.16);box-shadow:0 0 15px rgba(85,184,255,.18)}
-  .cal.is-collapsed> :not(h2){display:none}
+  .earnings-workspace.is-collapsed .earnings-collapse-body{display:none}
   .pts-card.base{border-color:rgba(34,230,160,.5);background:radial-gradient(300px 120px at 50% 0,rgba(34,230,160,.1),transparent 70%),var(--panel);position:relative}
   .pts-card.base::after{content:"BASE CASE";position:absolute;top:-8px;left:50%;transform:translateX(-50%);
     font:800 8px var(--mono);letter-spacing:1px;color:#04120c;background:linear-gradient(92deg,var(--grn),var(--cyan));padding:2px 7px;border-radius:999px}
@@ -1647,7 +1649,7 @@
     grid-template-areas:
       "title title"
       "flow caps"
-      "flow metrics"
+      "metrics metrics"
       "monitor monitor";
     gap:10px 18px;
     align-items:start;
@@ -1655,7 +1657,7 @@
   .protocol-map .pm-title{grid-area:title;margin-bottom:0!important}
   .protocol-map .pm-sankey{grid-area:flow;width:100%!important;height:auto!important;max-height:285px!important;margin:0!important}
   .protocol-map .pm-cap{grid-area:caps;grid-template-columns:1fr!important;margin-top:0!important;gap:6px!important}
-  .protocol-map .pm-metrics{grid-area:metrics;grid-template-columns:repeat(2,minmax(0,1fr))!important;margin-top:0!important;gap:10px 16px!important}
+  .protocol-map .pm-metrics{grid-area:metrics;grid-template-columns:repeat(4,minmax(0,1fr))!important;margin-top:0!important;gap:10px 16px!important}
   .protocol-map .pm-cap span{padding-top:0!important;padding-bottom:7px!important}
   .protocol-map .pm-metric{padding-top:4px!important;padding-bottom:9px!important}
   @media(max-width:1100px){
@@ -1664,6 +1666,7 @@
       grid-template-areas:"title" "flow" "metrics" "caps" "monitor";
     }
     .protocol-map .pm-sankey{max-height:260px!important}
+    .protocol-map .pm-metrics{grid-template-columns:repeat(2,minmax(0,1fr))!important}
   }
   @media(max-width:680px){
     .protocol-map .pm-metrics{grid-template-columns:1fr!important}
@@ -1866,8 +1869,8 @@
   }
   .header-terminal .kd strong{
     color:var(--ink);
-    font:760 clamp(25px,2.5vw,36px)/.95 var(--sans);
-    letter-spacing:-1.5px;
+    font:780 clamp(32px,3.15vw,46px)/.92 var(--sans);
+    letter-spacing:-1.8px;
   }
   .header-terminal .kd .handle{
     color:var(--dim);
@@ -2367,9 +2370,9 @@
   }
   .market-legend{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
   .market-legend b{color:var(--sub);font:700 10px/1 var(--mono)}
-  .market-legend i{display:inline-block;width:16px;height:7px;margin-right:6px;border-radius:2px;vertical-align:1px}
-  .market-legend .vol{background:#3f8ff0}
-  .market-legend .oi{height:3px;background:#ff4d83;box-shadow:0 0 8px rgba(255,77,131,.35)}
+  .market-legend i{display:inline-block;width:18px;height:3px;margin-right:6px;border-radius:999px;vertical-align:2px}
+  .market-legend .vol{background:#4c9eff;box-shadow:0 0 7px rgba(76,158,255,.28)}
+  .market-legend .oi{background:#ff4d83;box-shadow:0 0 7px rgba(255,77,131,.28)}
   .market-range{
     display:flex;
     gap:2px;
@@ -2799,6 +2802,124 @@
   tr.me .oi-track i{background:var(--grn)}
   tr.me .oi-cell strong,tr.me .share-cell strong{color:var(--grn)}
 
+  /* compact top-15 board: all ranks visible without repeated comparison bars */
+  .rank-board-wrap{
+    overflow:hidden;
+    border:1px solid var(--line);
+    border-radius:0 0 7px 7px;
+    background:rgba(3,10,18,.5);
+  }
+  .rank-board{
+    display:grid;
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:0;
+  }
+  .rank-board-column{min-width:0}
+  .rank-board-column+.rank-board-column{border-left:1px solid var(--line)}
+  .rank-board-column-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    height:28px;
+    padding:0 10px;
+    border-bottom:1px solid var(--line);
+    color:var(--dim);
+    background:rgba(85,184,255,.035);
+    font:800 7px/1 var(--mono);
+    letter-spacing:.85px;
+    text-transform:uppercase;
+  }
+  .rank-board-column-head span:last-child{text-align:right}
+  .rank-board-row{
+    display:grid;
+    grid-template-columns:35px minmax(108px,1fr) minmax(76px,.72fr) minmax(76px,.72fr);
+    align-items:center;
+    gap:8px;
+    min-height:48px;
+    padding:6px 9px;
+    border-bottom:1px solid rgba(255,255,255,.07);
+  }
+  .rank-board-column .rank-board-row:last-child{border-bottom:0}
+  .rank-board-row:hover{background:rgba(199,242,132,.025)}
+  .rank-board-row.me{
+    background:linear-gradient(90deg,rgba(199,242,132,.13),rgba(199,242,132,.025));
+    box-shadow:inset 3px 0 0 var(--grn);
+  }
+  .rank-board-row .rank-number{
+    min-width:31px;
+    width:31px;
+    height:23px;
+    font-size:9px;
+  }
+  .rank-board-row.top-1 .rank-number{border-color:rgba(255,181,71,.45);color:var(--amber);background:rgba(255,181,71,.06)}
+  .rank-board-row.top-2 .rank-number,
+  .rank-board-row.top-3 .rank-number{border-color:rgba(85,184,255,.3);color:var(--ink)}
+  .rank-board-row.me .rank-number{border-color:rgba(199,242,132,.5);color:var(--grn);background:rgba(199,242,132,.07)}
+  .rank-board-exchange{
+    display:flex;
+    align-items:center;
+    gap:7px;
+    min-width:0;
+  }
+  .rank-board-exchange .table-logo{
+    display:block;
+    flex:0 0 19px;
+    width:19px;
+    height:19px;
+    object-fit:contain;
+    border-radius:5px;
+    background:#0a101b;
+  }
+  .rank-board-exchange>span{display:block;min-width:0}
+  .rank-board-exchange b{
+    display:block;
+    overflow:hidden;
+    color:var(--ink);
+    font:700 11px/1.1 var(--sans);
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
+  .rank-board-exchange small{
+    display:block;
+    margin-top:3px;
+    color:var(--grn);
+    font:750 6.5px/1 var(--mono);
+    letter-spacing:.55px;
+    text-transform:uppercase;
+  }
+  .rank-board-metric{min-width:0;text-align:right}
+  .rank-board-metric small{
+    display:block;
+    overflow:hidden;
+    color:var(--dim);
+    font:700 6.5px/1 var(--mono);
+    letter-spacing:.35px;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
+  .rank-board-metric strong{
+    display:block;
+    overflow:hidden;
+    margin-top:4px;
+    color:var(--ink);
+    font:720 10.5px/1 var(--sans);
+    font-variant-numeric:tabular-nums;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
+  .rank-board-row.me .rank-board-exchange b,
+  .rank-board-row.me .rank-board-metric:not(.volume) strong{color:var(--grn)}
+  @media(max-width:1250px){
+    .rank-board{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .rank-board-column:nth-child(3){border-left:0;border-top:1px solid var(--line)}
+  }
+  @media(max-width:760px){
+    .rank-board{grid-template-columns:1fr}
+    .rank-board-column+.rank-board-column{border-left:0;border-top:1px solid var(--line)}
+    .rank-board-row{grid-template-columns:35px minmax(110px,1fr) minmax(75px,.7fr) minmax(75px,.7fr);min-height:44px;padding:5px 8px}
+  }
+
   .valuation-report{padding-bottom:4px}
   .valuation-report .val-hero{margin:0 0 16px}
   .valuation-report .val-cell{padding:18px;border-color:var(--line);border-radius:8px;background:var(--panel)!important;box-shadow:none}
@@ -2843,6 +2964,21 @@
   .pm-daily-monitor.alert-down .pm-alert-dot{background:#ef7180;box-shadow:0 0 12px rgba(239,113,128,.65)}
   .pm-daily-monitor.alert-down .pm-daily-badge{border-color:rgba(239,113,128,.4);color:#f08a98;background:rgba(239,113,128,.07)}
   .pm-daily-monitor.alert-down #pmDailyVsPrev,.pm-daily-monitor.alert-down #pmDailyVsAvg{color:#f08a98}
+  .pm-growth{margin-top:10px;padding:8px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+  .pm-growth-title{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px;font:800 8px/1 var(--mono);letter-spacing:1px;text-transform:uppercase;color:var(--sub)}
+  .pm-growth-title i{font-style:normal;letter-spacing:.2px;text-transform:none;color:var(--dim)}
+  .pm-growth-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr))}
+  .pm-growth-cell{min-width:0;padding:0 8px}
+  .pm-growth-cell:first-child{padding-left:0}
+  .pm-growth-cell:last-child{padding-right:0}
+  .pm-growth-cell+.pm-growth-cell{border-left:1px solid var(--line)}
+  .pm-metric .pm-growth-cell>span{display:block;margin:0!important;font:820 8px/1 var(--mono);letter-spacing:.8px;color:var(--sub)}
+  .pm-growth-cell>b{display:block;overflow:hidden;margin-top:5px;font:740 clamp(12px,1.05vw,16px)/1 var(--sans);font-variant-numeric:tabular-nums;color:var(--ink);text-overflow:ellipsis;white-space:nowrap}
+  .pm-growth-cell>em{display:block;margin-top:4px;font:720 9px/1 var(--mono);font-style:normal;color:var(--dim)}
+  .pm-growth-cell.up>b,.pm-growth-cell.up>em{color:var(--grn)}
+  .pm-growth-cell.down>b,.pm-growth-cell.down>em{color:#f08a98}
+  .pm-growth-note{display:block;margin-top:8px;padding-top:7px;border-top:1px dashed rgba(85,184,255,.13);font:680 9px/1.35 var(--sans);color:var(--dim)}
+  .pm-growth-note b{color:var(--ink);font-weight:800}
   @media(max-width:1080px){
     .cmp-summary,.cmp-direct-grid{grid-template-columns:1fr}
     .cmp-table-pane{padding-right:0}
@@ -2872,6 +3008,532 @@
     .cmp-hl-strip>div:nth-child(even){border-left:0}
     .cmp-hl-brand{grid-column:auto}
     .cmp-revenue-pane .comp-rev-head{align-items:flex-start;flex-direction:column}
+  }
+  /* ---- merged earnings workspace: live windows + calendar + hourly inspector ---- */
+  .earnings-workspace{
+    margin:0 0 14px!important;
+    padding:0!important;
+    overflow:hidden;
+  }
+  .earnings-workspace-head{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:24px;
+    padding:17px 18px 15px;
+    border-bottom:1px solid var(--line);
+  }
+  .earnings-workspace-title{min-width:0}
+  .earnings-eyebrow{
+    display:flex;
+    align-items:center;
+    gap:7px;
+    margin-bottom:7px;
+    color:var(--grn);
+    font:800 9px/1 var(--mono);
+    letter-spacing:1.35px;
+    text-transform:uppercase;
+  }
+  .earnings-workspace-head h2{
+    margin:0 0 5px;
+    font:760 23px/1.08 var(--sans);
+    letter-spacing:-.65px;
+  }
+  .earnings-workspace-head .cap{margin:0;max-width:880px}
+  .earnings-controls{display:flex;align-items:center;gap:8px;flex:none}
+  .earnings-controls .seg{margin:0}
+  .earnings-controls .cal-collapse{
+    min-width:34px;
+    width:34px;
+    padding:0;
+    font-size:13px;
+  }
+  .earnings-summary{
+    display:grid;
+    grid-template-columns:minmax(260px,1.45fr) repeat(3,minmax(170px,1fr));
+    border-bottom:1px solid var(--line);
+    background:var(--line);
+    gap:1px;
+  }
+  .earnings-summary-cell{
+    min-width:0;
+    padding:14px 17px;
+    background:var(--panel2);
+  }
+  .earnings-summary-cell.current{
+    background:linear-gradient(105deg,rgba(199,242,132,.09),var(--panel2) 74%);
+  }
+  .earnings-summary-cell>span{
+    display:block;
+    color:var(--sub);
+    font:800 8.5px/1.15 var(--mono);
+    letter-spacing:1.15px;
+    text-transform:uppercase;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+  .earnings-summary-cell>strong,
+  .earnings-summary-cell .ticker{
+    display:block;
+    margin:7px 0 0;
+    color:var(--ink);
+    background:none;
+    filter:none;
+    font:760 clamp(27px,2.55vw,42px)/.95 var(--sans);
+    letter-spacing:-1.8px;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+  .earnings-summary-cell.current .ticker{color:var(--grn)}
+  .earnings-summary-cell .ticker .cents{font-size:.52em;color:var(--sub);-webkit-text-fill-color:var(--sub)}
+  .earnings-summary-cell>small{
+    display:block;
+    margin-top:7px;
+    color:var(--dim);
+    font:650 9px/1.35 var(--mono);
+  }
+  .earnings-summary-cell>small b{color:var(--grn)}
+  .earnings-main{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) minmax(330px,390px);
+    align-items:stretch;
+  }
+  .earnings-calendar-pane{min-width:0;padding:16px 17px 17px}
+  .earnings-calendar-pane .cal-head{margin:0 0 10px}
+  .earnings-calendar-pane .hist-row{margin:0 0 10px}
+  .earnings-calendar-pane .cal-grid{grid-auto-rows:minmax(118px,auto)}
+  .earnings-calendar-pane .cal-cell{min-height:118px}
+  .earnings-calendar-pane .cal-countdown-card strong{font-size:clamp(16px,1.35vw,23px);letter-spacing:-.7px}
+  .earnings-calendar-pane .cal-countdown-card .cal-awaiting{font-size:12px;letter-spacing:.5px;color:var(--sub);text-transform:uppercase}
+  .earnings-inspector{
+    min-width:0;
+    border-left:1px solid var(--line);
+    background:#0f1211;
+  }
+  .earnings-inspector-head{
+    padding:17px 17px 14px;
+    border-bottom:1px solid var(--line);
+    background:linear-gradient(145deg,rgba(199,242,132,.075),transparent 68%);
+  }
+  .earnings-inspector-title{display:flex;align-items:center;justify-content:space-between;gap:10px}
+  .earnings-inspector-title>span{
+    color:var(--grn);
+    font:800 9px/1 var(--mono);
+    letter-spacing:1.1px;
+    text-transform:uppercase;
+  }
+  .earnings-status{
+    flex:none;
+    padding:4px 7px;
+    border:1px solid rgba(199,242,132,.32);
+    border-radius:999px;
+    color:var(--grn);
+    font:800 7.5px/1 var(--mono);
+    letter-spacing:.6px;
+    text-transform:uppercase;
+  }
+  .earnings-status.estimated{border-color:rgba(111,201,255,.32);color:var(--cyan)}
+  .earnings-status.pending{border-color:var(--line);color:var(--dim)}
+  .earnings-inspector .cal-sel{
+    display:block;
+    margin:12px 0 0;
+    padding:0;
+    border:0;
+  }
+  .earnings-inspector .cal-sel .amt{
+    font:760 clamp(30px,3vw,43px)/.95 var(--sans);
+    letter-spacing:-1.8px;
+    color:var(--ink);
+    background:none;
+    -webkit-text-fill-color:currentColor;
+  }
+  .earnings-inspector .cal-sel .lab{margin-top:7px;font:10px/1.45 var(--mono);color:var(--sub)}
+  .earnings-inspector .cal-sel .lab b{color:var(--ink)}
+  .earnings-inspector-actions{display:flex;gap:7px;margin-top:12px}
+  .earnings-inspector-actions .share-btn{padding:6px 9px;font-size:9px}
+  .earnings-day-progress{height:4px;margin-top:13px;border-radius:999px;background:#29302b;overflow:hidden}
+  .earnings-day-progress i{display:block;width:0;height:100%;border-radius:inherit;background:var(--grn);transition:width .25s ease}
+  .earnings-hourly{padding:15px 17px 16px}
+  .earnings-hourly .tlog{margin:0;padding:0;border:0}
+  .earnings-hourly .tlog-h{display:flex;justify-content:space-between;margin:0 0 10px}
+  .earnings-hourly .tlog-h b{color:var(--dim);font-weight:700;letter-spacing:.5px}
+  .tlog-zone-chips{display:flex;flex-wrap:wrap;gap:5px;margin:0 0 8px}
+  .tlog-zone-chips span{
+    padding:5px 6px;
+    border:1px solid var(--line);
+    border-radius:4px;
+    color:var(--sub);
+    font:700 7.5px/1 var(--mono);
+    white-space:nowrap;
+  }
+  .earnings-hourly .tlog-list{
+    min-width:0;
+    width:100%;
+    max-height:328px;
+    overflow-y:auto;
+    overflow-x:hidden;
+  }
+  .earnings-hourly .tlog-row{
+    display:grid;
+    grid-template-columns:118px minmax(42px,1fr) auto;
+    gap:10px;
+    align-items:center;
+    min-width:0;
+    min-height:48px;
+    padding:7px 0;
+    border-top:1px solid rgba(255,255,255,.07);
+  }
+  .earnings-hourly .tlog-row:first-child{border-top:0}
+  .earnings-hourly .tlog-row::before{display:none}
+  .tlog-time{min-width:0}
+  .tlog-time b,.tlog-time small{display:block;white-space:nowrap}
+  .tlog-time b{color:var(--sub);font:750 9px/1.25 var(--mono)}
+  .tlog-time small{margin-top:3px;color:var(--dim);font:650 7.5px/1.2 var(--mono)}
+  .tlog-meter{height:4px;border-radius:999px;background:#262d29;overflow:hidden}
+  .tlog-meter i{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,#6aa84c,var(--grn))}
+  .earnings-hourly .tlog-b{
+    display:block;
+    min-width:76px;
+    min-height:0;
+    padding:0;
+    border:0;
+    text-align:right;
+  }
+  .earnings-hourly .tlog-b strong{font:760 11px/1 var(--mono);color:var(--ink)}
+  .earnings-hourly .tlog-b small{margin:4px 0 0 auto;font-size:6.5px}
+  .earnings-hourly .tlog-row.live-hour .tlog-b strong{color:var(--grn)}
+  .tlog-empty{padding:22px 4px;color:var(--dim);font:10px/1.5 var(--mono)}
+  .earnings-context{border-top:1px solid var(--line)}
+  .earnings-context summary{
+    cursor:pointer;
+    list-style:none;
+    padding:12px 17px;
+    color:var(--sub);
+    font:800 8px/1 var(--mono);
+    letter-spacing:1px;
+    text-transform:uppercase;
+  }
+  .earnings-context summary::-webkit-details-marker{display:none}
+  .earnings-context summary::before{content:'+';display:inline-block;width:14px;color:var(--grn)}
+  .earnings-context[open] summary::before{content:'−'}
+  .earnings-context .macro-panel{display:block;margin:0;padding:0 17px 16px;border:0}
+  .earnings-context .macro-box{margin-top:8px;padding:10px}
+  .earnings-context .play-grid{grid-template-columns:1fr}
+  .earnings-workspace.is-collapsed>.earnings-workspace-head{display:flex!important;border-bottom:0}
+  @media(max-width:1180px){
+    .earnings-main{grid-template-columns:minmax(0,1fr) 330px}
+    .earnings-summary{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .earnings-summary-cell:nth-child(2){border-right:0}
+  }
+  @media(max-width:920px){
+    .earnings-main{grid-template-columns:1fr}
+    .earnings-inspector{border-left:0;border-top:1px solid var(--line)}
+    .earnings-hourly .tlog-list{max-height:286px}
+  }
+  @media(max-width:680px){
+    .earnings-workspace-head{display:block;padding:14px}
+    .earnings-controls{justify-content:space-between;margin-top:13px}
+    .earnings-summary{grid-template-columns:1fr 1fr}
+    .earnings-summary-cell{padding:12px}
+    .earnings-summary-cell>strong,.earnings-summary-cell .ticker{font-size:clamp(22px,7.8vw,31px);letter-spacing:-1.2px}
+    .earnings-calendar-pane{padding:13px 11px;overflow:hidden}
+    .earnings-calendar-pane .cal-scroll{overflow-x:auto}
+    .earnings-calendar-pane .cal-head{min-width:720px}
+    .earnings-calendar-pane .cal-weekdays,
+    .earnings-calendar-pane .cal-grid{min-width:900px;grid-template-columns:repeat(7,minmax(122px,1fr))}
+    .earnings-inspector-head,.earnings-hourly{padding-left:13px;padding-right:13px}
+  }
+
+  /* ---- overview daily status brief ---- */
+  .daily-brief{
+    margin:0 0 14px;
+    overflow:hidden;
+    border:1px solid var(--line);
+    border-radius:8px;
+    background:var(--panel);
+  }
+  .daily-brief-head{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) auto;
+    gap:22px;
+    align-items:start;
+    padding:16px 18px 14px;
+  }
+  .daily-brief-eyebrow{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin-bottom:8px;
+    color:var(--grn);
+    font:820 8.5px/1 var(--mono);
+    letter-spacing:1.25px;
+    text-transform:uppercase;
+  }
+  .daily-brief-eyebrow i{
+    width:7px;
+    height:7px;
+    flex:none;
+    border-radius:50%;
+    background:currentColor;
+    box-shadow:0 0 10px currentColor;
+  }
+  .daily-brief h2{
+    margin:0;
+    color:var(--ink);
+    font:760 clamp(20px,1.8vw,28px)/1.08 var(--sans);
+    letter-spacing:-.7px;
+  }
+  .daily-brief-summary{
+    max-width:1050px;
+    margin:7px 0 0;
+    color:var(--sub);
+    font:500 11.5px/1.5 var(--sans);
+  }
+  .daily-brief-state{text-align:right;white-space:nowrap}
+  .daily-brief-state span{
+    display:block;
+    margin-bottom:8px;
+    color:var(--dim);
+    font:720 8px/1.25 var(--mono);
+    letter-spacing:.55px;
+  }
+  .daily-brief-state strong{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    min-width:92px;
+    padding:7px 10px;
+    border:1px solid rgba(199,242,132,.38);
+    border-radius:5px;
+    color:var(--grn);
+    background:rgba(199,242,132,.055);
+    font:850 9px/1 var(--mono);
+    letter-spacing:1px;
+  }
+  .daily-brief[data-status="momentum"] .daily-brief-state strong{color:var(--grn);border-color:rgba(199,242,132,.48);background:rgba(199,242,132,.08)}
+  .daily-brief[data-status="watch"] .daily-brief-eyebrow,
+  .daily-brief[data-status="watch"] .daily-brief-state strong{color:#f08a98}
+  .daily-brief[data-status="watch"] .daily-brief-state strong{border-color:rgba(240,138,152,.42);background:rgba(240,138,152,.06)}
+  .daily-brief-grid{
+    display:grid;
+    grid-template-columns:1.15fr repeat(4,minmax(0,1fr));
+    border-top:1px solid var(--line);
+    border-bottom:1px solid var(--line);
+    background:rgba(3,8,15,.2);
+  }
+  .daily-brief-metric{
+    min-width:0;
+    padding:13px 16px 12px;
+  }
+  .daily-brief-metric+.daily-brief-metric{border-left:1px solid var(--line)}
+  .daily-brief-metric>span{
+    display:block;
+    overflow:hidden;
+    color:var(--sub);
+    font:800 8px/1.15 var(--mono);
+    letter-spacing:1px;
+    text-overflow:ellipsis;
+    text-transform:uppercase;
+    white-space:nowrap;
+  }
+  .daily-brief-metric>strong{
+    display:block;
+    overflow:hidden;
+    margin-top:8px;
+    color:var(--ink);
+    font:760 clamp(22px,2vw,32px)/.95 var(--sans);
+    font-variant-numeric:tabular-nums;
+    letter-spacing:-1px;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
+  .daily-brief-metric.revenue>strong,
+  .daily-brief-metric.treasury>strong{color:var(--grn)}
+  .daily-brief-metric.volume>strong{color:var(--cyan)}
+  .daily-brief-metric.oi>strong{color:#f08aa0}
+  .daily-brief-delta{
+    display:block;
+    overflow:hidden;
+    margin-top:7px;
+    color:var(--dim);
+    font:700 8.5px/1.25 var(--mono);
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
+  .daily-brief-delta.up{color:var(--grn)}
+  .daily-brief-delta.down{color:#f08a98}
+  .daily-brief-metric>small{
+    display:block;
+    overflow:hidden;
+    margin-top:5px;
+    color:var(--dim);
+    font:600 9.5px/1.25 var(--sans);
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
+  .daily-brief-foot{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:16px;
+    padding:9px 14px 10px 18px;
+    color:var(--dim);
+    font:650 9.5px/1.35 var(--sans);
+  }
+  .daily-brief-foot b{color:var(--sub)}
+  .daily-brief-copy{
+    flex:none;
+    padding:6px 9px;
+    border:1px solid var(--line);
+    border-radius:5px;
+    color:var(--sub);
+    background:transparent;
+    font:800 8px/1 var(--mono);
+    letter-spacing:.55px;
+    text-transform:uppercase;
+  }
+  .daily-brief-copy:hover{border-color:rgba(199,242,132,.45);color:var(--grn)}
+  .daily-news-compose{
+    padding:15px 18px 14px;
+    border-bottom:1px solid var(--line);
+    background:#0c100f;
+  }
+  .daily-news-compose-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    color:var(--grn);
+    font:820 8.5px/1 var(--mono);
+    letter-spacing:1.1px;
+    text-transform:uppercase;
+  }
+  .daily-news-compose-head b{
+    color:var(--sub);
+    font-size:8px;
+    letter-spacing:.4px;
+  }
+  .daily-news-compose-head b.over{color:#f08a98}
+  .daily-news-compose pre{
+    min-height:150px;
+    margin:11px 0 12px;
+    padding:15px;
+    border:1px solid var(--line);
+    border-radius:6px;
+    color:var(--ink);
+    background:#080b0a;
+    font:650 13px/1.55 var(--mono);
+    white-space:pre-wrap;
+    overflow-wrap:anywhere;
+  }
+  .daily-news-actions{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:16px;
+  }
+  .daily-news-actions>span{color:var(--dim);font:600 9.5px/1.35 var(--sans)}
+  .daily-news-actions>div{display:flex;gap:7px;flex:none}
+  .daily-news-tweet{
+    padding:7px 11px;
+    border:1px solid var(--grn);
+    border-radius:5px;
+    color:#07100c;
+    background:var(--grn);
+    font:850 8px/1 var(--mono);
+    letter-spacing:.55px;
+    text-transform:uppercase;
+  }
+  .daily-news-tweet:hover{filter:brightness(1.08)}
+  .daily-news-sources{
+    border-bottom:1px solid var(--line);
+    background:rgba(199,242,132,.018);
+  }
+  .daily-news-sources-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:14px;
+    padding:11px 18px 10px;
+    color:var(--grn);
+    font:820 8.5px/1 var(--mono);
+    letter-spacing:1.1px;
+    text-transform:uppercase;
+  }
+  .daily-news-sources-head span:last-child{color:var(--dim);font-size:7.5px;letter-spacing:.45px}
+  .daily-news-source-grid{
+    display:grid;
+    grid-template-columns:repeat(4,minmax(0,1fr));
+    border-top:1px solid var(--line);
+  }
+  .daily-news-source{
+    min-width:0;
+    padding:13px 16px 14px;
+  }
+  .daily-news-source+.daily-news-source{border-left:1px solid var(--line)}
+  .daily-news-source>span{
+    display:block;
+    color:var(--sub);
+    font:800 8px/1.2 var(--mono);
+    letter-spacing:.85px;
+    text-transform:uppercase;
+  }
+  .daily-news-source>p{
+    min-height:42px;
+    margin:7px 0 9px;
+    color:var(--dim);
+    font:550 10px/1.4 var(--sans);
+  }
+  .daily-news-source>small{
+    display:block;
+    overflow:hidden;
+    margin-bottom:9px;
+    color:var(--dim);
+    font:700 7.5px/1.2 var(--mono);
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
+  .daily-news-source-links{display:flex;flex-wrap:wrap;gap:6px}
+  .daily-news-source-links a{
+    padding:5px 7px;
+    border:1px solid var(--line);
+    border-radius:4px;
+    color:var(--cyan);
+    font:800 7.5px/1 var(--mono);
+    letter-spacing:.35px;
+    text-decoration:none;
+    text-transform:uppercase;
+  }
+  .daily-news-source-links a:hover{border-color:rgba(111,201,255,.5);color:var(--ink)}
+  @media(max-width:900px){
+    .daily-brief-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .daily-brief-metric:first-child{grid-column:1/-1}
+    .daily-brief-metric{border-top:1px solid var(--line)}
+    .daily-brief-metric:first-child{border-top:0}
+    .daily-brief-metric+.daily-brief-metric{border-left:0}
+    .daily-brief-metric:nth-child(odd):not(:first-child){border-left:1px solid var(--line)}
+    .daily-news-source-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .daily-news-source:nth-child(3){border-left:0;border-top:1px solid var(--line)}
+    .daily-news-source:nth-child(4){border-top:1px solid var(--line)}
+  }
+  @media(max-width:600px){
+    .daily-brief-head{grid-template-columns:1fr;gap:12px;padding:14px}
+    .daily-brief-state{text-align:left}
+    .daily-brief-state span{margin-bottom:7px}
+    .daily-brief-grid{grid-template-columns:1fr 1fr}
+    .daily-brief-metric{padding:12px}
+    .daily-brief-metric>strong{font-size:24px}
+    .daily-brief-foot{align-items:flex-start;padding:10px 12px;flex-direction:column}
+    .daily-news-compose{padding:13px 12px}
+    .daily-news-compose pre{min-height:0;font-size:11px}
+    .daily-news-actions{align-items:flex-start;flex-direction:column}
+    .daily-news-sources-head{align-items:flex-start;padding:10px 12px;flex-direction:column}
+    .daily-news-source-grid{grid-template-columns:1fr}
+    .daily-news-source{padding:12px}
+    .daily-news-source+.daily-news-source{border-left:0;border-top:1px solid var(--line)}
+    .daily-news-source>p{min-height:0}
   }
 </style>
 </head>
@@ -2926,10 +3588,9 @@
   </div>
 </header>
 
-<div class="changes tsec" id="changes" data-tg="overview"></div>
-
 <nav class="tabs" id="tabs" role="tablist" aria-label="Dashboard sections">
   <button id="tab-overview" type="button" role="tab" aria-selected="true" data-tab="overview" class="on">Overview</button>
+  <button id="tab-daily-news" type="button" role="tab" aria-selected="false" data-tab="daily-news">Daily VAR News</button>
   <button id="tab-implied" type="button" role="tab" aria-selected="false" data-tab="implied">Mechanic</button>
   <button id="tab-historical" type="button" role="tab" aria-selected="false" data-tab="historical">Historical Data</button>
   <button id="tab-efficiency" type="button" role="tab" aria-selected="false" data-tab="efficiency">Fundamentals</button>
@@ -2941,6 +3602,105 @@
 
 <main id="main">
 
+<section class="daily-brief daily-news tsec tg-hide" id="dailyBrief" data-tg="daily-news" data-status="steady" aria-labelledby="dailyBriefHeadline">
+  <div class="daily-brief-head">
+    <div>
+      <div class="daily-brief-eyebrow"><i aria-hidden="true"></i> Daily VAR News · X-ready protocol update</div>
+      <h2 id="dailyBriefHeadline">Syncing Variational's current state…</h2>
+      <p class="daily-brief-summary" id="dailyBriefSummary">Combining on-chain treasury revenue with live volume and open interest.</p>
+    </div>
+    <div class="daily-brief-state">
+      <span id="dailyBriefAsOf">Waiting for live sources</span>
+      <strong id="dailyBriefStatus">SYNCING</strong>
+    </div>
+  </div>
+  <div class="daily-brief-grid" aria-label="Variational daily status metrics">
+    <div class="daily-brief-metric revenue">
+      <span>Latest ET treasury revenue</span>
+      <strong id="dailyBriefRevenue">—</strong>
+      <em class="daily-brief-delta" id="dailyBriefRevenueDelta">Waiting for completed close</em>
+      <small id="dailyBriefBurn">Minimum buyback-burn floor —</small>
+    </div>
+    <div class="daily-brief-metric volume">
+      <span>Rolling 24H volume</span>
+      <strong id="dailyBriefVolume">—</strong>
+      <em class="daily-brief-delta" id="dailyBriefVolumeDelta">Official live stats</em>
+      <small>Trading activity now</small>
+    </div>
+    <div class="daily-brief-metric oi">
+      <span>Live open interest</span>
+      <strong id="dailyBriefOi">—</strong>
+      <em class="daily-brief-delta" id="dailyBriefOiDelta">Official live stats</em>
+      <small>Capital active in positions</small>
+    </div>
+    <div class="daily-brief-metric treasury">
+      <span>Treasury added · 7D</span>
+      <strong id="dailyBriefSevenDay">—</strong>
+      <em class="daily-brief-delta" id="dailyBriefSevenDayRate">— per ET day</em>
+      <small>Actual on-chain USDC inflow</small>
+    </div>
+    <div class="daily-brief-metric">
+      <span>Protocol treasury held</span>
+      <strong id="dailyBriefTreasury">—</strong>
+      <em class="daily-brief-delta" id="dailyBriefTreasuryGrowth">— over trailing 30D</em>
+      <small>Live on-chain balance</small>
+    </div>
+  </div>
+  <div class="daily-news-compose" aria-label="X post preview">
+    <div class="daily-news-compose-head">
+      <span>X-ready post</span>
+      <b id="dailyNewsCount">— / 280</b>
+    </div>
+    <pre id="dailyNewsPost">Syncing today's post…</pre>
+    <div class="daily-news-actions">
+      <span>Source labels and time windows stay in the dashboard; the post keeps only the numbers people need.</span>
+      <div>
+        <button class="daily-brief-copy" id="dailyBriefCopy" type="button">Copy post</button>
+        <button class="daily-news-tweet" id="dailyNewsTweet" type="button">Post on X ↗</button>
+      </div>
+    </div>
+  </div>
+  <div class="daily-news-sources" aria-label="Verification sources">
+    <div class="daily-news-sources-head"><span>Verify the numbers</span><span>Open the primary or methodology source for each metric</span></div>
+    <div class="daily-news-source-grid">
+      <div class="daily-news-source">
+        <span>Treasury balance + ET revenue</span>
+        <p>Live USDC held by the protocol treasury. Daily revenue is the balance change between exact 00:00 ET closes.</p>
+        <small id="dailySourceTreasuryAsOf">Latest completed ET close</small>
+        <div class="daily-news-source-links"><a href="https://arbiscan.io/address/0x5e91b40467fb8902c46a7b6cb90482363188d645#tokentxns" target="_blank" rel="noopener noreferrer">Arbiscan wallet ↗</a></div>
+      </div>
+      <div class="daily-news-source">
+        <span>Rolling 24H volume + live OI</span>
+        <p>Current rolling volume and open interest returned by Variational's official public stats endpoint.</p>
+        <small id="dailySourceMarketAsOf">Waiting for live API timestamp</small>
+        <div class="daily-news-source-links"><a href="https://omni-client-api.prod.ap-northeast-1.variational.io/metadata/stats" target="_blank" rel="noopener noreferrer">Official live API ↗</a></div>
+      </div>
+      <div class="daily-news-source">
+        <span>Historical volume + OI</span>
+        <p>Daily UTC observations used for comparisons and the historical market-activity chart.</p>
+        <small id="dailySourceHistoryAsOf">Waiting for latest daily observation</small>
+        <div class="daily-news-source-links">
+          <a href="https://defillama.com/protocol/variational?openInterest=true&amp;groupBy=daily" target="_blank" rel="noopener noreferrer">DeFiLlama chart ↗</a>
+          <a href="https://github.com/DefiLlama/dimension-adapters/blob/master/dexs/variational-omni/index.ts" target="_blank" rel="noopener noreferrer">Adapter code ↗</a>
+        </div>
+      </div>
+      <div class="daily-news-source">
+        <span>Revenue share + burn floor</span>
+        <p>Docs describe a 10% treasury cut subject to change; the latest three official reports show a 20% observed cut. The burn figure applies the stated 30% minimum to treasury revenue.</p>
+        <small id="dailySourceReportAsOf">Latest official report window</small>
+        <div class="daily-news-source-links">
+          <a href="https://docs.variational.io/omni/the-omni-liquidity-provider-olp" target="_blank" rel="noopener noreferrer">Variational Docs ↗</a>
+          <a href="https://docs.variational.io/getting-started/usdvar-token" target="_blank" rel="noopener noreferrer">Burn policy ↗</a>
+          <a href="https://x.com/search?q=from%3Avariational_io%20biweekly%20update!&amp;src=typed_query" target="_blank" rel="noopener noreferrer">Biweekly reports ↗</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="daily-brief-foot">
+    <span id="dailyBriefSignal"><b>Signal:</b> revenue versus its prior 7D average, supported by volume and OI changes versus their latest daily observations.</span>
+  </div>
+</section>
+
 <div class="card roadmap tsec tg-hide" data-tg="roadmap">
   <h2>Roadmap Tracker <span class="tag">to the promise land</span></h2>
   <div class="cap">A clean read of the official Variational roadmap: what has shipped, where the project is on the path, and what gates are still ahead.</div>
@@ -2948,16 +3708,16 @@
     <div class="road-top">
       <div>
         <div class="road-eyebrow">Current journey</div>
-        <div class="road-big"><b>63%</b> of the listed path shipped</div>
-        <div class="road-copy">Every dated item from Q1 2025 through Q4 2025 is checked off in the docs, plus five undated items already shipped (read-only API, mobile, CSV exports, RWA Phase 1, portfolio analytics). Eleven undated items remain — in docs order, from Omni v3 all the way to Variational Pro.</div>
+        <div class="road-big"><b>67%</b> of the listed path shipped</div>
+        <div class="road-copy">Every dated item from Q1 2025 through Q4 2025 is checked off, along with six undated items including the completed Omni v3 major UI rework. Ten undated items remain — from isolated margin through Variational Pro.</div>
       </div>
       <div class="road-progress" aria-label="Roadmap completion estimate">
-        <div class="road-progress-head"><strong>19/30</strong><span>listed roadmap items completed</span></div>
-        <div class="road-meter"><span style="width:63%"></span></div>
+        <div class="road-progress-head"><strong>20/30</strong><span>listed roadmap items completed</span></div>
+        <div class="road-meter"><span style="width:67%"></span></div>
         <div class="road-stats">
           <div class="road-stat"><strong>4</strong><span>quarters shipped</span></div>
-          <div class="road-stat"><strong>5</strong><span>undated shipped</span></div>
-          <div class="road-stat"><strong>11</strong><span>items left</span></div>
+          <div class="road-stat"><strong>6</strong><span>undated shipped</span></div>
+          <div class="road-stat"><strong>10</strong><span>items left</span></div>
         </div>
       </div>
     </div>
@@ -2991,7 +3751,7 @@
         <div class="road-stop pending">
           <span class="road-dot">1</span>
           <b>2026 · Omni v3</b>
-          <span>Major UI rework · isolated margin</span>
+          <span>UI rework ✓ · isolated margin next</span>
         </div>
         <div class="road-stop pending">
           <span class="road-dot">2</span>
@@ -3041,9 +3801,9 @@
         </div>
       </div>
       <div class="ry-col ahead">
-        <div class="ry-head"><b>2026</b><span>0/11 · the road ahead</span></div>
+        <div class="ry-head"><b>2026</b><span>1/11 · the road ahead</span></div>
         <div class="ry-q"><h4>Undated backlog · docs order <i>slotted 2026</i></h4><ul>
-          <li>Major UI rework ("Omni v3")</li>
+          <li class="ok">Major UI rework ("Omni v3")</li>
           <li>Isolated margin</li>
           <li>Launch swaps ("Phase 2")</li>
           <li>Partial fills of limit orders</li>
@@ -3055,7 +3815,7 @@
           <li>Open community vault for OLP</li>
           <li>Launch of Variational Pro</li>
         </ul></div>
-        <div class="ry-note">The docs keep these items undated — this board slots them into 2026 as the working assumption, in the exact order the docs list them.</div>
+        <div class="ry-note">Major UI rework is marked complete. The remaining ten items are still undated; this board keeps them in the exact order listed by the docs.</div>
       </div>
     </div>
     <div class="road-backlog">
@@ -3077,10 +3837,27 @@
     <div class="pm-metrics">
       <div class="pm-metric">
         <strong id="pmOlpBalance">syncing</strong><span>Core OLP Vault USDC</span>
+        <div class="pm-growth" aria-label="Core OLP wallet net USDC movements">
+          <div class="pm-growth-title">Core wallet USDC movement <i>transfers + PnL · not a loss metric</i></div>
+          <div class="pm-growth-grid">
+            <div class="pm-growth-cell" id="pmOlpGrowth1"><span>1D</span><b id="pmOlp1d">syncing</b><em id="pmOlp1dPct">—</em></div>
+            <div class="pm-growth-cell" id="pmOlpGrowth7"><span>7D</span><b id="pmOlp7d">syncing</b><em id="pmOlp7dPct">—</em></div>
+            <div class="pm-growth-cell" id="pmOlpGrowth30"><span>30D</span><b id="pmOlp30d">syncing</b><em id="pmOlp30dPct">—</em></div>
+          </div>
+          <small class="pm-growth-note"><b>Negative = USDC left this address.</b> Capital can move to settlement pools or external hedge venues, so this is not OLP PnL or total TVL.</small>
+        </div>
         <small class="pm-formula" id="pmOlpFormula">Formula: <b>USDC balanceOf(Core OLP Vault)</b></small>
       </div>
       <div class="pm-metric">
         <strong id="pmTreasuryTotal">—</strong><span>treasury accumulated</span>
+        <div class="pm-growth" aria-label="Treasury rolling balance growth">
+          <div class="pm-growth-title">Completed ET growth <i id="pmTreasuryGrowthAsOf">exact daily closes</i></div>
+          <div class="pm-growth-grid">
+            <div class="pm-growth-cell" id="pmTreasuryGrowth1"><span>1D</span><b id="pmTreasury1d">syncing</b><em id="pmTreasury1dPct">—</em></div>
+            <div class="pm-growth-cell" id="pmTreasuryGrowth7"><span>7D</span><b id="pmTreasury7d">syncing</b><em id="pmTreasury7dPct">—</em></div>
+            <div class="pm-growth-cell" id="pmTreasuryGrowth30"><span>30D</span><b id="pmTreasury30d">syncing</b><em id="pmTreasury30dPct">—</em></div>
+          </div>
+        </div>
         <small class="pm-formula" id="pmTreasuryFormula">Formula: <b>USDC balanceOf(Protocol Treasury)</b></small>
       </div>
       <div class="pm-metric">
@@ -3111,33 +3888,92 @@
   </div>
 </div>
 
-<div class="live-card tsec" data-tg="overview">
-  <div class="money-rain" id="rain"></div>
-  <div class="hg" aria-hidden="true">
-    <img class="rune-logo" src="variational-rune-transparent.png?v=1" alt="">
+<div class="card cal earnings-workspace tsec" data-tg="overview">
+  <div class="earnings-workspace-head">
+    <div class="earnings-workspace-title">
+      <div class="earnings-eyebrow"><span class="live-dot"></span> ET earnings workspace · live · <span id="liveExactClock">— ET</span></div>
+      <h2>Total Earnings / Day <span class="tag" id="calTag">daily totals</span></h2>
+      <div class="cap">Completed treasury revenue closes at 00:00 ET. Select a date to see its hourly earning shape; today updates live until the ET close.</div>
+    </div>
+    <div class="earnings-controls">
+      <div class="seg" id="calSeg">
+        <button type="button" data-c="day" class="on">Daily</button>
+        <button type="button" data-c="week">Weekly</button>
+        <button type="button" data-c="month">Monthly</button>
+      </div>
+      <button class="cal-collapse" id="calCollapse" type="button" aria-expanded="true" aria-label="Collapse earnings workspace" title="Collapse earnings workspace">⌃</button>
+    </div>
   </div>
-  <div class="live-body">
-    <div class="live-headline">
-      <div class="k"><span class="live-dot"></span> Printing right now · live · <span id="liveExactClock">— ET</span></div>
-      <div class="ticker" id="ticker">$0<span class="cents">.00</span></div>
-      <div class="sub" id="tickerSub">USDC earned in the current ET hour · updates live</div>
+
+  <div class="earnings-collapse-body">
+    <div class="earnings-summary" aria-label="Live treasury earning windows">
+      <div class="earnings-summary-cell current">
+        <span id="liveHourLabel">Current ET hour</span>
+        <strong class="ticker" id="ticker">$0<span class="cents">.00</span></strong>
+        <small id="tickerSub"><b>Live</b> · earned so far</small>
+      </div>
+      <div class="earnings-summary-cell"><span>Rolling 12 hours</span><strong id="ac12h">—</strong><small>Actual on-chain earnings</small></div>
+      <div class="earnings-summary-cell"><span>Rolling 24 hours</span><strong id="ac24h">—</strong><small>Actual on-chain earnings</small></div>
+      <div class="earnings-summary-cell"><span>Rolling 7 days</span><strong id="ac7d">—</strong><small>Actual on-chain earnings</small></div>
     </div>
-    <div class="live-stats">
-      <div class="stat-grp">
-        <div class="twap-lead actual">Actual earned · on-chain</div>
-        <div class="twap-row act">
-          <div class="twap"><span class="n" id="ac12h">—</span><span class="l">12 hours</span></div>
-          <div class="twap"><span class="n" id="ac24h">—</span><span class="l">24 hours</span></div>
-          <div class="twap"><span class="n" id="ac7d">—</span><span class="l">7 days</span></div>
+
+    <div class="earnings-main">
+      <section class="earnings-calendar-pane">
+        <div class="cal-head">
+          <div class="cal-title" id="calTitle">—</div>
+          <div class="cal-nav">
+            <button type="button" id="calPrev">‹ Prev</button>
+            <button type="button" id="calToday">Latest</button>
+            <button type="button" id="calNext">Next ›</button>
+          </div>
         </div>
-      </div>
-    </div>
-    <div class="tlog">
-      <div class="tlog-h"><span class="live-dot"></span> Hourly earnings · local daytime map</div>
-      <div class="tlog-scroll">
-        <div class="tlog-cols" aria-hidden="true"><span>ET window</span><span>🇺🇸 United States</span><span>🇸🇬 Singapore</span><span>🇩🇪 Germany</span><span>🇪🇸 Spain</span><span>🇰🇷 Korea</span><span>Earned / hour</span></div>
-        <div class="tlog-list" id="tlogList"><div class="tlog-row"><span class="tlog-t">ET hour</span><span class="tlog-country">loading</span><span class="tlog-country">loading</span><span class="tlog-country">loading</span><span class="tlog-country">loading</span><span class="tlog-country">loading</span><span class="tlog-b"><strong>syncing…</strong></span></div></div>
-      </div>
+        <div class="hist-row" id="histMonths"></div>
+        <div class="cal-scroll">
+          <div class="cal-months" id="calMonths"></div>
+          <div class="cal-weekdays"><span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span></div>
+          <div class="cal-grid" id="calGrid"></div>
+        </div>
+        <div class="cal-legend">
+          <span>less</span>
+          <span class="sc" style="background:#0f1826"></span>
+          <span class="sc" style="background:rgba(34,230,160,.28)"></span>
+          <span class="sc" style="background:rgba(34,230,160,.55)"></span>
+          <span class="sc" style="background:rgba(34,230,160,.8)"></span>
+          <span class="sc" style="background:linear-gradient(92deg,var(--grn),var(--cyan))"></span>
+          <span>more</span>
+        </div>
+      </section>
+
+      <aside class="earnings-inspector" aria-label="Selected date hourly earnings">
+        <div class="earnings-inspector-head">
+          <div class="earnings-inspector-title"><span id="calInspectorDate">Select a date</span><i class="earnings-status pending" id="calInspectorStatus">Pending</i></div>
+          <div class="cal-sel" id="calSel">
+            <div class="amt pos" id="calAmt">—</div>
+            <div class="lab" id="calLab">Click a calendar cell to inspect it.</div>
+            <div class="earnings-inspector-actions">
+              <button class="share-btn" id="calShare" type="button">𝕏 Share</button>
+              <button class="share-btn ghost" id="calCopy" type="button">⧉ Copy</button>
+            </div>
+          </div>
+          <div class="earnings-day-progress" aria-hidden="true"><i id="calInspectorProgress"></i></div>
+        </div>
+
+        <div class="earnings-hourly">
+          <div class="tlog">
+            <div class="tlog-h"><span><span class="live-dot"></span> Hourly earnings</span><b id="tlogMode">ET / SGT</b></div>
+            <div class="tlog-zone-chips" id="tlogZones"></div>
+            <div class="tlog-list" id="tlogList"><div class="tlog-empty">Syncing hourly data…</div></div>
+          </div>
+        </div>
+
+        <details class="earnings-context">
+          <summary>Macro context and index playbook</summary>
+          <div class="macro-panel">
+            <div class="macro-box"><h3>Macro Events</h3><div class="macro-list" id="macroList"></div></div>
+            <div class="macro-box"><h3>Index Playbook</h3><div class="play-grid" id="playbook"></div></div>
+          </div>
+        </details>
+      </aside>
     </div>
   </div>
 </div>
@@ -3173,7 +4009,7 @@
       <button type="button" data-market-days="0">All</button>
     </div>
   </div>
-  <svg class="chart" id="marketActivityChart" viewBox="0 0 960 330" preserveAspectRatio="none" role="img" aria-label="Variational daily perp volume bars and open interest line"></svg>
+  <svg class="chart" id="marketActivityChart" viewBox="0 0 960 330" preserveAspectRatio="none" role="img" aria-label="Variational daily perp volume and open interest lines"></svg>
   <div class="market-source">
     <span><b>Exact values:</b> hover any date for the full USD figures. Historical observations are grouped at UTC day boundaries; live volume is a rolling 24-hour value and is intentionally labeled separately.</span>
     <span>Sources: <a href="https://defillama.com/protocol/variational?openInterest=true&amp;groupBy=daily" target="_blank" rel="noopener">DeFiLlama chart ↗</a> · <a href="https://github.com/DefiLlama/dimension-adapters/blob/master/dexs/variational-omni/index.ts" target="_blank" rel="noopener">adapter code ↗</a></span>
@@ -3516,54 +4352,6 @@
   </div>
 </div>
 
-<div class="card cal tsec tg-hide" data-tg="overview" style="margin-top:16px">
-  <h2><button class="cal-collapse" id="calCollapse" type="button" aria-expanded="true" aria-label="Collapse calendar" title="Collapse calendar">⌃ Collapse</button><span>Total Earnings + Fee/Revenue Calendar <span class="tag" id="calTag">daily totals</span></span></h2>
-  <div class="cap">Completed treasury revenue at the exact 00:00 ET close, with implied activity, burn firepower, and market events. Exact on-chain day boundaries are reconciled from Jun 30 onward. Today stays pending until the ET day closes.</div>
-  <div class="seg" id="calSeg">
-    <button type="button" data-c="day" class="on">Daily</button>
-    <button type="button" data-c="week">Weekly</button>
-    <button type="button" data-c="month">Monthly</button>
-  </div>
-  <div class="cal-head">
-    <div class="cal-title" id="calTitle">—</div>
-    <div class="cal-nav">
-      <button type="button" id="calPrev">‹ Prev</button>
-      <button type="button" id="calToday">Latest</button>
-      <button type="button" id="calNext">Next ›</button>
-    </div>
-  </div>
-  <div class="hist-row" id="histMonths"></div>
-  <div class="cal-scroll">
-    <div class="cal-months" id="calMonths"></div>
-    <div class="cal-weekdays"><span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span></div>
-    <div class="cal-grid" id="calGrid"></div>
-  </div>
-  <div class="cal-legend">
-    <span>less</span>
-    <span class="sc" style="background:#0f1826"></span>
-    <span class="sc" style="background:rgba(34,230,160,.28)"></span>
-    <span class="sc" style="background:rgba(34,230,160,.55)"></span>
-    <span class="sc" style="background:rgba(34,230,160,.8)"></span>
-    <span class="sc" style="background:linear-gradient(92deg,var(--grn),var(--cyan))"></span>
-    <span>more</span>
-  </div>
-  <div class="cal-sel" id="calSel">
-    <div><div class="amt pos" id="calAmt">—</div><div class="lab" id="calLab">Click a cell to pick a period</div></div>
-    <button class="share-btn" id="calShare" type="button">𝕏 Share this</button>
-    <button class="share-btn ghost" id="calCopy" type="button">⧉ Copy</button>
-  </div>
-  <div class="macro-panel">
-    <div class="macro-box">
-      <h3>Macro Events</h3>
-      <div class="macro-list" id="macroList"></div>
-    </div>
-    <div class="macro-box">
-      <h3>Index Playbook</h3>
-      <div class="play-grid" id="playbook"></div>
-    </div>
-  </div>
-</div>
-
 <section class="comparison-report tsec tg-hide" data-tg="comparison">
   <div class="cmp-heading">
     <h2>Perp DEX Positioning</h2>
@@ -3624,7 +4412,7 @@
       <div class="cmp-rank-current"><span>Variational position</span><strong id="cmpRankLine">loading</strong></div>
     </div>
     <div class="cmp-rank-toolbar"><span id="peersAsOf">loading market snapshot</span><span class="live-pill" id="boardLive"><i></i>loading</span><a href="https://www.coingecko.com/en/derivatives" target="_blank" rel="noopener">CoinGecko source ↗</a></div>
-    <div class="pulse-table-wrap"><table class="pulse-table" id="pulseTable"><thead><tr><th>Rank</th><th>Exchange</th><th>Open interest</th><th>Listed OI share</th><th>24H volume</th></tr></thead><tbody></tbody></table></div>
+    <div class="rank-board-wrap"><div class="rank-board" id="pulseTable" role="table" aria-label="Top 15 perpetual DEXs by open interest"></div></div>
   </section>
 
 </section>
