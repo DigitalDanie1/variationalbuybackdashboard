@@ -679,6 +679,33 @@ function renderDailyRevenueCalendar(e){
   $('#effCalTitle') && ($('#effCalTitle').textContent=monthName(EFF_CAL_MONTH));
   $('#effCalSub') && ($('#effCalSub').textContent=`Exact daily treasury inflow · bps proxy uses ${e.label} avg daily volume (${e.vol>=1e9?'$'+(dailyVol/1e9).toFixed(2)+'B':'$'+fmtK(dailyVol)}/day; ${e.volSource}).`);
 }
+const PM_GROWTH_WINDOWS=[1,7,30];
+const PM_GROWTH_STATE={olp:null,olpCurrent:null};
+function renderPmGrowthGroup(prefix,current,bases){
+  PM_GROWTH_WINDOWS.forEach((days,index)=>{
+    const cell=$(`#${prefix}Growth${days}`), amount=$(`#${prefix}${days}d`), percent=$(`#${prefix}${days}dPct`);
+    if(!cell||!amount||!percent)return;
+    cell.classList.remove('up','down','flat');
+    const base=bases?.[index];
+    if(!Number.isFinite(current)||!Number.isFinite(base)){
+      amount.textContent='—';percent.textContent='unavailable';cell.classList.add('flat');return;
+    }
+    const delta=current-base, pct=base>0?delta/base*100:null;
+    const sign=delta>0?'+':delta<0?'−':'';
+    amount.textContent=`${sign}$${fmtK(Math.abs(delta))}`;
+    percent.textContent=Number.isFinite(pct)?`${pct>=0?'+':'−'}${Math.abs(pct).toFixed(2)}%`:'new balance';
+    cell.classList.add(delta>0?'up':delta<0?'down':'flat');
+    const metric=prefix==='pmOlp'?'Core wallet net USDC movement':'treasury balance growth';
+    cell.title=`${days}D ${metric}: ${delta>=0?'+':'−'}${fmtUSD(Math.abs(delta))}${Number.isFinite(pct)?` (${pct>=0?'+':''}${pct.toFixed(2)}%)`:''}`;
+  });
+}
+function renderCompletedTreasuryGrowth(){
+  const n=SERIES.length, latest=SERIES[n-1];
+  if(!latest)return;
+  const bases=PM_GROWTH_WINDOWS.map(days=>n-1-days>=0?SERIES[n-1-days].v:null);
+  renderPmGrowthGroup('pmTreasury',latest.v,bases);
+  $('#pmTreasuryGrowthAsOf') && ($('#pmTreasuryGrowthAsOf').textContent=`through ${latest.d}`);
+}
 function renderImpliedSpreadTotal(treasuryTotal){
   const totalFees=treasuryTotal/MKT.spreadShare;
   const olpSide=totalFees-treasuryTotal;
@@ -697,8 +724,36 @@ function renderImpliedSpreadTotal(treasuryTotal){
   $('#pmTreasuryFormula') && ($('#pmTreasuryFormula').innerHTML=`Formula: <b>USDC balanceOf(0x5e91...d645) = ${fmtUSD(treasuryTotal)}</b>`);
   $('#pmDailyFormula') && ($('#pmDailyFormula').innerHTML=days?`Formula: <b>(${fmtUSD(treasuryTotal)} - ${fmtUSD(start30)}) / ${days}D = ${fmtUSD(avg30)}/day</b>`:'Formula: <b>waiting for historical treasury series</b>');
   $('#pmFeesFormula') && ($('#pmFeesFormula').innerHTML=`Formula: <b>${fmtUSD(treasuryTotal)} / ${(MKT.spreadShare*100).toFixed(0)}% = ${compact(totalFees)}</b>`);
+  renderCompletedTreasuryGrowth();
   renderPmDailyMonitor();
   renderMoneyMap(treasuryTotal);
+}
+async function refreshProtocolBalanceGrowth(){
+  const nowTs=Math.floor(Date.now()/1000);
+  const blocks=PM_GROWTH_WINDOWS.map(days=>blockAt(nowTs-days*86400));
+  let olpCurrent=null;
+  try{olpCurrent=await balAtPad(CHAIN.olpPad,'latest');}catch(_){ }
+  const olpBases=[];
+  for(const block of blocks){
+    let value=null;
+    try{value=await balAtPad(CHAIN.olpPad,block);}
+    catch(_){
+      await new Promise(resolve=>setTimeout(resolve,450));
+      try{value=await balAtPad(CHAIN.olpPad,block);}catch(__){ }
+    }
+    olpBases.push(value);
+  }
+  PM_GROWTH_STATE.olp=olpBases;
+  PM_GROWTH_STATE.olpCurrent=olpCurrent;
+  renderPmGrowthGroup('pmOlp',olpCurrent,olpBases);
+  if(Number.isFinite(olpCurrent)){
+    $('#pmOlpBalance') && ($('#pmOlpBalance').textContent=fmtUSD(olpCurrent));
+    $('#pmOlpFormula') && ($('#pmOlpFormula').innerHTML=`Formula: <b>USDC balanceOf(0x74bbbb...1f2cd) = ${fmtUSD(olpCurrent)}</b>`);
+    if(olpCurrent>0){OLP_TVL=olpCurrent;OLP_TVL_LIVE=true;renderEfficiency();}
+  }else{
+    $('#pmOlpBalance') && ($('#pmOlpBalance').textContent='check Arbiscan');
+    $('#pmOlpFormula') && ($('#pmOlpFormula').innerHTML='Formula: <b>read Core OLP Vault USDC balance on Arbiscan</b>');
+  }
 }
 function renderPmDailyMonitor(){
   const monitor=$('#pmDailyMonitor');
@@ -844,7 +899,8 @@ const SESSION_TZS=[
   {flag:'🇸🇬',code:'SG',tz:'Asia/Singapore'},
   {flag:'🇩🇪',code:'DE',tz:'Europe/Berlin'},
   {flag:'🇪🇸',code:'ES',tz:'Europe/Madrid'},
-  {flag:'🇰🇷',code:'KR',tz:'Asia/Seoul'}
+  {flag:'🇰🇷',code:'KR',tz:'Asia/Seoul'},
+  {flag:'🇯🇵',code:'JP',tz:'Asia/Tokyo'}
 ];
 function tzParts(date,tz=RESET_TZ.tz){
   const parts=new Intl.DateTimeFormat('en-US',{timeZone:tz,year:'numeric',month:'2-digit',day:'2-digit',
@@ -897,15 +953,26 @@ function localSessionCell(date,h,c){
   const daytime=hr>=9&&hr<18;
   return `<span class="tlog-country ${daytime?'day':''}"><b>${c.flag}</b>${s}-${e}${daytime?'<small>DAY</small>':''}<em>${day}</em></span>`;
 }
-function hourlyRow(h,earned,{current=false,max=1,date=resetDateKey(),projected=false}={}){
+function compactHourRange(date,h,tz,label){
+  const start=new Date(resetLocalTs(date,h)*1000);
+  const end=new Date(resetLocalTs(date,h+1)*1000);
+  const opt={timeZone:tz,hour:'2-digit',minute:'2-digit',hourCycle:'h23'};
+  return `${start.toLocaleTimeString('en-US',opt)}-${end.toLocaleTimeString('en-US',opt)} ${label}`;
+}
+function renderInspectorZoneClocks(now=new Date()){
+  const box=$('#tlogZones');if(!box)return;
+  box.innerHTML=SESSION_TZS.map(c=>{
+    const p=tzParts(now,c.tz);
+    return `<span>${c.flag} ${c.code} ${p.hour}:${p.minute}</span>`;
+  }).join('');
+}
+function hourlyRow(h,earned,{current=false,max=1,date=resetDateKey(),projected=false,estimated=false}={}){
   const heat=Math.min(100,Math.max(6,earned/Math.max(1,max)*100));
   const hot=earned>=max*.72&&max>0;
-  const countries=SESSION_TZS.map(c=>localSessionCell(date,h,c)).join('');
   return `<div class="tlog-row ${current?'new live-hour':''} ${hot?'hot':''}" data-hour="${h}" style="--heat:${heat.toFixed(1)}%">
-    <span class="tlog-t">${String(h).padStart(2,'0')}-${String((h+1)%24).padStart(2,'0')} ET${current?' · live':''}</span>
-    ${countries}
-    <span class="tlog-b"><strong>+${fmtUSD(Math.max(0,earned),2)}</strong>${projected?'<small class="proj">PROJ</small>':hot?'<small>HOT</small>':''}</span>
-    <span class="tlog-d"></span>
+    <span class="tlog-time"><b>${compactHourRange(date,h,RESET_TZ.tz,'ET')}</b><small>${compactHourRange(date,h,ASIA_TZ.tz,'SGT')}</small></span>
+    <span class="tlog-meter"><i style="width:${heat.toFixed(1)}%"></i></span>
+    <span class="tlog-b"><strong>+${fmtUSD(Math.max(0,earned),2)}</strong>${estimated?'<small class="proj">EST</small>':projected?'<small class="proj">PROJ</small>':hot?'<small>HOT</small>':''}</span>
   </div>`;
 }
 function placeTT(e){
@@ -1033,21 +1100,27 @@ function fmtPulseMoney(v){
   return '$'+Math.round(v).toLocaleString('en-US');
 }
 function renderPulseTable(){
-  const body=$('#pulseTable tbody');
-  if(!body)return;
+  const board=$('#pulseTable');
+  if(!board)return;
   const total=PEERS.total||PEERS.list.reduce((sum,p)=>sum+(p.oi||0),0)||1;
-  const max=PEERS.list[0]?.oi||1;
-  body.innerHTML=PEERS.list.slice(0,15).map((p,i)=>{
-    const share=(p.oi||0)/total*100,relative=(p.oi||0)/max*100;
+  const rows=PEERS.list.slice(0,15).map((p,i)=>{
+    const share=(p.oi||0)/total*100;
     const classes=[p.me?'me':'',i<3?'top-'+(i+1):''].filter(Boolean).join(' ');
-    return `<tr class="${classes}">
-      <td class="rank"><span class="rank-number">#${i+1}</span></td>
-      <td><span class="exchange"><img class="table-logo" src="${PLOGO[p.n]||'variational-symbol-transparent.png'}" alt="" width="20" height="20" style="width:20px!important;height:20px!important;min-width:20px!important;max-width:20px!important;min-height:20px!important;max-height:20px!important;object-fit:contain!important"><span class="exchange-copy"><b>${escapeHTML(p.n)}</b>${p.me?'<small>Variational · current position</small>':''}</span></span></td>
-      <td class="oi-cell ${(PEERS.live&&!p.live)?'snap':''}"><div class="oi-read"><strong>${fmtPulseMoney(p.oi)}</strong></div><span class="oi-track" title="${relative.toFixed(1)}% of the #1 venue's OI"><i style="width:${relative.toFixed(2)}%"></i></span></td>
-      <td class="share-cell"><strong>${share.toFixed(2)}%</strong></td>
-      <td class="volume-cell ${(PEERS.live&&!p.live)?'snap':''}"><strong>${fmtPulseMoney(p.vol)}</strong></td>
-    </tr>`;
-  }).join('');
+    return `<div class="rank-board-row ${classes}" role="row">
+      <span class="rank-number" role="cell">#${i+1}</span>
+      <span class="rank-board-exchange" role="cell">
+        <img class="table-logo" src="${PLOGO[p.n]||'variational-symbol-transparent.png'}" alt="" width="20" height="20">
+        <span><b>${escapeHTML(p.n)}</b>${p.me?'<small>Current position</small>':''}</span>
+      </span>
+      <span class="rank-board-metric" role="cell"><small>OI · ${share.toFixed(2)}%</small><strong>${fmtPulseMoney(p.oi)}</strong></span>
+      <span class="rank-board-metric volume" role="cell"><small>24H VOL</small><strong>${fmtPulseMoney(p.vol)}</strong></span>
+    </div>`;
+  });
+  board.innerHTML=[0,1,2].map(column=>`
+    <div class="rank-board-column" role="rowgroup">
+      <div class="rank-board-column-head"><span>Rank · exchange</span><span>Open interest · 24H volume</span></div>
+      ${rows.slice(column*5,column*5+5).join('')}
+    </div>`).join('');
 }
 /* ---------- king scoreboard (Hyperliquid benchmark) ---------- */
 function renderKing(){
@@ -1322,6 +1395,7 @@ function renderMarketActivity(){
   put('#marketLiveOi','#marketLiveOiExact',live?.oi,2);
   put('#marketVol7d','#marketVol7dExact',vols.length?vols.slice(-7).reduce((s,x)=>s+x.v,0):null);
   put('#marketVol30d','#marketVol30dExact',vols.length?vols.slice(-30).reduce((s,x)=>s+x.v,0):null);
+  renderDailyBrief();
   const sync=$('#marketSync');
   if(sync){
     const errors=Object.values(MARKET_ACTIVITY.errors).filter(Boolean);
@@ -1343,7 +1417,6 @@ function renderMarketActivity(){
   if(rows.length<2)return;
   const {W,H}=chartDims(svg,960,330),pl=74,pr=78,pt=26,pb=42,n=rows.length;
   const X=i=>pl+i/Math.max(1,n-1)*(W-pl-pr);
-  const step=(W-pl-pr)/Math.max(1,n),bw=Math.max(2,Math.min(14,step*.66));
   const vMax=Math.max(...rows.map(x=>x.vol))*1.12,oMax=Math.max(...rows.map(x=>x.oi))*1.12;
   const YV=v=>pt+(1-v/Math.max(1,vMax))*(H-pt-pb);
   const YO=v=>pt+(1-v/Math.max(1,oMax))*(H-pt-pb);
@@ -1354,24 +1427,20 @@ function renderMarketActivity(){
       `<text class="axis" x="${pl-9}" y="${y+4}" text-anchor="end">${marketBig(v).replace('$','')}</text>`+
       `<text class="axis" x="${W-pr+9}" y="${y+4}">${marketBig(o).replace('$','')}</text>`;
   }
-  const bars=rows.map((x,i)=>`<rect x="${(X(i)-bw/2).toFixed(1)}" y="${YV(x.vol).toFixed(1)}" width="${bw.toFixed(1)}" height="${(H-pb-YV(x.vol)).toFixed(1)}" rx="${Math.min(2,bw/3)}" fill="url(#marketVolBar)"/>`).join('');
-  const line=rows.map((x,i)=>`${i?'L':'M'}${X(i).toFixed(1)} ${YO(x.oi).toFixed(1)}`).join(' ');
-  const area=line+`L${X(n-1).toFixed(1)} ${H-pb} L${X(0).toFixed(1)} ${H-pb} Z`;
-  const ticks=Math.min(7,n),tickEvery=Math.max(1,Math.floor((n-1)/Math.max(1,ticks-1)));
-  let dates='';
-  rows.forEach((x,i)=>{if(i%tickEvery===0||i===n-1)dates+=`<text class="axis-date" x="${X(i)}" y="${H-14}" text-anchor="${i===0?'start':i===n-1?'end':'middle'}">${mdShort(x.d)}</text>`;});
+  const volumeLine=rows.map((x,i)=>`${i?'L':'M'}${X(i).toFixed(1)} ${YV(x.vol).toFixed(1)}`).join(' ');
+  const oiLine=rows.map((x,i)=>`${i?'L':'M'}${X(i).toFixed(1)} ${YO(x.oi).toFixed(1)}`).join(' ');
+  const ticks=Math.min(W<520?5:7,n);
+  const tickIndices=[...new Set(Array.from({length:ticks},(_,i)=>Math.round(i*(n-1)/Math.max(1,ticks-1))))];
+  const dates=tickIndices.map(i=>`<text class="axis-date" x="${X(i)}" y="${H-14}" text-anchor="${i===0?'start':i===n-1?'end':'middle'}">${mdShort(rows[i].d)}</text>`).join('');
   const last=rows[n-1],lx=X(n-1);
   svg.innerHTML=`
-    <defs>
-      <linearGradient id="marketVolBar" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4c9eff"/><stop offset="1" stop-color="#244c82"/></linearGradient>
-      <linearGradient id="marketOiArea" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff4d83" stop-opacity=".28"/><stop offset="1" stop-color="#ff4d83" stop-opacity="0"/></linearGradient>
-      <filter id="marketOiGlow"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-    </defs>
     <text class="axis" x="${pl}" y="${pt-10}" fill="#55a8ff">DAILY PERP VOLUME</text>
     <text class="axis" x="${W-pr}" y="${pt-10}" fill="#ff7ba0" text-anchor="end">OPEN INTEREST · DAILY CLOSE</text>
-    ${grid}${bars}<path d="${area}" fill="url(#marketOiArea)"/>
-    <path d="${line}" fill="none" stroke="#ff4d83" stroke-width="2.4" stroke-linejoin="round" filter="url(#marketOiGlow)"/>
-    <circle cx="${lx}" cy="${YO(last.oi)}" r="4" fill="#ff4d83"/>
+    ${grid}
+    <path d="${volumeLine}" fill="none" stroke="#4c9eff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="${oiLine}" fill="none" stroke="#ff4d83" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="${lx}" cy="${YV(last.vol)}" r="3.6" fill="#4c9eff"/>
+    <circle cx="${lx}" cy="${YO(last.oi)}" r="3.6" fill="#ff4d83"/>
     ${dates}<rect x="${pl}" y="${pt}" width="${W-pl-pr}" height="${H-pt-pb}" fill="transparent"/>`;
   const tt=$('#tt');
   svg.onmousemove=e=>{
@@ -1977,40 +2046,103 @@ function renderPointsDeadline(){
   $('#ptsDeadlineText').textContent='Ends Sep 30, 2026 · 11:59PM ET';
   $('#ptsProgress').style.setProperty('--p',(done*100).toFixed(2)+'%');
 }
+function renderDailyBrief(){
+  const root=$('#dailyBrief');if(!root||SERIES.length<3)return;
+  const earnings=dailyEarn();
+  const latest=earnings[earnings.length-1],previous=earnings[earnings.length-2];
+  const baselineRows=earnings.slice(Math.max(0,earnings.length-8),-1);
+  const baseline=baselineRows.reduce((sum,row)=>sum+row.e,0)/Math.max(1,baselineRows.length);
+  const vsPrevious=pctChange(latest.e,previous.e);
+  const vsAverage=pctChange(latest.e,baseline);
+  const cur=currentTreasuryBalance(),asOf=currentTreasuryDate();
+  const base7=cumAt(addDays(asOf,-7)),base30=cumAt(addDays(asOf,-30));
+  const earned7=Math.max(0,cur-base7),earned30=Math.max(0,cur-base30);
+  const treasuryGrowth=pctChange(cur,base30);
+  const live=MARKET_ACTIVITY.live;
+  const volume=live?.volume24h||MKT.vol.d1;
+  const oi=live?.oi||MKT.oi;
+  const volumeObservation=MARKET_ACTIVITY.volume[MARKET_ACTIVITY.volume.length-1];
+  const oiObservation=MARKET_ACTIVITY.oi[MARKET_ACTIVITY.oi.length-1];
+  const volumeDelta=live&&volumeObservation?pctChange(volume,volumeObservation.v):null;
+  const oiDelta=live&&oiObservation?pctChange(oi,oiObservation.v):null;
+  const signedPct=value=>value==null||!Number.isFinite(value)?'—':`${value>=0?'+':'-'}${Math.abs(value).toFixed(1)}%`;
+  const signedMoney=value=>`${value>=0?'+':'-'}${fmtUSD(Math.abs(value))}`;
+  const signal=(value,up,down)=>value==null?0:value>=up?1:value<=down?-1:0;
+  const score=signal(vsAverage,15,-20)*2+signal(volumeDelta,10,-10)+signal(oiDelta,5,-5);
+  const status=score>=2?'momentum':score<=-2?'watch':'steady';
+  const labels={momentum:'MOMENTUM',steady:'STEADY',watch:'WATCH'};
+  const headlines={
+    momentum:'Revenue is running above its recent baseline.',
+    steady:'Variational is holding near its recent revenue pace.',
+    watch:'Revenue and market activity need a closer look.'
+  };
+  const dateLabel=new Date(`${latest.d}T12:00:00Z`).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric',timeZone:'UTC'});
+  const liveLabel=MARKET_ACTIVITY.liveAt
+    ?MARKET_ACTIVITY.liveAt.toLocaleTimeString('en-US',{timeZone:'UTC',hour:'2-digit',minute:'2-digit',hour12:false})+' UTC'
+    :'market snapshot';
+  const setDelta=(selector,value,label)=>{
+    const el=$(selector);if(!el)return;
+    el.className='daily-brief-delta';
+    if(value!=null&&Math.abs(value)>.05)el.classList.add(value>0?'up':'down');
+    el.textContent=value==null?`Waiting for ${label}`:`${signedPct(value)} ${label}`;
+  };
+
+  root.dataset.status=status;
+  $('#dailyBriefStatus').textContent=labels[status];
+  $('#dailyBriefHeadline').textContent=headlines[status];
+  $('#dailyBriefAsOf').textContent=`ET revenue through ${dateLabel} · ${liveLabel}`;
+  $('#dailyBriefSummary').textContent=`The latest completed ET day produced ${fmtUSD(latest.e)} of treasury revenue (${signedPct(vsAverage)} versus its prior ${baselineRows.length}D average). Live open interest is ${marketBig(oi)} and rolling 24H volume is ${marketBig(volume)}; the treasury added ${fmtUSD(earned7)} over the trailing 7 days.`;
+
+  $('#dailyBriefRevenue').textContent=signedMoney(latest.e);
+  const revenueDelta=$('#dailyBriefRevenueDelta');
+  revenueDelta.className='daily-brief-delta';
+  if(vsAverage!=null&&Math.abs(vsAverage)>.05)revenueDelta.classList.add(vsAverage>0?'up':'down');
+  revenueDelta.textContent=`${signedPct(vsPrevious)} DoD · ${signedPct(vsAverage)} vs prior ${baselineRows.length}D avg`;
+  $('#dailyBriefBurn').textContent=`At least ${fmtUSD(Math.max(0,latest.e*MKT.burnShare))} buyback-burn floor`;
+  $('#dailyBriefVolume').textContent=marketBig(volume);
+  setDelta('#dailyBriefVolumeDelta',volumeDelta,volumeObservation?`vs ${mdShort(volumeObservation.d)} daily observation`:'daily comparison');
+  $('#dailyBriefOi').textContent=marketBig(oi);
+  setDelta('#dailyBriefOiDelta',oiDelta,oiObservation?`vs ${mdShort(oiObservation.d)} daily close`:'daily close');
+  $('#dailyBriefSevenDay').textContent='+'+fmtUSD(earned7);
+  $('#dailyBriefSevenDayRate').textContent=`${fmtUSD(earned7/7)}/day trailing pace`;
+  $('#dailyBriefTreasury').textContent=fmtUSD(cur);
+  const growth=$('#dailyBriefTreasuryGrowth');
+  growth.className='daily-brief-delta'+(treasuryGrowth>0?' up':treasuryGrowth<0?' down':'');
+  growth.textContent=`+${fmtUSD(earned30)} · ${signedPct(treasuryGrowth)} over 30D`;
+  $('#dailyBriefSignal').innerHTML=`<b>Signal:</b> ${signedPct(vsAverage)} revenue vs prior ${baselineRows.length}D average · ${signedPct(volumeDelta)} live volume · ${signedPct(oiDelta)} live OI versus latest daily observations.`;
+  $('#dailySourceTreasuryAsOf').textContent=`Balance live · daily revenue through ${dateLabel} ET`;
+  $('#dailySourceMarketAsOf').textContent=MARKET_ACTIVITY.liveAt?`Live API synced ${liveLabel}`:'Showing the latest saved market snapshot';
+  $('#dailySourceHistoryAsOf').textContent=`Volume through ${volumeObservation?.d||'—'} UTC · OI through ${oiObservation?.d||'—'} UTC`;
+  $('#dailySourceReportAsOf').textContent=`Latest report in dataset: ${BIWEEKLY.asOf}`;
+
+  const post=[
+    `Variational Daily VAR News — ${dateLabel} ET`,
+    '',
+    `Treasury ${signedMoney(latest.e)} (${signedPct(vsAverage)} vs 7D avg)`,
+    `24H volume ${marketBig(volume)}`,
+    `Open interest ${marketBig(oi)}`,
+    `7D treasury +${marketBig(earned7)}`,
+    `Treasury held ${marketBig(cur)}`,
+    '',
+    `Status: ${labels[status]}`
+  ].join('\n');
+  const newsUrl='https://variationalbuybackdashboard.vercel.app/#daily-news';
+  const sourceLine='Sources + live dashboard:';
+  root.dataset.tweet=post+'\n\n'+sourceLine;
+  root.dataset.url=newsUrl;
+  root.dataset.report=root.dataset.tweet+'\n'+newsUrl;
+  $('#dailyNewsPost').textContent=root.dataset.report;
+  const xCount=root.dataset.tweet.length+25;
+  const count=$('#dailyNewsCount');
+  count.textContent=`~${xCount} / 280`;
+  count.classList.toggle('over',xCount>280);
+}
 function renderChanges(){
-  const last=SERIES[SERIES.length-1].d;
-  const prev=addDays(last,-1);
-  const lastEarn=earnOn(last), prevEarn=earnOn(prev);
-  const dailyPct=pctChange(lastEarn,prevEarn);
-
-  const monthStart=last.slice(0,7)+'-01';
-  const prevMonthSame=shiftMonth(last,-1);
-  const prevMonthStart=prevMonthSame.slice(0,7)+'-01';
-  const momNow=sumEarn(monthStart,last);
-  const momBase=sumEarn(prevMonthStart,prevMonthSame);
-  const momPct=pctChange(momNow,momBase);
-
-  const yoyDate=shiftYear(last,-1);
-  const yoyEarn=earnOn(yoyDate);
-  const yoyPct=pctChange(lastEarn,yoyEarn);
-
-  const r7=dailyRate(7), r30=dailyRate(30);
-  const rollPct=pctChange(r7,r30);
+  renderDailyBrief();
   renderEfficiency();
   renderBiweekly();
   renderMath();
   renderPointsCalc();
-  const eff=computeEff();
-  const cards=[
-    {k:'Daily change',v:changeVal(dailyPct),d:`${fmtUSD(lastEarn||0)} ET day vs ${fmtUSD(prevEarn||0)} on ${prev}`,p:dailyPct},
-    {k:'MoM pace',v:changeVal(momPct),d:`${fmtUSD(momNow||0)} ET MTD vs ${fmtUSD(momBase||0)} same days last month`,p:momPct},
-    {k:'Volume → $1 fee',v:'$'+fmtK(eff.volPerFee),d:`${eff.takeBpsFee.toFixed(2)} bps spread take · $${fmtK(eff.volPerRev)} vol per $1 to treasury`,p:14,raw:true},
-    {k:'Rolling average',v:changeVal(rollPct),d:`7D ${fmtUSD(r7)}/day vs 30D ${fmtUSD(r30)}/day`,p:rollPct}
-  ];
-  $('#changes').innerHTML=cards.map(c=>`<div class="chg ${changeTone(c.p)}">
-    <div class="k">${c.k}</div><div class="v">${c.v}</div><div class="d">${c.d}</div>
-    <div class="spark"><i style="--w:${intensity(c.p).toFixed(0)}%"></i></div>
-  </div>`).join('');
 }
 
 /* ---------- rate helpers & forecast state ---------- */
@@ -2372,6 +2504,7 @@ let _liveT0=performance.now();
 let LIVE_BASE={balance:SERIES[SERIES.length-1].v,at:performance.now()};
 let LIVE_HOUR_BASE={key:resetHourKey(),balance:SERIES[SERIES.length-1].v,at:performance.now()};
 let _lastHourDom=0;
+let _lastZoneDom=0;
 function projectedBalance(){
   return LIVE_BASE.balance+ratePerSec()*((performance.now()-LIVE_BASE.at)/1000);
 }
@@ -2398,6 +2531,7 @@ function projectedDayEarn(date=resetDateKey(),balance=projectedBalance()){
 }
 function renderProjectedHourlyEarnings(balance=projectedBalance()){
   const list=$('#tlogList'); if(!list)return;
+  if(CALMODE!=='day'||(CAL.selectedDate&&CAL.selectedDate!==resetDateKey()))return;
   const {date,hour}=resetHourParts();
   const nowParts=tzParts(new Date());
   const mins=+nowParts.minute+(+nowParts.second/60);
@@ -2412,10 +2546,12 @@ function renderProjectedHourlyEarnings(balance=projectedBalance()){
   const max=Math.max(...vals.map(x=>x.earned),1);
   const rows=vals.map(x=>hourlyRow(x.h,x.earned,{current:x.h===hour,max,date,projected:true})).join('');
   list.innerHTML=rows || `<div class="tlog-row"><span class="tlog-t">—</span><span class="tlog-b">waiting for ET clock…</span><span class="tlog-d"></span></div>`;
+  if($('#tlogMode'))$('#tlogMode').textContent='TODAY · ET / SGT';
   list.scrollTop=list.scrollHeight;
 }
 function updateCurrentHourRow(balance=projectedBalance()){
   const list=$('#tlogList'); if(!list)return;
+  if(CALMODE!=='day'||(CAL.selectedDate&&CAL.selectedDate!==resetDateKey()))return;
   const {date,hour}=resetHourParts();
   const row=list.querySelector(`.tlog-row[data-hour="${hour}"]`);
   if(!row){renderProjectedHourlyEarnings(balance);return;}
@@ -2431,6 +2567,7 @@ function updateCurrentHourRow(balance=projectedBalance()){
 }
 async function renderHourlyEarnings(cur=projectedBalance()){
   const list=$('#tlogList'); if(!list)return;
+  if(CALMODE!=='day'||(CAL.selectedDate&&CAL.selectedDate!==resetDateKey()))return;
   const {date,hour}=resetHourParts();
   const dayBase=todayBaseBalance();
   try{
@@ -2449,11 +2586,35 @@ async function renderHourlyEarnings(cur=projectedBalance()){
     const max=Math.max(...vals.map(x=>x.earned),1);
     const rows=vals.map(x=>hourlyRow(x.h,x.earned,{current:x.h===hour,max,date})).join('');
     list.innerHTML=rows;
+    if($('#tlogMode'))$('#tlogMode').textContent='LIVE · ET / SGT';
     list.scrollTop=list.scrollHeight;
   }catch(_){
     LIVE_HOUR_BASE={key:resetHourKey(),balance:cur,at:performance.now()};
     renderProjectedHourlyEarnings(cur);
   }
+}
+function renderSelectedHourlyEarnings(dateStr,amount,complete){
+  const list=$('#tlogList');if(!list)return;
+  if(CALMODE!=='day'){
+    list.innerHTML='<div class="tlog-empty">Hourly detail is available in Daily view. Weekly and monthly views show final totals only.</div>';
+    if($('#tlogMode'))$('#tlogMode').textContent='FINAL TOTAL';
+    return;
+  }
+  if(dateStr===resetDateKey()){
+    renderProjectedHourlyEarnings(projectedBalance());
+    return;
+  }
+  if(!complete||!amount){
+    list.innerHTML='<div class="tlog-empty">This ET day has not closed yet. Its final total and hourly shape will appear after 00:00 ET.</div>';
+    if($('#tlogMode'))$('#tlogMode').textContent='PENDING';
+    return;
+  }
+  const weights=hourlyProfileWeights(dateStr);
+  const vals=weights.map((weight,h)=>({h,earned:amount*weight}));
+  const max=Math.max(...vals.map(x=>x.earned),1);
+  list.innerHTML=vals.map(x=>hourlyRow(x.h,x.earned,{max,date:dateStr,estimated:true})).join('');
+  if($('#tlogMode'))$('#tlogMode').textContent='ESTIMATED SHAPE · ET / SGT';
+  list.scrollTop=0;
 }
 function tickLive(){
   const bal=projectedBalance();
@@ -2470,12 +2631,23 @@ function tickLive(){
   const asiaRange=hourRangeLabel(hp.date,hp.hour,ASIA_TZ.tz,ASIA_TZ.label);
   $('#ticker').innerHTML=fmtUSD(whole)+'<span class="cents">.'+String(cents).padStart(2,'0')+'</span>';
   $('#liveExactClock').textContent=exactNow+' ET';
+  if($('#liveHourLabel'))$('#liveHourLabel').textContent=`Current ET hour · ${String(hp.hour).padStart(2,'0')}:00-${String((hp.hour+1)%24).padStart(2,'0')}:00`;
   $('#tickerSub').textContent=`${hourRange} / ${asiaRange} · earned so far`;
   $('#totalVal').textContent=fmtUSD(Math.floor(bal));
   renderImpliedSpreadTotal(bal);
+  if(CALMODE==='day'&&CAL.selectedDate===hp.date){
+    const todayEarned=Math.max(0,bal-cumAt(addDays(hp.date,-1)));
+    $('#calAmt').textContent='+'+fmtUSD(todayEarned);
+    if(CAL.sel)CAL.sel.amt='+'+fmtUSD(todayEarned);
+  }
   if(performance.now()-_lastHourDom>1000){
     updateCurrentHourRow(bal);
+    updateSelectedDayProgress();
     _lastHourDom=performance.now();
+  }
+  if(performance.now()-_lastZoneDom>30000){
+    renderInspectorZoneClocks(now);
+    _lastZoneDom=performance.now();
   }
 }
 function initRain(){
@@ -2489,6 +2661,7 @@ function animHourglass(){
 }
 function startLive(){
   renderTwaps();setInterval(tickLive,250);initRain();animHourglass();
+  renderInspectorZoneClocks();
   renderProjectedHourlyEarnings(projectedBalance());
   renderActualsFallback(LIVE_BASE.balance);
   renderActuals(LIVE_BASE.balance);
@@ -2566,6 +2739,7 @@ function calImpliedActivity(earn){
 }
 const calMiniMoney=n=>n>=1e9?'$'+(n/1e9).toFixed(1)+'B':n>=1e6?'$'+(n/1e6).toFixed(1)+'M':n>=1e3?'$'+(n/1e3).toFixed(0)+'K':fmtUSD(n);
 function pending24Meta(dateStr){
+  if(dateStr<resetDateKey())return '<div class="cal-countdown-card"><strong class="cal-awaiting">awaiting sync</strong></div>';
   const closeTs=resetMidnightTs(addDays(dateStr,1))*1000;
   return `<div class="cal-countdown-card"><strong class="countdown" data-countdown="${closeTs}">${calendarTimeLeftLabel(closeTs)}</strong></div>`;
 }
@@ -2667,44 +2841,79 @@ function paintCalendar(){
   autoSelect();
 }
 function autoSelect(){
-  let best=null,mx=-1;
-  document.querySelectorAll('#calGrid [data-d]').forEach(c=>{
-    const d=c.dataset.d,disp=calendarDisplay(d);
-    if(!disp.end)return;
-    if(disp.v>mx){mx=disp.v;best=d;}
+  const nodes=[...document.querySelectorAll('#calGrid [data-d]')];
+  const visible=new Set(nodes.map(c=>c.dataset.d));
+  const today=resetDateKey();
+  let preferred=CAL.selectedDate&&visible.has(CAL.selectedDate)?CAL.selectedDate:null;
+  if(!preferred&&CALMODE==='day'&&today.slice(0,7)===CAL.month&&visible.has(today))preferred=today;
+  if(!preferred){
+    const completed=nodes.map(c=>c.dataset.d).filter(d=>calendarDisplay(d).end);
+    preferred=completed[completed.length-1]||nodes[nodes.length-1]?.dataset.d||CAL.month+'-01';
+  }
+  selectCell(preferred);
+}
+function updateSelectedDayProgress(){
+  const bar=$('#calInspectorProgress');if(!bar||!CAL.selectedDate)return;
+  let pct=0;
+  if(CALMODE!=='day')pct=calendarDisplay(CAL.selectedDate).end?100:0;
+  else if(isClosedDailyTotal(CAL.selectedDate))pct=100;
+  else if(CAL.selectedDate===resetDateKey()){
+    const start=resetMidnightTs(CAL.selectedDate)*1000;
+    const end=resetMidnightTs(addDays(CAL.selectedDate,1))*1000;
+    pct=Math.max(0,Math.min(100,(Date.now()-start)/(end-start)*100));
+  }
+  bar.style.width=pct.toFixed(2)+'%';
+}
+function selectedDateHeading(dateStr){
+  return new Date(resetMidnightTs(dateStr)*1000).toLocaleDateString('en-US',{
+    timeZone:RESET_TZ.tz,month:'short',day:'numeric',weekday:'short',year:'numeric'
   });
-  if(best)selectCell(best);
-  else selectCell(CAL.month+'-01');
 }
 function selectCell(dateStr){
-  let amt,label,scope,complete=true;
+  let amt,label,scope,complete=true,showAmount=true,status='COMPLETE',statusClass='estimated';
   const events=macroByDate(dateStr);
+  CAL.selectedDate=dateStr;
   if(CALMODE==='day'){
     complete=isClosedDailyTotal(dateStr);
-    amt=complete?(CAL.eMap.get(dateStr)||0):0;
+    const isToday=dateStr===resetDateKey();
+    amt=complete?(CAL.eMap.get(dateStr)||0):(isToday?Math.max(0,currentTreasuryBalance()-cumAt(addDays(dateStr,-1))):0);
     const wd=resetWeekday(dateStr);
     if(complete){
       const a=calImpliedActivity(amt);
       label=`<b>${dateStr}</b> (${wd}) · completed daily total<br>
-        implied activity: <b>${calMiniMoney(a.volume)}</b> estimated volume · <b>${calMiniMoney(a.oi)}</b> OI needed at current efficiency · <b>${calMiniMoney(a.spreadFees)}</b> spread fees · <b>${calMiniMoney(a.burn)}</b> buyback-burn firepower`;
+        <b>${calMiniMoney(a.volume)}</b> estimated volume · <b>${calMiniMoney(a.oi)}</b> OI needed · <b>${calMiniMoney(a.burn)}</b> buyback-burn firepower`;
+      status='COMPLETE';statusClass='estimated';
+    }else if(isToday){
+      label=`<b>${dateStr}</b> (${wd}) · earned so far<br>Final daily total locks at <b>00:00 ET</b>.`;
+      status='LIVE DAY';statusClass='';
     }else{
       label=`<b>${dateStr}</b> (${wd}) · pending until day close`;
+      showAmount=false;status='PENDING';statusClass='pending';
     }
     scope=`on ${dateStr}`;
   }else if(CALMODE==='week'){
     const ws=weekStart(dateStr),we=addDays(ws,6); complete=we<=CAL.last;
     amt=complete?(CAL.wk.get(ws)||0):0;
     label=complete?`<b>${ws} → ${we}</b> · official weekly total`:`<b>${ws} → ${we}</b> · final posts Saturday`;
+    showAmount=complete;status=complete?'WEEK TOTAL':'PENDING';statusClass=complete?'estimated':'pending';
     scope=`the week of ${ws}`;
   }else{
     const ym=dateStr.slice(0,7),me=monthEnd(dateStr); complete=me<=CAL.last;
     amt=complete?(CAL.mo.get(ym)||0):0;
     label=complete?`<b>${monthName(ym)}</b> · official monthly total`:`<b>${monthName(ym)}</b> · final posts ${me}`;
+    showAmount=complete;status=complete?'MONTH TOTAL':'PENDING';statusClass=complete?'estimated':'pending';
     scope=`in ${monthName(ym)}`;
   }
-  CAL.sel={amt:complete?('+'+fmtUSD(amt)):'pending final close',scope};
-  $('#calAmt').textContent=complete?('+'+fmtUSD(amt)):'—';
+  CAL.sel={amt:showAmount?('+'+fmtUSD(amt)):'pending final close',scope};
+  $('#calAmt').textContent=showAmount?('+'+fmtUSD(amt)):'—';
   $('#calLab').innerHTML=label;
+  if($('#calInspectorDate'))$('#calInspectorDate').textContent=selectedDateHeading(dateStr);
+  if($('#calInspectorStatus')){
+    $('#calInspectorStatus').textContent=status;
+    $('#calInspectorStatus').className='earnings-status '+statusClass;
+  }
+  updateSelectedDayProgress();
+  renderSelectedHourlyEarnings(dateStr,amt,complete);
   renderMacroPanel(events,dateStr);
   // highlight
   document.querySelectorAll('#calGrid .cal-cell.sel,#calGrid .cal-summary-card.sel').forEach(c=>c.classList.remove('sel'));
@@ -2734,7 +2943,7 @@ function calShareText(){
 }
 $('#calSeg').addEventListener('click',e=>{
   const b=e.target.closest('button');if(!b)return;
-  CALMODE=b.dataset.c;[...$('#calSeg').children].forEach(x=>x.classList.toggle('on',x===b));
+  CALMODE=b.dataset.c;CAL.selectedDate=null;[...$('#calSeg').children].forEach(x=>x.classList.toggle('on',x===b));
   $('#calTag').textContent={day:'daily totals',week:'weekly totals',month:'monthly totals'}[CALMODE];
   buildCalendar();
 });
@@ -2744,7 +2953,7 @@ $('#calNext').addEventListener('click',()=>{
   const next=ymAdd(CAL.month,1), maxMonth=addDays(weekStart(resetDateKey()),13).slice(0,7);
   if(next<=maxMonth){CAL.month=next;buildCalendar();}
 });
-$('#calToday').addEventListener('click',()=>{CAL.month=SERIES[SERIES.length-1].d.slice(0,7);buildCalendar();});
+$('#calToday').addEventListener('click',()=>{CAL.month=resetDateKey().slice(0,7);CAL.selectedDate=null;buildCalendar();});
 $('#histMonths').addEventListener('click',e=>{const b=e.target.closest('button[data-m]');if(!b)return;CAL.month=b.dataset.m;buildCalendar();});
 $('#traders')?.addEventListener('input',renderFeePerTrader);
 $('#effWindowTabs')?.addEventListener('click',e=>{
@@ -2784,6 +2993,23 @@ $('#calCopy').addEventListener('click',async()=>{
   try{await navigator.clipboard.writeText(s.t+'\n'+s.url);btn.textContent='✓ Copied';}
   catch(_){btn.textContent='Copy failed';}
   setTimeout(()=>btn.textContent=old,1500);
+});
+$('#dailyBriefCopy')?.addEventListener('click',async e=>{
+  const root=$('#dailyBrief'),btn=e.currentTarget,text=root?.dataset.report;
+  if(!text)return;
+  const old=btn.textContent;
+  try{
+    if(navigator.clipboard?.writeText)await navigator.clipboard.writeText(text);
+    else fallbackCopy(text);
+    btn.textContent='Copied';
+  }catch(_){fallbackCopy(text);btn.textContent='Copied';}
+  setTimeout(()=>btn.textContent=old,1400);
+});
+$('#dailyNewsTweet')?.addEventListener('click',()=>{
+  const root=$('#dailyBrief'),text=root?.dataset.tweet,url=root?.dataset.url;
+  if(!text||!url)return;
+  const intent='https://twitter.com/intent/tweet?text='+encodeURIComponent(text)+'&url='+encodeURIComponent(url)+'&via=0xdefidaniel';
+  window.open(intent,'_blank','noopener,width=600,height=520');
 });
 
 /* ---------- master render ---------- */
@@ -2981,6 +3207,7 @@ async function refresh({deep=false}={}){
     $('#totalVal').textContent=fmtUSD(Math.floor(cur));
     renderImpliedSpreadTotal(cur);
     renderActualsFallback(cur);
+    const protocolGrowthPromise=refreshProtocolBalanceGrowth();
     tickLive();
     $('#stamp').textContent=`verified ${RPC_STATE.lastQuorum}/${CHAIN.rpcs.length} · ${resetTimeString()} ET`;
     $('#stamp').className='live';
@@ -3005,15 +3232,7 @@ async function refresh({deep=false}={}){
     }
     LIVE_BASE={balance:cur,at:performance.now()};
     LIVE_HOUR_BASE={key:resetHourKey(),balance:cur,at:performance.now()};
-    try{
-      const olpBal=await balAtPad(CHAIN.olpPad,'latest');
-      $('#pmOlpBalance') && ($('#pmOlpBalance').textContent=fmtUSD(olpBal));
-      $('#pmOlpFormula') && ($('#pmOlpFormula').innerHTML=`Formula: <b>USDC balanceOf(0x74bbbb...1f2cd) = ${fmtUSD(olpBal)}</b>`);
-      if(olpBal>0){OLP_TVL=olpBal;OLP_TVL_LIVE=true;renderEfficiency();}
-    }catch(_){
-      $('#pmOlpBalance') && ($('#pmOlpBalance').textContent='check Arbiscan');
-      $('#pmOlpFormula') && ($('#pmOlpFormula').innerHTML='Formula: <b>read Core OLP Vault USDC balance on Arbiscan</b>');
-    }
+    await protocolGrowthPromise;
     if(deep)await renderHourlyEarnings(cur); else renderProjectedHourlyEarnings(cur);
     render();
     renderTwaps();
@@ -3099,11 +3318,12 @@ $('#refCodeCopy')?.addEventListener('click',copyReferralCode);
 /* ---------- tabs ---------- */
 const TABS=$('#tabs');
 const TAB_ORDER_KEY='variationalTabOrder';
-const VALID_TABS=['overview','implied','historical','efficiency','biweekly','roadmap','points','comparison'];
+const VALID_TABS=['overview','daily-news','implied','historical','efficiency','biweekly','roadmap','points','comparison'];
 const normalizeTabName=name=>{
   if(name==='charts'||name==='interval')return 'historical';
   if(name==='peers')return 'comparison';
   if(name==='spreads'||name==='implied-fees')return 'implied';
+  if(name==='news'||name==='daily-var-news')return 'daily-news';
   if(name==='calendar'||name==='total-earnings'||name==='earnings')return 'overview';
   return name;
 };
@@ -3114,10 +3334,15 @@ function applySavedTabOrder(){
   try{
     const saved=[...new Set(JSON.parse(localStorage.getItem(TAB_ORDER_KEY)||'[]').map(normalizeTabName))];
     if(!Array.isArray(saved))return;
+    if(!saved.length){
+      VALID_TABS.forEach(name=>{const btn=TABS.querySelector(`[data-tab="${name}"]`);if(btn)TABS.appendChild(btn);});
+      return;
+    }
     const oldImplied=saved.indexOf('implied');
     if(oldImplied>=0)saved.splice(oldImplied,1);
     const at=Math.max(0,saved.indexOf('overview'))+1;
     saved.splice(at,0,'implied');
+    if(!saved.includes('daily-news'))saved.splice(at,0,'daily-news');
     const order=[...saved.filter(x=>VALID_TABS.includes(x)),...VALID_TABS.filter(x=>!saved.includes(x))];
     order.forEach(name=>{const btn=TABS.querySelector(`[data-tab="${name}"]`);if(btn)TABS.appendChild(btn);});
   }catch(_){}
@@ -3182,18 +3407,16 @@ TABS.addEventListener('keydown',e=>{
 
 /* ---------- init ---------- */
 $('#genstamp').textContent='Exact ET closes reconciled through 2026-07-13 · daily reset 00:00 ET · click Refresh live to sync on-chain';
-const combinedCal=document.querySelector('.card.cal[data-tg="efficiency"]');
-const feeRevenueCard=document.querySelector('.card.eff[data-tg="efficiency"]');
-if(combinedCal&&feeRevenueCard)feeRevenueCard.before(combinedCal);
+const combinedCal=document.querySelector('.earnings-workspace');
 const calCollapse=document.querySelector('#calCollapse');
 const CAL_COLLAPSE_KEY='variationalCalendarCollapsed';
 function setCalendarCollapsed(collapsed){
   if(!combinedCal||!calCollapse)return;
   combinedCal.classList.toggle('is-collapsed',collapsed);
-  calCollapse.textContent=collapsed?'⌄ Expand':'⌃ Collapse';
+  calCollapse.textContent=collapsed?'⌄':'⌃';
   calCollapse.setAttribute('aria-expanded',collapsed?'false':'true');
-  calCollapse.setAttribute('aria-label',collapsed?'Expand calendar':'Collapse calendar');
-  calCollapse.title=collapsed?'Expand calendar':'Collapse calendar';
+  calCollapse.setAttribute('aria-label',collapsed?'Expand earnings workspace':'Collapse earnings workspace');
+  calCollapse.title=collapsed?'Expand earnings workspace':'Collapse earnings workspace';
   try{localStorage.setItem(CAL_COLLAPSE_KEY,collapsed?'1':'0');}catch(_){ }
 }
 if(calCollapse){
