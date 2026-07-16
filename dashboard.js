@@ -1478,80 +1478,150 @@ async function refreshMarketLive(){
 async function refreshMarketActivity(){await Promise.allSettled([refreshMarketHistory(),refreshMarketLive()])}
 async function refreshLlamaOi(){await refreshMarketLive()}
 
-/* ---------- head-to-head: Variational vs Lighter ---------- */
+/* ---------- head-to-head: Variational vs Lighter vs Extended ---------- */
 const VSL={
-  // volume & OI: Perpetual Pulse snapshot (2026-07-08) · fees & revenue: DeFiLlama + app.lighter.xyz/stats (2026-07-08)
-  li:{ vol1d:1465961931.57, oi:810022995.62, fees30:2975571, rev30:2321912, feesAll:69683968, revAll:53652406 },
+  // Volume & OI refresh from the live peer board. Fee and revenue fallbacks are
+  // current DeFiLlama observations and are replaced on load when the API responds.
+  li:{ vol1d:1465961931.57, oi:810022995.62, fees30:2847277, rev30:2220420, feesAll:70234383, revAll:54115685 },
   hl:{ vol1d:8112902385.84, oi:10133720905.35, fees30:65130968, rev30:46828446, feesAll:1418488399, revAll:1153924947 },
   note:`Read the revenue row carefully: it measures what each protocol books, not what traders pay. Variational's latest three official reports route exactly ${(MKT.spreadShare*100).toFixed(0)}% of gross spreads to the protocol treasury. The remainder funds market-making costs, rewards, and residual OLP PnL. Lighter keeps about 78% of the fees it collects (standard accounts trade fee-free; premium and institutional accounts may pay trading, withdrawal, and transfer fees).`
 };
 /* Lighter daily protocol revenue — DeFiLlama totalDataChart snapshot (last 70 days, retrieved 2026-07-08) */
 const LREV=[{"d":"2026-04-30","v":58526},{"d":"2026-05-01","v":61102},{"d":"2026-05-02","v":30662},{"d":"2026-05-03","v":45338},{"d":"2026-05-04","v":102673},{"d":"2026-05-05","v":80540},{"d":"2026-05-06","v":92873},{"d":"2026-05-07","v":85086},{"d":"2026-05-08","v":71735},{"d":"2026-05-09","v":33817},{"d":"2026-05-10","v":51198},{"d":"2026-05-11","v":73638},{"d":"2026-05-12","v":94042},{"d":"2026-05-13","v":81824},{"d":"2026-05-14","v":68538},{"d":"2026-05-15","v":73810},{"d":"2026-05-16","v":37478},{"d":"2026-05-17","v":42600},{"d":"2026-05-18","v":70164},{"d":"2026-05-19","v":72272},{"d":"2026-05-20","v":83957},{"d":"2026-05-21","v":83480},{"d":"2026-05-22","v":73985},{"d":"2026-05-23","v":37862},{"d":"2026-05-24","v":40732},{"d":"2026-05-25","v":57998},{"d":"2026-05-26","v":78983},{"d":"2026-05-27","v":81009},{"d":"2026-05-28","v":86039},{"d":"2026-05-29","v":74981},{"d":"2026-05-30","v":40895},{"d":"2026-05-31","v":46853},{"d":"2026-06-01","v":72508},{"d":"2026-06-02","v":95970},{"d":"2026-06-03","v":115572},{"d":"2026-06-04","v":121003},{"d":"2026-06-05","v":109944},{"d":"2026-06-06","v":59967},{"d":"2026-06-07","v":58201},{"d":"2026-06-08","v":227921},{"d":"2026-06-09","v":132873},{"d":"2026-06-10","v":125872},{"d":"2026-06-11","v":110290},{"d":"2026-06-12","v":91264},{"d":"2026-06-13","v":47280},{"d":"2026-06-14","v":49093},{"d":"2026-06-15","v":78248},{"d":"2026-06-16","v":85183},{"d":"2026-06-17","v":92159},{"d":"2026-06-18","v":119439},{"d":"2026-06-19","v":85809},{"d":"2026-06-20","v":45095},{"d":"2026-06-21","v":48774},{"d":"2026-06-22","v":73362},{"d":"2026-06-23","v":80605},{"d":"2026-06-24","v":83029},{"d":"2026-06-25","v":81158},{"d":"2026-06-26","v":74519},{"d":"2026-06-27","v":40645},{"d":"2026-06-28","v":42999},{"d":"2026-06-29","v":66084},{"d":"2026-06-30","v":76169},{"d":"2026-07-01","v":85172},{"d":"2026-07-02","v":74282},{"d":"2026-07-03","v":66684},{"d":"2026-07-04","v":41835},{"d":"2026-07-05","v":41312},{"d":"2026-07-06","v":93944},{"d":"2026-07-07","v":78245},{"d":"2026-07-08","v":97075}];
 const liRevBetween=(s,e)=>LREV.reduce((sum,x)=>sum+(x.d>s&&x.d<=e?x.v:0),0);
+const COMP_FEES={
+  asOf:'2026-07-15',
+  lighter:{daily:[]},
+  extended:{fees30:1803890,feesAll:29986610,duneAll:30190000,daily:[]},
+  fallbackWeeks:[
+    {end:'2026-05-27',l:693732,e:495198},{end:'2026-06-03',l:915190,e:556604},
+    {end:'2026-06-10',l:1383280,e:685195},{end:'2026-06-17',l:699668,e:446517},
+    {end:'2026-06-24',l:696604,e:416007},{end:'2026-07-01',l:698754,e:396741},
+    {end:'2026-07-08',l:625496,e:442484},{end:'2026-07-15',l:550415,e:383817}
+  ]
+};
+let COMP_FEE_SYNCING=false;
+const normalizeFeeChart=raw=>(Array.isArray(raw?.totalDataChart)?raw.totalDataChart:[])
+  .map(([ts,v])=>({d:marketDay(ts),v:Number(v)}))
+  .filter(x=>/^\d{4}-\d{2}-\d{2}$/.test(x.d)&&Number.isFinite(x.v)&&x.v>=0)
+  .sort((a,b)=>a.d.localeCompare(b.d));
+async function refreshComparisonFees(){
+  if(COMP_FEE_SYNCING)return;COMP_FEE_SYNCING=true;
+  try{
+    const [liFees,extFees,liRevenue]=await Promise.all([
+      fetchMarketJson('https://api.llama.fi/summary/fees/lighter?dataType=dailyFees'),
+      fetchMarketJson('https://api.llama.fi/summary/fees/extended?dataType=dailyFees'),
+      fetchMarketJson('https://api.llama.fi/summary/fees/lighter?dataType=dailyRevenue')
+    ]);
+    const liDaily=normalizeFeeChart(liFees),extDaily=normalizeFeeChart(extFees);
+    if(liDaily.length<8||extDaily.length<8)throw new Error('comparison fee series incomplete');
+    COMP_FEES.lighter.daily=liDaily;
+    COMP_FEES.extended.daily=extDaily;
+    COMP_FEES.extended.fees30=Number(extFees.total30d)||COMP_FEES.extended.fees30;
+    COMP_FEES.extended.feesAll=Number(extFees.totalAllTime)||COMP_FEES.extended.feesAll;
+    VSL.li.fees30=Number(liFees.total30d)||VSL.li.fees30;
+    VSL.li.feesAll=Number(liFees.totalAllTime)||VSL.li.feesAll;
+    VSL.li.rev30=Number(liRevenue.total30d)||VSL.li.rev30;
+    VSL.li.revAll=Number(liRevenue.totalAllTime)||VSL.li.revAll;
+    COMP_FEES.asOf=[liDaily.at(-1).d,extDaily.at(-1).d].sort()[0];
+    renderVsLighter();
+  }catch(err){console.warn('Peer fee comparison sync fell back to saved exact values:',err);}
+  finally{COMP_FEE_SYNCING=false;}
+}
 function renderVsLighter(){
   if(!$('#h2hRows'))return;
-  const cB=v=>v>=1e9?'$'+(v/1e9).toFixed(2)+'B':v>=1e6?'$'+(v/1e6).toFixed(2)+'M':'$'+fmtK(v);
-  const va=PEERS.list.find(p=>p.me), li=VSL.li;
+  const cB=v=>{
+    if(v==null||v==='')return '—';
+    const n=Number(v);
+    return !Number.isFinite(n)?'—':n>=1e9?'$'+(n/1e9).toFixed(2)+'B':n>=1e6?'$'+(n/1e6).toFixed(2)+'M':'$'+fmtK(n);
+  };
+  const va=PEERS.list.find(p=>p.me), li=VSL.li, ext=PEERS.list.find(p=>p.n==='Extended');
   const last=SERIES[SERIES.length-1];
   const rev30=Math.max(0,last.v-cumAt(addDays(last.d,-30)));
   const fees30=rev30/MKT.spreadShare;
+  const extFees30=COMP_FEES.extended.fees30;
   const oiEdge=li.oi?va.oi/li.oi:0;
+  const oiExtEdge=ext?.oi?va.oi/ext.oi:0;
   const feeEdge=li.fees30?fees30/li.fees30:0;
+  const feeExtEdge=extFees30?fees30/extFees30:0;
   const revGap=rev30?li.rev30/rev30:0;
   $('#valOiEdge') && ($('#valOiEdge').textContent='Variational '+oiEdge.toFixed(1)+'×');
-  $('#valOiEdgeSub') && ($('#valOiEdgeSub').textContent='Variational holds '+oiEdge.toFixed(1)+'× more open positions than Lighter');
+  $('#valOiEdgeSub') && ($('#valOiEdgeSub').textContent=`${oiEdge.toFixed(1)}× Lighter · ${oiExtEdge.toFixed(1)}× Extended`);
   $('#valFeeEdge') && ($('#valFeeEdge').textContent='Variational '+feeEdge.toFixed(1)+'×');
-  $('#valFeeEdgeSub') && ($('#valFeeEdgeSub').textContent='traders paid Variational '+feeEdge.toFixed(1)+'× more than Lighter in 30 days');
+  $('#valFeeEdgeSub') && ($('#valFeeEdgeSub').textContent=`${feeEdge.toFixed(1)}× Lighter · ${feeExtEdge.toFixed(1)}× Extended`);
   if($('#cmpRevenueEdge'))$('#cmpRevenueEdge').textContent=revGap>=1?'Lighter '+revGap.toFixed(1)+'×':'Variational '+(1/revGap).toFixed(1)+'×';
   if($('#cmpRevenueEdgeSub'))$('#cmpRevenueEdgeSub').textContent=revGap>=1
     ?'Lighter kept '+revGap.toFixed(1)+'× more, versus Variational\'s observed '+(MKT.spreadShare*100).toFixed(0)+'% treasury capture'
     :'Variational kept '+(1/revGap).toFixed(1)+'× more booked revenue than Lighter';
-  if($('#cmpVerdict'))$('#cmpVerdict').textContent=`Variational leads Lighter on OI and fee pool. ${revGap>=1?'Lighter':'Variational'} leads on booked revenue.`;
-  if($('#cmpVerdictSub'))$('#cmpVerdictSub').textContent=`Variational has ${oiEdge.toFixed(1)}× Lighter OI and ${feeEdge.toFixed(1)}× its 30D fee pool. The latest three official reports put ${(MKT.spreadShare*100).toFixed(0)}% of gross spreads into Variational's treasury; the rest covers market-making costs, rewards, and OLP PnL.`;
+  if($('#cmpVerdict'))$('#cmpVerdict').textContent=`Variational leads both peers on OI and 30D fee pool. ${revGap>=1?'Lighter':'Variational'} leads published booked revenue.`;
+  if($('#cmpVerdictSub'))$('#cmpVerdictSub').textContent=`Variational has ${oiEdge.toFixed(1)}× Lighter OI and ${oiExtEdge.toFixed(1)}× Extended OI. Extended publishes fees, but no matched booked-revenue series, so that cell remains explicitly unavailable.`;
   $('#varThesis') && ($('#varThesis').innerHTML=`<b>${oiEdge.toFixed(1)}× Lighter OI</b> and <b>${feeEdge.toFixed(1)}× Lighter 30D fee pool</b>. The current revenue line is lower because Variational only books the treasury cut, not the OLP side.`);
   $('#lighterThesis') && ($('#lighterThesis').innerHTML=`Lighter is the clean market comp: <b>${revGap.toFixed(1)}× Variational 30D booked revenue</b>, but smaller OI and fee pool in this snapshot.`);
   const SRC={
     cg:{cls:'src-cg',label:PEERS.live?'CoinGecko live':'Pulse snapshot'},
     chain:{cls:'src-chain',label:'On-chain wallet'},
-    llama:{cls:'src-llama',label:'DeFiLlama'}
+    llama:{cls:'src-llama',label:'DeFiLlama'},
+    dune:{cls:'src-dune',label:'Dune'}
   };
-  const srcChip=s=>`<span class="src ${SRC[s].cls}" title="Data source: ${SRC[s].label}"><i></i>${SRC[s].label}</span>`;
+  const srcChip=s=>SRC[s]?`<span class="src ${SRC[s].cls}" title="Data source: ${SRC[s].label}"><i></i>${SRC[s].label}</span>`:'';
+  const srcChips=s=>(Array.isArray(s)?s:[s]).filter(Boolean).map(srcChip).join('');
   const rows=[
-    {k:'Open interest', a:va.oi, b:li.oi, an:'live venue capacity', bn:'live venue capacity', as:OI_SRC, bs:OI_SRC},
-    {k:'24H trading volume', a:va.vol, b:li.vol1d, an:'current activity', bn:'current activity', as:'cg', bs:'cg'},
-    {k:'30D fee pool', a:fees30, b:li.fees30, an:'spreads paid by traders', bn:'premium accounts and transfer fees', as:'chain', bs:'llama'},
-    {k:'30D booked revenue', a:rev30, b:li.rev30, an:`observed ${(MKT.spreadShare*100).toFixed(0)}% of gross spreads`, bn:'keeps about 78% of fees', as:'chain', bs:'llama'},
+    {k:'Open interest', a:va.oi, b:li.oi, c:ext?.oi, an:'live venue capacity', bn:'live venue capacity', cn:'live venue capacity', as:OI_SRC, bs:OI_SRC, cs:OI_SRC},
+    {k:'24H trading volume', a:va.vol, b:li.vol1d, c:ext?.vol, an:'current activity', bn:'current activity', cn:'current activity', as:'cg', bs:'cg', cs:'cg'},
+    {k:'30D fee pool', a:fees30, b:li.fees30, c:extFees30, an:'spreads paid by traders', bn:'fees collected', cn:`fees collected · Dune all-time ≈ ${cB(COMP_FEES.extended.duneAll)}`, as:'chain', bs:'llama', cs:['llama','dune']},
+    {k:'30D booked revenue', a:rev30, b:li.rev30, c:null, an:`observed ${(MKT.spreadShare*100).toFixed(0)}% of gross spreads`, bn:'DeFiLlama protocol revenue', cn:'not published on a matched basis', as:'chain', bs:'llama', cs:null},
   ];
-  $('#h2hRows').innerHTML=`<div class="h2h-src-legend"><span>Sources</span>${srcChip('cg')}${srcChip('chain')}${srcChip('llama')}<span style="text-transform:none;letter-spacing:0">same badge = same source, comparable · different badges = different measurement</span></div>
+  const cell=(cls,v,note,src,win)=>{
+    const unavailable=!Number.isFinite(Number(v));
+    return `<td class="${cls}${win&&!unavailable?' win':''}${unavailable?' is-na':''}"><b>${cB(v)}</b>${note?`<span class="sub">${note}</span>`:''}${srcChips(src)}</td>`;
+  };
+  $('#h2hRows').innerHTML=`<div class="h2h-src-legend"><span>Sources</span>${srcChip('cg')}${srcChip('chain')}${srcChip('llama')}${srcChip('dune')}<span style="text-transform:none;letter-spacing:0">same badge = same source, comparable · different badges = different measurement</span></div>
   <table class="h2h-tbl">
-    <thead><tr><th>Metric</th><th class="cva"><img class="cmp-logo" src="variational-symbol-transparent.png" alt="" width="20" height="20">Variational</th><th class="cli"><img class="cmp-logo" src="lighter-logo.png" alt="" width="20" height="20">Lighter</th><th>Lead</th></tr></thead>
+    <thead><tr><th>Metric</th><th class="cva"><img class="cmp-logo" src="variational-symbol-transparent.png" alt="" width="20" height="20">Variational</th><th class="cli"><img class="cmp-logo" src="lighter-logo.png" alt="" width="20" height="20">Lighter</th><th class="cex"><a href="https://dune.com/extended/extended" target="_blank" rel="noopener"><img class="cmp-logo" src="logo-extended.png" alt="" width="20" height="20">Extended ↗</a></th><th>Lead</th></tr></thead>
     <tbody>${rows.map(r=>{
-      const vals=[{c:'var',n:'Variational',v:r.a},{c:'ltr',n:'Lighter',v:r.b}].sort((x,y)=>y.v-x.v);
-      const lead={c:vals[0].c,t:vals[0].n+' '+(vals[1].v>0?(vals[0].v/vals[1].v).toFixed(1)+'×':'')};
-      const win=x=>vals[0].v===x?' win':'';
+      const vals=[{c:'var',n:'Variational',v:r.a},{c:'ltr',n:'Lighter',v:r.b},{c:'ext',n:'Extended',v:r.c}]
+        .filter(x=>Number.isFinite(Number(x.v))&&Number(x.v)>0)
+        .sort((x,y)=>y.v-x.v);
+      const lead=vals[0]?{c:vals[0].c,t:vals[0].n+' '+(vals[1]?.v>0?(vals[0].v/vals[1].v).toFixed(1)+'×':'sets it')}:{c:'na',t:'not comparable'};
+      const win=x=>vals[0]&&vals[0].v===x;
       return `<tr>
         <td>${r.k}</td>
-        <td class="cva${win(r.a)}"><b>${cB(r.a)}</b>${r.an?`<span class="sub">${r.an}</span>`:''}${srcChip(r.as)}</td>
-        <td class="cli${win(r.b)}"><b>${cB(r.b)}</b>${r.bn?`<span class="sub">${r.bn}</span>`:''}${srcChip(r.bs)}</td>
+        ${cell('cva',r.a,r.an,r.as,win(r.a))}
+        ${cell('cli',r.b,r.bn,r.bs,win(r.b))}
+        ${cell('cex',r.c,r.cn,r.cs,win(r.c))}
         <td><span class="lead ${lead.c}">${lead.t}</span></td>
       </tr>`;
     }).join('')}</tbody></table>`;
-  $('#h2hNote').innerHTML=`Variational fee pool = on-chain treasury revenue divided by the ${(MKT.spreadShare*100).toFixed(0)}% protocol share. OI uses ${OI_SRC==='llama'?'<a href="https://defillama.com/protocol/variational" target="_blank" rel="noopener">DeFiLlama open-interest</a> for both venues':(PEERS.live?'live CoinGecko derivatives data':'the '+PEERS.snapAsOf+' snapshot')}. Volume uses ${PEERS.live?'live CoinGecko data':'the '+PEERS.snapAsOf+' snapshot'} (DeFiLlama volume requires a paid API key). Variational revenue comes from the Arbitrum treasury wallet. Lighter revenue comes from <a href="https://defillama.com/protocol/lighter" target="_blank" rel="noopener">DeFiLlama</a>. ${VSL.note} Same-basis check: traders paid ${cB(fees30)} on Variational vs ${cB(li.fees30)} on Lighter over the last 30 days (${feeEdge.toFixed(1)}× more). If Variational booked revenue at Lighter's 78% keep-rate, its 30D revenue line would read about ${cB(fees30*0.78)}.`;
-  renderRevVs(rev30);
+  $('#h2hNote').innerHTML=`Variational fee pool = on-chain treasury revenue divided by the ${(MKT.spreadShare*100).toFixed(0)}% protocol share. OI uses ${OI_SRC==='llama'?'<a href="https://defillama.com/protocol/variational" target="_blank" rel="noopener">DeFiLlama open-interest</a> for all three venues':(PEERS.live?'live CoinGecko derivatives data':'the '+PEERS.snapAsOf+' snapshot')}. Volume uses ${PEERS.live?'live CoinGecko data':'the '+PEERS.snapAsOf+' snapshot'} for the current activity column. Lighter and Extended 30D fee pools come from <a href="https://defillama.com/protocol/lighter" target="_blank" rel="noopener">DeFiLlama Lighter</a> and <a href="https://defillama.com/protocol/extended" target="_blank" rel="noopener">DeFiLlama Extended</a>; Extended's <a href="https://dune.com/extended/extended" target="_blank" rel="noopener">Dune dashboard</a> all-time fee total is shown only as a source check. Extended does not publish a matched booked-revenue series here, so the revenue cell stays unavailable instead of being guessed. Same-basis check: traders paid ${cB(fees30)} on Variational vs ${cB(li.fees30)} on Lighter and ${cB(extFees30)} on Extended over the last 30 days.`;
+  renderFeeVs();
 }
-function renderRevVs(rev30){
+function renderFeeVs(){
   const svg=$('#revVs'); if(!svg)return;
   const W=720,H=250,pl=56,pr=14,pt=16,pb=30;
   const last=SERIES[SERIES.length-1];
-  const liLast=LREV[LREV.length-1].d;
-  const anchor=last.d<liLast?last.d:liLast; // only weeks both sides have data for
-  // trailing 8 complete 7-day windows ending at the shared anchor day
-  const weeks=[];
-  for(let k=7;k>=0;k--){
-    const end=addDays(anchor,-7*k), start=addDays(end,-7);
-    weeks.push({end, v:Math.max(0,cumAt(end)-cumAt(start)), l:liRevBetween(start,end)});
+  const feeBetween=(arr,start,end)=>arr.reduce((sum,p)=>p.d>start&&p.d<=end?sum+p.v:sum,0);
+  const liDaily=COMP_FEES.lighter.daily, extDaily=COMP_FEES.extended.daily;
+  let weeks=[];
+  if(liDaily.length>=8&&extDaily.length>=8){
+    const anchor=[last.d,liDaily.at(-1).d,extDaily.at(-1).d].sort()[0];
+    for(let k=7;k>=0;k--){
+      const end=addDays(anchor,-7*k), start=addDays(end,-7);
+      weeks.push({
+        end,
+        v:Math.max(0,cumAt(end)-cumAt(start))/MKT.spreadShare,
+        l:feeBetween(liDaily,start,end),
+        e:feeBetween(extDaily,start,end)
+      });
+    }
+  }else{
+    weeks=COMP_FEES.fallbackWeeks.map(w=>({
+      end:w.end,
+      v:Math.max(0,cumAt(w.end)-cumAt(addDays(w.end,-7)))/MKT.spreadShare,
+      l:w.l,
+      e:w.e
+    }));
   }
-  const max=Math.max(...weeks.map(w=>Math.max(w.v,w.l)))*1.15||1;
+  const max=Math.max(...weeks.map(w=>Math.max(w.v,w.l,w.e)))*1.15||1;
   const Y=v=>pt+(1-v/max)*(H-pt-pb);
   const slot=(W-pl-pr)/weeks.length, bw=Math.min(30,slot*0.32);
   let grid='';for(let g=0;g<=3;g++){const v=max*g/3,y=Y(v);
@@ -1560,32 +1630,37 @@ function renderRevVs(rev30){
   let bars='';
   weeks.forEach((w,i)=>{
     const cx=pl+slot*(i+0.5);
-    const vy=Y(w.v), ly=Y(w.l);
-    bars+=`<rect x="${(cx-bw-1.5).toFixed(1)}" y="${vy.toFixed(1)}" width="${bw.toFixed(1)}" height="${Math.max(1,H-pb-vy).toFixed(1)}" rx="3" fill="url(#rvA)"><title>wk → ${w.end}\nVariational +${fmtUSD(w.v)}\nLighter +${fmtUSD(w.l)}</title></rect>`;
-    bars+=`<rect x="${(cx+1.5).toFixed(1)}" y="${ly.toFixed(1)}" width="${bw.toFixed(1)}" height="${Math.max(1,H-pb-ly).toFixed(1)}" rx="3" fill="url(#rvB)"><title>wk → ${w.end}\nLighter +${fmtUSD(w.l)}\nVariational +${fmtUSD(w.v)}</title></rect>`;
+    const vy=Y(w.v), ly=Y(w.l), ey=Y(w.e);
+    const x1=cx-bw*1.5-3, x2=cx-bw/2, x3=cx+bw/2+3;
+    bars+=`<rect x="${x1.toFixed(1)}" y="${vy.toFixed(1)}" width="${bw.toFixed(1)}" height="${Math.max(1,H-pb-vy).toFixed(1)}" rx="3" fill="url(#rvA)"><title>wk → ${w.end}\nVariational fee pool +${fmtUSD(w.v)}\nLighter +${fmtUSD(w.l)}\nExtended +${fmtUSD(w.e)}</title></rect>`;
+    bars+=`<rect x="${x2.toFixed(1)}" y="${ly.toFixed(1)}" width="${bw.toFixed(1)}" height="${Math.max(1,H-pb-ly).toFixed(1)}" rx="3" fill="url(#rvB)"><title>wk → ${w.end}\nLighter fee pool +${fmtUSD(w.l)}\nVariational +${fmtUSD(w.v)}\nExtended +${fmtUSD(w.e)}</title></rect>`;
+    bars+=`<rect x="${x3.toFixed(1)}" y="${ey.toFixed(1)}" width="${bw.toFixed(1)}" height="${Math.max(1,H-pb-ey).toFixed(1)}" rx="3" fill="url(#rvC)"><title>wk → ${w.end}\nExtended fee pool +${fmtUSD(w.e)}\nVariational +${fmtUSD(w.v)}\nLighter +${fmtUSD(w.l)}</title></rect>`;
     bars+=`<text x="${cx.toFixed(1)}" y="${H-10}" fill="#4a5674" font-size="9" text-anchor="middle">${w.end.slice(5)}</text>`;
     if(i===weeks.length-1){
-      bars+=`<image href="variational-symbol-transparent.png" x="${(cx-bw/2-1.5-8).toFixed(1)}" y="${(vy-20).toFixed(1)}" width="16" height="16"/>`;
-      bars+=`<image href="lighter-logo.png" x="${(cx+bw/2+1.5-10).toFixed(1)}" y="${(ly-22).toFixed(1)}" width="20" height="20"/>`;
+      bars+=`<image href="variational-symbol-transparent.png" x="${(x1+bw/2-9).toFixed(1)}" y="${(vy-21).toFixed(1)}" width="18" height="18"/>`;
+      bars+=`<image href="lighter-logo.png" x="${(x2+bw/2-10).toFixed(1)}" y="${(ly-22).toFixed(1)}" width="20" height="20"/>`;
+      bars+=`<image href="logo-extended.png" x="${(x3+bw/2-10).toFixed(1)}" y="${(ey-22).toFixed(1)}" width="20" height="20"/>`;
     }
   });
   svg.innerHTML=`
     <defs>
       <linearGradient id="rvA" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#22e6a0" stop-opacity=".95"/><stop offset="1" stop-color="#38e1ff" stop-opacity=".3"/></linearGradient>
       <linearGradient id="rvB" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3f74c9" stop-opacity=".95"/><stop offset="1" stop-color="#2c4c7f" stop-opacity=".3"/></linearGradient>
+      <linearGradient id="rvC" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffb547" stop-opacity=".9"/><stop offset="1" stop-color="#7d5120" stop-opacity=".24"/></linearGradient>
     </defs>
     ${grid}${bars}
     <line x1="${pl}" y1="${Y(0)}" x2="${W-pr}" y2="${Y(0)}" stroke="#22304a" stroke-width="1"/>`;
   const liKept=VSL.li.rev30/VSL.li.fees30*100;
+  const rev30=Math.max(0,last.v-cumAt(addDays(last.d,-30)));
   const revenueLead=rev30>0?VSL.li.rev30/rev30:0;
   $('#revCallout').innerHTML=`
     <div class="rev-explain">
-      <strong>Why the fee-pool lead does not equal a revenue lead</strong>
-      <p>This is a payout-policy gap, not an earnings gap. Variational's latest reports book ${(MKT.spreadShare*100).toFixed(0)}% of gross spreads to treasury; the remainder covers costs, rewards, and residual OLP PnL. Lighter retains most of what it collects.</p>
+      <strong>Why fee pool does not equal booked revenue</strong>
+      <p>The bars compare what traders paid into each venue's fee pool. Booked protocol revenue is a policy/accounting line: Variational currently books ${(MKT.spreadShare*100).toFixed(0)}% of gross spreads to treasury, Lighter books most collected fees, and Extended does not publish a same-basis revenue series here.</p>
       <div class="rev-explain-grid">
         <span>Variational capture<b>${(MKT.spreadShare*100).toFixed(0)}% of spreads</b></span>
         <span>Lighter capture<b>about ${liKept.toFixed(0)}% of fees</b></span>
-        <span>30D revenue leader<b>${revenueLead>=1?'Lighter '+revenueLead.toFixed(1)+'×':'Variational '+(1/revenueLead).toFixed(1)+'×'}</b></span>
+        <span>Extended revenue<b>not published</b></span>
       </div>
     </div>`;
 }
@@ -3407,24 +3482,6 @@ TABS.addEventListener('keydown',e=>{
 
 /* ---------- init ---------- */
 $('#genstamp').textContent='Exact ET closes reconciled through 2026-07-13 · daily reset 00:00 ET · click Refresh live to sync on-chain';
-const combinedCal=document.querySelector('.earnings-workspace');
-const calCollapse=document.querySelector('#calCollapse');
-const CAL_COLLAPSE_KEY='variationalCalendarCollapsed';
-function setCalendarCollapsed(collapsed){
-  if(!combinedCal||!calCollapse)return;
-  combinedCal.classList.toggle('is-collapsed',collapsed);
-  calCollapse.textContent=collapsed?'⌄':'⌃';
-  calCollapse.setAttribute('aria-expanded',collapsed?'false':'true');
-  calCollapse.setAttribute('aria-label',collapsed?'Expand earnings workspace':'Collapse earnings workspace');
-  calCollapse.title=collapsed?'Expand earnings workspace':'Collapse earnings workspace';
-  try{localStorage.setItem(CAL_COLLAPSE_KEY,collapsed?'1':'0');}catch(_){ }
-}
-if(calCollapse){
-  let collapsed=false;
-  try{collapsed=localStorage.getItem(CAL_COLLAPSE_KEY)==='1';}catch(_){ }
-  setCalendarCollapsed(collapsed);
-  calCollapse.addEventListener('click',()=>setCalendarCollapsed(!combinedCal.classList.contains('is-collapsed')));
-}
 initDraggableTabs();
 showTab(location.hash.replace('#','')||'overview',{push:false,scroll:false});
 try{
@@ -3450,9 +3507,11 @@ refresh({deep:false});
 setInterval(quickSyncLive,30000);
 // live perp-DEX board (CoinGecko) — refresh on load, then every 3 min
 refreshPerpBoard();
+refreshComparisonFees();
 refreshValuationMcaps();
 refreshMarketActivity();
 setInterval(refreshPerpBoard,180000);
+setInterval(refreshComparisonFees,900000);
 setInterval(refreshValuationMcaps,180000);
 setInterval(refreshMarketLive,60000);
 setInterval(refreshMarketHistory,900000);
