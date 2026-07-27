@@ -18,6 +18,13 @@ const CHAIN = {
   olpPad:"00000000000000000000000074bbbb0e7f0bad6938509dd4b556a39a4db1f2cd",
   b0:424000000, t0:1769076491, bps:3.9958149219963364
 };
+const ADDR={
+  treasury:'0x5e91b40467fb8902c46a7b6cb90482363188d645',
+  olp:'0x74bbbb0e7f0bad6938509dd4b556a39a4db1f2cd',
+  usdc:'0xaf88d065e77c8cC2239327C5EDb3A432268e5831'
+};
+const arbiscanAddr=addr=>'https://arbiscan.io/address/'+addr;
+const walletLink=(addr,label)=>`<a class="wallet-link" href="${arbiscanAddr(addr)}" target="_blank" rel="noopener">${label} ↗</a>`;
 
 /* ---------- Variational market data ----------
    These values are offline fallbacks only. Public DeFiLlama v2 daily chart endpoints
@@ -521,6 +528,35 @@ const BIWEEKLY_HISTORY=[
   olpPnl2w:654752,           // 2w OLP PnL
   olpPnlLife:15619555,       // lifetime OLP PnL
   treasuryHoldings:4662552   // current protocol treasury holdings (USDC)
+},
+{
+  asOf:'2026-07-25', src:'https://x.com/search?q=from%3Avariational_io%20biweekly%20update!&src=typed_query',
+  totalVolume:278.10e9,      // Total Volume Traded
+  oi:1.32e9,                 // Current Dual-Sided OI
+  tvl:158.17e6,              // TVL (excludes OLP hedging accounts)
+  markets:517,               // Total markets currently listed
+  rewardsClaimed:7600341,    // Total rewards claimed (lifetime)
+  lossesRefunded:4559196,    // Total losses refunded (Sunset)
+  referralClaimed:3041145,   // Total referral rewards claimed (lifetime)
+  dau:9798,                  // Daily active users, avg over past week
+  wau:16932,                 // Weekly active users
+  spreads2w:2380440,         // 2w spreads paid (gross revenue)
+  mmCosts2w:1365199,         // 2w market making costs (cost of revenue)
+  netRevenue2w:1015241,      // 2w net revenue
+  rewards2w:115932,          // 2w rewards (all referral rewards in this report)
+  referralRewards2w:115932,  // 2w referral rewards
+  netProfit2w:899309,        // 2w net profit
+  treasury2w:476088,         // 2w protocol treasury inflow
+  olpPnl2w:423221,           // 2w OLP PnL
+  olpPnlLife:16042776,       // lifetime OLP PnL
+  treasuryHoldings:5144043,  // current protocol treasury holdings (USDC)
+  release:'v0.22.0',         // most recent mainnet release named in the post
+  product:[
+    'Added buy/sell icons to charts.',
+    'Mobile portfolio balance display.',
+    'Improvements to PnL card shareouts.',
+    'Improved chart setting persistence.'
+  ]
 }
 ];
 const BIWEEKLY=BIWEEKLY_HISTORY[BIWEEKLY_HISTORY.length-1];
@@ -721,7 +757,7 @@ function renderImpliedSpreadTotal(treasuryTotal){
   $('#pmDailyRevenue') && ($('#pmDailyRevenue').textContent=fmtUSD(dailyRate(30))+'/day');
   $('#pmFeesTotal') && ($('#pmFeesTotal').textContent=compact(totalFees));
   $('#pmSpreadTotal') && ($('#pmSpreadTotal').textContent=compact(totalFees));
-  $('#pmTreasuryFormula') && ($('#pmTreasuryFormula').innerHTML=`Formula: <b>USDC balanceOf(0x5e91...d645) = ${fmtUSD(treasuryTotal)}</b>`);
+  $('#pmTreasuryFormula') && ($('#pmTreasuryFormula').innerHTML=`Formula: <b>USDC balanceOf(${walletLink(ADDR.treasury,'0x5e91...d645')}) = ${fmtUSD(treasuryTotal)}</b>`);
   $('#pmDailyFormula') && ($('#pmDailyFormula').innerHTML=days?`Formula: <b>(${fmtUSD(treasuryTotal)} - ${fmtUSD(start30)}) / ${days}D = ${fmtUSD(avg30)}/day</b>`:'Formula: <b>waiting for historical treasury series</b>');
   $('#pmFeesFormula') && ($('#pmFeesFormula').innerHTML=`Formula: <b>${fmtUSD(treasuryTotal)} / ${(MKT.spreadShare*100).toFixed(0)}% = ${compact(totalFees)}</b>`);
   renderCompletedTreasuryGrowth();
@@ -748,11 +784,11 @@ async function refreshProtocolBalanceGrowth(){
   renderPmGrowthGroup('pmOlp',olpCurrent,olpBases);
   if(Number.isFinite(olpCurrent)){
     $('#pmOlpBalance') && ($('#pmOlpBalance').textContent=fmtUSD(olpCurrent));
-    $('#pmOlpFormula') && ($('#pmOlpFormula').innerHTML=`Formula: <b>USDC balanceOf(0x74bbbb...1f2cd) = ${fmtUSD(olpCurrent)}</b>`);
+    $('#pmOlpFormula') && ($('#pmOlpFormula').innerHTML=`Formula: <b>USDC balanceOf(${walletLink(ADDR.olp,'0x74bbbb...1f2cd')}) = ${fmtUSD(olpCurrent)}</b>`);
     if(olpCurrent>0){OLP_TVL=olpCurrent;OLP_TVL_LIVE=true;renderEfficiency();}
   }else{
     $('#pmOlpBalance') && ($('#pmOlpBalance').textContent='check Arbiscan');
-    $('#pmOlpFormula') && ($('#pmOlpFormula').innerHTML='Formula: <b>read Core OLP Vault USDC balance on Arbiscan</b>');
+    $('#pmOlpFormula') && ($('#pmOlpFormula').innerHTML=`Formula: <b>read Core OLP Vault ${walletLink(ADDR.olp,'USDC balance')} on Arbiscan</b>`);
   }
 }
 function renderPmDailyMonitor(){
@@ -1713,6 +1749,43 @@ const BW_METRIC_DEFS=[
   {g:'Special notes',k:'referralBackfillExcluded',l:'Older referral payment not counted (about)',t:'usd'}
 ];
 const BW_CORE_KEYS=['totalVolume','oi','tvl','dau','wau','netProfit2w','olpPnlLife','treasuryHoldings'];
+/* Product / release notes from the same official post.
+   Injected from JS so the deployed app shell needs no markup change. */
+function renderBiweeklyProduct(B){
+  const host=$('#bwBlock'); if(!host)return;
+  const items=Array.isArray(B.product)?B.product:[];
+  if(!items.length&&!B.release){$('#bwProduct')?.remove();return;}
+  if(!$('#bwProductCss')){
+    const st=document.createElement('style');
+    st.id='bwProductCss';
+    st.textContent=`
+      .bw-product{border-block:1px solid var(--line);margin:0 0 22px;padding:16px 0}
+      .bw-product-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap}
+      .bw-product-head b{font:900 14px var(--display);letter-spacing:1.2px;text-transform:uppercase;color:var(--ink)}
+      .bw-product-head span{font:13px/1.45 var(--sans);color:var(--sub)}
+      .bw-release{display:inline-flex;align-items:center;gap:7px;padding:4px 9px;border:1px solid rgba(199,242,132,.4);
+        border-radius:4px;background:rgba(199,242,132,.06);font:900 12px var(--mono);color:var(--grn)}
+      .bw-product-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0;margin-top:14px}
+      .bw-product-list div{padding:11px 16px 11px 0;font:13.5px/1.5 var(--sans);color:var(--sub);
+        border-top:1px solid rgba(255,255,255,.06);display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:baseline}
+      .bw-product-list div:nth-child(2n){border-left:1px solid var(--line);padding-left:16px}
+      .bw-product-list i{font-style:normal;font-weight:900;color:var(--grn);font-family:var(--mono);font-size:11px}
+      @media(max-width:760px){.bw-product-list{grid-template-columns:1fr}.bw-product-list div:nth-child(2n){border-left:0;padding-left:0}}`;
+    document.head.appendChild(st);
+  }
+  let box=$('#bwProduct');
+  if(!box){
+    box=document.createElement('div');
+    box.id='bwProduct';
+    box.className='bw-product';
+    const anchor=$('#bwVerdict')||host.firstElementChild;
+    host.insertBefore(box,anchor);
+  }
+  box.innerHTML=`<div class="bw-product-head"><b>What Shipped This Cycle</b>`+
+    (B.release?`<span class="bw-release">Mainnet ${B.release}</span>`:'')+
+    `<span>Product notes from the ${B.asOf} official post</span></div>`+
+    (items.length?`<div class="bw-product-list">${items.map((t,i)=>`<div><i>0${i+1}</i><span>${t}</span></div>`).join('')}</div>`:'');
+}
 function renderBiweekly(){
   if(!$('#bwBlock'))return;
   const B=BIWEEKLY, M=v=>Number.isFinite(v)?'$'+(v>=1e9?(v/1e9).toFixed(2)+'B':v>=1e6?(v/1e6).toFixed(2)+'M':fmtK(v)):'—';
@@ -1738,6 +1811,7 @@ function renderBiweekly(){
     return `<div class="bw-metric-trend"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${d.l} by official report date"><path d="${path}" fill="none" stroke="var(--cyan)" stroke-width="2.5" vector-effect="non-scaling-stroke"/>${dots}${labels}</svg><div class="bw-metric-dates"><span>${pts[0].r.asOf}</span><span>${mid.r.asOf}</span><span>${pts[pts.length-1].r.asOf}</span></div></div>`;
   };
   $('#bwAsOf').textContent='2-week window · posted '+B.asOf;
+  renderBiweeklyProduct(B);
   const margin=B.netProfit2w/B.spreads2w*100;
   const M0=v=>'$'+(v>=1e6?(v/1e6).toFixed(2)+'M':fmtK(v));
   $('#bwTeaser') && ($('#bwTeaser').textContent=M0(B.netProfit2w)+' / 2w');
