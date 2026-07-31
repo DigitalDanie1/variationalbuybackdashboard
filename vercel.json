@@ -1,8 +1,30 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "rewrites": [
+    {
+      "source": "/",
+      "has": [
+        {
+          "type": "header",
+          "key": "user-agent",
+          "value": ".*Twitterbot.*"
+        }
+      ],
+      "destination": "/x-root-card-20260731d.html"
+    }
+  ],
   "headers": [
     {
       "source": "/",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-store, no-cache, max-age=0, s-maxage=0, must-revalidate"
+        }
+      ]
+    },
+    {
+      "source": "/x-root-card-20260731d.html",
       "headers": [
         {
           "key": "Cache-Control",
