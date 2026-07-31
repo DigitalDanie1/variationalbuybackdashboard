@@ -25,6 +25,26 @@ const ADDR={
 };
 const arbiscanAddr=addr=>'https://arbiscan.io/address/'+addr;
 const walletLink=(addr,label)=>`<a class="wallet-link" href="${arbiscanAddr(addr)}" target="_blank" rel="noopener">${label} ↗</a>`;
+const THEME_KEY='variationalRadarTheme';
+function setRadarTheme(mode){
+  const light=mode==='light';
+  document.body.classList.toggle('theme-light',light);
+  const btn=document.getElementById('themeToggle');
+  if(btn){
+    btn.setAttribute('aria-pressed',light?'true':'false');
+    btn.setAttribute('aria-label',light?'Switch to dark mode':'Switch to light mode');
+  }
+  try{localStorage.setItem(THEME_KEY,light?'light':'dark');}catch(_){}
+  if(typeof renderMemeLab==='function')renderMemeLab();
+}
+function initRadarTheme(){
+  let saved='dark';
+  try{saved=localStorage.getItem(THEME_KEY)||'dark';}catch(_){}
+  setRadarTheme(saved==='light'?'light':'dark');
+  document.getElementById('themeToggle')?.addEventListener('click',()=>{
+    setRadarTheme(document.body.classList.contains('theme-light')?'dark':'light');
+  });
+}
 
 /* ---------- Variational market data ----------
    These values are offline fallbacks only. Public DeFiLlama v2 daily chart endpoints
@@ -528,35 +548,6 @@ const BIWEEKLY_HISTORY=[
   olpPnl2w:654752,           // 2w OLP PnL
   olpPnlLife:15619555,       // lifetime OLP PnL
   treasuryHoldings:4662552   // current protocol treasury holdings (USDC)
-},
-{
-  asOf:'2026-07-25', src:'https://x.com/search?q=from%3Avariational_io%20biweekly%20update!&src=typed_query',
-  totalVolume:278.10e9,      // Total Volume Traded
-  oi:1.32e9,                 // Current Dual-Sided OI
-  tvl:158.17e6,              // TVL (excludes OLP hedging accounts)
-  markets:517,               // Total markets currently listed
-  rewardsClaimed:7600341,    // Total rewards claimed (lifetime)
-  lossesRefunded:4559196,    // Total losses refunded (Sunset)
-  referralClaimed:3041145,   // Total referral rewards claimed (lifetime)
-  dau:9798,                  // Daily active users, avg over past week
-  wau:16932,                 // Weekly active users
-  spreads2w:2380440,         // 2w spreads paid (gross revenue)
-  mmCosts2w:1365199,         // 2w market making costs (cost of revenue)
-  netRevenue2w:1015241,      // 2w net revenue
-  rewards2w:115932,          // 2w rewards (all referral rewards in this report)
-  referralRewards2w:115932,  // 2w referral rewards
-  netProfit2w:899309,        // 2w net profit
-  treasury2w:476088,         // 2w protocol treasury inflow
-  olpPnl2w:423221,           // 2w OLP PnL
-  olpPnlLife:16042776,       // lifetime OLP PnL
-  treasuryHoldings:5144043,  // current protocol treasury holdings (USDC)
-  release:'v0.22.0',         // most recent mainnet release named in the post
-  product:[
-    'Added buy/sell icons to charts.',
-    'Mobile portfolio balance display.',
-    'Improvements to PnL card shareouts.',
-    'Improved chart setting persistence.'
-  ]
 }
 ];
 const BIWEEKLY=BIWEEKLY_HISTORY[BIWEEKLY_HISTORY.length-1];
@@ -1104,7 +1095,7 @@ function shiftYear(dstr,delta){
   dt.setUTCFullYear(dt.getUTCFullYear()+delta);
   return dt.toISOString().slice(0,10);
 }
-const PLOGO={'Hyperliquid':'logo-hyperliquid.png','Aster':'logo-aster.png','Variational':'variational-symbol-transparent.png','Lighter':'lighter-logo.png','GRVT':'logo-grvt.png','edgeX':'logo-edgex.png','Jupiter':'logo-jupiter.png','Extended':'logo-extended.png','Ostium':'logo-ostium.png','Drift':'logo-drift.png','ApeX Protocol':'logo-apex-protocol.png','Pacifica':'logo-pacifica.png','Backpack':'logo-backpack.png','Vest Exchange':'logo-vest-exchange.png','GMX':'logo-gmx.png'};
+const PLOGO={'Hyperliquid':'logo-hyperliquid.png','Aster':'logo-aster.png','Variational':'variational-symbol-transparent.png','Lighter':'lighter-logo.png','GRVT':'logo-grvt.png','edgeX':'logo-edgex.png','Jupiter':'logo-jupiter.png','Extended':'logo-extended.png','Ostium':'logo-ostium.png','Drift':'logo-drift.png','ApeX Protocol':'logo-apex-protocol.png','Pacifica':'logo-pacifica.png','Backpack':'logo-backpack.png','Vest Exchange':'logo-vest-exchange.png','GMX':'logo-gmx.png','dYdX':'logo-dydx.png','Avantis':'logo-avantis.png','Orderly':'logo-orderly.png','Gains Network':'logo-gains-network.png'};
 function renderPeers(){
   const fmtB=v=>v>=1e9?'$'+(v/1e9).toFixed(2)+'B':'$'+fmtK(v);
   const rankList=$('#rankList'), max=PEERS.list[0]?.oi||1;
@@ -1207,7 +1198,10 @@ function renderValuation(){
   $('#valFdv')&&($('#valFdv').textContent=fmtBig(fdv));
   $('#valFloat')&&($('#valFloat').textContent=Math.round(VAL_FLOAT*100)+'%');
   $('#valFdvRange')&&($('#valFdvRange').textContent=fmtBig(mcap/0.33)+' - '+fmtBig(mcap/0.20));
-  const W=760,H=430,pl=58,pr=18,pt=22,pb=44;
+  // The plot shows relationships; the exact values live in the table below.
+  // Keeping numbers out of the plot prevents clustered protocols from covering
+  // one another while preserving the actual-to-model distance visually.
+  const W=960,H=630,pl=58,pr=24,pt=22,pb=44,plotRight=W-pr;
   const lx0=Math.log10(2e6),lx1=Math.log10(2.2e10),ly0=Math.log10(4e6),ly1=Math.log10(2.2e10);
   const X=v=>pl+(Math.log10(v)-lx0)/(lx1-lx0)*(W-pl-pr);
   const Y=v=>pt+(1-(Math.log10(v)-ly0)/(ly1-ly0))*(H-pt-pb);
@@ -1218,7 +1212,7 @@ function renderValuation(){
     grid+=`<line x1="${x.toFixed(1)}" y1="${pt}" x2="${x.toFixed(1)}" y2="${H-pb}" stroke="rgba(85,184,255,.08)"/>`+
       `<text x="${x.toFixed(1)}" y="${H-pb+16}" fill="#4a5674" font-size="10" text-anchor="middle">${lbl(t)}</text>`;});
   ticks.forEach(t=>{const y=Y(t);
-    grid+=`<line x1="${pl}" y1="${y.toFixed(1)}" x2="${W-pr}" y2="${y.toFixed(1)}" stroke="rgba(85,184,255,.08)"/>`+
+    grid+=`<line x1="${pl}" y1="${y.toFixed(1)}" x2="${plotRight}" y2="${y.toFixed(1)}" stroke="rgba(85,184,255,.08)"/>`+
       `<text x="${pl-8}" y="${(y+3).toFixed(1)}" fill="#4a5674" font-size="10" text-anchor="end">${lbl(t)}</text>`;});
   grid+=`<text x="${((pl+(W-pr))/2).toFixed(0)}" y="${H-4}" fill="#6b83a8" font-size="10" text-anchor="middle" letter-spacing="1.5">OPEN INTEREST →</text>`;
   const midY=((pt+(H-pb))/2).toFixed(1);
@@ -1229,49 +1223,69 @@ function renderValuation(){
   const premCol=p=>p>=1.08?'#c7f284':p<=0.92?'#f08aa0':'#72cdf7';
   // Clear legend: the line is the model's fair-value estimate.
   let legend=`<g transform="translate(${pl+8},${pt+10})" font-family="var(--mono)">`+
-    `<circle cx="4" cy="0" r="3.8" fill="#c7f284"/><text x="13" y="3.8" fill="#b7c9df" font-size="10" font-weight="800">PREMIUM: market cap above model</text>`+
-    `<circle cx="4" cy="17" r="3.8" fill="#e0728a"/><text x="13" y="20.8" fill="#b7c9df" font-size="10" font-weight="800">DISCOUNT: market cap below model</text></g>`;
+    `<circle cx="4" cy="0" r="3.8" fill="#c7f284"/><text x="13" y="3.8" fill="#b7c9df" font-size="10" font-weight="800">PREMIUM: actual above model</text>`+
+    `<circle cx="4" cy="17" r="3.8" fill="#e0728a"/><text x="13" y="20.8" fill="#b7c9df" font-size="10" font-weight="800">DISCOUNT: actual below model</text>`+
+    `<circle cx="4" cy="34" r="3.3" fill="#07111d" stroke="#72cdf7" stroke-width="1.3"/><text x="13" y="37.8" fill="#6f83a1" font-size="9">HOLLOW DOT: model value on trend line</text></g>`;
+  const labelText=n=>({
+    'ApeX Protocol':'ApeX',
+    'Gains Network':'Gains',
+    'Variational':'Variational'
+  }[n]||n);
+  const labelOffset={
+    Hyperliquid:{dx:-12,dy:-24,anchor:'end'},
+    Aster:{dx:15,dy:-18,anchor:'start'},
+    Lighter:{dx:15,dy:-18,anchor:'start'},
+    Jupiter:{dx:16,dy:-26,anchor:'start'},
+    edgeX:{dx:15,dy:24,anchor:'start'},
+    dYdX:{dx:-14,dy:-20,anchor:'end'},
+    GMX:{dx:16,dy:24,anchor:'start'},
+    'ApeX Protocol':{dx:16,dy:24,anchor:'start'},
+    Avantis:{dx:-14,dy:-20,anchor:'end'},
+    Orderly:{dx:-14,dy:-20,anchor:'end'},
+    'Gains Network':{dx:16,dy:-20,anchor:'start'},
+    Drift:{dx:16,dy:24,anchor:'start'}
+  };
+  const drawLabel=(name,x,y,col,cls='val-peer-label')=>{
+    const o=labelOffset[name]||{dx:14,dy:-16,anchor:'start'};
+    const tx=Math.max(pl+8,Math.min(plotRight-8,x+o.dx));
+    const ty=Math.max(pt+14,Math.min(H-pb-8,y+o.dy));
+    return `<text class="${cls}" x="${tx.toFixed(1)}" y="${ty.toFixed(1)}" text-anchor="${o.anchor||'start'}">${escapeHTML(labelText(name))}</text>`+
+      `<text class="val-peer-sub" x="${tx.toFixed(1)}" y="${(ty+12).toFixed(1)}" text-anchor="${o.anchor||'start'}" fill="${col}">${escapeHTML(name==='Variational'?'MODEL':'')}</text>`;
+  };
   let dots='';
   VAL_COMPS.forEach(c=>{if(c.oi<=0||c.mc<=0)return;
     const imp=valPred(c.oi), prem=c.mc/imp, col=premCol(prem);
-    const x=X(c.oi), ya=Y(c.mc), yi=Y(imp), logo=PLOGO[c.n], s=20;
-    dots+=`<line x1="${x.toFixed(1)}" y1="${yi.toFixed(1)}" x2="${x.toFixed(1)}" y2="${ya.toFixed(1)}" stroke="${col}" stroke-width="1.3" stroke-dasharray="2 2" opacity=".5"/>`;
+    const x=X(c.oi), ya=Y(c.mc), yi=Y(imp), logo=PLOGO[c.n], s=c.big?38:34;
+    const pct=(prem-1)*100,gap=`${pct>=0?'+':''}${pct.toFixed(0)}%`;
+    dots+=`<g><title>${escapeHTML(c.n)} · Actual ${fmtBig(c.mc)} · Model ${fmtBig(imp)} · ${gap}</title>`+
+      `<line x1="${x.toFixed(1)}" y1="${yi.toFixed(1)}" x2="${x.toFixed(1)}" y2="${ya.toFixed(1)}" stroke="${col}" stroke-width="1.5" stroke-dasharray="3 3" opacity=".72"/>`+
+      `<circle cx="${x.toFixed(1)}" cy="${yi.toFixed(1)}" r="3.2" fill="#07111d" stroke="${col}" stroke-width="1.5"/>`;
     if(logo){
-      dots+=`<rect x="${(x-s/2).toFixed(1)}" y="${(ya-s/2).toFixed(1)}" width="${s}" height="${s}" rx="6" fill="#0a1220" stroke="${col}" stroke-width="1.5"/>`+
-        `<image href="${logo}" x="${(x-s/2+3).toFixed(1)}" y="${(ya-s/2+3).toFixed(1)}" width="${(s-6)}" height="${(s-6)}" preserveAspectRatio="xMidYMid meet"/>`;
+      dots+=`<rect x="${(x-s/2).toFixed(1)}" y="${(ya-s/2).toFixed(1)}" width="${s}" height="${s}" rx="9" fill="var(--panel)" stroke="${col}" stroke-width="2"/>`+
+        `<image href="${logo}" x="${(x-s/2+5).toFixed(1)}" y="${(ya-s/2+5).toFixed(1)}" width="${(s-10)}" height="${(s-10)}" preserveAspectRatio="xMidYMid meet"/>`;
     }else{
-      dots+=`<circle cx="${x.toFixed(1)}" cy="${ya.toFixed(1)}" r="5" fill="${col}" stroke="#0a1220" stroke-width="1"/>`+
-        `<text x="${x.toFixed(1)}" y="${(ya-9).toFixed(1)}" fill="#9db6da" font-size="8.5" text-anchor="middle">${c.n}</text>`;
+      dots+=`<circle cx="${x.toFixed(1)}" cy="${ya.toFixed(1)}" r="8" fill="${col}" stroke="var(--panel)" stroke-width="2"/>`;
     }
-    if(c.n==='Hyperliquid'){
-      const callX=Math.max(pl+180,x-142),callY=Math.min(H-pb-38,ya+18);
-      const word=prem>=1?'PREMIUM':'DISCOUNT';
-      dots+=`<line x1="${(x-3).toFixed(1)}" y1="${(ya+8).toFixed(1)}" x2="${(callX+126).toFixed(1)}" y2="${(callY+4).toFixed(1)}" stroke="${col}" stroke-width="1" opacity=".75"/>`+
-        `<g transform="translate(${callX.toFixed(1)},${callY.toFixed(1)})"><rect x="0" y="0" width="130" height="34" rx="7" fill="#07111d" stroke="${col}" stroke-width="1.2"/>`+
-        `<text x="8" y="13" fill="${col}" font-size="9.5" font-weight="900">HL ${word} ${prem>=1?'+':''}${((prem-1)*100).toFixed(0)}%</text>`+
-        `<text x="8" y="26" fill="#b7c9df" font-size="9">${prem.toFixed(2)}x model value</text></g>`;
-    }});
-  const vx=X(oi),vy=Y(mcap),vs=20;
-  const cxL=Math.min(vx+20,W-pr-108).toFixed(1), cyL=Math.max(vy-50,pt+14).toFixed(1);
+    dots+=drawLabel(c.n,x,ya,col)+`</g>`;
+  });
+  const vx=X(oi),vy=Y(mcap),vs=48;
   const vlogo=PLOGO['Variational'];
-  const hero=`<circle cx="${vx.toFixed(1)}" cy="${vy.toFixed(1)}" r="14" fill="rgba(199,242,132,.13)"/>`+
-    `<rect x="${(vx-vs/2).toFixed(1)}" y="${(vy-vs/2).toFixed(1)}" width="${vs}" height="${vs}" rx="7" fill="#111413" stroke="#c7f284" stroke-width="2.2"/>`+
-    `<image href="${vlogo}" x="${(vx-vs/2+5).toFixed(1)}" y="${(vy-vs/2+5).toFixed(1)}" width="${vs-10}" height="${vs-10}" preserveAspectRatio="xMidYMid meet"/>`+
-    `<line x1="${vx.toFixed(1)}" y1="${(vy-vs/2).toFixed(1)}" x2="${cxL}" y2="${(+cyL+14).toFixed(1)}" stroke="rgba(199,242,132,.55)" stroke-width="1"/>`+
-    `<g transform="translate(${cxL},${cyL})"><text x="0" y="0" fill="#c7f284" font-size="10.5" font-weight="900" letter-spacing=".5">Variational implied</text>`+
-    `<text x="0" y="16" fill="#eafff6" font-size="15" font-weight="900">${fmtBig(mcap)}</text></g>`;
+  const hero=`<circle cx="${vx.toFixed(1)}" cy="${vy.toFixed(1)}" r="28" fill="rgba(199,242,132,.13)"/>`+
+    `<rect x="${(vx-vs/2).toFixed(1)}" y="${(vy-vs/2).toFixed(1)}" width="${vs}" height="${vs}" rx="13" fill="var(--panel)" stroke="#c7f284" stroke-width="3"/>`+
+    `<image href="${vlogo}" x="${(vx-vs/2+7).toFixed(1)}" y="${(vy-vs/2+7).toFixed(1)}" width="${vs-14}" height="${vs-14}" preserveAspectRatio="xMidYMid meet"/>`+
+    `<text class="val-var-label" x="${Math.min(plotRight-12,vx+34).toFixed(1)}" y="${(vy-9).toFixed(1)}" text-anchor="start">Variational</text>`+
+    `<text class="val-peer-sub" x="${Math.min(plotRight-12,vx+34).toFixed(1)}" y="${(vy+6).toFixed(1)}" text-anchor="start">implied ${fmtBig(mcap)}</text>`;
   svg.innerHTML=`<defs>`+
     `<linearGradient id="valTrend" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#4f7fc4"/><stop offset="1" stop-color="#c7f284"/></linearGradient></defs>`+
     grid+trend+dots+legend+hero;
   const side=$('#valSide');
   if(side){
-    const keyPeers=['Hyperliquid','Lighter','Aster','Jupiter','edgeX','dYdX'];
-    const rows=keyPeers.map(n=>VAL_COMPS.find(c=>c.n===n)).filter(Boolean).map(c=>({n:c.n,mc:c.mc,imp:valPred(c.oi),prem:c.mc/valPred(c.oi)}));
+    const rows=VAL_COMPS.filter(c=>c.oi>0&&c.mc>0).map(c=>({n:c.n,mc:c.mc,imp:valPred(c.oi),prem:c.mc/valPred(c.oi)}));
     const chip=n=>PLOGO[n]?`<img class="vs-logo" src="${PLOGO[n]}" alt="" width="20" height="20" loading="lazy" decoding="async" style="width:20px!important;height:20px!important;min-width:20px!important;max-width:20px!important;min-height:20px!important;max-height:20px!important;object-fit:contain!important">`:`<span class="vs-dot"></span>`;
     const status=p=>p>=1.08?{cls:'premium',word:'PREMIUM'}:p<=0.92?{cls:'discount',word:'DISCOUNT'}:{cls:'fair',word:'NEAR MODEL'};
-    side.innerHTML=`<div class="vs-h"><span>Key peers vs model</span><span class="vs-hs">${escapeHTML(VAL_MCAP_ASOF)}</span></div>`+
-      `<div class="vs-row me"><span class="n">${chip('Variational')}<span class="vs-nm"><b>Variational</b><small>no traded MCAP yet</small></span></span><span class="vs-mcap"><b>${fmtBig(mcap)}</b><small>model est.</small></span><span class="v fair"><b>PRE-TGE</b><small>not priced</small></span></div>`+
-      rows.map(r=>{const s=status(r.prem),pct=(r.prem-1)*100;return `<div class="vs-row"><span class="n">${chip(r.n)}<span class="vs-nm"><b>${escapeHTML(r.n)}</b><small>Model ${fmtBig(r.imp)}</small></span></span><span class="vs-mcap"><b>${fmtBig(r.mc)}</b><small>actual MCAP</small></span><span class="v ${s.cls}" title="Actual market cap divided by model-implied market cap"><b>${pct>=0?'+':''}${pct.toFixed(0)}%</b><small>${s.word} · ${r.prem.toFixed(2)}x</small></span></div>`}).join('');}
+    side.innerHTML=`<div class="vs-h"><span>All peers · Actual vs Model</span><span class="vs-hs">${escapeHTML(VAL_MCAP_ASOF)}</span></div>`+
+      rows.map(r=>{const s=status(r.prem),pct=(r.prem-1)*100;return `<div class="vs-row"><span class="n">${chip(r.n)}<span class="vs-nm"><b>${escapeHTML(r.n)}</b></span></span><span class="vs-values"><span class="vs-mcap"><b>${fmtBig(r.mc)}</b><small>actual MCAP</small></span><span class="vs-mcap model"><b>${fmtBig(r.imp)}</b><small>model MCAP</small></span></span><span class="v ${s.cls}" title="Actual market cap minus model-implied market cap"><b>${pct>=0?'+':''}${pct.toFixed(0)}%</b><small>${s.word} · ${r.prem.toFixed(2)}x</small></span></div>`}).join('')+
+      `<div class="vs-row me"><span class="n">${chip('Variational')}<span class="vs-nm"><b>Variational</b><small>no traded MCAP yet</small></span></span><span class="vs-values"><span class="vs-mcap actual-empty"><b>—</b><small>actual MCAP</small></span><span class="vs-mcap model"><b>${fmtBig(mcap)}</b><small>model MCAP</small></span></span><span class="v fair"><b>PRE-TGE</b><small>not priced</small></span></div>`;}
   const note=$('#valNote');
   if(note)note.innerHTML=`$VAR has no traded market cap before TGE. The ${fmtBig(mcap)} figure is a model estimate, not a current price. Model: MCAP ≈ ${VAL_FIT.A.toFixed(1)} × OI<sup>${VAL_FIT.B}</sup>, R² ${VAL_FIT.r2}. Market caps and available OI update from <a href="https://www.coingecko.com/" target="_blank" rel="noopener">CoinGecko</a>. Framework reference: <a href="https://www.perpetualpulse.xyz/" target="_blank" rel="noopener">Perpetual Pulse</a>. Not financial advice.`;
 }
@@ -1680,9 +1694,9 @@ function renderFeeVs(){
   });
   svg.innerHTML=`
     <defs>
-      <linearGradient id="rvA" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#22e6a0" stop-opacity=".95"/><stop offset="1" stop-color="#38e1ff" stop-opacity=".3"/></linearGradient>
-      <linearGradient id="rvB" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3f74c9" stop-opacity=".95"/><stop offset="1" stop-color="#2c4c7f" stop-opacity=".3"/></linearGradient>
-      <linearGradient id="rvC" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffb547" stop-opacity=".9"/><stop offset="1" stop-color="#7d5120" stop-opacity=".24"/></linearGradient>
+      <linearGradient id="rvA" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1478ff" stop-opacity=".98"/><stop offset=".48" stop-color="#55b8ff" stop-opacity=".82"/><stop offset="1" stop-color="#d7ecff" stop-opacity=".5"/></linearGradient>
+      <linearGradient id="rvB" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#05070c" stop-opacity=".96"/><stop offset=".55" stop-color="#202838" stop-opacity=".78"/><stop offset="1" stop-color="#7f91ad" stop-opacity=".38"/></linearGradient>
+      <linearGradient id="rvC" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#00c487" stop-opacity=".96"/><stop offset=".55" stop-color="#008b73" stop-opacity=".76"/><stop offset="1" stop-color="#bff5df" stop-opacity=".42"/></linearGradient>
     </defs>
     ${grid}${bars}
     <line x1="${pl}" y1="${Y(0)}" x2="${W-pr}" y2="${Y(0)}" stroke="#22304a" stroke-width="1"/>`;
@@ -1749,43 +1763,6 @@ const BW_METRIC_DEFS=[
   {g:'Special notes',k:'referralBackfillExcluded',l:'Older referral payment not counted (about)',t:'usd'}
 ];
 const BW_CORE_KEYS=['totalVolume','oi','tvl','dau','wau','netProfit2w','olpPnlLife','treasuryHoldings'];
-/* Product / release notes from the same official post.
-   Injected from JS so the deployed app shell needs no markup change. */
-function renderBiweeklyProduct(B){
-  const host=$('#bwBlock'); if(!host)return;
-  const items=Array.isArray(B.product)?B.product:[];
-  if(!items.length&&!B.release){$('#bwProduct')?.remove();return;}
-  if(!$('#bwProductCss')){
-    const st=document.createElement('style');
-    st.id='bwProductCss';
-    st.textContent=`
-      .bw-product{border-block:1px solid var(--line);margin:0 0 22px;padding:16px 0}
-      .bw-product-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap}
-      .bw-product-head b{font:900 14px var(--display);letter-spacing:1.2px;text-transform:uppercase;color:var(--ink)}
-      .bw-product-head span{font:13px/1.45 var(--sans);color:var(--sub)}
-      .bw-release{display:inline-flex;align-items:center;gap:7px;padding:4px 9px;border:1px solid rgba(199,242,132,.4);
-        border-radius:4px;background:rgba(199,242,132,.06);font:900 12px var(--mono);color:var(--grn)}
-      .bw-product-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0;margin-top:14px}
-      .bw-product-list div{padding:11px 16px 11px 0;font:13.5px/1.5 var(--sans);color:var(--sub);
-        border-top:1px solid rgba(255,255,255,.06);display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:baseline}
-      .bw-product-list div:nth-child(2n){border-left:1px solid var(--line);padding-left:16px}
-      .bw-product-list i{font-style:normal;font-weight:900;color:var(--grn);font-family:var(--mono);font-size:11px}
-      @media(max-width:760px){.bw-product-list{grid-template-columns:1fr}.bw-product-list div:nth-child(2n){border-left:0;padding-left:0}}`;
-    document.head.appendChild(st);
-  }
-  let box=$('#bwProduct');
-  if(!box){
-    box=document.createElement('div');
-    box.id='bwProduct';
-    box.className='bw-product';
-    const anchor=$('#bwVerdict')||host.firstElementChild;
-    host.insertBefore(box,anchor);
-  }
-  box.innerHTML=`<div class="bw-product-head"><b>What Shipped This Cycle</b>`+
-    (B.release?`<span class="bw-release">Mainnet ${B.release}</span>`:'')+
-    `<span>Product notes from the ${B.asOf} official post</span></div>`+
-    (items.length?`<div class="bw-product-list">${items.map((t,i)=>`<div><i>0${i+1}</i><span>${t}</span></div>`).join('')}</div>`:'');
-}
 function renderBiweekly(){
   if(!$('#bwBlock'))return;
   const B=BIWEEKLY, M=v=>Number.isFinite(v)?'$'+(v>=1e9?(v/1e9).toFixed(2)+'B':v>=1e6?(v/1e6).toFixed(2)+'M':fmtK(v)):'—';
@@ -1811,7 +1788,6 @@ function renderBiweekly(){
     return `<div class="bw-metric-trend"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${d.l} by official report date"><path d="${path}" fill="none" stroke="var(--cyan)" stroke-width="2.5" vector-effect="non-scaling-stroke"/>${dots}${labels}</svg><div class="bw-metric-dates"><span>${pts[0].r.asOf}</span><span>${mid.r.asOf}</span><span>${pts[pts.length-1].r.asOf}</span></div></div>`;
   };
   $('#bwAsOf').textContent='2-week window · posted '+B.asOf;
-  renderBiweeklyProduct(B);
   const margin=B.netProfit2w/B.spreads2w*100;
   const M0=v=>'$'+(v>=1e6?(v/1e6).toFixed(2)+'M':fmtK(v));
   $('#bwTeaser') && ($('#bwTeaser').textContent=M0(B.netProfit2w)+' / 2w');
@@ -2211,21 +2187,24 @@ function renderDailyBrief(){
   const volume=live?.volume24h||MKT.vol.d1;
   const oi=live?.oi||MKT.oi;
   const volumeObservation=MARKET_ACTIVITY.volume[MARKET_ACTIVITY.volume.length-1];
+  const prevVolumeObservation=MARKET_ACTIVITY.volume[MARKET_ACTIVITY.volume.length-2];
   const oiObservation=MARKET_ACTIVITY.oi[MARKET_ACTIVITY.oi.length-1];
-  const volumeDelta=live&&volumeObservation?pctChange(volume,volumeObservation.v):null;
-  const oiDelta=live&&oiObservation?pctChange(oi,oiObservation.v):null;
+  const prevOiObservation=MARKET_ACTIVITY.oi[MARKET_ACTIVITY.oi.length-2];
+  const volumePrev=prevVolumeObservation?.v||volumeObservation?.v||null;
+  const oiPrev=prevOiObservation?.v||oiObservation?.v||null;
+  const volumeDelta=volumePrev?pctChange(volume,volumePrev):null;
+  const oiDelta=oiPrev?pctChange(oi,oiPrev):null;
+  const treasuryPrev=Math.max(0,cur-latest.e);
+  const treasuryHeldDelta=treasuryPrev?pctChange(cur,treasuryPrev):null;
   const signedPct=value=>value==null||!Number.isFinite(value)?'—':`${value>=0?'+':'-'}${Math.abs(value).toFixed(1)}%`;
   const signedMoney=value=>`${value>=0?'+':'-'}${fmtUSD(Math.abs(value))}`;
   const signal=(value,up,down)=>value==null?0:value>=up?1:value<=down?-1:0;
   const score=signal(vsAverage,15,-20)*2+signal(volumeDelta,10,-10)+signal(oiDelta,5,-5);
   const status=score>=2?'momentum':score<=-2?'watch':'steady';
   const labels={momentum:'MOMENTUM',steady:'STEADY',watch:'WATCH'};
-  const headlines={
-    momentum:'Revenue is running above its recent baseline.',
-    steady:'Variational is holding near its recent revenue pace.',
-    watch:'Revenue and market activity need a closer look.'
-  };
+  const tail={momentum:' — running hot.',steady:'.',watch:' — off its recent pace.'};
   const dateLabel=new Date(`${latest.d}T12:00:00Z`).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric',timeZone:'UTC'});
+  const dateShort=new Date(`${latest.d}T12:00:00Z`).toLocaleDateString('en-US',{month:'short',day:'numeric',timeZone:'UTC'});
   const liveLabel=MARKET_ACTIVITY.liveAt
     ?MARKET_ACTIVITY.liveAt.toLocaleTimeString('en-US',{timeZone:'UTC',hour:'2-digit',minute:'2-digit',hour12:false})+' UTC'
     :'market snapshot';
@@ -2238,53 +2217,272 @@ function renderDailyBrief(){
 
   root.dataset.status=status;
   $('#dailyBriefStatus').textContent=labels[status];
-  $('#dailyBriefHeadline').textContent=headlines[status];
+  const heroRank=dayRank(earnings),heroHot=hotStreak(earnings).n;
+  const heroNote=heroRank<=10?`, its ${ordinal(heroRank)} biggest day out of ${earnings.length}`
+    :heroHot>=3?`, a ${heroHot}th straight day above the 30-day average`:'';
+  $('#dailyBriefHeadline').textContent=`${dateShort} Daily VAR Fundamentals`;
   $('#dailyBriefAsOf').textContent=`ET revenue through ${dateLabel} · ${liveLabel}`;
-  $('#dailyBriefSummary').textContent=`The latest completed ET day produced ${fmtUSD(latest.e)} of treasury revenue (${signedPct(vsAverage)} versus its prior ${baselineRows.length}D average). Live open interest is ${marketBig(oi)} and rolling 24H volume is ${marketBig(volume)}; the treasury added ${fmtUSD(earned7)} over the trailing 7 days.`;
+  $('#dailyBriefSummary').textContent=`Daily state check: treasury revenue, 24H volume, open interest, and total treasury held versus the prior observation. ${heroNote?heroNote.slice(2)+'. ':''}Use this to see whether activity is converting into real on-chain revenue.`;
 
   $('#dailyBriefRevenue').textContent=signedMoney(latest.e);
   const revenueDelta=$('#dailyBriefRevenueDelta');
   revenueDelta.className='daily-brief-delta';
-  if(vsAverage!=null&&Math.abs(vsAverage)>.05)revenueDelta.classList.add(vsAverage>0?'up':'down');
-  revenueDelta.textContent=`${signedPct(vsPrevious)} DoD · ${signedPct(vsAverage)} vs prior ${baselineRows.length}D avg`;
+  if(vsPrevious!=null&&Math.abs(vsPrevious)>.05)revenueDelta.classList.add(vsPrevious>0?'up':'down');
+  revenueDelta.textContent=`${money0(previous.e)} → ${money0(latest.e)} · ${signedPct(vsPrevious)} DoD`;
   $('#dailyBriefBurn').textContent=`At least ${fmtUSD(Math.max(0,latest.e*MKT.burnShare))} buyback-burn floor`;
   $('#dailyBriefVolume').textContent=marketBig(volume);
-  setDelta('#dailyBriefVolumeDelta',volumeDelta,volumeObservation?`vs ${mdShort(volumeObservation.d)} daily observation`:'daily comparison');
+  setDelta('#dailyBriefVolumeDelta',volumeDelta,volumePrev?`${marketBig(volumePrev)} → ${marketBig(volume)}`:'daily comparison');
   $('#dailyBriefOi').textContent=marketBig(oi);
-  setDelta('#dailyBriefOiDelta',oiDelta,oiObservation?`vs ${mdShort(oiObservation.d)} daily close`:'daily close');
+  setDelta('#dailyBriefOiDelta',oiDelta,oiPrev?`${marketBig(oiPrev)} → ${marketBig(oi)}`:'daily close');
   $('#dailyBriefSevenDay').textContent='+'+fmtUSD(earned7);
   $('#dailyBriefSevenDayRate').textContent=`${fmtUSD(earned7/7)}/day trailing pace`;
   $('#dailyBriefTreasury').textContent=fmtUSD(cur);
   const growth=$('#dailyBriefTreasuryGrowth');
-  growth.className='daily-brief-delta'+(treasuryGrowth>0?' up':treasuryGrowth<0?' down':'');
-  growth.textContent=`+${fmtUSD(earned30)} · ${signedPct(treasuryGrowth)} over 30D`;
-  $('#dailyBriefSignal').innerHTML=`<b>Signal:</b> ${signedPct(vsAverage)} revenue vs prior ${baselineRows.length}D average · ${signedPct(volumeDelta)} live volume · ${signedPct(oiDelta)} live OI versus latest daily observations.`;
+  growth.className='daily-brief-delta'+(treasuryHeldDelta>0?' up':treasuryHeldDelta<0?' down':'');
+  growth.textContent=`${marketBig(treasuryPrev)} → ${marketBig(cur)} · ${signedPct(treasuryHeldDelta)} DoD`;
+  $('#dailyBriefSignal').innerHTML=`<b>Signal:</b> treasury revenue ${signedPct(vsPrevious)} DoD · volume ${signedPct(volumeDelta)} DoD · OI ${signedPct(oiDelta)} DoD. The useful read: how much volume and OI it takes to generate $1 of treasury revenue.`;
   $('#dailySourceTreasuryAsOf').textContent=`Balance live · daily revenue through ${dateLabel} ET`;
   $('#dailySourceMarketAsOf').textContent=MARKET_ACTIVITY.liveAt?`Live API synced ${liveLabel}`:'Showing the latest saved market snapshot';
   $('#dailySourceHistoryAsOf').textContent=`Volume through ${volumeObservation?.d||'—'} UTC · OI through ${oiObservation?.d||'—'} UTC`;
   $('#dailySourceReportAsOf').textContent=`Latest report in dataset: ${BIWEEKLY.asOf}`;
 
-  const post=[
-    `Variational Daily VAR News — ${dateLabel} ET`,
+  NEWS_CTX={
+    rev:latest.e,
+    perHour:latest.e/24,
+    perMin:latest.e/1440,
+    vsAverage,vsPrevious,volume,volumePrev,volumeDelta,oi,oiPrev,oiDelta,earned7,earned30,cur,treasuryPrev,treasuryHeldDelta,status,dateLabel,
+    latestDate:latest.d,latestRevenue:latest.e,previousRevenue:previous.e,
+    runRate:(earned7/7)*365,
+    pace:earned7/7,
+    streak:hotStreak(earnings).n,
+    rank:dayRank(earnings),
+    totalDays:earnings.length,
+    burnDay:Math.max(0,latest.e*MKT.burnShare),
+    burnTotal:Math.max(0,cur*MKT.burnShare),
+    milestone:nextMilestone(cur)
+  };
+	  NEWS_CTX.toMilestone=Math.max(0,NEWS_CTX.milestone-cur);
+	  NEWS_CTX.daysToMilestone=NEWS_CTX.pace>0?Math.max(1,Math.round(NEWS_CTX.toMilestone/NEWS_CTX.pace)):null;
+	  renderOverviewPulse(NEWS_CTX);
+	  renderNewsPost();
+	  drawNewsCard();
+	}
+	function renderOverviewPulse(c){
+	  if(!c||!$('#varPulseTitle'))return;
+	  const set=(id,value)=>{const el=$(id);if(el)el.textContent=value;};
+	  const setHTML=(id,value)=>{const el=$(id);if(el)el.innerHTML=value;};
+	  const moneyWhole=n=>'$'+Math.round(Number(n)||0).toLocaleString('en-US');
+	  const scoreFrom=(value,step=10)=>clamp(Math.round(5+(Number(value)||0)/step),1,10);
+	  const volumeScore=scoreFrom(c.volumeDelta,8);
+	  const oiScore=scoreFrom(c.oiDelta,5);
+	  const revenueScore=scoreFrom(c.vsAverage,12);
+	  const burnScore=clamp(Math.round(3+Math.min(7,c.burnDay/3500)),1,10);
+	  const engine=Math.round((volumeScore+oiScore+revenueScore+burnScore)/4);
+	  const statusCopy={
+	    momentum:['Momentum day','Activity is converting into treasury revenue faster than the recent baseline.'],
+	    steady:['Healthy baseline','Treasury is still stacking; use volume and OI to decide whether the pace can improve.'],
+	    watch:['Cooling day','Revenue or volume is below recent pace; watch whether OI holds up before calling it weak.']
+	  };
+	  let verdict=statusCopy[c.status]||statusCopy.steady;
+	  if(c.volumeDelta<0&&c.oiDelta>0)verdict=['OI holding, volume cooling','A slower trading day, but open interest is still firm. That means capacity remains in the system.'];
+	  if(c.volumeDelta>0&&c.oiDelta>0)verdict=['Activity expanding','Both trading flow and open interest are rising, the cleanest setup for more spread revenue.'];
+	  const signedRead=v=>v==null||!Number.isFinite(v)?'—':`${v>=0?'+':'-'}${Math.abs(v).toFixed(1)}%`;
+	  set('#varPulseTitle',`${moneyWhole(c.rev)} became treasury revenue yesterday.`);
+	  set('#varPulseLede',`That is ${moneyWhole(c.rev/24)} an hour, ${signedRead(c.vsAverage)} versus the prior 7-day average, earned on ${marketBig(c.volume)} of 24H volume and ${marketBig(c.oi)} of open interest.`);
+	  set('#varPulseAsOf',c.dateLabel);
+	  set('#varPulseVerdict',verdict[0]);
+	  set('#varPulseTakeaway',verdict[1]);
+	  set('#varPulseData',`Treasury held ${marketBig(c.cur)} · 7D pace ${moneyWhole(c.pace)}/day · burn floor ${moneyWhole(c.burnDay)}`);
+	  set('#varPulseScoreLine',`${engine}/10`);
+	  set('#varPulseScoreCopy',`Volume ${volumeScore} · OI ${oiScore} · revenue ${revenueScore} · burn ${burnScore}, each out of 10. Every leg is scored against its own recent trend, where 5 means unchanged — a momentum read, not a valuation.`);
+	  [['#scoreVol',volumeScore],['#scoreOi',oiScore],['#scoreRev',revenueScore],['#scoreBurn',burnScore]].forEach(([id,v])=>{
+	    const el=$(id);
+	    if(el)el.style.setProperty('--w',`${v*10}%`);
+	  });
+	  const milestoneLabel=marketBig(c.milestone);
+	  set('#varMilestoneAmount',marketBig(c.toMilestone));
+	  set('#varMilestoneCopy',c.daysToMilestone?`${marketBig(c.toMilestone)} until the treasury reaches ${milestoneLabel}. At the current 7D pace, that is about ${c.daysToMilestone} day${c.daysToMilestone===1?'':'s'}.`:`Next treasury milestone: ${milestoneLabel}. Waiting for a clean pace estimate.`);
+	  set('#varMilestoneSub',`At least ${marketBig(c.burnTotal)} of treasury is buyback-burn firepower at the ${Math.round(MKT.burnShare*100)}% floor.`);
+	  const vari=PEERS.list.find(p=>p.me)||{oi:c.oi,vol:c.volume};
+	  const lighter=PEERS.list.find(p=>p.n==='Lighter')||{};
+	  const extended=PEERS.list.find(p=>p.n==='Extended')||{};
+	  const liEdge=lighter.oi?vari.oi/lighter.oi:null;
+	  const exEdge=extended.oi?vari.oi/extended.oi:null;
+	  set('#varInvestorRank',`#${PEERS.varRank||'—'}`);
+	  set('#varInvestorCopy',`Variational is #${PEERS.varRank||'—'} of ${PEERS.count||15} by open interest. ${liEdge?`${liEdge.toFixed(1)}× Lighter OI`:''}${liEdge&&exEdge?' · ':''}${exEdge?`${exEdge.toFixed(1)}× Extended OI`:''}.`);
+	  set('#varInvestorSub',`Use Comparison to separate capacity (OI), activity (volume), and booked protocol revenue.`);
+	  const pace30=c.earned30/30, gap30=pace30-c.rev;
+	  const watch=[
+	    c.volume>=1e9?`Keep 24H volume above ${marketBig(1e9)}; it is already ${marketBig(c.volume)}.`:`Watch for 24H volume to reclaim ${marketBig(1e9)}; it is now ${marketBig(c.volume)}.`,
+	    c.oi>=1.25e9?`OI is holding above ${marketBig(1.25e9)}; watch if it stays there.`:`OI is ${marketBig(c.oi)}; watch whether it returns above ${marketBig(1.25e9)}.`,
+	    gap30>0
+	      ?`Yesterday ran ${moneyWhole(gap30)} below the 30D average pace of ${moneyWhole(pace30)}/day.`
+	      :`Yesterday ran ${moneyWhole(-gap30)} above the 30D average pace of ${moneyWhole(pace30)}/day.`,
+	    `Yesterday loaded ${moneyWhole(c.burnDay)} of buyback-burn firepower; none has been spent on-chain yet.`
+	  ];
+	  setHTML('#varWatchList',watch.map(x=>`<li>${escapeHTML(x)}</li>`).join(''));
+	}
+	/* ---------- Daily VAR News: post engine ----------
+   The old post listed every metric, so the link had no job and the text was
+   byte-identical every day (X deprioritises templated duplicates). These angles
+   lead with one number at human scale, hold something back, and rotate daily. */
+let NEWS_CTX=null, NEWS_ANGLE=null;
+const NEWS_URL='https://variationalbuybackdashboard.vercel.app/#daily-news';
+/* The treasury has no outflows, so "days of growth" is trivially every day.
+   Rank the latest day against every other day instead — that one can fail. */
+function dayRank(earnings){
+  const v=earnings[earnings.length-1].e;
+  return earnings.reduce((n,r)=>n+(r.e>v?1:0),1);
+}
+/* Consecutive days earning above the trailing-30D average pace. */
+function hotStreak(earnings){
+  const win=earnings.slice(-30);
+  const avg=win.reduce((s,r)=>s+r.e,0)/Math.max(1,win.length);
+  let n=0;
+  for(let i=earnings.length-1;i>=0;i--){if(earnings[i].e>avg)n++;else break;}
+  return {n,avg};
+}
+function nextMilestone(v){
+  const step=v>=1e7?1e6:v>=1e6?5e5:1e5;
+  return Math.ceil((v+step*0.05)/step)*step;
+}
+const NEWS_ANGLES=[
+  {id:'hourly',ok:c=>c.rev>0,card:c=>({big:money0(c.perHour),label:'earned every hour, yesterday'}),
+   text:c=>[`Variational's treasury earned ${money0(c.perHour)} every hour yesterday.`,'',
+     `No token. No emissions. Just spreads people already paid.`,'',
+     `${money0(c.rev)} in a day → ${marketBig(c.cur)} stacked so far.`]},
+  {id:'runrate',ok:c=>c.pace>0,card:c=>({big:marketBig(c.runRate),label:'annualised revenue run-rate'}),
+   text:c=>[`Variational is running at ${marketBig(c.runRate)}/year in protocol revenue.`,'',
+     `Still pre-token. ${marketBig(c.cur)} is already sitting in the treasury wallet, and you can count it yourself on Arbiscan.`]},
+  {id:'milestone',ok:c=>c.daysToMilestone!=null,card:c=>({big:marketBig(c.toMilestone),label:`until the treasury hits ${marketBig(c.milestone)}`}),
+   text:c=>[`Variational's treasury is ${marketBig(c.toMilestone)} away from ${marketBig(c.milestone)}.`,'',
+     `At the current pace that lands in about ${c.daysToMilestone} day${c.daysToMilestone===1?'':'s'}.`,'',
+     `Every dollar of it is on-chain.`]},
+  {id:'record',ok:c=>c.rank<=10,card:c=>({big:'#'+c.rank,label:`best treasury day out of ${c.totalDays}`}),
+   text:c=>[`Yesterday was Variational's ${ordinal(c.rank)} biggest treasury day ever.`,'',
+     `${money0(c.rev)} in 24 hours, out of ${c.totalDays} days of history.`,'',
+     `Revenue, not emissions. The token isn't even live.`]},
+  {id:'streak',ok:c=>c.streak>=3,card:c=>({big:c.streak+' days',label:'running above the 30-day average'}),
+   text:c=>[`Variational has out-earned its own 30-day average ${c.streak} days in a row.`,'',
+     `+${marketBig(c.earned7)} in the last week.`,'',
+     `This is revenue, not incentives — the token hasn't even launched.`]},
+  {id:'burn',ok:c=>c.burnDay>0,card:c=>({big:money0(c.burnDay),label:'of $VAR burn fuel loaded yesterday'}),
+   text:c=>[`Yesterday Variational loaded ${money0(c.burnDay)} of buyback-and-burn fuel for $VAR.`,'',
+     `At least 30% of every treasury dollar is earmarked for it — ${marketBig(c.burnTotal)} and counting.`,'',
+     `None of it has been spent yet.`]},
+  {id:'scale',ok:()=>true,card:c=>({big:marketBig(c.oi),label:'open interest, pre-token'}),
+   text:c=>[`${marketBig(c.oi)} open interest.`,`${marketBig(c.volume)} traded in 24h.`,'',
+     `Variational is running perp-DEX volume at real scale and has not launched a token yet.`,'',
+     `The treasury is at ${marketBig(c.cur)}.`]},
+  {id:'week',ok:c=>c.earned7>0,card:c=>({big:marketBig(c.earned7),label:'added to the treasury this week'}),
+   text:c=>[`Variational's treasury added ${marketBig(c.earned7)} this week.`,'',
+     `That's ${money0(c.pace)} a day, every day, from spreads alone.`,'',
+     `Total held: ${marketBig(c.cur)}.`]}
+];
+const money0=n=>'$'+Math.round(n).toLocaleString('en-US');
+const ordinal=n=>{const s=['th','st','nd','rd'],v=n%100;return n+(s[(v-20)%10]||s[v]||s[0]);};
+function anglePool(c){
+  const banned=c.status==='watch'?['hourly','streak']:[];
+  return NEWS_ANGLES.filter(a=>a.ok(c)&&!banned.includes(a.id));
+}
+function currentAngle(){
+  const c=NEWS_CTX;if(!c)return null;
+  const pool=anglePool(c);if(!pool.length)return null;
+  if(NEWS_ANGLE){const hit=pool.find(a=>a.id===NEWS_ANGLE);if(hit)return hit;}
+  const seed=Math.floor(Date.parse(SERIES[SERIES.length-1].d+'T00:00:00Z')/864e5);
+  return pool[seed%pool.length];
+}
+function renderNewsPost(){
+  const c=NEWS_CTX,root=$('#dailyBrief');if(!c||!root)return;
+  const day=new Date(`${c.latestDate||SERIES[SERIES.length-1].d}T12:00:00Z`);
+  const title=day.toLocaleDateString('en-US',{timeZone:'UTC',month:'short',day:'numeric'})+' Daily VAR Fundamentals';
+  const weekend=[0,6].includes(day.getUTCDay());
+  const revenueDown=c.vsPrevious!=null&&c.vsPrevious<0;
+  const volumeDown=c.volumeDelta!=null&&c.volumeDelta<0;
+  const oiUp=c.oiDelta!=null&&c.oiDelta>0;
+  const tone=weekend&&revenueDown&&volumeDown&&oiUp
+    ?'Slow weekend as usual\nBut OI continues to climb up.'
+    :revenueDown&&volumeDown&&oiUp
+      ?'Volume cooled down.\nBut OI continues to climb up.'
+      :c.status==='momentum'
+        ?'Activity is picking up.\nTreasury keeps stacking.'
+        :'Daily check-in.\nWatch volume, OI, and treasury together.';
+  const arrow=v=>v==null?'':v>0?' 📈':v<0?' 📉':' →';
+  const val=(v,fmt)=>v==null||!Number.isFinite(+v)?'—':fmt(v);
+  const moneyPlus=v=>v==null||!Number.isFinite(+v)?'—':(v>=0?'+':'-')+money0(Math.abs(v));
+  const line=(label,prev,next,delta,fmt)=>
+    `${label.padEnd(14,' ')} ${val(prev,fmt)} -> ${val(next,fmt)}${arrow(delta)}`.trimEnd();
+  const body=[
+    title,
     '',
-    `Treasury ${signedMoney(latest.e)} (${signedPct(vsAverage)} vs 7D avg)`,
-    `24H volume ${marketBig(volume)}`,
-    `Open interest ${marketBig(oi)}`,
-    `7D treasury +${marketBig(earned7)}`,
-    `Treasury held ${marketBig(cur)}`,
+    tone,
     '',
-    `Status: ${labels[status]}`
+    line('Treasury',c.previousRevenue,c.latestRevenue,c.vsPrevious,moneyPlus),
+    line('24H volume',c.volumePrev||0,c.volume,c.volumeDelta,marketBig),
+    line('Open interest',c.oiPrev||0,c.oi,c.oiDelta,marketBig),
+    line('Treasury held',c.treasuryPrev,c.cur,c.treasuryHeldDelta,marketBig),
+    '',
+    'You can see how much volume and OI',
+    'is needed to generate $1 in treasury.'
   ].join('\n');
-  const newsUrl='https://variationalbuybackdashboard.vercel.app/#daily-news';
-  const sourceLine='Sources + live dashboard:';
-  root.dataset.tweet=post+'\n\n'+sourceLine;
-  root.dataset.url=newsUrl;
-  root.dataset.report=root.dataset.tweet+'\n'+newsUrl;
-  $('#dailyNewsPost').textContent=root.dataset.report;
-  const xCount=root.dataset.tweet.length+25;
+  root.dataset.tweet=body;
+  root.dataset.url=NEWS_URL;
+  root.dataset.report=root.dataset.tweet+'\n'+NEWS_URL;
+  if($('#dailyNewsPost'))$('#dailyNewsPost').textContent=root.dataset.report;
+  const xCount=root.dataset.tweet.length+24;
   const count=$('#dailyNewsCount');
-  count.textContent=`~${xCount} / 280`;
-  count.classList.toggle('over',xCount>280);
+  if(count){count.textContent=`${xCount} / 280`;count.classList.toggle('over',xCount>280);}
+  const tag=$('#dailyNewsAngle');
+  if(tag)tag.textContent='fundamentals';
+}
+function cycleNewsAngle(){
+  const c=NEWS_CTX;if(!c)return;
+  const pool=anglePool(c);if(pool.length<2)return;
+  const i=pool.findIndex(a=>a.id===NEWS_ANGLE);
+  NEWS_ANGLE=pool[(i+1+pool.length)%pool.length].id;
+  renderNewsPost();drawNewsCard();
+}
+/* Share card: text-only posts underperform badly on X, so ship a pasteable image. */
+async function drawNewsCard(){
+  const cv=$('#newsCard'),c=NEWS_CTX;if(!cv||!c)return;
+  const angle=currentAngle();if(!angle)return;
+  const face=angle.card(c);
+  try{await document.fonts.ready;}catch(_){}
+  const W=1200,H=675,x=cv.getContext('2d');
+  cv.width=W;cv.height=H;
+  x.fillStyle='#0d0d0d';x.fillRect(0,0,W,H);
+  x.strokeStyle='rgba(255,255,255,.045)';x.lineWidth=1;
+  for(let gx=0;gx<W;gx+=60){x.beginPath();x.moveTo(gx+.5,0);x.lineTo(gx+.5,H);x.stroke();}
+  for(let gy=0;gy<H;gy+=60){x.beginPath();x.moveTo(0,gy+.5);x.lineTo(W,gy+.5);x.stroke();}
+  const glow=x.createRadialGradient(W*.78,H*.12,0,W*.78,H*.12,W*.7);
+  glow.addColorStop(0,'rgba(199,242,132,.10)');glow.addColorStop(1,'rgba(199,242,132,0)');
+  x.fillStyle=glow;x.fillRect(0,0,W,H);
+  const mono=s=>`${s}px "Geist Mono",ui-monospace,Menlo,monospace`;
+  const sans=s=>`${s}px Geist,Inter,system-ui,sans-serif`;
+  x.fillStyle='#c7f284';x.font='800 '+mono(19);x.letterSpacing='3px';
+  x.fillText('VARIATIONAL · PROTOCOL TREASURY',72,96);
+  x.letterSpacing='0px';
+  x.fillStyle='#c7f284';x.font='760 '+sans(132);
+  let big=face.big,size=132;
+  while(x.measureText(big).width>W-144&&size>64){size-=6;x.font='760 '+sans(size);}
+  x.fillText(big,70,268);
+  x.fillStyle='#a3aaa4';x.font='500 '+sans(34);
+  x.fillText(face.label,72,324);
+  x.strokeStyle='rgba(255,255,255,.12)';x.beginPath();x.moveTo(72,392);x.lineTo(W-72,392);x.stroke();
+  const stats=[['TREASURY HELD',marketBig(c.cur)],['OPEN INTEREST',marketBig(c.oi)],['24H VOLUME',marketBig(c.volume)]];
+  stats.forEach((s,i)=>{
+    const cx=72+i*((W-144)/3);
+    x.fillStyle='#687069';x.font='800 '+mono(15);x.letterSpacing='1.6px';x.fillText(s[0],cx,436);
+    x.letterSpacing='0px';x.fillStyle='#f4f6f2';x.font='760 '+sans(46);x.fillText(s[1],cx,492);
+  });
+  x.strokeStyle='rgba(255,255,255,.12)';x.beginPath();x.moveTo(72,556);x.lineTo(W-72,556);x.stroke();
+  x.fillStyle='#c7f284';x.font='800 '+mono(20);x.fillText('@0xdefidaniel',72,606);
+  x.fillStyle='#687069';x.font='600 '+mono(18);
+  const foot='Revenue Radar · on-chain, verifiable · '+c.dateLabel;
+  x.fillText(foot,W-72-x.measureText(foot).width,606);
+}
+function newsCardBlob(){
+  return new Promise(res=>{const cv=$('#newsCard');cv?cv.toBlob(res,'image/png'):res(null);});
 }
 function renderChanges(){
   renderDailyBrief();
@@ -2632,22 +2830,32 @@ function renderActualsFallback(cur){
   setDeltaPill('#hd24',cur,Math.max(0,cur-values[1]));
   setDeltaPill('#hd7d',cur,Math.max(0,cur-values[2]));
 }
-async function renderActuals(cur){
+/* Reads `latest` itself rather than trusting a caller-supplied balance.
+   startLive() used to pass the embedded SERIES snapshot, which lags the chain by
+   hours; subtracting a live archive balance from that stale "current" produced a
+   negative delta that Math.max(0,…) clamped into a confident-looking "+$0" — i.e.
+   the dashboard reported the protocol earning nothing. Both sides now come from
+   the same read, and a non-positive delta is shown as unavailable, never as zero. */
+async function renderActuals(){
   try{
     const nowTs=Math.floor(Date.now()/1000);
-    if(cur==null) cur=await balAt('latest');
+    const cur=await balAt('latest');
     const [b12,b24,b7]=await Promise.all([
       balAt(blockAt(nowTs-12*3600)),
       balAt(blockAt(nowTs-24*3600)),
       balAt(blockAt(nowTs-7*86400))
     ]);
-    $('#ac12h').textContent='+'+fmtUSD(Math.max(0,cur-b12));
-    $('#ac24h').textContent='+'+fmtUSD(Math.max(0,cur-b24));
-    $('#ac7d').textContent='+'+fmtUSD(Math.max(0,cur-b7));
+    const show=(sel,past)=>{
+      const el=$(sel);if(!el)return;
+      const d=cur-past;
+      el.textContent=d>0?'+'+fmtUSD(d):d===0?'+$0':'—';
+      el.title=d<0?'Archive read disagreed with the live balance; retrying on the next sync.':'';
+    };
+    show('#ac12h',b12);show('#ac24h',b24);show('#ac7d',b7);
     setDeltaPill('#hd12',cur,b12);
     setDeltaPill('#hd24',cur,b24);
     setDeltaPill('#hd7d',cur,b7);
-  }catch(e){renderActualsFallback(cur??SERIES[SERIES.length-1].v);}
+  }catch(e){renderActualsFallback(SERIES[SERIES.length-1].v);}
 }
 let _liveT0=performance.now();
 let LIVE_BASE={balance:SERIES[SERIES.length-1].v,at:performance.now()};
@@ -2780,6 +2988,7 @@ function tickLive(){
   const asiaRange=hourRangeLabel(hp.date,hp.hour,ASIA_TZ.tz,ASIA_TZ.label);
   $('#ticker').innerHTML=fmtUSD(whole)+'<span class="cents">.'+String(cents).padStart(2,'0')+'</span>';
   $('#liveExactClock').textContent=exactNow+' ET';
+  renderCalendarLiveSync(CAL.selectedDate||hp.date);
   if($('#liveHourLabel'))$('#liveHourLabel').textContent=`Current ET hour · ${String(hp.hour).padStart(2,'0')}:00-${String((hp.hour+1)%24).padStart(2,'0')}:00`;
   $('#tickerSub').textContent=`${hourRange} / ${asiaRange} · earned so far`;
   $('#totalVal').textContent=fmtUSD(Math.floor(bal));
@@ -2813,7 +3022,7 @@ function startLive(){
   renderInspectorZoneClocks();
   renderProjectedHourlyEarnings(projectedBalance());
   renderActualsFallback(LIVE_BASE.balance);
-  renderActuals(LIVE_BASE.balance);
+  renderActuals();
 }
 
 /* ================= EARNINGS CALENDAR ================= */
@@ -2877,6 +3086,20 @@ function cellVal(dateStr){
   return {v:CAL.mo.get(dateStr.slice(0,7))||0,max:CAL.maxMo};
 }
 const isClosedDailyTotal=dateStr=>dateStr<resetDateKey()&&dateStr<=CAL.last&&CAL.eMap.has(dateStr);
+function renderCalendarLiveSync(dateStr){
+  const wrap=$('#calLiveSync'), text=$('#calLiveSyncText');
+  if(!wrap||!text)return;
+  const hp=resetHourParts();
+  const selected=dateStr||hp.date;
+  const live=selected===hp.date;
+  const final=isClosedDailyTotal(selected);
+  wrap.classList.toggle('is-live',live);
+  wrap.classList.toggle('is-final',!live&&final);
+  wrap.classList.toggle('is-pending',!live&&!final);
+  text.textContent=live
+    ? `Live syncing · ${resetTimeShort()} ET`
+    : (final?'Finalized at 00:00 ET':'Waiting for ET close');
+}
 function calImpliedActivity(earn){
   const e=computeEff();
   return {
@@ -2905,13 +3128,10 @@ function calendarEarnHtml(dateStr,disp){
   const closed=isClosedDailyTotal(dateStr), total=CAL.eMap.get(dateStr)||0;
   const a=closed?calImpliedActivity(total):null;
   if(!closed)return `<div class="cal-dual pending-only" title="Time remaining until this ET daily total closes.">${pending24Meta(dateStr)}</div>`;
-  return `<div class="cal-dual" title="Completed daily total only. Current/future dates stay pending until the day closes.">
-    <div class="cal-money-row total"><span class="tz">Total</span><span class="money">+${fmtUSD(total)}</span></div>
-    <div class="cal-flow-mini" title="Implied from 30D fee efficiency, not raw reported daily volume/OI">
-      <div><b>${calMiniMoney(a.volume)}</b><span>Est Vol</span></div>
-      <div><b>${calMiniMoney(a.oi)}</b><span>OI needed</span></div>
-      <div class="burn"><b>${calMiniMoney(a.burn)}</b><span>Burn</span></div>
-    </div>
+  const sharePct=Math.round(MKT.spreadShare*100);
+  return `<div class="cal-dual" title="Completed ET day. Revenue is the measured treasury inflow; fee is the trader-paid spread it implies at the ${sharePct}% treasury share.">
+    <div class="cal-money-row total"><span class="tz">Revenue</span><span class="money">+${fmtUSD(total)}</span></div>
+    <div class="cal-money-row fee"><span class="tz">Fee</span><span class="money">${calMiniMoney(a.spreadFees)}</span></div>
   </div>`;
 }
 function calendarDisplay(dateStr){
@@ -3056,6 +3276,7 @@ function selectCell(dateStr){
   CAL.sel={amt:showAmount?('+'+fmtUSD(amt)):'pending final close',scope};
   $('#calAmt').textContent=showAmount?('+'+fmtUSD(amt)):'—';
   $('#calLab').innerHTML=label;
+  renderCalendarLiveSync(dateStr);
   if($('#calInspectorDate'))$('#calInspectorDate').textContent=selectedDateHeading(dateStr);
   if($('#calInspectorStatus')){
     $('#calInspectorStatus').textContent=status;
@@ -3076,6 +3297,9 @@ function selectCell(dateStr){
 }
 function renderMacroPanel(events,dateStr){
   const list=$('#macroList'), play=$('#playbook');
+  // The macro panel is optional markup; without this guard a layout that omits
+  // it throws mid-selectCell and the selected-day highlight never runs.
+  if(!list||!play)return;
   if(!events.length){
     list.innerHTML=`<div class="macro-item"><span class="ev">NONE</span><div><b>No major tagged macro event</b><br>${dateStr} still shows weekday/weekend and treasury earnings context.</div></div>`;
     play.innerHTML=`<div class="play"><b>ES</b><span>Default broad-market read.</span></div><div class="play"><b>NQ</b><span>Use when rates/tech beta is driving.</span></div><div class="play"><b>VIX</b><span>Use when realized volatility expands.</span></div>`;
@@ -3160,6 +3384,179 @@ $('#dailyNewsTweet')?.addEventListener('click',()=>{
   const intent='https://twitter.com/intent/tweet?text='+encodeURIComponent(text)+'&url='+encodeURIComponent(url)+'&via=0xdefidaniel';
   window.open(intent,'_blank','noopener,width=600,height=520');
 });
+$('#dailyNewsShuffle')?.addEventListener('click',cycleNewsAngle);
+$('#newsCardCopy')?.addEventListener('click',async e=>{
+  const btn=e.currentTarget,old=btn.textContent;
+  try{
+    const blob=await newsCardBlob();
+    if(!blob)throw new Error('no card');
+    await navigator.clipboard.write([new ClipboardItem({'image/png':blob})]);
+    btn.textContent='Copied — paste into X';
+  }catch(_){btn.textContent='Copy blocked · use Save PNG';}
+  setTimeout(()=>btn.textContent=old,1800);
+});
+$('#newsCardSave')?.addEventListener('click',async ()=>{
+  const blob=await newsCardBlob();if(!blob)return;
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=`variational-${SERIES[SERIES.length-1].d}-${NEWS_ANGLE||'card'}.png`;
+  a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href),4000);
+});
+
+/* ---------- meme lab ---------- */
+const MEME_LIBRARY=Array.isArray(window.PEPE_LIBRARY)?window.PEPE_LIBRARY:[];
+const MEME_LINES=[
+  ['WHEN THE VARIANCE','IS ACTUALLY IN YOUR FAVOR'],
+  ['I SAID I WOULD TAKE PROFIT','I DID NOT SAY WHEN'],
+  ['THE CHART LOOKED AT ME','SO I BOUGHT MORE'],
+  ['RISK: CALCULATED','MATH: QUESTIONABLE'],
+  ['ONE MORE TRADE','THEN I AM DEFINITELY SLEEPING'],
+  ['MY STRATEGY?','VIBES WITH RISK MANAGEMENT']
+];
+const MEME_PAGE_SIZE=6;
+let MEME_INDEX=0,MEME_PAGE=0,MEME_IMAGE=null,MEME_READY=false,MEME_USER_EDITED=false,MEME_UPLOAD=null;
+function loadMemeImage(index=MEME_INDEX){
+  if(!MEME_LIBRARY.length)return;
+  MEME_INDEX=Math.max(0,Math.min(index,MEME_LIBRARY.length-1));
+  const img=new Image();
+  img.onload=()=>{MEME_IMAGE=img;MEME_READY=true;renderMemeLab();renderMemeLibrary();};
+  img.onerror=()=>{MEME_READY=false;renderMemeLab();};
+  img.src=MEME_LIBRARY[MEME_INDEX].src;
+}
+function memeMetrics(){
+  const cur=currentTreasuryBalance();
+  const asOf=currentTreasuryDate();
+  const latest=dailyEarn().filter(x=>x.d<resetDateKey()&&x.e>0).slice(-1)[0];
+  const latestEarn=latest?.e ?? Math.max(0,cur-cumAt(addDays(asOf,-1)));
+  const earned7=Math.max(0,cur-cumAt(addDays(asOf,-7)));
+  const burn=Math.max(0,latestEarn*MKT.burnShare);
+  return {cur,asOf,latestEarn,earned7,burn,volume:MKT.vol?.d1||0,oi:MKT.oi||0};
+}
+function autoMemeValues(){
+  const values=MEME_LINES[MEME_INDEX%MEME_LINES.length];
+  return {headline:values[0],footer:values[1]};
+}
+function setMemeTemplate(index,{force=false}={}){
+  MEME_UPLOAD=null;
+  MEME_INDEX=Number(index)||0;
+  if(force||!MEME_USER_EDITED){
+    const values=autoMemeValues();
+    if($('#memeHeadline'))$('#memeHeadline').value=values.headline;
+    if($('#memeFooter'))$('#memeFooter').value=values.footer;
+    MEME_USER_EDITED=false;
+  }
+  loadMemeImage(MEME_INDEX);
+}
+function renderMemeLibrary(){
+  const grid=$('#memeTemplates');if(!grid)return;
+  const pages=Math.max(1,Math.ceil(MEME_LIBRARY.length/MEME_PAGE_SIZE));
+  MEME_PAGE=Math.max(0,Math.min(MEME_PAGE,pages-1));
+  const start=MEME_PAGE*MEME_PAGE_SIZE;
+  grid.innerHTML=MEME_LIBRARY.slice(start,start+MEME_PAGE_SIZE).map((item,offset)=>{
+    const index=start+offset,active=index===MEME_INDEX?' on':'';
+    return `<button class="meme-template${active}" type="button" data-meme-index="${index}"><span class="meme-thumb"><img src="${item.src}" alt=""></span><b>PEPE ${String(index+1).padStart(4,'0')}</b></button>`;
+  }).join('');
+  grid.querySelectorAll('[data-meme-index]').forEach(btn=>btn.addEventListener('click',()=>setMemeTemplate(btn.dataset.memeIndex,{force:false})));
+  if($('#memeLibraryPage'))$('#memeLibraryPage').textContent=`${MEME_PAGE+1} / ${pages}`;
+  if($('#memeLibraryTotal'))$('#memeLibraryTotal').textContent=`${MEME_LIBRARY.length.toLocaleString()} templates`;
+}
+function memeWrap(ctx,text,x,y,max,lineH,font,limit=4){
+  ctx.font=font;
+  const words=String(text||'').split(/\s+/).filter(Boolean);
+  const lines=[];let line='';
+  words.forEach(word=>{
+    const test=line?line+' '+word:word;
+    if(ctx.measureText(test).width>max&&line){lines.push(line);line=word;}
+    else line=test;
+  });
+  if(line)lines.push(line);
+  lines.slice(0,limit).forEach((l,i)=>ctx.fillText(l,x,y+i*lineH));
+}
+function memeRounded(ctx,x,y,w,h,r){
+  ctx.beginPath();
+  ctx.moveTo(x+r,y);
+  ctx.arcTo(x+w,y,x+w,y+h,r);
+  ctx.arcTo(x+w,y+h,x,y+h,r);
+  ctx.arcTo(x,y+h,x,y,r);
+  ctx.arcTo(x,y,x+w,y,r);
+  ctx.closePath();
+}
+function renderMemeLab(){
+  const canvas=$('#varMemeCanvas');if(!canvas)return;
+  const ctx=canvas.getContext('2d');
+  const img=MEME_UPLOAD||MEME_IMAGE;
+  const auto=autoMemeValues();
+  if(!MEME_USER_EDITED){
+    if($('#memeHeadline'))$('#memeHeadline').value=auto.headline;
+    if($('#memeFooter'))$('#memeFooter').value=auto.footer;
+  }
+  const headline=$('#memeHeadline')?.value||auto.headline;
+  const footer=$('#memeFooter')?.value||auto.footer;
+  const bg=ctx.createLinearGradient(0,0,1080,1080);
+  bg.addColorStop(0,'#1f6bd4');bg.addColorStop(.62,'#1455b5');bg.addColorStop(1,'#082f72');
+  ctx.fillStyle=bg;ctx.fillRect(0,0,1080,1080);
+  ctx.save();
+  ctx.globalAlpha=.09;ctx.strokeStyle='#fff';ctx.lineWidth=2;
+  for(let y=80;y<1080;y+=48){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(1080,y-140);ctx.stroke();}
+  ctx.restore();
+  if(img){
+    const scale=Math.max(1080/img.width,1080/img.height),w=img.width*scale,h=img.height*scale;
+    ctx.drawImage(img,(1080-w)/2,(1080-h)/2,w,h);
+  }
+  const caption=(text,y,bottom=false)=>{
+    ctx.font='900 72px Arial Black, Inter, sans-serif';ctx.textAlign='center';ctx.textBaseline='top';ctx.lineJoin='round';
+    const words=String(text||'').toUpperCase().split(/\s+/),lines=[];let line='';
+    words.forEach(word=>{const test=line?line+' '+word:word;if(ctx.measureText(test).width>930&&line){lines.push(line);line=word}else line=test});if(line)lines.push(line);
+    const shown=lines.slice(0,3),start=bottom?y-shown.length*80:y;
+    shown.forEach((value,i)=>{ctx.strokeStyle='#111329';ctx.lineWidth=18;ctx.strokeText(value,540,start+i*80);ctx.fillStyle='#fff';ctx.fillText(value,540,start+i*80);});
+  };
+  caption(headline,52);caption(footer,1030,true);
+  if($('#memeTopCount'))$('#memeTopCount').textContent=headline.length+'/80';
+  if($('#memeBottomCount'))$('#memeBottomCount').textContent=footer.length+'/80';
+  const tweet=`${headline}\n${footer}\n\nhttps://variationalbuybackdashboard.vercel.app/`;
+  const copy=$('#memeTweetCopy');
+  if(copy)copy.innerHTML='<b>Tweet copy</b><br>'+tweet.replaceAll('\n','<br>');
+  if($('#memeAutoState'))$('#memeAutoState').textContent=MEME_READY?`VAR Pepe ${MEME_INDEX+1} / ${MEME_LIBRARY.length}`:'Loading Pepe library';
+}
+function initMemeLab(){
+  if(!$('#varMemeCanvas'))return;
+  renderMemeLibrary();
+  loadMemeImage(0);
+  ['memeHeadline','memeFooter'].forEach(id=>{
+    $('#'+id)?.addEventListener('input',()=>{MEME_USER_EDITED=true;renderMemeLab();});
+  });
+  $('#memeAutoFill')?.addEventListener('click',()=>{
+    if(!MEME_LIBRARY.length)return;
+    const index=Math.floor(Math.random()*MEME_LIBRARY.length);
+    MEME_PAGE=Math.floor(index/MEME_PAGE_SIZE);setMemeTemplate(index,{force:true});
+  });
+  $('#memeLibraryPrev')?.addEventListener('click',()=>{MEME_PAGE=Math.max(0,MEME_PAGE-1);renderMemeLibrary();});
+  $('#memeLibraryNext')?.addEventListener('click',()=>{MEME_PAGE=Math.min(Math.ceil(MEME_LIBRARY.length/MEME_PAGE_SIZE)-1,MEME_PAGE+1);renderMemeLibrary();});
+  $('#memeUpload')?.addEventListener('change',event=>{
+    const file=event.target.files?.[0];if(!file||!file.type.startsWith('image/'))return;
+    const reader=new FileReader();reader.onload=()=>{const img=new Image();img.onload=()=>{MEME_UPLOAD=img;MEME_READY=true;renderMemeLab()};img.src=reader.result};reader.readAsDataURL(file);
+  });
+  $('#memeDownload')?.addEventListener('click',()=>{
+    renderMemeLab();
+    const a=document.createElement('a');
+    a.download='variational-pepe-meme.png';
+    a.href=$('#varMemeCanvas').toDataURL('image/png');
+    a.click();
+  });
+  $('#memeCopyText')?.addEventListener('click',async()=>{
+    const text=$('#memeTweetCopy')?.innerText.replace(/^Tweet copy\n/,'');
+    if(!text)return;
+    try{await navigator.clipboard.writeText(text);}catch(_){fallbackCopy(text);}
+    if($('#memeCopied'))$('#memeCopied').textContent='Copied tweet text';
+    setTimeout(()=>{if($('#memeCopied'))$('#memeCopied').textContent='';},1400);
+  });
+  $('#memeTweet')?.addEventListener('click',()=>{
+    const text=$('#memeTweetCopy')?.innerText.replace(/^Tweet copy\n/,'')||'';
+    window.open('https://twitter.com/intent/tweet?text='+encodeURIComponent(text),'_blank','noopener,width=600,height=520');
+  });
+  setMemeTemplate(0,{force:true});
+}
 
 /* ---------- master render ---------- */
 let CUR='week', booted=false;
@@ -3167,6 +3564,9 @@ function render(){
   const rows=buildPeriods(CUR);
   const total=currentTreasuryBalance();
   _ctToken++;$('#totalVal').textContent=fmtUSD(total);
+  if($('#headVol24'))$('#headVol24').textContent=fmtBig(MKT.vol.d1||MKT.vol.d30/30);
+  if($('#headOi'))$('#headOi').textContent=fmtBig(MKT.oi);
+  if($('#headSpreads'))$('#headSpreads').textContent=fmtBig(total/MKT.spreadShare);
   renderImpliedSpreadTotal(total);
   if($('#vIntroTotal'))$('#vIntroTotal').textContent=fmtUSD(total);
   $('#rangeBadge').textContent=SERIES[0].d+' → '+currentTreasuryDate();
@@ -3182,6 +3582,7 @@ function render(){
   renderRunningTotals();
   renderHeaderDeltasFallback();
   renderMarketActivity();
+  renderMemeLab();
 }
 let _chartResizeTimer=0;
 window.addEventListener('resize',()=>{
@@ -3376,8 +3777,9 @@ async function refresh({deep=false}={}){
       SERIES.sort((a,b)=>a.d<b.d?-1:1);
       persistLiveSeries();
     }catch(_){
-      note.textContent='Live balance synced. Daily history backfill is paused while public RPC capacity recovers.';
-      note.classList.add('show');
+      note.classList.remove('show');
+      $('#stamp').textContent='live balance · saved daily history';
+      $('#stamp').className='warn';
     }
     LIVE_BASE={balance:cur,at:performance.now()};
     LIVE_HOUR_BASE={key:resetHourKey(),balance:cur,at:performance.now()};
@@ -3385,12 +3787,11 @@ async function refresh({deep=false}={}){
     if(deep)await renderHourlyEarnings(cur); else renderProjectedHourlyEarnings(cur);
     render();
     renderTwaps();
-    if(deep)await renderActuals(cur);
+    if(deep)await renderActuals();
     buildCalendar();
     renderVsLighter();
   }catch(err){
-    note.textContent='Public Arbitrum RPCs are temporarily busy. Keeping the latest saved ET snapshot through '+SERIES[SERIES.length-1].d+'.';
-    note.classList.add('show');
+    note.classList.remove('show');
     $('#stamp').textContent='snapshot · '+SERIES[SERIES.length-1].d+' ET';
     $('#stamp').className='warn';
   }finally{btn.classList.remove('busy');btn.textContent='↻ Refresh live';}
@@ -3413,7 +3814,7 @@ async function quickSyncLive(){
     $('#stamp').className='live';
     if(Date.now()-lastWindowSync>300000){
       lastWindowSync=Date.now();
-      renderActuals(cur);
+      renderActuals();
     }
   }catch(_){
     // Keep the last visible value; the full refresh handles status messaging.
@@ -3466,8 +3867,71 @@ $('#refCodeCopy')?.addEventListener('click',copyReferralCode);
 
 /* ---------- tabs ---------- */
 const TABS=$('#tabs');
-const TAB_ORDER_KEY='variationalTabOrder';
-const VALID_TABS=['overview','daily-news','implied','historical','efficiency','biweekly','roadmap','points','comparison'];
+const TAB_ORDER_KEY='variationalTabOrderV2';
+const VALID_TABS=['overview','daily-news','meme','implied','historical','efficiency','biweekly','roadmap','points','comparison'];
+const DEFAULT_TAB_ORDER=['overview','daily-news','efficiency','comparison','historical','implied','biweekly','roadmap','points','meme'];
+const SECTION_COPY={
+  overview:{
+    eyebrow:'Live dashboard',
+    title:'Overview',
+    description:'Treasury balance, recent change, live earning pace, and the quickest read on Variational today.',
+    chip:'live state'
+  },
+  'daily-news':{
+    eyebrow:'Share-ready brief',
+    title:'Daily VAR News',
+    description:'A compact daily status post with source links, written for people who want to share the current state quickly.',
+    chip:'tweet format'
+  },
+  efficiency:{
+    eyebrow:'Revenue model',
+    title:'Fundamentals',
+    description:'How volume and open interest translate into spread fees, treasury revenue, burn firepower, and valuation context.',
+    chip:'money engine'
+  },
+  comparison:{
+    eyebrow:'Market position',
+    title:'Comparison',
+    description:'Where Variational sits versus other perp DEXs by open interest, activity, and comparable revenue capture.',
+    chip:'peer rank'
+  },
+  historical:{
+    eyebrow:'Time series',
+    title:'Historical Data',
+    description:'Market activity and treasury history over time, so changes are easier to see without mixing today with past windows.',
+    chip:'charts'
+  },
+  implied:{
+    eyebrow:'Flow mechanics',
+    title:'Mechanic',
+    description:'The dollar-flow explanation: customer spread, OLP side, protocol treasury, and buyback-burn firepower.',
+    chip:'flow map'
+  },
+  biweekly:{
+    eyebrow:'Operating update',
+    title:'Biweekly Report',
+    description:'A summarized two-week readout for activity, revenue, roadmap, and the biggest changes worth tracking.',
+    chip:'report'
+  },
+  roadmap:{
+    eyebrow:'Build status',
+    title:'Roadmap',
+    description:'Protocol milestones, completed items, pending docs, and what still sits ahead on the Variational path.',
+    chip:'docs state'
+  },
+  points:{
+    eyebrow:'Scenario tool',
+    title:'Points',
+    description:'FDV and points calculator for estimating potential airdrop value under editable assumptions.',
+    chip:'calculator'
+  },
+  meme:{
+    eyebrow:'Community tool',
+    title:'Meme Lab',
+    description:'Variational-styled Pepe templates and caption tools for turning dashboard takes into shareable images.',
+    chip:'social'
+  }
+};
 const normalizeTabName=name=>{
   if(name==='charts'||name==='interval')return 'historical';
   if(name==='peers')return 'comparison';
@@ -3484,15 +3948,10 @@ function applySavedTabOrder(){
     const saved=[...new Set(JSON.parse(localStorage.getItem(TAB_ORDER_KEY)||'[]').map(normalizeTabName))];
     if(!Array.isArray(saved))return;
     if(!saved.length){
-      VALID_TABS.forEach(name=>{const btn=TABS.querySelector(`[data-tab="${name}"]`);if(btn)TABS.appendChild(btn);});
+      DEFAULT_TAB_ORDER.forEach(name=>{const btn=TABS.querySelector(`[data-tab="${name}"]`);if(btn)TABS.appendChild(btn);});
       return;
     }
-    const oldImplied=saved.indexOf('implied');
-    if(oldImplied>=0)saved.splice(oldImplied,1);
-    const at=Math.max(0,saved.indexOf('overview'))+1;
-    saved.splice(at,0,'implied');
-    if(!saved.includes('daily-news'))saved.splice(at,0,'daily-news');
-    const order=[...saved.filter(x=>VALID_TABS.includes(x)),...VALID_TABS.filter(x=>!saved.includes(x))];
+    const order=[...saved.filter(x=>VALID_TABS.includes(x)),...DEFAULT_TAB_ORDER.filter(x=>!saved.includes(x))];
     order.forEach(name=>{const btn=TABS.querySelector(`[data-tab="${name}"]`);if(btn)TABS.appendChild(btn);});
   }catch(_){}
 }
@@ -3531,6 +3990,11 @@ function initDraggableTabs(){
 function showTab(name,{push=true,scroll=true}={}){
   name=normalizeTabName(name);
   if(!VALID_TABS.includes(name))name='overview';
+  const section=SECTION_COPY[name]||SECTION_COPY.overview;
+  if($('#sectionEyebrow'))$('#sectionEyebrow').textContent=section.eyebrow;
+  if($('#sectionTitle'))$('#sectionTitle').textContent=section.title;
+  if($('#sectionDescription'))$('#sectionDescription').textContent=section.description;
+  if($('#sectionChip'))$('#sectionChip').textContent=section.chip;
   document.querySelectorAll('[data-tg]').forEach(el=>{el.classList.toggle('tg-hide', el.dataset.tg!==name);});
   [...TABS.children].forEach(b=>{
     const on=b.dataset.tab===name;
@@ -3538,7 +4002,11 @@ function showTab(name,{push=true,scroll=true}={}){
     b.setAttribute('aria-selected',on?'true':'false');
   });
   if(push)history.replaceState(null,'','#'+name);
-  if(scroll)window.scrollTo({top:0,behavior:'smooth'});
+  if(scroll){
+    const active=document.querySelector(`[data-tg="${name}"]`);
+    const top=name==='meme'&&active?Math.max(0,active.offsetTop-72):0;
+    requestAnimationFrame(()=>setTimeout(()=>window.scrollTo({top,behavior:name==='meme'?'auto':'smooth'}),30));
+  }
   if(booted)requestAnimationFrame(render);
 }
 $('#bwTeaserLink')?.addEventListener('click',e=>{
@@ -3556,8 +4024,11 @@ TABS.addEventListener('keydown',e=>{
 
 /* ---------- init ---------- */
 $('#genstamp').textContent='Exact ET closes reconciled through 2026-07-13 · daily reset 00:00 ET · click Refresh live to sync on-chain';
+initRadarTheme();
+initMemeLab();
 initDraggableTabs();
-showTab(location.hash.replace('#','')||'overview',{push:false,scroll:false});
+const INITIAL_TAB=location.hash.replace('#','')||'overview';
+showTab(INITIAL_TAB,{push:false,scroll:INITIAL_TAB==='meme'});
 try{
   initForecast();
   render();
