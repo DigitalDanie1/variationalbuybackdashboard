@@ -569,6 +569,36 @@ const REVENUE_EVIDENCE=(()=>{
 })();
 MKT.spreadShare=REVENUE_EVIDENCE.observedShare;
 
+/* Gross spreads are not read on-chain. They are inferred from treasury inflow.
+   Use the latest report-observed allocation available on each date instead of
+   applying today's 20% rate to the full history. Before the first comparable
+   report, fall back to the 10% rate stated in Docs. */
+const OBSERVED_SPREAD_SHARES=BIWEEKLY_HISTORY
+  .filter(r=>r.spreads2w>0&&r.treasury2w>=0)
+  .map(r=>({d:r.asOf,rate:r.treasury2w/r.spreads2w}))
+  .filter(x=>Number.isFinite(x.rate)&&x.rate>0&&x.rate<1);
+function spreadShareAt(d){
+  let hit=null;
+  for(const x of OBSERVED_SPREAD_SHARES){if(x.d<=d)hit=x;else break;}
+  return hit?{rate:hit.rate,asOf:hit.d,source:'official report'}:{rate:MKT.docsSpreadShare,asOf:'Docs',source:'Docs assumption'};
+}
+function impliedSpreadsBetween(startExclusive,endInclusive,totalInflow){
+  let previous=cumAt(startExclusive),total=0;
+  for(const p of SERIES){
+    if(p.d<=startExclusive)continue;
+    if(p.d>endInclusive)break;
+    const delta=Math.max(0,p.v-previous);
+    total+=delta/spreadShareAt(p.d).rate;
+    previous=p.v;
+  }
+  const measured=Number.isFinite(totalInflow)?Math.max(0,totalInflow):Math.max(0,currentTreasuryBalance()-cumAt(startExclusive));
+  const accounted=Math.max(0,previous-cumAt(startExclusive));
+  const residual=Math.max(0,measured-accounted);
+  if(residual)total+=residual/spreadShareAt(endInclusive).rate;
+  return total;
+}
+const impliedSpreadsAllTime=()=>impliedSpreadsBetween(addDays(SERIES[0].d,-1),currentTreasuryDate(),currentTreasuryBalance());
+
 /* perp-DEX peer ranking by open interest (Perpetual Pulse snapshot) */
 const PEERS = {
   asOf:'loading live data', snapAsOf:'2026-07-08 board', live:false, total:16.408469162e9, count:15, varRank:3, varShare:7.4, vsHl:8.9,
@@ -590,20 +620,23 @@ const PEERS = {
     {n:'GMX',oi:49634401,vol:42765304,tvl:252749585,pairs:6,maker:'0.04%',taker:'0.06%',lev:'100x',url:'https://app.gmx.io/'}
   ]
 };
-/* the fee-efficiency thesis: how much volume / OI does it take to make $1?
-   revenue = treasury inflow (on-chain, live); total fees (spreads) = revenue / spreadShare */
+/* Fee-efficiency proxy: how much volume / OI accompanies each $1?
+   Treasury inflow is a wallet-balance delta, not audited revenue. Implied gross
+   spreads use the report-observed allocation in effect on each date. */
 function computeEff(){
   const cur=currentTreasuryBalance(), asOf=currentTreasuryDate();
-  const rev30=Math.max(1,cur-cumAt(addDays(asOf,-30)));     // treasury revenue, trailing 30d (live)
+  const start30=addDays(asOf,-30);
+  const rev30=Math.max(1,cur-cumAt(start30));               // net treasury inflow, trailing 30d
+  const spread30=Math.max(1,impliedSpreadsBetween(start30,asOf,rev30));
   const dailyRev=rev30/30;
-  const volPerRev=MKT.vol.d30/rev30;                        // $ volume per $1 treasury revenue
-  const volPerFee=volPerRev*MKT.spreadShare;                // $ volume per $1 total fee (spread)
-  const takeBpsRev=rev30/MKT.vol.d30*1e4;                   // treasury take-rate on volume
-  const takeBpsFee=takeBpsRev/MKT.spreadShare;              // total-spread take-rate on volume
-  const oiPerDayRev=MKT.oi/dailyRev;                        // $ OI per $1/day treasury revenue
+  const volPerRev=MKT.vol.d30/rev30;                        // $ volume per $1 net treasury inflow
+  const volPerFee=MKT.vol.d30/spread30;                     // $ volume per $1 implied gross spread
+  const takeBpsRev=rev30/MKT.vol.d30*1e4;                   // net-inflow proxy on volume
+  const takeBpsFee=spread30/MKT.vol.d30*1e4;                // implied gross-spread rate on volume
+  const oiPerDayRev=MKT.oi/dailyRev;                        // $ OI per $1/day net treasury inflow
   const oiTurnover=(MKT.vol.d30/30)/MKT.oi;                 // volume/OI, ×/day
   const annRevYield=dailyRev*365/MKT.oi*100;                // annualised treasury yield on OI
-  const feesCum=cur/MKT.spreadShare;                        // implied cumulative spreads paid
+  const feesCum=impliedSpreadsAllTime();                    // period-specific implied cumulative spreads
   return {cur,rev30,dailyRev,volPerRev,volPerFee,takeBpsRev,takeBpsFee,oiPerDayRev,oiTurnover,annRevYield,feesCum};
 }
 let EFF_WINDOW='month';
@@ -626,19 +659,21 @@ function computeEffWindow(key=EFF_WINDOW){
   const first=SERIES[0], cur=currentTreasuryBalance(), asOf=currentTreasuryDate();
   const allDays=Math.max(1,Math.round((new Date(asOf+'T00:00:00Z')-new Date(first.d+'T00:00:00Z'))/86400000)+1);
   let days=cfg.days||allDays;
-  let rev,vol,volSource='DeFiLlama exact daily series';
+  let rev,vol,volSource='DeFiLlama exact daily series',startDate;
   if(key==='month'){
     const monthStart=asOf.slice(0,7)+'-01';
+    startDate=addDays(monthStart,-1);
     days=Math.max(1,Math.round((new Date(asOf+'T00:00:00Z')-new Date(monthStart+'T00:00:00Z'))/86400000)+1);
     rev=Math.max(1,cur-cumAt(addDays(monthStart,-1)));
     vol=(MKT.vol.d30/30)*days;
     volSource='30D avg daily volume × month elapsed days';
   }else{
+    startDate=cfg.days?addDays(asOf,-cfg.days):addDays(first.d,-1);
     rev=cfg.days?Math.max(1,cur-cumAt(addDays(asOf,-cfg.days))):cur;
     vol=MKT.vol[cfg.volKey];
   }
   const dailyRev=rev/days;
-  const spread=rev/MKT.spreadShare;
+  const spread=impliedSpreadsBetween(startDate,asOf,rev);
   const dailySpread=spread/days;
   const volPerRev=vol/rev;
   const volPerFee=vol/spread;
@@ -686,17 +721,18 @@ function renderDailyRevenueCalendar(e){
   for(let i=0;i<lead;i++)html+='<div class="edc-cell empty" aria-hidden="true"></div>';
   vals.forEach(x=>{
     const hasData=x.d<=SERIES[SERIES.length-1].d&&x.d>=SERIES[0].d;
-    const fee=x.rev/MKT.spreadShare;
+    const share=spreadShareAt(x.d);
+    const fee=x.rev/share.rate;
     const bps=dailyVol>0?x.rev/dailyVol*1e4:0;
     const yld=MKT.oi>0?x.rev*365/MKT.oi*100:0;
     const heat=Math.max(0,Math.min(100,x.rev/max*100));
     const today=x.d===SERIES[SERIES.length-1].d;
-    const title=`${x.d}: treasury ${fmtUSD(x.rev)}, spread fees ${fmtUSD(fee)}, proxy wallet bps ${bps.toFixed(3)}, OI yield ${yld.toFixed(2)}%`;
+    const title=`${x.d}: net treasury inflow ${fmtUSD(x.rev)}, implied gross spreads ${fmtUSD(fee)} at ${(share.rate*100).toFixed(1)}%, proxy wallet bps ${bps.toFixed(3)}, OI yield ${yld.toFixed(2)}%`;
     html+=`<div class="edc-cell ${today?'today':''} ${hasData?'':'no-data'}" style="--heat:${hasData?heat.toFixed(1):'0'}" title="${hasData?title:x.d+': no embedded wallet data yet'}">
       <div class="edc-d"><span>${+x.d.slice(-2)}</span>${today?'<i>latest</i>':''}</div>
       <div class="edc-money">${hasData?fmtUSD(x.rev):'no data'}</div>
       <div class="edc-meta">
-        <span>fees <b>${hasData?fmtUSD(fee):'—'}</b></span>
+        <span>implied spreads <b>${hasData?fmtUSD(fee):'—'}</b></span>
         <span class="bps">wallet bps <b>${hasData?bps.toFixed(3):'—'}</b></span>
         <span class="yield">OI yield <b>${hasData?yld.toFixed(2)+'%':'—'}</b></span>
       </div>
@@ -734,7 +770,7 @@ function renderCompletedTreasuryGrowth(){
   $('#pmTreasuryGrowthAsOf') && ($('#pmTreasuryGrowthAsOf').textContent=`through ${latest.d}`);
 }
 function renderImpliedSpreadTotal(treasuryTotal){
-  const totalFees=treasuryTotal/MKT.spreadShare;
+  const totalFees=impliedSpreadsAllTime();
   const olpSide=totalFees-treasuryTotal;
   const burnFirepower=treasuryTotal*MKT.burnShare;
   const compact=n=>n>=1e9?'$'+(n/1e9).toFixed(2)+'B':n>=1e6?'$'+(n/1e6).toFixed(2)+'M':fmtUSD(n);
@@ -750,7 +786,7 @@ function renderImpliedSpreadTotal(treasuryTotal){
   $('#pmSpreadTotal') && ($('#pmSpreadTotal').textContent=compact(totalFees));
   $('#pmTreasuryFormula') && ($('#pmTreasuryFormula').innerHTML=`Formula: <b>USDC balanceOf(${walletLink(ADDR.treasury,'0x5e91...d645')}) = ${fmtUSD(treasuryTotal)}</b>`);
   $('#pmDailyFormula') && ($('#pmDailyFormula').innerHTML=days?`Formula: <b>(${fmtUSD(treasuryTotal)} - ${fmtUSD(start30)}) / ${days}D = ${fmtUSD(avg30)}/day</b>`:'Formula: <b>waiting for historical treasury series</b>');
-  $('#pmFeesFormula') && ($('#pmFeesFormula').innerHTML=`Formula: <b>${fmtUSD(treasuryTotal)} / ${(MKT.spreadShare*100).toFixed(0)}% = ${compact(totalFees)}</b>`);
+  $('#pmFeesFormula') && ($('#pmFeesFormula').innerHTML=`Formula: <b>daily net treasury inflow ÷ report-observed share = ${compact(totalFees)} implied gross spreads</b>`);
   renderCompletedTreasuryGrowth();
   renderPmDailyMonitor();
   renderMoneyMap(treasuryTotal);
@@ -829,8 +865,8 @@ function renderPmDailyMonitor(){
 /* income-flow sankey: gross spreads -> non-treasury pool / treasury -> burn / dry powder */
 function renderMoneyMap(T){
   const svg=$('#pmSankey'); if(!svg||!T)return;
-  const F=T/MKT.spreadShare, REMAINDER=F-T, BURN=T*MKT.burnShare, DRY=T-BURN;
-  const treasuryPct=(MKT.spreadShare*100).toFixed(0), remainderPct=(100-MKT.spreadShare*100).toFixed(0);
+  const F=impliedSpreadsAllTime(), REMAINDER=Math.max(0,F-T), BURN=T*MKT.burnShare, DRY=T-BURN;
+  const currentPct=(MKT.spreadShare*100).toFixed(0), treasuryPct=(T/F*100).toFixed(1), remainderPct=(100-T/F*100).toFixed(1);
   const c=n=>n>=1e9?'$'+(n/1e9).toFixed(2)+'B':'$'+(n/1e6).toFixed(2)+'M';
   const W=720,H=230,bw=11,x1=20,x2=350,x3=690,top=46,bot=184,gap=9;
   const usable=bot-top-gap, hv=v=>Math.max(4,v/F*usable);
@@ -854,7 +890,7 @@ function renderMoneyMap(T){
      <linearGradient id="pmRibD" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#22e6a0" stop-opacity=".45"/><stop offset="1" stop-color="#22e6a0" stop-opacity=".35"/></linearGradient>
    </defs>
    ${rib(x1+bw,yA0,yA0+hOLP,x2,yO0,yO1,'url(#pmRibOlp)',`Non-treasury pool · ${fmtUSD(REMAINDER)} (${remainderPct}%) before costs, rewards, and OLP PnL`)}
-   ${rib(x1+bw,yA0+hOLP+gap,yA1,x2,yT0,yT1,'url(#pmRibT)',`Protocol treasury · ${fmtUSD(T)} (${treasuryPct}%)`)}
+   ${rib(x1+bw,yA0+hOLP+gap,yA1,x2,yT0,yT1,'url(#pmRibT)',`Current treasury balance · ${fmtUSD(T)} (${treasuryPct}% of modeled historical spreads)`)}
    ${rib(x2+bw,yT0,tSplit,x3,yB0,yB1,'url(#pmRibB)',`$VAR buy & burn firepower · ≥ ${fmtUSD(BURN)} (≥30% of treasury)`)}
    ${rib(x2+bw,tSplit,yT1,x3,yD0,yD1,'url(#pmRibD)',`Dry powder retained · ≤ ${fmtUSD(DRY)}`)}
    <rect x="${x1}" y="${yA0}" width="${bw}" height="${yA1-yA0}" rx="3" fill="#3f74c9"/>
@@ -866,7 +902,7 @@ function renderMoneyMap(T){
    <text x="${x1}" y="36" fill="#eaf1ff" font-size="16" font-weight="900">${c(F)} · 100%</text>
    <text x="${x2}" y="20" fill="#7d8aa5" font-size="9.5" font-weight="800" letter-spacing="1.5">SPLIT</text>
    <text x="${x2}" y="36" fill="#eaf1ff" font-size="15" font-weight="900">Operating pool ${c(REMAINDER)} · ${remainderPct}%</text>
-   <text x="${x2}" y="${Math.min(H-10,yT1+22)}" fill="#22e6a0" font-size="15" font-weight="900">Treasury ${c(T)} · ${treasuryPct}%</text>
+   <text x="${x2}" y="${Math.min(H-10,yT1+22)}" fill="#22e6a0" font-size="15" font-weight="900">Treasury balance ${c(T)} · current observed share ${currentPct}%</text>
    <text x="${x3}" y="20" fill="#7d8aa5" font-size="9.5" font-weight="800" letter-spacing="1.5" text-anchor="end">USE OF TREASURY</text>
    <text x="${x3}" y="${Math.max(56,yB0-8)}" fill="#c7bcff" font-size="13" font-weight="900" text-anchor="end">Burn ≥ ${c(BURN)}</text>
    <text x="${x3}" y="${Math.min(H-10,yD1+16)}" fill="#7fe8c4" font-size="13" font-weight="900" text-anchor="end">Dry powder ≤ ${c(DRY)}</text>`;
@@ -1162,20 +1198,20 @@ function renderKing(){
    A/B reproduce the Perpetual Pulse "Circulating MarketCap vs OI" model (R^2~0.74, log-log). */
 const VAL_FIT={A:10.0339,B:0.8753,r2:0.74};
 const VAL_FLOAT=0.25; // assumed circulating float at TGE, for FDV
-let VAL_MCAP_ASOF='CoinGecko snapshot · 2026-07-10 16:55 SGT';
+let VAL_MCAP_ASOF='CoinGecko snapshot · 2026-08-01 18:35 SGT';
 const VAL_COMPS=[
-  {n:'Hyperliquid',cg:'hyperliquid',oi:10650289066,mc:15251711817,big:1},
-  {n:'Aster',cg:'aster-2',oi:1873558499,mc:1694156746,big:1},
-  {n:'Lighter',cg:'lighter',oi:841224409,mc:617506501,big:1},
-  {n:'Jupiter',cg:'jupiter-exchange-solana',oi:231885286,mc:696647498,big:1},
-  {n:'edgeX',cg:'edgex',oi:297961154,mc:143319946},
-  {n:'dYdX',cg:'dydx-chain',oi:39069154,mc:113579140},
-  {n:'GMX',cg:'gmx',oi:45194812,mc:64586151},
-  {n:'ApeX Protocol',cg:'apex-token-2',oi:113429724,mc:38384644},
-  {n:'Avantis',cg:'avantis',oi:12551268,mc:31220697},
-  {n:'Orderly',cg:'orderly-network',oi:35976834,mc:13370390},
-  {n:'Gains Network',cg:'gains-network',oi:3337198,mc:14535752},
-  {n:'Drift',cg:'drift-protocol',oi:123964778,mc:9022464}
+  {n:'Hyperliquid',cg:'hyperliquid',oi:10650289066,mc:11599713040,fdv:52137671327,big:1},
+  {n:'Aster',cg:'aster-2',oi:1873558499,mc:1605324651,fdv:4667103076,big:1},
+  {n:'Lighter',cg:'lighter',oi:841224409,mc:509610389,fdv:2038441555,big:1},
+  {n:'Jupiter',cg:'jupiter-exchange-solana',oi:231885286,mc:636595444,fdv:1315717088,big:1},
+  {n:'edgeX',cg:'edgex',oi:297961154,mc:124286369,fdv:355103912},
+  {n:'dYdX',cg:'dydx-chain',oi:39069154,mc:95435590,fdv:107776514},
+  {n:'GMX',cg:'gmx',oi:45194812,mc:62567571,fdv:62567571},
+  {n:'ApeX Protocol',cg:'apex-token-2',oi:113429724,mc:32226080,fdv:220516983},
+  {n:'Avantis',cg:'avantis',oi:12551268,mc:27915130,fdv:83387800},
+  {n:'Orderly',cg:'orderly-network',oi:35976834,mc:11242088,fdv:28215849},
+  {n:'Gains Network',cg:'gains-network',oi:3337198,mc:11758338,fdv:11758338},
+  {n:'Drift',cg:'drift-protocol',oi:123964778,mc:9022464,fdv:12178493}
 ];
 const valPred=oi=>VAL_FIT.A*Math.pow(oi,VAL_FIT.B);
 function fmtBig(v){return v>=1e9?'$'+(v/1e9).toFixed(2)+'B':v>=1e6?'$'+(v/1e6).toFixed(0)+'M':'$'+fmtK(v);}
@@ -1245,19 +1281,21 @@ function renderValuation(){
     'Gains Network':{dx:16,dy:-20,anchor:'start'},
     Drift:{dx:16,dy:24,anchor:'start'}
   };
-  const drawLabel=(name,x,y,col,cls='val-peer-label')=>{
+  const drawLabel=(name,x,y,col,sub='',cls='val-peer-label')=>{
     const o=labelOffset[name]||{dx:14,dy:-16,anchor:'start'};
     const tx=Math.max(pl+8,Math.min(plotRight-8,x+o.dx));
     const ty=Math.max(pt+14,Math.min(H-pb-8,y+o.dy));
     return `<text class="${cls}" x="${tx.toFixed(1)}" y="${ty.toFixed(1)}" text-anchor="${o.anchor||'start'}">${escapeHTML(labelText(name))}</text>`+
-      `<text class="val-peer-sub" x="${tx.toFixed(1)}" y="${(ty+12).toFixed(1)}" text-anchor="${o.anchor||'start'}" fill="${col}">${escapeHTML(name==='Variational'?'MODEL':'')}</text>`;
+      `<text class="val-peer-sub" x="${tx.toFixed(1)}" y="${(ty+12).toFixed(1)}" text-anchor="${o.anchor||'start'}" fill="${col}">${escapeHTML(sub)}</text>`;
   };
   let dots='';
   VAL_COMPS.forEach(c=>{if(c.oi<=0||c.mc<=0)return;
     const imp=valPred(c.oi), prem=c.mc/imp, col=premCol(prem);
     const x=X(c.oi), ya=Y(c.mc), yi=Y(imp), logo=PLOGO[c.n], s=c.big?38:34;
     const pct=(prem-1)*100,gap=`${pct>=0?'+':''}${pct.toFixed(0)}%`;
-    dots+=`<g><title>${escapeHTML(c.n)} · Actual ${fmtBig(c.mc)} · Model ${fmtBig(imp)} · ${gap}</title>`+
+    const floatPct=Number.isFinite(c.fdv)&&c.fdv>0?c.mc/c.fdv*100:null;
+    const floatLabel=floatPct!=null?floatPct.toFixed(0)+'% circulating':'float unavailable';
+    dots+=`<g><title>${escapeHTML(c.n)} · FDV ${Number.isFinite(c.fdv)?fmtBig(c.fdv):'unavailable'} · MCAP ${fmtBig(c.mc)} · ${floatLabel} · Model ${fmtBig(imp)} · ${gap}</title>`+
       `<line x1="${x.toFixed(1)}" y1="${yi.toFixed(1)}" x2="${x.toFixed(1)}" y2="${ya.toFixed(1)}" stroke="${col}" stroke-width="1.5" stroke-dasharray="3 3" opacity=".72"/>`+
       `<circle cx="${x.toFixed(1)}" cy="${yi.toFixed(1)}" r="3.2" fill="#07111d" stroke="${col}" stroke-width="1.5"/>`;
     if(logo){
@@ -1266,26 +1304,33 @@ function renderValuation(){
     }else{
       dots+=`<circle cx="${x.toFixed(1)}" cy="${ya.toFixed(1)}" r="8" fill="${col}" stroke="var(--panel)" stroke-width="2"/>`;
     }
-    dots+=drawLabel(c.n,x,ya,col)+`</g>`;
+    dots+=drawLabel(c.n,x,ya,col,floatLabel)+`</g>`;
   });
   const vx=X(oi),vy=Y(mcap),vs=48;
+  const fdv20=mcap/.20,fdv25=mcap/.25,fdv30=mcap/.30;
   const vlogo=PLOGO['Variational'];
-  const hero=`<circle cx="${vx.toFixed(1)}" cy="${vy.toFixed(1)}" r="28" fill="rgba(199,242,132,.13)"/>`+
+  const hero=`<g><title>Variational · Implied MCAP ${fmtBig(mcap)} · Model FDV: 20% ${fmtBig(fdv20)}, 25% ${fmtBig(fdv25)}, 30% ${fmtBig(fdv30)} tokens at TGE</title><circle cx="${vx.toFixed(1)}" cy="${vy.toFixed(1)}" r="28" fill="rgba(199,242,132,.13)"/>`+
     `<rect x="${(vx-vs/2).toFixed(1)}" y="${(vy-vs/2).toFixed(1)}" width="${vs}" height="${vs}" rx="13" fill="var(--panel)" stroke="#c7f284" stroke-width="3"/>`+
     `<image href="${vlogo}" x="${(vx-vs/2+7).toFixed(1)}" y="${(vy-vs/2+7).toFixed(1)}" width="${vs-14}" height="${vs-14}" preserveAspectRatio="xMidYMid meet"/>`+
     `<text class="val-var-label" x="${Math.min(plotRight-12,vx+34).toFixed(1)}" y="${(vy-9).toFixed(1)}" text-anchor="start">Variational</text>`+
-    `<text class="val-peer-sub" x="${Math.min(plotRight-12,vx+34).toFixed(1)}" y="${(vy+6).toFixed(1)}" text-anchor="start">implied ${fmtBig(mcap)}</text>`;
+    `<text class="val-peer-sub" x="${Math.min(plotRight-12,vx+34).toFixed(1)}" y="${(vy+6).toFixed(1)}" text-anchor="start">Implied MCAP ${fmtBig(mcap)}</text>`+
+    `<text class="val-peer-sub val-tge-assumption" x="${Math.min(plotRight-12,vx+34).toFixed(1)}" y="${(vy+20).toFixed(1)}" text-anchor="start">FDV: 20% ${fmtBig(fdv20)} · 25% ${fmtBig(fdv25)} · 30% ${fmtBig(fdv30)}</text></g>`;
   svg.innerHTML=`<defs>`+
     `<linearGradient id="valTrend" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#4f7fc4"/><stop offset="1" stop-color="#c7f284"/></linearGradient></defs>`+
     grid+trend+dots+legend+hero;
   const side=$('#valSide');
   if(side){
-    const rows=VAL_COMPS.filter(c=>c.oi>0&&c.mc>0).map(c=>({n:c.n,mc:c.mc,imp:valPred(c.oi),prem:c.mc/valPred(c.oi)}));
-    const chip=n=>PLOGO[n]?`<img class="vs-logo" src="${PLOGO[n]}" alt="" width="20" height="20" loading="lazy" decoding="async" style="width:20px!important;height:20px!important;min-width:20px!important;max-width:20px!important;min-height:20px!important;max-height:20px!important;object-fit:contain!important">`:`<span class="vs-dot"></span>`;
+    const rows=VAL_COMPS.filter(c=>c.oi>0&&c.mc>0).map(c=>({n:c.n,mc:c.mc,fdv:c.fdv,imp:valPred(c.oi),prem:c.mc/valPred(c.oi)}));
+    const chip=n=>PLOGO[n]?`<img class="vs-logo" src="${PLOGO[n]}" alt="" width="20" height="20" loading="lazy" decoding="async" onerror="this.style.display='none'" style="width:20px!important;height:20px!important;min-width:20px!important;max-width:20px!important;min-height:20px!important;max-height:20px!important;object-fit:contain!important">`:`<span class="vs-dot"></span>`;
     const status=p=>p>=1.08?{cls:'premium',word:'PREMIUM'}:p<=0.92?{cls:'discount',word:'DISCOUNT'}:{cls:'fair',word:'NEAR MODEL'};
-    side.innerHTML=`<div class="vs-h"><span>All peers · Actual vs Model</span><span class="vs-hs">${escapeHTML(VAL_MCAP_ASOF)}</span></div>`+
-      rows.map(r=>{const s=status(r.prem),pct=(r.prem-1)*100;return `<div class="vs-row"><span class="n">${chip(r.n)}<span class="vs-nm"><b>${escapeHTML(r.n)}</b></span></span><span class="vs-values"><span class="vs-mcap"><b>${fmtBig(r.mc)}</b><small>actual MCAP</small></span><span class="vs-mcap model"><b>${fmtBig(r.imp)}</b><small>model MCAP</small></span></span><span class="v ${s.cls}" title="Actual market cap minus model-implied market cap"><b>${pct>=0?'+':''}${pct.toFixed(0)}%</b><small>${s.word} · ${r.prem.toFixed(2)}x</small></span></div>`}).join('')+
-      `<div class="vs-row me"><span class="n">${chip('Variational')}<span class="vs-nm"><b>Variational</b><small>no traded MCAP yet</small></span></span><span class="vs-values"><span class="vs-mcap actual-empty"><b>—</b><small>actual MCAP</small></span><span class="vs-mcap model"><b>${fmtBig(mcap)}</b><small>model MCAP</small></span></span><span class="v fair"><b>PRE-TGE</b><small>not priced</small></span></div>`;}
+    const varRows=`<section class="var-scenario-card">
+      <div class="var-scenario-head"><span class="n">${chip('Variational')}<span class="vs-nm"><b>Variational · pre-TGE valuation</b><small>Not traded yet · model estimate</small></span></span><span class="var-common-mcap"><small>ONE SHARED ESTIMATE</small><b>${fmtBig(mcap)} MCAP</b></span></div>
+      <p class="var-scenario-explain">Same estimated market cap. Fewer tokens released at TGE means a higher FDV.</p>
+      <div class="var-scenario-grid">${[20,25,30].map(p=>`<div class="var-scenario${p===25?' base':''}"><span class="var-float"><b>${p}%</b><small>tokens at TGE</small></span><span class="var-arrow">→</span><span class="var-fdv"><b>${fmtBig(mcap/(p/100))}</b><small>implied FDV</small></span>${p===25?'<em>BASE CASE</em>':''}</div>`).join('')}</div>
+    </section>`;
+    side.innerHTML=`<div class="vs-h"><span>Protocol</span><span>FDV</span><span>MCAP</span><span>vs model</span><em>${escapeHTML(VAL_MCAP_ASOF)}</em></div>`+
+      varRows+
+      rows.map(r=>{const s=status(r.prem),pct=(r.prem-1)*100;return `<div class="vs-row"><span class="n">${chip(r.n)}<span class="vs-nm"><b>${escapeHTML(r.n)}</b></span></span><span class="vs-values"><span class="vs-mcap"><b>${Number.isFinite(r.fdv)&&r.fdv>0?fmtBig(r.fdv):'—'}</b><small>FDV</small></span><span class="vs-mcap model"><b>${fmtBig(r.mc)}</b><small>actual MCAP</small></span></span><span class="v ${s.cls}" title="Actual market cap minus model-implied market cap"><b>${pct>=0?'+':''}${pct.toFixed(0)}%</b><small>${s.word} · ${r.prem.toFixed(2)}x</small></span></div>`}).join('');}
   const note=$('#valNote');
   if(note)note.innerHTML=`$VAR has no traded market cap before TGE. The ${fmtBig(mcap)} figure is a model estimate, not a current price. Model: MCAP ≈ ${VAL_FIT.A.toFixed(1)} × OI<sup>${VAL_FIT.B}</sup>, R² ${VAL_FIT.r2}. Market caps and available OI update from <a href="https://www.coingecko.com/" target="_blank" rel="noopener">CoinGecko</a>. Framework reference: <a href="https://www.perpetualpulse.xyz/" target="_blank" rel="noopener">Perpetual Pulse</a>. Not financial advice.`;
 }
@@ -1293,22 +1338,24 @@ function renderValuation(){
 async function refreshValuationMcaps(){
   try{
     const ids=VAL_COMPS.map(c=>c.cg).filter(Boolean).join(',');
-    const url='https://api.coingecko.com/api/v3/simple/price?ids='+encodeURIComponent(ids)+'&vs_currencies=usd&include_market_cap=true&include_last_updated_at=true';
+    const url='https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids='+encodeURIComponent(ids)+'&sparkline=false';
     const res=await fetch(url);
     if(!res.ok)throw new Error('coingecko mcap http '+res.status);
-    const data=await res.json();
+    const list=await res.json();
+    const data=Object.fromEntries((Array.isArray(list)?list:[]).map(x=>[x.id,x]));
     let hit=0,latest=0;
     VAL_COMPS.forEach(c=>{
       const live=data[c.cg];
-      if(live&&Number.isFinite(+live.usd_market_cap)&&+live.usd_market_cap>0){
-        c.mc=+live.usd_market_cap;
+      if(live&&Number.isFinite(+live.market_cap)&&+live.market_cap>0){
+        c.mc=+live.market_cap;
+        c.fdv=Number.isFinite(+live.fully_diluted_valuation)&&+live.fully_diluted_valuation>0?+live.fully_diluted_valuation:null;
         c.mcLive=true;
         hit++;
-        latest=Math.max(latest,+live.last_updated_at||0);
+        latest=Math.max(latest,Date.parse(live.last_updated)||0);
       }
     });
     if(!hit)throw new Error('no current market caps');
-    const stamp=latest?new Date(latest*1000):new Date();
+    const stamp=latest?new Date(latest):new Date();
     VAL_MCAP_ASOF='Live CoinGecko · '+stamp.toLocaleString('en-US',{month:'short',day:'2-digit',hour:'2-digit',minute:'2-digit',timeZoneName:'short'});
     renderValuation();
   }catch(err){
@@ -1588,7 +1635,7 @@ function renderVsLighter(){
   const va=PEERS.list.find(p=>p.me), li=VSL.li, ext=PEERS.list.find(p=>p.n==='Extended');
   const last=SERIES[SERIES.length-1];
   const rev30=Math.max(0,last.v-cumAt(addDays(last.d,-30)));
-  const fees30=rev30/MKT.spreadShare;
+  const fees30=impliedSpreadsBetween(addDays(last.d,-30),last.d,rev30);
   const extFees30=COMP_FEES.extended.fees30;
   const oiEdge=li.oi?va.oi/li.oi:0;
   const oiExtEdge=ext?.oi?va.oi/ext.oi:0;
@@ -1599,14 +1646,12 @@ function renderVsLighter(){
   $('#valOiEdgeSub') && ($('#valOiEdgeSub').textContent=`${oiEdge.toFixed(1)}× Lighter · ${oiExtEdge.toFixed(1)}× Extended`);
   $('#valFeeEdge') && ($('#valFeeEdge').textContent='Variational '+feeEdge.toFixed(1)+'×');
   $('#valFeeEdgeSub') && ($('#valFeeEdgeSub').textContent=`${feeEdge.toFixed(1)}× Lighter · ${feeExtEdge.toFixed(1)}× Extended`);
-  if($('#cmpRevenueEdge'))$('#cmpRevenueEdge').textContent=revGap>=1?'Lighter '+revGap.toFixed(1)+'×':'Variational '+(1/revGap).toFixed(1)+'×';
-  if($('#cmpRevenueEdgeSub'))$('#cmpRevenueEdgeSub').textContent=revGap>=1
-    ?'Lighter kept '+revGap.toFixed(1)+'× more, versus Variational\'s observed '+(MKT.spreadShare*100).toFixed(0)+'% treasury capture'
-    :'Variational kept '+(1/revGap).toFixed(1)+'× more booked revenue than Lighter';
-  if($('#cmpVerdict'))$('#cmpVerdict').textContent=`Variational leads both peers on OI and 30D fee pool. ${revGap>=1?'Lighter':'Variational'} leads published booked revenue.`;
-  if($('#cmpVerdictSub'))$('#cmpVerdictSub').textContent=`Variational has ${oiEdge.toFixed(1)}× Lighter OI and ${oiExtEdge.toFixed(1)}× Extended OI. Extended publishes fees, but no matched booked-revenue series, so that cell remains explicitly unavailable.`;
-  $('#varThesis') && ($('#varThesis').innerHTML=`<b>${oiEdge.toFixed(1)}× Lighter OI</b> and <b>${feeEdge.toFixed(1)}× Lighter 30D fee pool</b>. The current revenue line is lower because Variational only books the treasury cut, not the OLP side.`);
-  $('#lighterThesis') && ($('#lighterThesis').innerHTML=`Lighter is the clean market comp: <b>${revGap.toFixed(1)}× Variational 30D booked revenue</b>, but smaller OI and fee pool in this snapshot.`);
+  if($('#cmpRevenueEdge'))$('#cmpRevenueEdge').textContent='Not same basis';
+  if($('#cmpRevenueEdgeSub'))$('#cmpRevenueEdgeSub').textContent=`VAR ${cB(rev30)} wallet inflow · Lighter ${cB(li.rev30)} reported revenue`;
+  if($('#cmpVerdict'))$('#cmpVerdict').textContent=`Variational leads both peers on OI and modeled 30D fee pool. Monetization is not directly comparable.`;
+  if($('#cmpVerdictSub'))$('#cmpVerdictSub').textContent=`Variational has ${oiEdge.toFixed(1)}× Lighter OI and ${oiExtEdge.toFixed(1)}× Extended OI. Its treasury figure is a net wallet-balance change; Lighter's is reported protocol revenue. Extended has no matched revenue series.`;
+  $('#varThesis') && ($('#varThesis').innerHTML=`<b>${oiEdge.toFixed(1)}× Lighter OI</b> and <b>${feeEdge.toFixed(1)}× Lighter modeled 30D fee pool</b>. Variational's monetization signal here is net treasury-wallet inflow, not audited revenue.`);
+  $('#lighterThesis') && ($('#lighterThesis').innerHTML=`Lighter publishes protocol revenue through DeFiLlama. Do not divide it by Variational's wallet inflow to infer a revenue lead; the definitions differ.`);
   const SRC={
     cg:{cls:'src-cg',label:PEERS.live?'CoinGecko live':'Pulse snapshot'},
     chain:{cls:'src-chain',label:'On-chain wallet'},
@@ -1618,8 +1663,8 @@ function renderVsLighter(){
   const rows=[
     {k:'Open interest', a:va.oi, b:li.oi, c:ext?.oi, an:'live venue capacity', bn:'live venue capacity', cn:'live venue capacity', as:OI_SRC, bs:OI_SRC, cs:OI_SRC},
     {k:'24H trading volume', a:va.vol, b:li.vol1d, c:ext?.vol, an:'current activity', bn:'current activity', cn:'current activity', as:'cg', bs:'cg', cs:'cg'},
-    {k:'30D fee pool', a:fees30, b:li.fees30, c:extFees30, an:'spreads paid by traders', bn:'fees collected', cn:`fees collected · Dune all-time ≈ ${cB(COMP_FEES.extended.duneAll)}`, as:'chain', bs:'llama', cs:['llama','dune']},
-    {k:'30D booked revenue', a:rev30, b:li.rev30, c:null, an:`observed ${(MKT.spreadShare*100).toFixed(0)}% of gross spreads`, bn:'DeFiLlama protocol revenue', cn:'not published on a matched basis', as:'chain', bs:'llama', cs:null},
+    {k:'30D trader fee pool', a:fees30, b:li.fees30, c:extFees30, an:'modeled gross spreads', bn:'fees collected', cn:`fees collected · Dune all-time ≈ ${cB(COMP_FEES.extended.duneAll)}`, as:'chain', bs:'llama', cs:['llama','dune']},
+    {k:'30D monetization signal', a:rev30, b:li.rev30, c:null, an:'net treasury-wallet inflow', bn:'DeFiLlama protocol revenue', cn:'not published on a matched basis', as:'chain', bs:'llama', cs:null,comparable:false},
   ];
   const cell=(cls,v,note,src,win)=>{
     const unavailable=!Number.isFinite(Number(v));
@@ -1632,22 +1677,24 @@ function renderVsLighter(){
       const vals=[{c:'var',n:'Variational',v:r.a},{c:'ltr',n:'Lighter',v:r.b},{c:'ext',n:'Extended',v:r.c}]
         .filter(x=>Number.isFinite(Number(x.v))&&Number(x.v)>0)
         .sort((x,y)=>y.v-x.v);
-      const lead=vals[0]?{c:vals[0].c,t:vals[0].n+' '+(vals[1]?.v>0?(vals[0].v/vals[1].v).toFixed(1)+'×':'sets it')}:{c:'na',t:'not comparable'};
+      const lead=r.comparable===false
+        ? {c:'na',t:'not same basis'}
+        : (vals[0]?{c:vals[0].c,t:vals[0].n+' '+(vals[1]?.v>0?(vals[0].v/vals[1].v).toFixed(1)+'×':'sets it')}:{c:'na',t:'not comparable'});
       const win=x=>vals[0]&&vals[0].v===x;
       return `<tr>
         <td>${r.k}</td>
-        ${cell('cva',r.a,r.an,r.as,win(r.a))}
-        ${cell('cli',r.b,r.bn,r.bs,win(r.b))}
-        ${cell('cex',r.c,r.cn,r.cs,win(r.c))}
+        ${cell('cva',r.a,r.an,r.as,r.comparable!==false&&win(r.a))}
+        ${cell('cli',r.b,r.bn,r.bs,r.comparable!==false&&win(r.b))}
+        ${cell('cex',r.c,r.cn,r.cs,r.comparable!==false&&win(r.c))}
         <td><span class="lead ${lead.c}">${lead.t}</span></td>
       </tr>`;
     }).join('')}</tbody></table>`;
-  $('#h2hNote').innerHTML=`Variational fee pool = on-chain treasury revenue divided by the ${(MKT.spreadShare*100).toFixed(0)}% protocol share. OI uses ${OI_SRC==='llama'?'<a href="https://defillama.com/protocol/variational" target="_blank" rel="noopener">DeFiLlama open-interest</a> for all three venues':(PEERS.live?'live CoinGecko derivatives data':'the '+PEERS.snapAsOf+' snapshot')}. Volume uses ${PEERS.live?'live CoinGecko data':'the '+PEERS.snapAsOf+' snapshot'} for the current activity column. Lighter and Extended 30D fee pools come from <a href="https://defillama.com/protocol/lighter" target="_blank" rel="noopener">DeFiLlama Lighter</a> and <a href="https://defillama.com/protocol/extended" target="_blank" rel="noopener">DeFiLlama Extended</a>; Extended's <a href="https://dune.com/extended/extended" target="_blank" rel="noopener">Dune dashboard</a> all-time fee total is shown only as a source check. Extended does not publish a matched booked-revenue series here, so the revenue cell stays unavailable instead of being guessed. Same-basis check: traders paid ${cB(fees30)} on Variational vs ${cB(li.fees30)} on Lighter and ${cB(extFees30)} on Extended over the last 30 days.`;
+  $('#h2hNote').innerHTML=`Variational's 30D fee pool is an estimate: each day's net treasury-wallet inflow is divided by the latest official report-observed allocation available for that date. This is not audited protocol revenue, and non-revenue wallet transfers could affect it. Current Docs still describe a 10% treasury share; recent official reports imply 20%. OI uses ${OI_SRC==='llama'?'<a href="https://defillama.com/protocol/variational" target="_blank" rel="noopener">DeFiLlama open-interest</a> for all three venues':(PEERS.live?'live CoinGecko derivatives data':'the '+PEERS.snapAsOf+' snapshot')}. Volume uses ${PEERS.live?'live CoinGecko data':'the '+PEERS.snapAsOf+' snapshot'} for the current activity column. Lighter and Extended 30D fee pools come from <a href="https://defillama.com/protocol/lighter" target="_blank" rel="noopener">DeFiLlama Lighter</a> and <a href="https://defillama.com/protocol/extended" target="_blank" rel="noopener">DeFiLlama Extended</a>; Extended's <a href="https://dune.com/extended/extended" target="_blank" rel="noopener">Dune dashboard</a> all-time fee total is shown only as a source check. Extended does not publish a matched booked-revenue series here, so the revenue cell stays unavailable instead of being guessed. Same-basis fee-pool check: ${cB(fees30)} Variational (modeled) vs ${cB(li.fees30)} Lighter and ${cB(extFees30)} Extended over the last 30 days.`;
   renderFeeVs();
 }
 function renderFeeVs(){
   const svg=$('#revVs'); if(!svg)return;
-  const W=720,H=250,pl=56,pr=14,pt=16,pb=30;
+  const W=720,H=250,pl=56,pr=14,pt=16,pb=38;
   const last=SERIES[SERIES.length-1];
   const feeBetween=(arr,start,end)=>arr.reduce((sum,p)=>p.d>start&&p.d<=end?sum+p.v:sum,0);
   const liDaily=COMP_FEES.lighter.daily, extDaily=COMP_FEES.extended.daily;
@@ -1658,7 +1705,7 @@ function renderFeeVs(){
       const end=addDays(anchor,-7*k), start=addDays(end,-7);
       weeks.push({
         end,
-        v:Math.max(0,cumAt(end)-cumAt(start))/MKT.spreadShare,
+        v:impliedSpreadsBetween(start,end,Math.max(0,cumAt(end)-cumAt(start))),
         l:feeBetween(liDaily,start,end),
         e:feeBetween(extDaily,start,end)
       });
@@ -1666,26 +1713,37 @@ function renderFeeVs(){
   }else{
     weeks=COMP_FEES.fallbackWeeks.map(w=>({
       end:w.end,
-      v:Math.max(0,cumAt(w.end)-cumAt(addDays(w.end,-7)))/MKT.spreadShare,
+      v:impliedSpreadsBetween(addDays(w.end,-7),w.end,Math.max(0,cumAt(w.end)-cumAt(addDays(w.end,-7)))),
       l:w.l,
       e:w.e
     }));
   }
   const max=Math.max(...weeks.map(w=>Math.max(w.v,w.l,w.e)))*1.15||1;
+  const shortDate=d=>new Date(d+'T00:00:00Z').toLocaleDateString('en-US',{month:'short',day:'2-digit',timeZone:'UTC'});
+  const longDate=d=>new Date(d+'T00:00:00Z').toLocaleDateString('en-US',{month:'short',day:'2-digit',year:'numeric',timeZone:'UTC'});
+  const weekStart=d=>addDays(d,-6);
+  if($('#weeklyFeeRange')&&weeks.length){
+    $('#weeklyFeeRange').textContent=`8 complete 7-day periods · ${longDate(weekStart(weeks[0].end))} – ${longDate(weeks.at(-1).end)}`;
+  }
   const Y=v=>pt+(1-v/max)*(H-pt-pb);
   const slot=(W-pl-pr)/weeks.length, bw=Math.min(30,slot*0.32);
   let grid='';for(let g=0;g<=3;g++){const v=max*g/3,y=Y(v);
     grid+=`<line x1="${pl}" y1="${y.toFixed(1)}" x2="${W-pr}" y2="${y.toFixed(1)}" stroke="#16203040"/>`+
           `<text x="${pl-8}" y="${(y+3).toFixed(1)}" fill="#4a5674" font-size="10" text-anchor="end">$${fmtK(v)}</text>`;}
-  let bars='';
+  let bars='',bands='',hits='';
   weeks.forEach((w,i)=>{
     const cx=pl+slot*(i+0.5);
     const vy=Y(w.v), ly=Y(w.l), ey=Y(w.e);
     const x1=cx-bw*1.5-3, x2=cx-bw/2, x3=cx+bw/2+3;
-    bars+=`<rect x="${x1.toFixed(1)}" y="${vy.toFixed(1)}" width="${bw.toFixed(1)}" height="${Math.max(1,H-pb-vy).toFixed(1)}" rx="3" fill="url(#rvA)"><title>wk → ${w.end}\nVariational fee pool +${fmtUSD(w.v)}\nLighter +${fmtUSD(w.l)}\nExtended +${fmtUSD(w.e)}</title></rect>`;
-    bars+=`<rect x="${x2.toFixed(1)}" y="${ly.toFixed(1)}" width="${bw.toFixed(1)}" height="${Math.max(1,H-pb-ly).toFixed(1)}" rx="3" fill="url(#rvB)"><title>wk → ${w.end}\nLighter fee pool +${fmtUSD(w.l)}\nVariational +${fmtUSD(w.v)}\nExtended +${fmtUSD(w.e)}</title></rect>`;
-    bars+=`<rect x="${x3.toFixed(1)}" y="${ey.toFixed(1)}" width="${bw.toFixed(1)}" height="${Math.max(1,H-pb-ey).toFixed(1)}" rx="3" fill="url(#rvC)"><title>wk → ${w.end}\nExtended fee pool +${fmtUSD(w.e)}\nVariational +${fmtUSD(w.v)}\nLighter +${fmtUSD(w.l)}</title></rect>`;
-    bars+=`<text x="${cx.toFixed(1)}" y="${H-10}" fill="#4a5674" font-size="9" text-anchor="middle">${w.end.slice(5)}</text>`;
+    const bandX=pl+slot*i;
+    bands+=`<rect class="rev-week-band" x="${bandX.toFixed(1)}" y="${pt}" width="${slot.toFixed(1)}" height="${H-pt-pb}" fill="${i%2?'rgba(85,184,255,.028)':'rgba(85,184,255,.07)'}"/>`+
+      `<line x1="${bandX.toFixed(1)}" y1="${pt}" x2="${bandX.toFixed(1)}" y2="${H-pb}" stroke="rgba(85,184,255,.18)" stroke-width="1"/>`;
+    bars+=`<rect x="${x1.toFixed(1)}" y="${vy.toFixed(1)}" width="${bw.toFixed(1)}" height="${Math.max(1,H-pb-vy).toFixed(1)}" rx="3" fill="url(#rvA)"/>`;
+    bars+=`<rect x="${x2.toFixed(1)}" y="${ly.toFixed(1)}" width="${bw.toFixed(1)}" height="${Math.max(1,H-pb-ly).toFixed(1)}" rx="3" fill="url(#rvB)"/>`;
+    bars+=`<rect x="${x3.toFixed(1)}" y="${ey.toFixed(1)}" width="${bw.toFixed(1)}" height="${Math.max(1,H-pb-ey).toFixed(1)}" rx="3" fill="url(#rvC)"/>`;
+    bars+=`<text x="${cx.toFixed(1)}" y="${H-22}" fill="#52617c" font-size="7" font-weight="900" letter-spacing=".5" text-anchor="middle">7 DAYS</text>`+
+      `<text x="${cx.toFixed(1)}" y="${H-9}" fill="#9aabc5" font-size="8.5" font-weight="900" text-anchor="middle">${shortDate(weekStart(w.end))}–${shortDate(w.end)}</text>`;
+    hits+=`<rect class="rev-week-hit" x="${bandX.toFixed(1)}" y="${pt}" width="${slot.toFixed(1)}" height="${H-pt-pb}" fill="transparent" data-date="${w.end}" data-v="${w.v}" data-l="${w.l}" data-e="${w.e}"/>`;
     if(i===weeks.length-1){
       bars+=`<image href="variational-symbol-transparent.png" x="${(x1+bw/2-9).toFixed(1)}" y="${(vy-21).toFixed(1)}" width="18" height="18"/>`;
       bars+=`<image href="lighter-logo.png" x="${(x2+bw/2-10).toFixed(1)}" y="${(ly-22).toFixed(1)}" width="20" height="20"/>`;
@@ -1695,23 +1753,43 @@ function renderFeeVs(){
   svg.innerHTML=`
     <defs>
       <linearGradient id="rvA" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1478ff" stop-opacity=".98"/><stop offset=".48" stop-color="#55b8ff" stop-opacity=".82"/><stop offset="1" stop-color="#d7ecff" stop-opacity=".5"/></linearGradient>
-      <linearGradient id="rvB" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#05070c" stop-opacity=".96"/><stop offset=".55" stop-color="#202838" stop-opacity=".78"/><stop offset="1" stop-color="#7f91ad" stop-opacity=".38"/></linearGradient>
+      <linearGradient id="rvB" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f2f6ff" stop-opacity="1"/><stop offset=".52" stop-color="#b9c7da" stop-opacity=".96"/><stop offset="1" stop-color="#637895" stop-opacity=".9"/></linearGradient>
       <linearGradient id="rvC" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#00c487" stop-opacity=".96"/><stop offset=".55" stop-color="#008b73" stop-opacity=".76"/><stop offset="1" stop-color="#bff5df" stop-opacity=".42"/></linearGradient>
     </defs>
-    ${grid}${bars}
-    <line x1="${pl}" y1="${Y(0)}" x2="${W-pr}" y2="${Y(0)}" stroke="#22304a" stroke-width="1"/>`;
+    ${bands}${grid}${bars}
+    <line x1="${pl}" y1="${Y(0)}" x2="${W-pr}" y2="${Y(0)}" stroke="#22304a" stroke-width="1"/>
+    ${hits}
+    <g id="revHoverTip" visibility="hidden" pointer-events="none">
+      <rect width="190" height="88" rx="8" fill="#07111d" stroke="#55b8ff" stroke-width="1"/>
+      <text id="revTipDate" x="12" y="18" fill="#eaf2ff" font-size="11" font-weight="900"></text>
+      <text x="12" y="39" fill="#55b8ff" font-size="10" font-weight="800">Variational</text><text id="revTipV" x="178" y="39" fill="#eaf2ff" font-size="10" font-weight="900" text-anchor="end"></text>
+      <text x="12" y="58" fill="#dce7f8" font-size="10" font-weight="800">Lighter</text><text id="revTipL" x="178" y="58" fill="#eaf2ff" font-size="10" font-weight="900" text-anchor="end"></text>
+      <text x="12" y="77" fill="#22d3a0" font-size="10" font-weight="800">Extended</text><text id="revTipE" x="178" y="77" fill="#eaf2ff" font-size="10" font-weight="900" text-anchor="end"></text>
+    </g>`;
+  const hoverTip=$('#revHoverTip'),tipDate=$('#revTipDate'),tipV=$('#revTipV'),tipL=$('#revTipL'),tipE=$('#revTipE');
+  svg.querySelectorAll('.rev-week-hit').forEach(hit=>{
+    const show=e=>{
+      const box=svg.getBoundingClientRect(),x=(e.clientX-box.left)*W/box.width,y=(e.clientY-box.top)*H/box.height;
+      const tx=Math.max(4,Math.min(W-194,x+12)),ty=Math.max(4,Math.min(H-92,y-44));
+      tipDate.textContent=`${longDate(weekStart(hit.dataset.date))} – ${longDate(hit.dataset.date)}`;
+      tipV.textContent=fmtUSD(+hit.dataset.v);tipL.textContent=fmtUSD(+hit.dataset.l);tipE.textContent=fmtUSD(+hit.dataset.e);
+      hoverTip.setAttribute('transform',`translate(${tx.toFixed(1)} ${ty.toFixed(1)})`);hoverTip.setAttribute('visibility','visible');
+    };
+    hit.addEventListener('pointerenter',show);hit.addEventListener('pointermove',show);hit.addEventListener('pointerleave',()=>hoverTip.setAttribute('visibility','hidden'));
+  });
   const liKept=VSL.li.rev30/VSL.li.fees30*100;
   const rev30=Math.max(0,last.v-cumAt(addDays(last.d,-30)));
   const revenueLead=rev30>0?VSL.li.rev30/rev30:0;
   $('#revCallout').innerHTML=`
     <div class="rev-explain">
-      <strong>Why fee pool does not equal booked revenue</strong>
-      <p>The bars compare what traders paid into each venue's fee pool. Booked protocol revenue is a policy/accounting line: Variational currently books ${(MKT.spreadShare*100).toFixed(0)}% of gross spreads to treasury, Lighter books most collected fees, and Extended does not publish a same-basis revenue series here.</p>
+      <strong>What these bars mean</strong>
+      <p>Each group is one complete 7-day period, labeled start date to end date. The bars compare trader fee pools, not company revenue.</p>
       <div class="rev-explain-grid">
-        <span>Variational capture<b>${(MKT.spreadShare*100).toFixed(0)}% of spreads</b></span>
-        <span>Lighter capture<b>about ${liKept.toFixed(0)}% of fees</b></span>
-        <span>Extended revenue<b>not published</b></span>
+        <span>Variational · modeled<b>Arbitrum wallet inflow ÷ official report ratio</b></span>
+        <span>Lighter · published<b>DeFiLlama Fees · ≈${liKept.toFixed(0)}% booked as revenue</b></span>
+        <span>Extended · published<b>DeFiLlama Fees · revenue not published</b></span>
       </div>
+      <small class="rev-source-note">Sources: Variational Protocol Treasury on Arbitrum and official Variational Biweekly reports; DeFiLlama Fees datasets for Lighter and Extended. Variational is an estimate and may be affected by non-revenue wallet transfers.</small>
     </div>`;
 }
 function renderMath(){
@@ -1928,17 +2006,17 @@ function renderEfficiency(){
   $('#effActivePeriod') && ($('#effActivePeriod').textContent=periodLabel);
   $('#fmVolLabel') && ($('#fmVolLabel').textContent=periodLabel+' PERP VOLUME');
   $('#fmOiLabel') && ($('#fmOiLabel').textContent='OPEN INTEREST · LIVE SNAPSHOT');
-  $('#fmFeesLabel') && ($('#fmFeesLabel').textContent=periodLabel+' SPREAD FEES PAID BY TRADERS');
-  $('#fmRevLabel') && ($('#fmRevLabel').textContent=periodLabel+' VARIATIONAL TREASURY REVENUE');
-  $('#fmBurnLabel') && ($('#fmBurnLabel').textContent='estimated '+periodLabel+' buyback-burn firepower');
+  $('#fmFeesLabel') && ($('#fmFeesLabel').textContent=periodLabel+' IMPLIED GROSS SPREADS');
+  $('#fmRevLabel') && ($('#fmRevLabel').textContent=periodLabel+' NET TREASURY INFLOW');
+  $('#fmBurnLabel') && ($('#fmBurnLabel').textContent='theoretical minimum '+periodLabel+' buyback allocation');
   $('#efVol') && ($('#efVol').textContent=fmtBig(e.vol));
   $('#efVolLabel') && ($('#efVolLabel').textContent='Perp volume · '+e.label);
   $('#efVolSub') && ($('#efVolSub').textContent=e.key==='all'?'$168B all-time':e.key==='month'?'MTD proxy volume':'selected window');
   $('#efTake') && ($('#efTake').textContent=e.takeBpsFee.toFixed(2)+' bps');
   $('#efFee') && ($('#efFee').textContent=fmtBig(e.spread));
-  $('#efFeeLabel') && ($('#efFeeLabel').textContent='Spread payments · '+e.label);
+  $('#efFeeLabel') && ($('#efFeeLabel').textContent='Implied gross spreads · '+e.label);
   $('#efRev') && ($('#efRev').textContent=fmtBig(e.rev));
-  $('#efRevLabel') && ($('#efRevLabel').textContent='Treasury revenue · '+e.label);
+  $('#efRevLabel') && ($('#efRevLabel').textContent='Net treasury inflow · '+e.label);
   $('#efRevDay') && ($('#efRevDay').textContent='$'+fmtK(e.dailyRev)+'/day');
   $('#fmDailyRev') && ($('#fmDailyRev').textContent=fmtBig(e.rev));
   $('#fmDailyFees') && ($('#fmDailyFees').textContent=fmtBig(e.spread));
@@ -1949,13 +2027,13 @@ function renderEfficiency(){
     const annRev=e.dailyRev*365, annSpread=e.dailySpread*365;
     const modelM=typeof valPred==='function'&&MKT.oi>0?valPred(MKT.oi):0;
     $('#fmValLine').innerHTML=modelM?
-      `<span>VALUATION LENS</span><b>${fmtBig(annRev)}</b><small>annualized treasury run-rate at ${e.label} pace · gross spreads ${fmtBig(annSpread)}/yr</small><em>model MCAP ${fmtBig(modelM)} prices in <b>${(modelM/annRev).toFixed(0)}x</b> this run-rate</em>`
-      :`<span>VALUATION LENS</span><b>${fmtBig(annRev)}</b><small>annualized treasury run-rate at ${e.label} pace</small>`;
+      `<span>VALUATION LENS · PROXY</span><b>${fmtBig(annRev)}</b><small>annualized net treasury inflow at ${e.label} pace · implied gross spreads ${fmtBig(annSpread)}/yr</small><em>model MCAP ${fmtBig(modelM)} equals <b>${(modelM/annRev).toFixed(0)}x</b> this wallet-inflow run-rate</em>`
+      :`<span>VALUATION LENS · PROXY</span><b>${fmtBig(annRev)}</b><small>annualized net treasury inflow at ${e.label} pace</small>`;
   }
-  $('#fmDailyRevFormula') && ($('#fmDailyRevFormula').textContent=periodLabel+' treasury inflow');
-  $('#fmDailyFeesFormula') && ($('#fmDailyFeesFormula').textContent=periodLabel+' treasury ÷ observed '+(MKT.spreadShare*100).toFixed(0)+'%');
+  $('#fmDailyRevFormula') && ($('#fmDailyRevFormula').textContent=periodLabel+' net wallet balance change');
+  $('#fmDailyFeesFormula') && ($('#fmDailyFeesFormula').textContent='daily inflow ÷ period-specific report share · current '+(MKT.spreadShare*100).toFixed(0)+'%; Docs 10%');
   $('#fmDailyVolFormula') && ($('#fmDailyVolFormula').textContent=e.volSource);
-  $('#fmDailyBurnFormula') && ($('#fmDailyBurnFormula').textContent=periodLabel+' treasury × 30%');
+  $('#fmDailyBurnFormula') && ($('#fmDailyBurnFormula').textContent=periodLabel+' inflow × 30% Docs floor · not executed burn');
   $('#raTreasuryDay') && ($('#raTreasuryDay').textContent=fmtBig(e.dailyRev));
   $('#raSpreadDay') && ($('#raSpreadDay').textContent=fmtBig(e.dailySpread));
   $('#raVolumeDay') && ($('#raVolumeDay').textContent=fmtBig(e.dailySpread*e.volPerFee));
@@ -1982,9 +2060,9 @@ function renderEfficiency(){
   $('#efFeeVsTvl') && ($('#efFeeVsTvl').textContent=tvlOk?(e.spread/tvlV*100).toFixed(0)+'%':'—');
   $('#efYield') && ($('#efYield').textContent=e.annRevYield.toFixed(1)+'%');
   $('#effAsOf').textContent=e.key==='month'
-    ? 'Month uses exact wallet inflow; volume is a 30D average proxy. OI snapshot '+MKT.asOf+'.'
-    : 'Volume & OI snapshot '+MKT.asOf+'.';
-  $('#frReadRevNote') && ($('#frReadRevNote').textContent=e.label+' treasury revenue. If this rises, the venue is earning more real USDC.');
+    ? `Month uses net wallet inflow; volume is a 30D average proxy. OI snapshot ${MKT.asOf}; TVL official ${BIWEEKLY.asOf}. Implied spreads use period-specific observed shares.`
+    : `Net wallet inflow is measured; volume & OI snapshot ${MKT.asOf}; TVL official ${BIWEEKLY.asOf}. Implied spreads use period-specific observed shares.`;
+  $('#frReadRevNote') && ($('#frReadRevNote').textContent=e.label+' net treasury inflow. It is measurable on-chain, but wallet transfers may affect it.');
   renderFeeRevenueHistory();
   renderFeeOi();
   $('#frReadRev') && ($('#frReadRev').textContent=fmtBig(e.rev)+' / '+periodLabel);
@@ -1994,7 +2072,7 @@ function renderEfficiency(){
   const burn30=base.rev30*MKT.burnShare, dailyBurn=burn30/30;
   const treasuryPerSpread=MKT.spreadShare;
   const burnPerSpread=MKT.spreadShare*MKT.burnShare;
-  const totalSpreadFees=e.cur/MKT.spreadShare;
+  const totalSpreadFees=impliedSpreadsAllTime();
   const totalOlpSide=totalSpreadFees-e.cur;
   const totalBurn=e.cur*MKT.burnShare;
   $('#sfVol30') && ($('#sfVol30').textContent=fmtBig(MKT.vol.d30));
@@ -2057,7 +2135,7 @@ function renderFeeOi(){
     <rect id="foiHit" x="${pl}" y="${pt}" width="${W-pl-pr}" height="${H-pt-pb}" fill="transparent"/>`;
   const tt=$('#tt');
   svg.onmousemove=e=>{const rc=svg.getBoundingClientRect();let i=Math.round((( (e.clientX-rc.left)/rc.width*W)-pl)/(W-pl-pr)*(n-1));i=clamp(i,0,n-1);const d=data[i];
-    tt.innerHTML=`${d.d}<br>OI <b>$${fmtK(d.oi)}</b> (idx ${Math.round(idxOi[i])})<br>Fees30 <b>${fmtUSD(d.rev)}</b> (idx ${Math.round(idxFee[i])})<br>Yield <b>${d.yield.toFixed(2)}%/yr</b>`;placeTT(e);};
+    tt.innerHTML=`${d.d}<br>OI <b>$${fmtK(d.oi)}</b> (idx ${Math.round(idxOi[i])})<br>Treasury inflow 30D <b>${fmtUSD(d.rev)}</b> (idx ${Math.round(idxFee[i])})<br>Inflow/OI proxy <b>${d.yield.toFixed(2)}%/yr</b>`;placeTT(e);};
   svg.onmouseleave=()=>{tt.style.opacity=0;};
 }
 function renderFeeRevenueHistory(){
@@ -2101,9 +2179,9 @@ function renderFeeRevenueHistory(){
     <path d="${needLine}" fill="none" stroke="#8b6cff" stroke-width="2.1" stroke-dasharray="5 4" stroke-linejoin="round"/>
     <circle cx="${lx}" cy="${YRev(last.rev)}" r="4" fill="#22e6a0" filter="url(#frGlow)"/>
     <circle cx="${lx}" cy="${YNeed(last.volPerRev)}" r="4" fill="#8b6cff"/>
-    <text class="chart-label" x="${lx-7}" y="${clamp(YRev(last.rev)-10,pt+12,H-pb-10)}" fill="#65ffd2" text-anchor="end">${fmtUSD(last.rev)} earned in 30D</text>
+    <text class="chart-label" x="${lx-7}" y="${clamp(YRev(last.rev)-10,pt+12,H-pb-10)}" fill="#65ffd2" text-anchor="end">${fmtUSD(last.rev)} net inflow in 30D</text>
     <text class="chart-label" x="${lx-7}" y="${clamp(YNeed(last.volPerRev)+18,pt+18,H-pb-6)}" fill="#d7ccff" text-anchor="end">$${fmtK(last.volPerRev)} volume for $1</text>
-    <text class="axis" x="${pl}" y="${pt-8}" fill="#22e6a0">green up = more treasury revenue</text>
+    <text class="axis" x="${pl}" y="${pt-8}" fill="#22e6a0">green up = more net treasury inflow</text>
     <text class="axis" x="${pl+250}" y="${pt-8}" fill="#8b6cff">purple down = better monetization</text>`;
 }
 function renderFeePerTrader(){
@@ -2111,7 +2189,7 @@ function renderFeePerTrader(){
   const n=parseFloat(inp.value);
   const e=computeEff();
   if(!(n>0)){ ['#feePerTrader','#revPerTrader','#volPerTrader'].forEach(s=>$(s)&&($(s).textContent='—')); return; }
-  const feesCum=e.cur/MKT.spreadShare;   // implied cumulative spreads
+  const feesCum=impliedSpreadsAllTime(); // period-specific report-observed shares
   $('#feePerTrader').textContent='$'+fmtK(feesCum/n);
   $('#revPerTrader').textContent='$'+fmtK(e.cur/n);
   $('#volPerTrader').textContent='$'+fmtK(MKT.vol.d30/n);
@@ -2126,6 +2204,10 @@ function renderPointsCalc(){
   const pctHype=fdv/hype*100;
   $('#ptsFdvLabel').textContent=pctHype.toFixed(0)+'% of HYPE FDV ($67.7B)';
   $('#ptsFdvBig').textContent='$'+(fdv/1e9).toFixed(fdv>=1e9?1:3)+'B';
+  [20,25,30].forEach(p=>{
+    const el=$('#ptsTgeMcap'+p);
+    if(el)el.textContent=fmtUSD(fdv*p/100)+' MCAP'+(p===25?' · base':'');
+  });
   // scenario band — grounds expectations vs a live comp (HYPE)
   let band,bcol;
   if(pctHype<10){band='Conservative';bcol='var(--sub)';}
@@ -2221,15 +2303,15 @@ function renderDailyBrief(){
   const heroNote=heroRank<=10?`, its ${ordinal(heroRank)} biggest day out of ${earnings.length}`
     :heroHot>=3?`, a ${heroHot}th straight day above the 30-day average`:'';
   $('#dailyBriefHeadline').textContent=`${dateShort} Daily VAR Fundamentals`;
-  $('#dailyBriefAsOf').textContent=`ET revenue through ${dateLabel} · ${liveLabel}`;
-  $('#dailyBriefSummary').textContent=`Daily state check: treasury revenue, 24H volume, open interest, and total treasury held versus the prior observation. ${heroNote?heroNote.slice(2)+'. ':''}Use this to see whether activity is converting into real on-chain revenue.`;
+  $('#dailyBriefAsOf').textContent=`ET treasury inflow through ${dateLabel} · ${liveLabel}`;
+  $('#dailyBriefSummary').textContent=`Daily state check: net treasury inflow, 24H volume, open interest, and current treasury balance. ${heroNote?heroNote.slice(2)+'. ':''}Wallet inflow is measurable on-chain but is not audited accounting revenue.`;
 
   $('#dailyBriefRevenue').textContent=signedMoney(latest.e);
   const revenueDelta=$('#dailyBriefRevenueDelta');
   revenueDelta.className='daily-brief-delta';
   if(vsPrevious!=null&&Math.abs(vsPrevious)>.05)revenueDelta.classList.add(vsPrevious>0?'up':'down');
   revenueDelta.textContent=`${money0(previous.e)} → ${money0(latest.e)} · ${signedPct(vsPrevious)} DoD`;
-  $('#dailyBriefBurn').textContent=`At least ${fmtUSD(Math.max(0,latest.e*MKT.burnShare))} buyback-burn floor`;
+  $('#dailyBriefBurn').textContent=`Theoretical ${fmtUSD(Math.max(0,latest.e*MKT.burnShare))} minimum buyback allocation`;
   $('#dailyBriefVolume').textContent=marketBig(volume);
   setDelta('#dailyBriefVolumeDelta',volumeDelta,volumePrev?`${marketBig(volumePrev)} → ${marketBig(volume)}`:'daily comparison');
   $('#dailyBriefOi').textContent=marketBig(oi);
@@ -2240,8 +2322,8 @@ function renderDailyBrief(){
   const growth=$('#dailyBriefTreasuryGrowth');
   growth.className='daily-brief-delta'+(treasuryHeldDelta>0?' up':treasuryHeldDelta<0?' down':'');
   growth.textContent=`${marketBig(treasuryPrev)} → ${marketBig(cur)} · ${signedPct(treasuryHeldDelta)} DoD`;
-  $('#dailyBriefSignal').innerHTML=`<b>Signal:</b> treasury revenue ${signedPct(vsPrevious)} DoD · volume ${signedPct(volumeDelta)} DoD · OI ${signedPct(oiDelta)} DoD. The useful read: how much volume and OI it takes to generate $1 of treasury revenue.`;
-  $('#dailySourceTreasuryAsOf').textContent=`Balance live · daily revenue through ${dateLabel} ET`;
+  $('#dailyBriefSignal').innerHTML=`<b>Signal:</b> treasury inflow ${signedPct(vsPrevious)} DoD · volume ${signedPct(volumeDelta)} DoD · OI ${signedPct(oiDelta)} DoD. This is a wallet-based operating proxy.`;
+  $('#dailySourceTreasuryAsOf').textContent=`Balance live · net wallet inflow through ${dateLabel} ET`;
   $('#dailySourceMarketAsOf').textContent=MARKET_ACTIVITY.liveAt?`Live API synced ${liveLabel}`:'Showing the latest saved market snapshot';
   $('#dailySourceHistoryAsOf').textContent=`Volume through ${volumeObservation?.d||'—'} UTC · OI through ${oiObservation?.d||'—'} UTC`;
   $('#dailySourceReportAsOf').textContent=`Latest report in dataset: ${BIWEEKLY.asOf}`;
@@ -2279,22 +2361,22 @@ function renderDailyBrief(){
 	  const burnScore=clamp(Math.round(3+Math.min(7,c.burnDay/3500)),1,10);
 	  const engine=Math.round((volumeScore+oiScore+revenueScore+burnScore)/4);
 	  const statusCopy={
-	    momentum:['Momentum day','Activity is converting into treasury revenue faster than the recent baseline.'],
+	    momentum:['Momentum day','Activity is coinciding with faster treasury inflow than the recent baseline.'],
 	    steady:['Healthy baseline','Treasury is still stacking; use volume and OI to decide whether the pace can improve.'],
-	    watch:['Cooling day','Revenue or volume is below recent pace; watch whether OI holds up before calling it weak.']
+	    watch:['Cooling day','Treasury inflow or volume is below recent pace; watch whether OI holds up before calling it weak.']
 	  };
 	  let verdict=statusCopy[c.status]||statusCopy.steady;
 	  if(c.volumeDelta<0&&c.oiDelta>0)verdict=['OI holding, volume cooling','A slower trading day, but open interest is still firm. That means capacity remains in the system.'];
 	  if(c.volumeDelta>0&&c.oiDelta>0)verdict=['Activity expanding','Both trading flow and open interest are rising, the cleanest setup for more spread revenue.'];
 	  const signedRead=v=>v==null||!Number.isFinite(v)?'—':`${v>=0?'+':'-'}${Math.abs(v).toFixed(1)}%`;
-	  set('#varPulseTitle',`${moneyWhole(c.rev)} became treasury revenue yesterday.`);
-	  set('#varPulseLede',`That is ${moneyWhole(c.rev/24)} an hour, ${signedRead(c.vsAverage)} versus the prior 7-day average, earned on ${marketBig(c.volume)} of 24H volume and ${marketBig(c.oi)} of open interest.`);
+  set('#varPulseTitle',`${moneyWhole(c.rev)} net USDC entered the treasury yesterday.`);
+	  set('#varPulseLede',`That is ${moneyWhole(c.rev/24)} of net wallet inflow per hour, ${signedRead(c.vsAverage)} versus the prior 7-day average, alongside ${marketBig(c.volume)} of 24H volume and ${marketBig(c.oi)} of open interest.`);
 	  set('#varPulseAsOf',c.dateLabel);
 	  set('#varPulseVerdict',verdict[0]);
 	  set('#varPulseTakeaway',verdict[1]);
-	  set('#varPulseData',`Treasury held ${marketBig(c.cur)} · 7D pace ${moneyWhole(c.pace)}/day · burn floor ${moneyWhole(c.burnDay)}`);
+	  set('#varPulseData',`Treasury balance ${marketBig(c.cur)} · 7D inflow pace ${moneyWhole(c.pace)}/day · theoretical 30% floor ${moneyWhole(c.burnDay)}`);
 	  set('#varPulseScoreLine',`${engine}/10`);
-	  set('#varPulseScoreCopy',`Volume ${volumeScore} · OI ${oiScore} · revenue ${revenueScore} · burn ${burnScore}, each out of 10. Every leg is scored against its own recent trend, where 5 means unchanged — a momentum read, not a valuation.`);
+	  set('#varPulseScoreCopy',`Volume ${volumeScore} · OI ${oiScore} · treasury inflow ${revenueScore} · theoretical buyback floor ${burnScore}, each out of 10. This is a momentum read, not audited revenue or a valuation.`);
 	  [['#scoreVol',volumeScore],['#scoreOi',oiScore],['#scoreRev',revenueScore],['#scoreBurn',burnScore]].forEach(([id,v])=>{
 	    const el=$(id);
 	    if(el)el.style.setProperty('--w',`${v*10}%`);
@@ -3100,10 +3182,10 @@ function renderCalendarLiveSync(dateStr){
     ? `Live syncing · ${resetTimeShort()} ET`
     : (final?'Finalized at 00:00 ET':'Waiting for ET close');
 }
-function calImpliedActivity(earn){
+function calImpliedActivity(earn,date=currentTreasuryDate()){
   const e=computeEff();
   return {
-    spreadFees: earn/MKT.spreadShare,
+    spreadFees: earn/spreadShareAt(date).rate,
     volume: earn*e.volPerRev,
     oi: earn*e.oiPerDayRev,
     burn: earn*MKT.burnShare
@@ -3126,12 +3208,12 @@ function updateCalendarCountdowns(){
 function calendarEarnHtml(dateStr,disp){
   if(CALMODE!=='day')return `<div class="cal-earn ${disp.span?'span':(disp.v?'':'zero')}">${disp.label}</div>`;
   const closed=isClosedDailyTotal(dateStr), total=CAL.eMap.get(dateStr)||0;
-  const a=closed?calImpliedActivity(total):null;
+  const a=closed?calImpliedActivity(total,dateStr):null;
   if(!closed)return `<div class="cal-dual pending-only" title="Time remaining until this ET daily total closes.">${pending24Meta(dateStr)}</div>`;
-  const sharePct=Math.round(MKT.spreadShare*100);
-  return `<div class="cal-dual" title="Completed ET day. Revenue is the measured treasury inflow; fee is the trader-paid spread it implies at the ${sharePct}% treasury share.">
-    <div class="cal-money-row total"><span class="tz">Revenue</span><span class="money">+${fmtUSD(total)}</span></div>
-    <div class="cal-money-row fee"><span class="tz">Fee</span><span class="money">${calMiniMoney(a.spreadFees)}</span></div>
+  const sharePct=(spreadShareAt(dateStr).rate*100).toFixed(1);
+  return `<div class="cal-dual" title="Completed ET day. Inflow is the net treasury wallet change; gross spreads are implied at the ${sharePct}% report-observed share.">
+    <div class="cal-money-row total"><span class="tz">Inflow</span><span class="money">+${fmtUSD(total)}</span></div>
+    <div class="cal-money-row fee"><span class="tz">Implied spreads</span><span class="money">${calMiniMoney(a.spreadFees)}</span></div>
   </div>`;
 }
 function calendarDisplay(dateStr){
@@ -3248,9 +3330,9 @@ function selectCell(dateStr){
     amt=complete?(CAL.eMap.get(dateStr)||0):(isToday?Math.max(0,currentTreasuryBalance()-cumAt(addDays(dateStr,-1))):0);
     const wd=resetWeekday(dateStr);
     if(complete){
-      const a=calImpliedActivity(amt);
+      const a=calImpliedActivity(amt,dateStr);
       label=`<b>${dateStr}</b> (${wd}) · completed daily total<br>
-        <b>${calMiniMoney(a.volume)}</b> estimated volume · <b>${calMiniMoney(a.oi)}</b> OI needed · <b>${calMiniMoney(a.burn)}</b> buyback-burn firepower`;
+        <b>${calMiniMoney(a.volume)}</b> modeled volume · <b>${calMiniMoney(a.oi)}</b> modeled OI context · <b>${calMiniMoney(a.burn)}</b> theoretical 30% buyback floor`;
       status='COMPLETE';statusClass='estimated';
     }else if(isToday){
       label=`<b>${dateStr}</b> (${wd}) · earned so far<br>Final daily total locks at <b>00:00 ET</b>.`;
@@ -3566,7 +3648,7 @@ function render(){
   _ctToken++;$('#totalVal').textContent=fmtUSD(total);
   if($('#headVol24'))$('#headVol24').textContent=fmtBig(MKT.vol.d1||MKT.vol.d30/30);
   if($('#headOi'))$('#headOi').textContent=fmtBig(MKT.oi);
-  if($('#headSpreads'))$('#headSpreads').textContent=fmtBig(total/MKT.spreadShare);
+  if($('#headSpreads'))$('#headSpreads').textContent=fmtBig(impliedSpreadsAllTime());
   renderImpliedSpreadTotal(total);
   if($('#vIntroTotal'))$('#vIntroTotal').textContent=fmtUSD(total);
   $('#rangeBadge').textContent=SERIES[0].d+' → '+currentTreasuryDate();
