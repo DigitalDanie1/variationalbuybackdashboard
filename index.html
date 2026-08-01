@@ -1601,35 +1601,57 @@
   #valScatter .val-peer-label{fill:var(--ink);font-size:13px;font-weight:950;letter-spacing:.15px;paint-order:stroke;stroke:var(--panel);stroke-width:4.5px;stroke-linejoin:round}
   #valScatter .val-var-label{fill:var(--grn);font-size:15px;font-weight:950;letter-spacing:.2px;paint-order:stroke;stroke:var(--panel);stroke-width:5px;stroke-linejoin:round}
   #valScatter .val-peer-sub{fill:var(--sub);font-size:9px;font-weight:850;letter-spacing:.6px;paint-order:stroke;stroke:var(--panel);stroke-width:3.5px;stroke-linejoin:round}
+  #valScatter .val-tge-assumption{fill:var(--amber);font-weight:950;letter-spacing:.35px}
   .val-side{display:flex;flex-direction:column;gap:9px}
   .val-side .vs-h{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;font:950 10.5px/1.35 var(--mono);letter-spacing:1.1px;text-transform:uppercase;color:var(--ink);margin-bottom:4px}
   .val-side .vs-hs{color:var(--dim);font-size:9.5px;letter-spacing:.2px;text-transform:none;text-align:right}
-  .vs-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid rgba(27,37,54,.72);font:12.5px var(--mono)}
+  .vs-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:9px 12px;align-items:center;padding:11px 0;border-bottom:1px solid rgba(27,37,54,.72);font:12.5px var(--mono)}
   .vs-row:last-child{border-bottom:0}
-  .vs-row .n{min-width:0;color:var(--sub);display:flex;align-items:center;gap:7px}
+  .vs-row .n{min-width:0;color:var(--sub);display:flex;align-items:center;gap:7px;white-space:nowrap}
   .vs-row .vs-nm{min-width:0}
   .vs-row .n i{width:8px;height:8px;border-radius:50%;flex:none}
   .vs-row .v{display:flex;flex:none;min-width:96px;flex-direction:column;align-items:flex-end;gap:4px;color:var(--ink);font-weight:900;letter-spacing:-.3px;white-space:nowrap;text-align:right}
   .vs-row .v b{font:950 16px/1 var(--mono);letter-spacing:-.2px}
   .vs-row .v small{font:800 9.5px/1 var(--mono);color:var(--sub);letter-spacing:.5px}
-  .vs-row .vs-values{display:grid;grid-template-columns:repeat(2,minmax(74px,1fr));gap:5px;flex:none;margin-left:auto}
-  .vs-row .vs-mcap{display:flex;min-width:0;flex-direction:column;align-items:flex-end;gap:4px;padding:7px 8px;border:1px solid rgba(85,184,255,.11);border-radius:8px;background:rgba(85,184,255,.035);white-space:nowrap;text-align:right}
+  .vs-row .vs-values{grid-column:1/-1;grid-row:2;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;width:100%;margin-left:0}
+  .vs-row .vs-mcap{display:flex;min-width:0;flex-direction:column;align-items:flex-start;gap:5px;padding:9px 10px;border:1px solid rgba(85,184,255,.11);border-radius:8px;background:rgba(85,184,255,.035);white-space:normal;text-align:left}
   .vs-row .vs-mcap.model{border-color:rgba(85,184,255,.16);background:rgba(85,184,255,.035)}
+  .vs-row .vs-mcap.float{border-color:rgba(255,181,71,.24);background:rgba(255,181,71,.045)}
   .vs-row .vs-mcap b{font:950 17px/1 var(--mono);letter-spacing:-.4px;color:var(--ink)}
   .vs-row .vs-mcap small{font:800 8.5px/1 var(--mono);color:var(--dim);letter-spacing:.8px;text-transform:uppercase}
   .vs-row .vs-mcap.model b{color:#55b8ff}
+  .vs-row .vs-mcap.float b{color:var(--amber)}
   .vs-row .v.premium b{color:var(--grn)}
   .vs-row .v.discount b{color:#f08aa0}
   .vs-row .v.fair b{color:var(--cyan)}
   .vs-row .vs-nm small{display:block;margin-top:4px;color:var(--dim);font-size:10px;line-height:1.4}
   .vs-row .vs-nm small b{color:var(--sub);font-weight:800}
   .vs-row.me{margin-top:10px;padding:14px 12px;border:1px solid rgba(38,230,194,.35);border-radius:11px;background:rgba(38,230,194,.06)}
+  .vs-row.me+ .vs-row.me{margin-top:5px}
+  .vs-row.me.base{border-color:rgba(255,181,71,.48);background:rgba(255,181,71,.06)}
   .vs-row.me .n{color:var(--grn);font-weight:900} .vs-row.me .v{color:var(--grn)}
-  .vs-row.me .vs-values{grid-template-columns:minmax(88px,1fr)}
-  .vs-row.me .vs-mcap.actual-empty{display:none}
+  .vs-row.me .vs-values{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .var-scenario-card{margin:8px 0 7px;padding:12px;border:1px solid rgba(38,230,194,.35);border-radius:10px;background:rgba(38,230,194,.035)}
+  .var-scenario-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
+  .var-scenario-head .n{display:flex;align-items:center;gap:8px;color:var(--ink);font:800 12px/1.25 var(--sans)}
+  .var-scenario-head .vs-nm small{display:block;margin-top:3px;color:var(--dim);font:10px/1.3 var(--sans)}
+  .var-common-mcap{text-align:right;white-space:nowrap}
+  .var-common-mcap small{display:block;color:var(--dim);font:800 8px/1 var(--mono);letter-spacing:.8px}
+  .var-common-mcap b{display:block;margin-top:4px;color:var(--cyan);font:900 17px/1 var(--mono)}
+  .var-scenario-explain{margin:10px 0 8px;padding-top:9px;border-top:1px solid rgba(85,184,255,.14);color:var(--sub);font:11px/1.4 var(--sans)}
+  .var-scenario-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+  .var-scenario{position:relative;display:grid;grid-template-columns:1fr auto 1.25fr;align-items:center;gap:5px;padding:9px 8px;border:1px solid rgba(85,184,255,.16);border-radius:8px;background:rgba(85,184,255,.035)}
+  .var-scenario.base{border-color:rgba(255,181,71,.48);background:rgba(255,181,71,.06)}
+  .var-scenario span{display:flex;min-width:0;flex-direction:column;gap:4px}
+  .var-scenario b{color:var(--ink);font:900 15px/1 var(--mono)}
+  .var-scenario small{color:var(--dim);font:800 7.5px/1.15 var(--mono);letter-spacing:.4px;text-transform:uppercase}
+  .var-scenario .var-arrow{color:var(--dim);font:800 13px/1 var(--sans)}
+  .var-scenario .var-fdv b{color:var(--grn)}
+  .var-scenario em{position:absolute;right:6px;top:-6px;padding:2px 5px;border-radius:4px;background:var(--amber);color:#07111d;font:900 7px/1 var(--mono);letter-spacing:.5px}
+  @media(max-width:520px){.var-scenario-head{align-items:flex-start}.var-scenario-grid{grid-template-columns:1fr}.var-scenario{grid-template-columns:1fr auto 1fr}.var-scenario-explain{font-size:10px}}
   .val-note{margin-top:15px;border-top:1px solid rgba(85,184,255,.12);padding-top:12px;font:10.5px/1.65 var(--mono);color:var(--dim)}
   @media(max-width:900px){.val-hero,.val-benchmark{grid-template-columns:1fr}.val-grid{grid-template-columns:1fr}.val-bench-item{border-right:0;border-bottom:1px solid rgba(85,184,255,.14)}.val-bench-item:last-child{border-bottom:0}}
-  @media(max-width:520px){.vs-row{align-items:flex-start;flex-wrap:wrap}.vs-row .vs-values{order:3;width:100%;grid-template-columns:1fr 1fr;margin-left:0}.vs-row .v{margin-left:auto}.vs-row .vs-mcap{align-items:flex-start;text-align:left}}
+  @media(max-width:520px){.vs-row{align-items:center}.vs-row .vs-values{width:100%;grid-template-columns:repeat(3,minmax(0,1fr));margin-left:0}.vs-row .v{margin-left:auto}.vs-row .vs-mcap{align-items:flex-start;text-align:left}}
   .h2h-note a{color:var(--cyan);border-bottom:1px dashed rgba(56,225,255,.4)}
   .comparison-focus .peer-left,.comparison-focus .king-card{display:none}
   .comparison-focus .peer-layout{display:block}
@@ -1668,6 +1690,16 @@
   .fdv-control{display:grid;grid-template-columns:minmax(120px,.55fr) minmax(0,1.45fr);gap:14px;align-items:center;border:1px solid rgba(85,184,255,.34);border-radius:14px;padding:13px 14px;background:rgba(85,184,255,.055)}
   .fdv-value{min-width:0}
   .fdv-value .pts-fdv{margin-top:5px}
+  .pts-tge-assumption{margin-top:12px;padding-top:11px;border-top:1px solid rgba(85,184,255,.2)}
+  .pts-tge-assumption span{display:block;font:900 9px/1.25 var(--mono);letter-spacing:1.1px;text-transform:uppercase;color:var(--sub)}
+  .pts-tge-assumption b{display:block;margin-top:5px;font:950 19px/1.1 var(--mono);color:var(--cyan)}
+  .pts-tge-assumption small{display:block;margin-top:5px;font:700 10px/1.4 var(--mono);color:var(--dim)}
+  .pts-tge-scenarios{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-top:8px}
+  .pts-tge-scenario{padding:7px 6px;border:1px solid rgba(85,184,255,.16);border-radius:7px;background:rgba(85,184,255,.035)}
+  .pts-tge-scenario b{margin:0;font-size:14px;color:var(--ink)}
+  .pts-tge-scenario small{margin-top:3px;font-size:8px;line-height:1.25}
+  .pts-tge-scenario.base{border-color:rgba(255,181,71,.4);background:rgba(255,181,71,.06)}
+  .pts-tge-scenario.base b{color:var(--amber)}
   .fdv-tools{min-width:0}
   .fdv-head{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin-bottom:12px}
   .fdv-title{font:950 11px/1 var(--mono);letter-spacing:1.9px;text-transform:uppercase;color:var(--cyan)}
@@ -3183,7 +3215,7 @@
   .cmp-revenue-pane .comp-rev-head>div:first-child b{font:760 14px/1.2 var(--sans);letter-spacing:0;text-transform:none}
   .cmp-revenue-pane .comp-rev-head>div:first-child span{font-size:9px;letter-spacing:.8px}
 	  .cmp-revenue-pane .sw.act{background:linear-gradient(90deg,#1478ff,#55b8ff)!important}
-	  .lighter-sw{background:linear-gradient(90deg,#05070c,#303642)!important;border:1px solid rgba(143,215,255,.28)}
+	  .lighter-sw{background:linear-gradient(90deg,#f2f6ff,#8fa6c4)!important;border:1px solid rgba(242,246,255,.72)}
 	  .extended-sw{background:linear-gradient(90deg,#00c487,#00594f)!important}
   .comparison-report .h2h-rows{overflow-x:visible}
   .comparison-report .h2h-tbl{width:100%;min-width:0;table-layout:fixed;font-size:12px}
@@ -3383,12 +3415,13 @@
   .valuation-report .val-side{display:flex;flex-direction:column;gap:0;min-width:0}
   .valuation-report .val-side .vs-h{padding:0 0 8px;border-bottom:1px solid var(--line);font-family:var(--sans);font-size:10px;letter-spacing:.5px}
   .valuation-report .vs-row{min-height:38px;padding:5px 0;font-family:var(--sans);font-size:11.5px;border-color:var(--line)}
-  .valuation-report .vs-row .vs-values{grid-template-columns:repeat(2,minmax(68px,1fr));gap:4px}
+  .valuation-report .vs-row .vs-values{grid-template-columns:repeat(2,minmax(90px,1fr));gap:4px}
   .valuation-report .vs-row .vs-mcap{padding:5px 7px}
   .valuation-report .vs-row .vs-mcap b{font-size:15px}
   .valuation-report .vs-row .v{min-width:88px}
   .valuation-report .vs-row .v b{font-size:14px}
   .valuation-report .vs-row.me{margin:8px 0 0;padding:9px 8px;border:1px solid rgba(85,184,255,.22);border-radius:8px;background:rgba(85,184,255,.045)}
+  .valuation-report .vs-row.me.base{border-color:rgba(255,181,71,.48);background:rgba(255,181,71,.06)}
   .valuation-report .vs-row .v b,
   .valuation-report .vs-row .v small,
   .valuation-report .vs-row .vs-nm small{font-family:var(--sans)}
@@ -3439,7 +3472,7 @@
     .cmp-revenue-pane{padding:18px 0 14px;border-left:0;border-top:1px solid var(--line)}
     .valuation-report .val-grid{grid-template-columns:1fr}
     .valuation-report .val-side{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 22px}
-    .valuation-report .val-side .vs-h,.valuation-report .vs-row.me{grid-column:1 / -1}
+    .valuation-report .val-side .vs-h,.valuation-report .vs-row.me,.valuation-report .var-scenario-card{grid-column:1 / -1}
   }
   @media(max-width:760px){
     .comparison-report,.valuation-report{padding-top:18px}
@@ -3454,7 +3487,7 @@
     .comparison-report .h2h-rows{overflow-x:auto}
     .comparison-report .h2h-tbl{min-width:720px}
     .valuation-report .val-side{display:grid;grid-template-columns:1fr}
-    .valuation-report .val-side .vs-h,.valuation-report .vs-row.me{grid-column:1}
+    .valuation-report .val-side .vs-h,.valuation-report .vs-row.me,.valuation-report .var-scenario-card{grid-column:1}
     .pm-daily-monitor{grid-template-columns:1fr;gap:10px}
     .pm-daily-grid{grid-template-columns:1fr}
     .pm-daily-item+.pm-daily-item{border-left:0;border-top:1px solid var(--line)}
@@ -4814,8 +4847,8 @@
 	    background:linear-gradient(90deg,#1478ff,#55b8ff)!important;
 	  }
 	  body.theme-light .cmp-revenue-pane .lighter-sw{
-	    background:linear-gradient(90deg,#05070c,#303642)!important;
-	    border-color:rgba(6,23,44,.28)!important;
+	    background:linear-gradient(90deg,#253b5c,#7894bb)!important;
+	    border-color:rgba(6,23,44,.4)!important;
 	  }
 	  body.theme-light .cmp-revenue-pane .extended-sw{
 	    background:linear-gradient(90deg,#00c487,#00594f)!important;
@@ -6138,6 +6171,15 @@ body.theme-light .pts-slider::-moz-range-track{background:rgba(0,0,0,.10)!import
   align-self:start!important;
   margin-top:2px!important;
 }
+.historical-combo>.hist-inline-table{
+  grid-column:1/-1!important;
+  grid-row:6!important;
+  width:100%!important;
+  max-height:260px!important;
+  margin-top:2px!important;
+  border-top:1px solid var(--line)!important;
+  padding-top:10px!important;
+}
 
 /* same span-stretch pattern on the comparison layout */
 .comparison-focus{align-content:start!important}
@@ -6199,6 +6241,143 @@ body.theme-light .pts-slider::-moz-range-track{background:rgba(0,0,0,.10)!import
 .h2h-src-legend{display:none!important}
 .h2h-tbl td b{display:block}
 .h2h-tbl td{vertical-align:middle!important}
+
+/* Compact valuation peer table: one protocol per row, no repeated value boxes. */
+.valuation-report{
+  border:1px solid var(--line)!important;
+  border-radius:10px!important;
+  padding:18px!important;
+  background:var(--panel)!important;
+}
+.valuation-report .cmp-heading{margin-bottom:10px!important}
+.valuation-report .val-hero{margin:0!important;border-top:1px solid var(--line)!important;border-bottom:1px solid var(--line)!important}
+.valuation-report .val-cell{border:0!important;border-right:1px solid var(--line)!important;border-radius:0!important;background:transparent!important;padding:12px 16px!important}
+.valuation-report .val-cell:last-child{border-right:0!important}
+.valuation-report .val-grid{
+  display:grid!important;
+  grid-template-columns:minmax(0,1.45fr) minmax(430px,.75fr)!important;
+  gap:16px!important;
+  align-items:start!important;
+}
+.valuation-report .val-chart-wrap{
+  width:100%!important;
+  max-width:1180px!important;
+  margin:0 auto!important;
+  border:1px solid var(--line)!important;
+  border-radius:9px!important;
+  background:transparent!important;
+  padding:0 12px 6px!important;
+  overflow:hidden!important;
+  align-self:stretch!important;
+  height:100%!important;
+  display:flex!important;
+  flex-direction:column!important;
+}
+.valuation-report .val-chart-wrap>.val-hero{margin:0 -12px 4px!important;border-top:0!important}
+.valuation-report .val-chart-wrap .val-cell{padding:9px 14px!important}
+.valuation-report .val-chart-wrap .vh-big{font-size:clamp(30px,3.5vw,44px)!important;margin:5px 0!important;letter-spacing:-1.4px!important}
+.valuation-report .val-chart-wrap .vh-sub{font-size:10.5px!important;line-height:1.35!important}
+.valuation-report #valScatter{height:auto!important;min-height:0!important;width:100%!important;flex:1 1 auto!important}
+.valuation-report .val-side{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr)!important;
+  gap:0!important;
+  width:100%!important;
+  padding:0 0 0 14px!important;
+  border-top:0!important;
+  border-left:1px solid var(--line)!important;
+  align-self:start!important;
+  align-content:start!important;
+  justify-content:start!important;
+  height:auto!important;
+}
+.valuation-report .val-side>.vs-h,
+.valuation-report .val-side>.var-scenario-card{
+  grid-column:1/-1!important;
+}
+.valuation-report .val-side>.vs-h{
+  display:grid!important;
+  grid-template-columns:minmax(120px,1.4fr) minmax(70px,.7fr) minmax(70px,.7fr) minmax(88px,.8fr)!important;
+  gap:10px!important;
+  align-items:end!important;
+}
+.valuation-report .val-side>.vs-h>span:nth-child(n+2){text-align:right}
+.valuation-report .val-side>.vs-h>em{
+  grid-column:1/-1;
+  grid-row:1;
+  justify-self:end;
+  transform:translateY(-18px);
+  color:var(--dim);
+  font:500 9px var(--mono);
+  letter-spacing:0;
+  text-transform:none;
+}
+.valuation-report .vs-row{
+  display:grid!important;
+  grid-template-columns:minmax(120px,1.4fr) minmax(70px,.7fr) minmax(70px,.7fr) minmax(88px,.8fr)!important;
+  gap:10px!important;
+  min-height:0!important;
+  padding:6px 0!important;
+  align-items:center!important;
+}
+.valuation-report .vs-row .n{grid-column:1;min-width:0}
+.valuation-report .vs-row .vs-values{display:contents!important}
+.valuation-report .vs-row .vs-mcap{
+  display:flex!important;
+  padding:0!important;
+  border:0!important;
+  border-radius:0!important;
+  background:transparent!important;
+  align-items:flex-end!important;
+  text-align:right!important;
+  gap:2px!important;
+}
+.valuation-report .vs-row .vs-mcap:first-child{grid-column:2}
+.valuation-report .vs-row .vs-mcap.model{grid-column:3}
+.valuation-report .vs-row .vs-mcap b{font-size:14px!important}
+.valuation-report .vs-row .vs-mcap small{font-size:8px!important}
+.valuation-report .vs-row .v{grid-column:4;min-width:0!important;gap:2px!important}
+.valuation-report .vs-row .v b{font-size:14px!important}
+.valuation-report .vs-row .v small{font-size:8px!important}
+.weekly-fee-sources{
+  display:block;
+  margin-top:6px;
+  color:var(--dim);
+  font:600 10px/1.45 var(--sans);
+  letter-spacing:0;
+  text-transform:none;
+}
+.weekly-fee-sources b{color:var(--sub);font-weight:800}
+.rev-source-note{
+  display:block;
+  margin-top:12px;
+  padding-top:10px;
+  border-top:1px solid var(--line);
+  color:var(--dim);
+  font:500 11px/1.55 var(--sans);
+}
+@media(max-width:560px){
+  .valuation-report{padding:12px!important}
+  .valuation-report .val-hero{grid-template-columns:1fr!important}
+  .valuation-report .val-cell{border-right:0!important;border-bottom:1px solid var(--line)!important}
+  .valuation-report .val-cell:last-child{border-bottom:0!important}
+  .valuation-report #valScatter{height:360px!important}
+  .valuation-report .val-grid{grid-template-columns:1fr!important}
+  .valuation-report .val-side{grid-template-columns:1fr!important;padding:8px 0 0!important;border-left:0!important;border-top:1px solid var(--line)!important}
+  .valuation-report .val-side>.vs-h{grid-template-columns:1fr auto!important}
+  .valuation-report .val-side>.vs-h>span:nth-child(2),
+  .valuation-report .val-side>.vs-h>span:nth-child(3){display:none}
+  .valuation-report .val-side>.vs-h>em{display:none}
+  .valuation-report .vs-row{grid-template-columns:minmax(120px,1fr) auto auto!important;gap:8px!important}
+  .valuation-report .vs-row .n{grid-column:1}
+  .valuation-report .vs-row .v{grid-column:3;grid-row:1}
+  .valuation-report .vs-row .vs-mcap:first-child{grid-column:1;grid-row:2;align-items:flex-start!important;text-align:left!important}
+  .valuation-report .vs-row .vs-mcap.model{grid-column:2;grid-row:2;align-items:flex-start!important;text-align:left!important}
+}
+@media(min-width:561px) and (max-width:1199px){
+  .valuation-report .val-grid{grid-template-columns:1fr!important}
+  .valuation-report .val-side{grid-template-columns:repeat(2,minmax(0,1fr))!important;padding:8px 0 0!important;border-left:0!important;border-top:1px solid var(--line)!important;gap:0 22px!important}
+}
 
 /* ---------- points mascot ----------
    Replaces the line-art cat. The source is a 858x1280 portrait, so it is
@@ -6293,7 +6472,7 @@ body.theme-light .pts-input-mascot img{
       </span>
       <span class="tgl-knob" aria-hidden="true"></span>
     </button>
-    <div class="lbl">On-chain protocol treasury revenue</div>
+    <div class="lbl">On-chain protocol treasury balance</div>
     <div class="val" id="totalVal">—</div>
     <div class="hero-deltas" aria-label="Treasury balance percentage changes">
       <div class="delta-pill" id="hd12"><span>12H</span><b>—</b></div>
@@ -6333,7 +6512,7 @@ body.theme-light .pts-input-mascot img{
     <div>
       <div class="daily-brief-eyebrow"><i aria-hidden="true"></i> Daily VAR News · X-ready protocol update</div>
       <h2 id="dailyBriefHeadline">Syncing Variational's current state…</h2>
-      <p class="daily-brief-summary" id="dailyBriefSummary">Combining on-chain treasury revenue with live volume and open interest.</p>
+      <p class="daily-brief-summary" id="dailyBriefSummary">Combining net treasury wallet inflow with live volume and open interest.</p>
     </div>
     <div class="daily-brief-state">
       <span id="dailyBriefAsOf">Waiting for live sources</span>
@@ -6342,7 +6521,7 @@ body.theme-light .pts-input-mascot img{
   </div>
   <div class="daily-brief-grid" aria-label="Variational daily status metrics">
     <div class="daily-brief-metric revenue">
-      <span>Latest ET treasury revenue</span>
+      <span>Latest ET net treasury inflow</span>
       <strong id="dailyBriefRevenue">—</strong>
       <em class="daily-brief-delta" id="dailyBriefRevenueDelta">Waiting for completed close</em>
       <small id="dailyBriefBurn">Minimum buyback-burn floor —</small>
@@ -6363,7 +6542,7 @@ body.theme-light .pts-input-mascot img{
       <span>Treasury added · 7D</span>
       <strong id="dailyBriefSevenDay">—</strong>
       <em class="daily-brief-delta" id="dailyBriefSevenDayRate">— per ET day</em>
-      <small>Actual on-chain USDC inflow</small>
+      <small>Net change in the on-chain USDC balance</small>
     </div>
     <div class="daily-brief-metric">
       <span>Protocol treasury held</span>
@@ -6429,22 +6608,6 @@ body.theme-light .pts-input-mascot img{
   <h2>Roadmap Tracker <span class="tag">to the promise land</span></h2>
   <div class="cap">A clean read of the official Variational roadmap: what has shipped, where the project is on the path, and what gates are still ahead.</div>
   <div class="road-journey">
-    <div class="road-top">
-      <div>
-        <div class="road-eyebrow">Current journey</div>
-        <div class="road-big"><b>67%</b> of the listed path shipped</div>
-        <div class="road-copy">Every dated item from Q1 2025 through Q4 2025 is checked off, along with six undated items including the completed Omni v3 major UI rework. Ten undated items remain — from isolated margin through Variational Pro.</div>
-      </div>
-      <div class="road-progress" aria-label="Roadmap completion estimate">
-        <div class="road-progress-head"><strong>20/30</strong><span>listed roadmap items completed</span></div>
-        <div class="road-meter"><span style="width:67%"></span></div>
-        <div class="road-stats">
-          <div class="road-stat"><strong>4</strong><span>quarters shipped</span></div>
-          <div class="road-stat"><strong>6</strong><span>undated shipped</span></div>
-          <div class="road-stat"><strong>10</strong><span>items left</span></div>
-        </div>
-      </div>
-    </div>
     <div class="road-path" aria-label="Roadmap path">
       <div class="road-stop-grid">
         <div class="road-stop">
@@ -6551,11 +6714,11 @@ body.theme-light .pts-input-mascot img{
 <div class="protocol-map tsec tg-hide" data-tg="efficiency">
   <div class="pm-panel">
     <div class="pm-title">Protocol money map</div>
-    <svg class="pm-sankey" id="pmSankey" viewBox="0 0 720 230" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Income flow: spreads split to OLP vault and protocol treasury, treasury splits to buyback firepower and dry powder"></svg>
+    <svg class="pm-sankey" id="pmSankey" viewBox="0 0 720 230" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Modeled money flow: implied gross spreads, operating remainder, current treasury balance, and theoretical buyback allocation"></svg>
     <div class="pm-cap">
       <span><b>Core OLP Vault</b> quotes liquidity and absorbs trading flow. The non-treasury portion funds market-making costs, rewards, and residual OLP PnL; the vault balance itself is not company revenue. <a href="https://arbiscan.io/address/0x74bbbb0e7f0bad6938509dd4b556a39a4db1f2cd" target="_blank" rel="noopener">0x74bbbb…1f2cd ↗</a></span>
-      <span><b>Observed revenue cut</b> — <b id="pmSpreadTotal">—</b> recent-rate-equivalent spread payments. The latest three official reports show exactly 20% flowing to treasury; the current docs page still says 10% and notes the percentage can change.</span>
-      <span><b>Protocol Treasury</b> — USDC actually accumulated on-chain; the cleanest measurable “company earns” number. <a href="https://arbiscan.io/address/0x5e91b40467fb8902c46a7b6cb90482363188d645" target="_blank" rel="noopener">0x5e91…d645 ↗</a></span>
+      <span><b>Implied gross spreads</b> — <b id="pmSpreadTotal">—</b>, estimated from daily treasury inflows using the latest report-observed share available on each date. Before comparable reports, the model uses the 10% Docs rate.</span>
+      <span><b>Protocol Treasury</b> — current on-chain USDC balance. Balance changes are a transparent inflow proxy, but internal transfers or withdrawals may not be operating revenue. <a href="https://arbiscan.io/address/0x5e91b40467fb8902c46a7b6cb90482363188d645" target="_blank" rel="noopener">0x5e91…d645 ↗</a></span>
       <span><b>Settlement Pool Factory</b> creates settlement pools. It is infrastructure, not a direct revenue wallet. <a href="https://arbiscan.io/address/0x0F820B9afC270d658a9fD7D16B1Bdc45b70f074C" target="_blank" rel="noopener">0x0F820…074C ↗</a></span>
     </div>
     <div class="pm-metrics">
@@ -6573,7 +6736,7 @@ body.theme-light .pts-input-mascot img{
         <small class="pm-formula" id="pmOlpFormula">Formula: <b>USDC balanceOf(Core OLP Vault)</b></small>
       </div>
       <div class="pm-metric">
-        <strong id="pmTreasuryTotal">—</strong><span>treasury accumulated</span>
+        <strong id="pmTreasuryTotal">—</strong><span>current treasury balance</span>
         <div class="pm-growth" aria-label="Treasury rolling balance growth">
           <div class="pm-growth-title">Completed ET growth <i id="pmTreasuryGrowthAsOf">exact daily closes</i></div>
           <div class="pm-growth-grid">
@@ -6585,12 +6748,12 @@ body.theme-light .pts-input-mascot img{
         <small class="pm-formula" id="pmTreasuryFormula">Formula: <b>USDC balanceOf(Protocol Treasury)</b></small>
       </div>
       <div class="pm-metric">
-        <strong id="pmDailyRevenue">—</strong><span>30D avg revenue / day</span>
-        <small class="pm-formula" id="pmDailyFormula">Formula: <b>(today treasury - treasury 30D ago) / 30</b></small>
+        <strong id="pmDailyRevenue">—</strong><span>30D avg net inflow / day</span>
+        <small class="pm-formula" id="pmDailyFormula">Formula: <b>(current balance - balance 30D ago) / 30</b></small>
       </div>
       <div class="pm-metric">
-        <strong id="pmFeesTotal">—</strong><span>20% recent-rate equivalent</span>
-        <small class="pm-formula" id="pmFeesFormula">Formula: <b>treasury accumulated / observed revenue cut</b></small>
+        <strong id="pmFeesTotal">—</strong><span>implied gross spreads · modeled</span>
+        <small class="pm-formula" id="pmFeesFormula">Formula: <b>daily net inflow / period-specific observed share</b></small>
       </div>
     </div>
     <div class="pm-daily-monitor alert-normal" id="pmDailyMonitor" aria-live="polite">
@@ -6632,13 +6795,13 @@ body.theme-light .pts-input-mascot img{
       <small id="varPulseData">Treasury · Volume · Open Interest · Buyback floor</small>
     </article>
     <article class="var-pulse-card score">
-      <div class="k">Money engine score</div>
+      <div class="k">Treasury inflow score</div>
       <div class="v" id="varPulseScoreLine">—</div>
       <p id="varPulseScoreCopy">Scores activity, depth, treasury conversion, and burn firepower.</p>
       <div class="var-score-bars" aria-label="Money engine component scores">
         <span>Volume<b><i id="scoreVol"></i></b></span>
         <span>OI<b><i id="scoreOi"></i></b></span>
-        <span>Revenue<b><i id="scoreRev"></i></b></span>
+        <span>Inflow<b><i id="scoreRev"></i></b></span>
         <span>Burn<b><i id="scoreBurn"></i></b></span>
       </div>
     </article>
@@ -6667,13 +6830,14 @@ body.theme-light .pts-input-mascot img{
   <div class="earnings-workspace-head">
     <div class="earnings-workspace-title">
       <div class="earnings-eyebrow"><span class="live-dot"></span> ET earnings workspace · live · <span id="liveExactClock">— ET</span></div>
-      <h2>Revenue and Fee Tracker <span class="tag" id="calTag">daily totals</span></h2>
+      <h2>Treasury Inflow and Implied Spreads <span class="tag" id="calTag">daily totals</span></h2>
       <details class="cap-note">
-        <summary><b>Revenue</b> is what the protocol keeps &middot; <b>Fee</b> is what traders paid<span class="cap-note-hint">what these mean</span></summary>
+        <summary><b>Inflow</b> is the treasury wallet change &middot; <b>Spreads</b> are estimated<span class="cap-note-hint">what these mean</span></summary>
         <div class="cap-note-body">
-          <p><b>Revenue</b> is the USDC that actually lands in Variational's on-chain treasury wallet &mdash; measured, not modelled, and verifiable on Arbiscan. It is the protocol's own share, and at least 30% of it is earmarked to buy back and burn $VAR.</p>
-          <p><b>Fee</b> is the total spread traders paid to produce that revenue. The treasury books only its share of each spread (<b id="calSharePct">&mdash;</b> across the last three official reports); the rest goes to the OLP liquidity providers.</p>
-          <p>So revenue tells you what the protocol <em>earns</em>; fee tells you how large the business actually <em>is</em> &mdash; and fee is the number to use when comparing against fee-based exchanges. A day closes at 00:00 ET; today stays pending until then.</p>
+          <p><b>Data policy:</b> Treasury inflow is measured from changes in the on-chain USDC wallet balance. Implied gross spreads use allocation ratios observed in official biweekly reports. Non-revenue transfers and exact policy-change dates are not independently verified.</p>
+          <p><b>Net treasury inflow</b> is the change in USDC held by Variational's on-chain treasury wallet. It is directly measurable on Arbiscan, but non-revenue transfers could also change the balance.</p>
+          <p><b>Implied gross spreads</b> are estimated from treasury inflow using the share observed in the official report for that period. Recent reports show <b id="calSharePct">&mdash;</b>; current Docs still state 10% and say the rate is subject to change.</p>
+          <p>The non-treasury remainder covers market-making costs, rewards, and residual OLP PnL. It is not automatically OLP revenue. A day closes at 00:00 ET; today stays pending until then.</p>
         </div>
       </details>
     </div>
@@ -6693,9 +6857,9 @@ body.theme-light .pts-input-mascot img{
         <strong class="ticker" id="ticker">$0<span class="cents">.00</span></strong>
         <small id="tickerSub"><b>Live</b> · earned so far</small>
       </div>
-      <div class="earnings-summary-cell"><span>Rolling 12 hours</span><strong id="ac12h">—</strong><small>Actual on-chain earnings</small></div>
-      <div class="earnings-summary-cell"><span>Rolling 24 hours</span><strong id="ac24h">—</strong><small>Actual on-chain earnings</small></div>
-      <div class="earnings-summary-cell"><span>Rolling 7 days</span><strong id="ac7d">—</strong><small>Actual on-chain earnings</small></div>
+      <div class="earnings-summary-cell"><span>Rolling 12 hours</span><strong id="ac12h">—</strong><small>Net treasury inflow</small></div>
+      <div class="earnings-summary-cell"><span>Rolling 24 hours</span><strong id="ac24h">—</strong><small>Net treasury inflow</small></div>
+      <div class="earnings-summary-cell"><span>Rolling 7 days</span><strong id="ac7d">—</strong><small>Net treasury inflow</small></div>
     </div>
 
     <div class="earnings-main">
@@ -6756,7 +6920,7 @@ body.theme-light .pts-input-mascot img{
   <div class="market-head">
     <div>
       <h2>Market Activity → Actual Treasury Earnings <span class="tag">exact DeFiLlama series</span></h2>
-      <div class="cap">Volume and open interest show how active and deep the venue is. The green row connects that activity to real USDC received by Variational's on-chain treasury.</div>
+      <div class="cap">Volume and open interest show activity and market depth. The green row shows net USDC added to Variational's treasury wallet; it is a measurable inflow proxy, not audited accounting revenue.</div>
     </div>
     <div class="market-sync" id="marketSync">Syncing exact data…</div>
   </div>
@@ -6767,12 +6931,12 @@ body.theme-light .pts-input-mascot img{
       <div class="market-kpi volume"><span>7 daily volume observations</span><strong id="marketVol7d">—</strong><small id="marketVol7dExact">DeFiLlama daily UTC</small></div>
       <div class="market-kpi volume"><span>30 daily volume observations</span><strong id="marketVol30d">—</strong><small id="marketVol30dExact">DeFiLlama daily UTC</small></div>
     </div>
-    <div class="market-earnings-label"><b>Actual treasury earnings</b><span>On-chain USDC balance deltas · not gross trader spreads or modeled revenue</span></div>
+    <div class="market-earnings-label"><b>Net treasury inflow</b><span>On-chain USDC balance deltas · non-revenue transfers may affect the result</span></div>
     <div class="market-earnings" aria-label="Actual Variational treasury earnings">
       <div class="market-earning"><span>Trailing 7 days</span><strong id="marketEarn7">—</strong><small>current balance minus 7 ET days ago</small></div>
-      <div class="market-earning"><span>Trailing 30 days</span><strong id="marketEarn30">—</strong><small>actual USDC received</small></div>
+      <div class="market-earning"><span>Trailing 30 days</span><strong id="marketEarn30">—</strong><small>net wallet balance increase</small></div>
       <div class="market-earning"><span>Month to date</span><strong id="marketEarnMtd">—</strong><small id="marketEarnMtdRange">current ET calendar month</small></div>
-      <div class="market-earning"><span>All-time treasury held</span><strong id="marketEarnAll">—</strong><small>current on-chain USDC balance</small></div>
+      <div class="market-earning"><span>Current treasury balance</span><strong id="marketEarnAll">—</strong><small>current on-chain USDC held</small></div>
     </div>
   </div>
   <div class="market-chart-head">
@@ -6791,8 +6955,8 @@ body.theme-light .pts-input-mascot img{
 </div>
 
 <div class="card eff tsec tg-hide" data-tg="efficiency" style="margin-top:16px">
-  <h2>Revenue Run-Rate <span class="tag">FDV / MCAP input</span></h2>
-  <div class="cap">How much real USDC this venue earns per day, week, and month. Annualize the pace and you have the revenue leg of any FDV or MCAP multiple. <span id="effAsOf" class="muted"></span></div>
+  <h2>Treasury Inflow Run-Rate <span class="tag">valuation proxy</span></h2>
+  <div class="cap">Treasury inflow is measured from changes in the on-chain USDC wallet balance. Implied gross spreads use allocation ratios observed in official biweekly reports. Non-revenue transfers and exact policy-change dates are not independently verified. <span id="effAsOf" class="muted"></span></div>
   <div class="eff-window-tabs" id="effWindowTabs" role="tablist" aria-label="Time window">
     <button type="button" data-eff-window="1d">1D</button>
     <button type="button" data-eff-window="7d">1W</button>
@@ -6807,27 +6971,27 @@ body.theme-light .pts-input-mascot img{
       <div class="activity-plus">+</div>
       <div class="activity-input"><span id="fmOiLabel">OPEN INTEREST · LIVE SNAPSHOT</span><strong id="fmOi">—</strong><small>capital kept active in positions</small></div>
       <div class="activity-arrow">→</div>
-      <div class="activity-result"><span id="fmFeesLabel">1D SPREAD FEES PAID BY TRADERS</span><strong id="fmDailyFees">—</strong><small id="fmDailyFeesFormula">treasury ÷ observed 20%</small></div>
+      <div class="activity-result"><span id="fmFeesLabel">1D IMPLIED GROSS SPREADS</span><strong id="fmDailyFees">—</strong><small id="fmDailyFeesFormula">estimated from report-observed share</small></div>
       <div class="activity-arrow">→</div>
-      <div class="activity-result treasury"><span id="fmRevLabel">1D VARIATIONAL TREASURY REVENUE</span><strong id="fmDailyRev">—</strong><small id="fmDailyRevFormula">selected treasury inflow</small></div>
+      <div class="activity-result treasury"><span id="fmRevLabel">1D NET TREASURY INFLOW</span><strong id="fmDailyRev">—</strong><small id="fmDailyRevFormula">selected wallet balance change</small></div>
     </div>
-    <div class="activity-outcome"><b id="fmDailyBurn">—</b><span id="fmBurnLabel">estimated 1D buyback-burn firepower</span><small id="fmDailyBurnFormula">1D treasury × 30%</small></div>
+    <div class="activity-outcome"><b id="fmDailyBurn">—</b><span id="fmBurnLabel">theoretical minimum buyback allocation</span><small id="fmDailyBurnFormula">inflow × 30% Docs floor · not executed burn</small></div>
     <div class="activity-valuation" id="fmValLine"></div>
   </div>
   <div class="eff-ratios">
-    <div class="er"><div class="er-v" id="erVolFee">—</div><div class="er-l">perp volume makes <b>$1 in fees</b></div></div>
-    <div class="er"><div class="er-v" id="erVolRev">—</div><div class="er-l">volume makes <b>$1 to treasury</b></div></div>
+    <div class="er"><div class="er-v" id="erVolFee">—</div><div class="er-l">volume per <b>$1 implied gross spread</b></div></div>
+    <div class="er"><div class="er-v" id="erVolRev">—</div><div class="er-l">volume per <b>$1 net treasury inflow</b></div></div>
     <div class="er"><div class="er-v" id="erTvl">—</div><div class="er-l"><b>TVL</b> ex-hedging · official biweekly</div></div>
     <div class="er"><div class="er-v" id="erTurn">—</div><div class="er-l">OI turns over <b>per day</b></div></div>
   </div>
-  <div class="eff-note">TVL <b id="efTvl">—</b> backs <b id="efOi">—</b> OI → <b id="efCapEff">—</b> capital efficiency · $1 of TVL supports <b id="efVolSupport">—</b> of daily volume · selected-window fee pool = <b id="efFeeVsTvl">—</b> of TVL → <b>fee capture scales with volume, not with parked capital</b>. <span class="muted">TVL from the official biweekly post (cross-check: <a href="https://dune.com/entropy_advisors/variational-protocol" target="_blank" rel="noopener">Dune · Entropy Advisors</a>). Not financial advice.</span></div>
+  <div class="eff-note">Reported TVL <b id="efTvl">—</b> is compared with live OI <b id="efOi">—</b> → <b id="efCapEff">—</b> capital-efficiency context · $1 of reported TVL supports <b id="efVolSupport">—</b> of daily volume · implied selected-window spreads = <b id="efFeeVsTvl">—</b> of TVL. <span class="muted">TVL excludes hedging accounts and comes from the dated official biweekly report; OI is a live snapshot, so this is contextual rather than a same-timestamp accounting ratio. Cross-check: <a href="https://dune.com/entropy_advisors/variational-protocol" target="_blank" rel="noopener">Dune · Entropy Advisors</a>. Not financial advice.</span></div>
   <div class="bw-link"><a id="bwTeaserLink" href="#biweekly">Official biweekly P&amp;L: net profit <b id="bwTeaser">—</b> after all costs → open the full report</a></div>
   <div class="fr-chart-head">
     <b>Is the exchange getting better at making money?</b>
-    <span>Green up is good. Purple down is good. Together they show whether trading activity is turning into treasury revenue more efficiently.</span>
+    <span>Green up means more net treasury inflow. Purple down means less volume was needed per $1 of inflow. Both are wallet-based proxies.</span>
   </div>
   <div class="fr-read">
-    <div class="box good"><b>Money engine</b><strong id="frReadRev">—</strong><span id="frReadRevNote">Selected treasury revenue. If this rises, the venue is earning more real USDC.</span></div>
+    <div class="box good"><b>Treasury inflow</b><strong id="frReadRev">—</strong><span id="frReadRevNote">Selected net treasury inflow. Wallet transfers can affect this number.</span></div>
     <div class="box eff"><b>Efficiency</b><strong id="frReadNeed">—</strong><span>Volume needed for $1 to treasury. Lower means the exchange monetizes flow better.</span></div>
     <div class="box"><b>What to watch</b><strong id="frReadSignal">—</strong><span>Best setup: green line rising while purple line falls.</span></div>
   </div>
@@ -7008,6 +7172,15 @@ body.theme-light .pts-input-mascot img{
         <div class="fdv-value">
           <div class="fdv-title">FDV scenario</div>
           <div class="pts-fdv" id="ptsFdvBig">—</div>
+          <div class="pts-tge-assumption">
+            <span>TGE circulating supply assumption</span>
+            <div class="pts-tge-scenarios">
+              <div class="pts-tge-scenario"><b>20%</b><small id="ptsTgeMcap20">— MCAP</small></div>
+              <div class="pts-tge-scenario base"><b>25%</b><small id="ptsTgeMcap25">— MCAP · base</small></div>
+              <div class="pts-tge-scenario"><b>30%</b><small id="ptsTgeMcap30">— MCAP</small></div>
+            </div>
+            <small>Each MCAP = selected FDV × tokens circulating at TGE.</small>
+          </div>
         </div>
         <div class="fdv-tools">
           <div class="fdv-head">
@@ -7090,11 +7263,11 @@ body.theme-light .pts-input-mascot img{
       <b><span class="sw avg"></span>4-period rolling avg</b>
     </div>
     <div class="interval-chart"><svg class="chart" id="bars" viewBox="0 0 380 230"></svg></div>
-    <div class="tbl-wrap hist-inline-table">
-      <table id="tbl"><thead><tr>
-        <th>Period</th><th>Start</th><th>End</th><th>USDC Added</th><th>Δ %</th><th>Avg / day</th>
-      </tr></thead><tbody></tbody></table>
-    </div>
+  </div>
+  <div class="tbl-wrap hist-inline-table">
+    <table id="tbl"><thead><tr>
+      <th>Period</th><th>Start</th><th>End</th><th>USDC Added</th><th>Δ %</th><th>Avg / day</th>
+    </tr></thead><tbody></tbody></table>
   </div>
 </div>
 
@@ -7129,20 +7302,20 @@ body.theme-light .pts-input-mascot img{
 <section class="comparison-report tsec tg-hide" data-tg="comparison">
   <div class="cmp-heading">
     <h2>Perp DEX Positioning</h2>
-    <p>Variational, Lighter, and Extended are compared on matched windows. Hyperliquid is shown separately as the market ceiling.</p>
+    <p>Variational, Lighter, and Extended are compared on matched windows. Hyperliquid is shown separately as the market ceiling. Treasury inflow is measured from changes in the on-chain USDC wallet balance; implied gross spreads use allocation ratios observed in official biweekly reports. Non-revenue transfers and exact policy-change dates are not independently verified.</p>
   </div>
 
   <div class="cmp-summary">
     <div class="cmp-verdict">
       <span>Bottom line</span>
-      <h3 id="cmpVerdict">Capacity favors Variational. Revenue favors Lighter.</h3>
-      <p id="cmpVerdictSub">Booked revenue reflects each protocol's payout model. Variational's latest three reports send 20% of gross spreads to treasury; the remainder covers costs, rewards, and OLP PnL. Lighter keeps about 78% of the fees it collects.</p>
+      <h3 id="cmpVerdict">Compare activity first. Read monetization on its own basis.</h3>
+      <p id="cmpVerdictSub">OI and volume are comparable market metrics. Variational wallet inflow and Lighter protocol revenue are different measurements, so this page does not declare a revenue winner from them.</p>
     </div>
     <div class="cmp-key-metrics">
       <div class="cmp-kpi"><span>Market rank</span><strong id="cmpRank">#-</strong><small id="cmpRankSub">loading market data</small></div>
       <div class="cmp-kpi var"><span>Open interest</span><strong id="valOiEdge">-</strong><small id="valOiEdgeSub">loading</small></div>
       <div class="cmp-kpi var"><span>30D fee pool</span><strong id="valFeeEdge">-</strong><small id="valFeeEdgeSub">loading</small></div>
-      <div class="cmp-kpi lighter"><span>30D booked revenue</span><strong id="cmpRevenueEdge">-</strong><small id="cmpRevenueEdgeSub">current monetization lead</small></div>
+      <div class="cmp-kpi lighter"><span>30D monetization signals</span><strong id="cmpRevenueEdge">-</strong><small id="cmpRevenueEdgeSub">different definitions · shown side by side</small></div>
     </div>
   </div>
 
@@ -7156,7 +7329,7 @@ body.theme-light .pts-input-mascot img{
   <section class="cmp-direct">
     <div class="cmp-section-head">
       <h3>Variational vs Lighter vs Extended</h3>
-      <p>Capacity, activity, fee pool, and booked revenue on matched windows. Extended's Dune total is a source check, not a 30D input.</p>
+      <p>OI and volume use matched windows. Fee pools and monetization signals retain their source labels because the accounting definitions differ by venue.</p>
     </div>
     <div class="cmp-direct-grid">
       <div class="cmp-table-pane">
@@ -7165,7 +7338,7 @@ body.theme-light .pts-input-mascot img{
       </div>
       <div class="cmp-revenue-pane">
         <div class="comp-rev-head">
-          <div><b>Weekly fee pool</b><span>Trailing 8 matched 7-day windows</span></div>
+          <div><b>Weekly trader fee pool</b><span id="weeklyFeeRange">Eight complete 7-day periods</span><small class="weekly-fee-sources"><b>VAR</b> Arbitrum treasury wallet + official Biweekly allocation ratios · <b>Lighter / Extended</b> DeFiLlama Fees</small></div>
           <div class="legend">
             <b><img class="cmp-logo" src="variational-symbol-transparent.png" alt="" width="20" height="20"><span class="sw act"></span>Variational</b>
             <b><img class="cmp-logo" src="lighter-logo.png" alt="" width="20" height="20"><span class="sw lighter-sw"></span>Lighter</b>
@@ -7195,28 +7368,28 @@ body.theme-light .pts-input-mascot img{
 <section class="valmodel valuation-report tsec tg-hide" data-tg="comparison">
   <div class="cmp-heading">
     <h2>Implied Valuation</h2>
-    <p>The model estimates circulating market cap from open interest. Listed tokens reveal the premium or discount investors currently pay.</p>
-  </div>
-  <div class="val-hero">
-    <div class="val-cell">
-      <div class="vh-k">Model-implied Variational MCAP</div>
-      <div class="vh-big" id="valMcap">$—</div>
-      <div class="vh-sub">Based on current OI <b id="valOiBase">$—</b>. $VAR is pre-TGE, so this is not a traded value.</div>
-    </div>
-    <div class="val-cell actual">
-      <div class="vh-k">Gap to Hyperliquid</div>
-      <div class="vh-big" id="valVsHl">-</div>
-      <div class="vh-sub" id="valVsHlSub">Comparing Variational's model value with Hyperliquid's current market cap</div>
-    </div>
-    <div class="val-cell fdv">
-      <div class="vh-k">Model-implied FDV</div>
-      <div class="vh-big" id="valFdv">$—</div>
-      <div class="vh-sub">Assumes <b id="valFloat">25%</b> circulating float. Range <b id="valFdvRange">—</b> across 20-33%.</div>
-    </div>
+    <p>The model estimates circulating market cap from open interest. Premium or discount means actual token MCAP versus this statistical model, not versus FDV.</p>
   </div>
   <div class="val-grid">
     <div class="val-chart-wrap">
-      <svg id="valScatter" viewBox="0 0 960 630" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Open interest vs circulating market cap, log-log scatter with power-law fit"></svg>
+      <div class="val-hero">
+        <div class="val-cell fdv">
+          <div class="vh-k">Model-implied FDV</div>
+          <div class="vh-big" id="valFdv">$—</div>
+          <div class="vh-sub">MCAP ÷ TGE float · 25% base · <b id="valFdvRange">—</b> range</div>
+        </div>
+        <div class="val-cell">
+          <div class="vh-k">Model-implied MCAP</div>
+          <div class="vh-big" id="valMcap">$—</div>
+          <div class="vh-sub">From current OI <b id="valOiBase">$—</b> · <b id="valFloat">25%</b> TGE base</div>
+        </div>
+        <div class="val-cell actual">
+          <div class="vh-k">Gap to Hyperliquid</div>
+          <div class="vh-big" id="valVsHl">-</div>
+          <div class="vh-sub" id="valVsHlSub">Model MCAP versus Hyperliquid MCAP</div>
+        </div>
+      </div>
+      <svg id="valScatter" viewBox="0 0 960 630" preserveAspectRatio="none" role="img" aria-label="Open interest vs circulating market cap, log-log scatter with power-law fit"></svg>
     </div>
     <div class="val-side" id="valSide"></div>
   </div>
@@ -7252,7 +7425,7 @@ body.theme-light .pts-input-mascot img{
 <div class="tt" id="tt"></div>
 <script>if(location.hash==="#meme")history.replaceState(null,"",location.pathname+location.search+"#overview");</script>
 <script>addEventListener("load",function(){var e=document.getElementById("calSharePct");try{if(e)e.textContent=Math.round(MKT.spreadShare*100)+"%";}catch(_){}});</script>
-<script src="dashboard.js?v=20260731-1130" defer></script>
+<script src="dashboard.js?v=20260801-roadmap-hero-removed" defer></script>
 <script>
   ['trollbox-splitview-widget','trollbox-complete-widget'].forEach(id => {
     const node = document.getElementById(id);
