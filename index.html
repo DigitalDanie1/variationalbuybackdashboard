@@ -6339,6 +6339,40 @@ body.theme-light .pts-slider::-moz-range-track{background:rgba(0,0,0,.10)!import
 .valuation-report .vs-row .v{grid-column:4;min-width:0!important;gap:2px!important}
 .valuation-report .vs-row .v b{font-size:14px!important}
 .valuation-report .vs-row .v small{font-size:8px!important}
+
+/* Comparison color reset: keep peer data neutral and reserve color for meaning. */
+.valuation-report #valScatter .val-peer-label,
+.valuation-report #valScatter .val-peer-sub{
+  fill:var(--sub)!important;
+  stroke:var(--panel)!important;
+  stroke-width:2px!important;
+  paint-order:stroke!important;
+  vector-effect:non-scaling-stroke;
+  text-shadow:none!important;
+}
+.valuation-report #valScatter .val-var-label{
+  fill:var(--grn)!important;
+  stroke:var(--panel)!important;
+  stroke-width:2.5px!important;
+  paint-order:stroke!important;
+  vector-effect:non-scaling-stroke;
+  text-shadow:none!important;
+}
+.valuation-report #valScatter text{
+  filter:none!important;
+  text-shadow:none!important;
+}
+.valuation-report .vs-row .n b,
+.valuation-report .vs-row .vs-mcap b{
+  color:var(--ink)!important;
+  text-shadow:none!important;
+}
+.valuation-report .vs-row.var-row .n b,
+.valuation-report .vs-row.var-row .vs-mcap.model b{
+  color:var(--grn)!important;
+}
+.valuation-report .vs-row .v.premium b{color:var(--grn)!important}
+.valuation-report .vs-row .v.discount b{color:var(--red)!important}
 .weekly-fee-sources{
   display:block;
   margin-top:6px;
@@ -6409,6 +6443,55 @@ body.theme-light .pts-input-mascot img{
   .pts-input-mascot{display:block!important}
 }
 
+</style>
+<style id="light-theme-final">
+/* Final light-mode contract. Keep this last so component layers cannot restore
+   the dark v5 surface tokens after the theme toggle has been applied. */
+body.theme-light{
+  --bg:#f4f7fa;
+  --panel:#ffffff;
+  --panel2:#edf2f6;
+  --line:rgba(18,48,76,.18);
+  --ink:#102235;
+  --sub:#48647f;
+  --dim:#71869a;
+  --grn:#1478e8;
+  --grn2:#0d5fbf;
+  --cyan:#1478e8;
+  --vio:#315fcb;
+  --amber:#356fae;
+  --red:#c94159;
+  background:#f4f7fa!important;
+  color:var(--ink)!important;
+  color-scheme:light;
+}
+body.theme-light::before{opacity:.035!important;filter:none!important}
+body.theme-light::after{color:rgba(20,70,115,.035)!important;mix-blend-mode:multiply!important;text-shadow:none!important}
+body.theme-light .dashboard-shell,
+body.theme-light .sticky-dashboard-head,
+body.theme-light .overview-hero,
+body.theme-light .comparison-page{
+  color:var(--ink)!important;
+}
+body.theme-light .dashboard-shell .card,
+body.theme-light .dashboard-shell .live-card,
+body.theme-light .dashboard-shell .nav-shell,
+body.theme-light .header-signal-card,
+body.theme-light .valuation-report,
+body.theme-light .valuation-report .val-chart-wrap{
+  background:var(--panel)!important;
+  border-color:var(--line)!important;
+  box-shadow:none!important;
+}
+body.theme-light .valuation-report #valScatter .val-peer-label,
+body.theme-light .valuation-report #valScatter .val-peer-sub{
+  fill:var(--sub)!important;
+  stroke:#fff!important;
+}
+body.theme-light .valuation-report #valScatter .val-var-label{
+  fill:#0b67cf!important;
+  stroke:#fff!important;
+}
 </style>
 </head>
 <body>
@@ -7425,7 +7508,7 @@ body.theme-light .pts-input-mascot img{
 <div class="tt" id="tt"></div>
 <script>if(location.hash==="#meme")history.replaceState(null,"",location.pathname+location.search+"#overview");</script>
 <script>addEventListener("load",function(){var e=document.getElementById("calSharePct");try{if(e)e.textContent=Math.round(MKT.spreadShare*100)+"%";}catch(_){}});</script>
-<script src="dashboard.js?v=20260801-roadmap-hero-removed" defer></script>
+<script src="dashboard.js?v=20260801-comparison-color-fix" defer></script>
 <script>
   ['trollbox-splitview-widget','trollbox-complete-widget'].forEach(id => {
     const node = document.getElementById(id);
