@@ -2261,6 +2261,9 @@ function renderDailyBrief(){
   const baseline=baselineRows.reduce((sum,row)=>sum+row.e,0)/Math.max(1,baselineRows.length);
   const vsPrevious=pctChange(latest.e,previous.e);
   const vsAverage=pctChange(latest.e,baseline);
+  const reportShare=spreadShareAt(latest.d).rate;
+  const dailySpreadFees=reportShare>0?latest.e/reportShare:0;
+  const dailyOlpSide=Math.max(0,dailySpreadFees-latest.e);
   const cur=currentTreasuryBalance(),asOf=currentTreasuryDate();
   const base7=cumAt(addDays(asOf,-7)),base30=cumAt(addDays(asOf,-30));
   const earned7=Math.max(0,cur-base7),earned30=Math.max(0,cur-base30);
@@ -2304,14 +2307,18 @@ function renderDailyBrief(){
     :heroHot>=3?`, a ${heroHot}th straight day above the 30-day average`:'';
   $('#dailyBriefHeadline').textContent=`${dateShort} Daily VAR Fundamentals`;
   $('#dailyBriefAsOf').textContent=`ET treasury inflow through ${dateLabel} · ${liveLabel}`;
-  $('#dailyBriefSummary').textContent=`Daily state check: net treasury inflow, 24H volume, open interest, and current treasury balance. ${heroNote?heroNote.slice(2)+'. ':''}Wallet inflow is measurable on-chain but is not audited accounting revenue.`;
+  $('#dailyBriefSummary').textContent=`Daily money flow first: implied gross spread fees → OLP-side pool + net treasury inflow. Then check 24H volume, open interest, and treasury balance. ${heroNote?heroNote.slice(2)+'. ':''}Wallet inflow is measurable on-chain but is not audited accounting revenue.`;
 
+  $('#dailyBriefSpreadFees').textContent=fmtUSD(dailySpreadFees);
+  $('#dailyBriefSpreadShare').textContent=`Inflow ÷ ${(reportShare*100).toFixed(0)}% observed treasury share`;
   $('#dailyBriefRevenue').textContent=signedMoney(latest.e);
   const revenueDelta=$('#dailyBriefRevenueDelta');
   revenueDelta.className='daily-brief-delta';
   if(vsPrevious!=null&&Math.abs(vsPrevious)>.05)revenueDelta.classList.add(vsPrevious>0?'up':'down');
   revenueDelta.textContent=`${money0(previous.e)} → ${money0(latest.e)} · ${signedPct(vsPrevious)} DoD`;
   $('#dailyBriefBurn').textContent=`Theoretical ${fmtUSD(Math.max(0,latest.e*MKT.burnShare))} minimum buyback allocation`;
+  $('#dailyBriefOlpSide').textContent=fmtUSD(dailyOlpSide);
+  $('#dailyBriefOlpShare').textContent=`${((1-reportShare)*100).toFixed(0)}% non-treasury side of implied spreads`;
   $('#dailyBriefVolume').textContent=marketBig(volume);
   setDelta('#dailyBriefVolumeDelta',volumeDelta,volumePrev?`${marketBig(volumePrev)} → ${marketBig(volume)}`:'daily comparison');
   $('#dailyBriefOi').textContent=marketBig(oi);
@@ -2329,7 +2336,7 @@ function renderDailyBrief(){
   $('#dailySourceReportAsOf').textContent=`Latest report in dataset: ${BIWEEKLY.asOf}`;
 
   NEWS_CTX={
-    rev:latest.e,
+    rev:latest.e,dailySpreadFees,dailyOlpSide,reportShare,
     perHour:latest.e/24,
     perMin:latest.e/1440,
     vsAverage,vsPrevious,volume,volumePrev,volumeDelta,oi,oiPrev,oiDelta,earned7,earned30,cur,treasuryPrev,treasuryHeldDelta,status,dateLabel,
@@ -2409,7 +2416,7 @@ function renderDailyBrief(){
    byte-identical every day (X deprioritises templated duplicates). These angles
    lead with one number at human scale, hold something back, and rotate daily. */
 let NEWS_CTX=null, NEWS_ANGLE=null;
-const NEWS_URL='https://variationalbuybackdashboard.vercel.app/#daily-news';
+const NEWS_URL='https://www.variational.money/#daily-news';
 /* The treasury has no outflows, so "days of growth" is trivially every day.
    Rank the latest day against every other day instead — that one can fail. */
 function dayRank(earnings){
@@ -2483,29 +2490,26 @@ function renderNewsPost(){
   const volumeDown=c.volumeDelta!=null&&c.volumeDelta<0;
   const oiUp=c.oiDelta!=null&&c.oiDelta>0;
   const tone=weekend&&revenueDown&&volumeDown&&oiUp
-    ?'Slow weekend as usual\nBut OI continues to climb up.'
+    ?'Weekend check-in.'
     :revenueDown&&volumeDown&&oiUp
-      ?'Volume cooled down.\nBut OI continues to climb up.'
+      ?'OI held while volume cooled.'
       :c.status==='momentum'
-        ?'Activity is picking up.\nTreasury keeps stacking.'
-        :'Daily check-in.\nWatch volume, OI, and treasury together.';
+        ?'Momentum check-in.'
+        :'Daily check-in.';
   const arrow=v=>v==null?'':v>0?' 📈':v<0?' 📉':' →';
   const val=(v,fmt)=>v==null||!Number.isFinite(+v)?'—':fmt(v);
   const moneyPlus=v=>v==null||!Number.isFinite(+v)?'—':(v>=0?'+':'-')+money0(Math.abs(v));
-  const line=(label,prev,next,delta,fmt)=>
-    `${label.padEnd(14,' ')} ${val(prev,fmt)} -> ${val(next,fmt)}${arrow(delta)}`.trimEnd();
   const body=[
     title,
     '',
     tone,
     '',
-    line('Treasury',c.previousRevenue,c.latestRevenue,c.vsPrevious,moneyPlus),
-    line('24H volume',c.volumePrev||0,c.volume,c.volumeDelta,marketBig),
-    line('Open interest',c.oiPrev||0,c.oi,c.oiDelta,marketBig),
-    line('Treasury held',c.treasuryPrev,c.cur,c.treasuryHeldDelta,marketBig),
-    '',
-    'You can see how much volume and OI',
-    'is needed to generate $1 in treasury.'
+    `Treasury ${val(c.previousRevenue,moneyPlus)} → ${val(c.latestRevenue,moneyPlus)}${arrow(c.vsPrevious)}`,
+    `Spread fees ${val(c.dailySpreadFees,money0)} · implied`,
+    `OLP-side ${val(c.dailyOlpSide,money0)} · pre-cost`,
+    `24H vol ${val(c.volumePrev||0,marketBig)} → ${val(c.volume,marketBig)}${arrow(c.volumeDelta)}`,
+    `OI ${val(c.oiPrev||0,marketBig)} → ${val(c.oi,marketBig)}${arrow(c.oiDelta)}`,
+    `Treasury held ${val(c.treasuryPrev,marketBig)} → ${val(c.cur,marketBig)}${arrow(c.treasuryHeldDelta)}`
   ].join('\n');
   root.dataset.tweet=body;
   root.dataset.url=NEWS_URL;
