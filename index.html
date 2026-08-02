@@ -6492,6 +6492,58 @@ body.theme-light .valuation-report #valScatter .val-var-label{
   fill:#0b67cf!important;
   stroke:#fff!important;
 }
+
+/* Daily News: money flow gets a full, readable row before market context. */
+.daily-news .daily-brief-grid{
+  grid-template-columns:repeat(12,minmax(0,1fr))!important;
+}
+.daily-news .daily-brief-metric{
+  grid-column:span 3;
+  min-height:122px;
+  padding:16px 18px 15px!important;
+  border-top:1px solid var(--line);
+}
+.daily-news .daily-brief-metric:nth-child(-n+3){grid-column:span 4;border-top:0}
+.daily-news .daily-brief-metric:first-child,
+.daily-news .daily-brief-metric:nth-child(4){border-left:0!important}
+.daily-news .daily-brief-metric.spread-fee,
+.daily-news .daily-brief-metric.revenue,
+.daily-news .daily-brief-metric.olp-side{
+  background:color-mix(in srgb,var(--panel2) 58%,transparent);
+}
+.daily-news .daily-brief-metric.spread-fee>strong{color:var(--ink)}
+.daily-news .daily-brief-metric.olp-side>strong{color:var(--sub)}
+.daily-news .daily-brief-metric>span{
+  overflow:visible!important;
+  text-overflow:clip!important;
+  white-space:normal!important;
+  font-size:11px!important;
+  line-height:1.25!important;
+}
+.daily-news .daily-brief-metric>strong{
+  margin-top:10px!important;
+  font-size:clamp(25px,2.15vw,34px)!important;
+}
+.daily-news .daily-brief-metric>small,
+.daily-news .daily-brief-delta{
+  overflow:visible!important;
+  text-overflow:clip!important;
+  white-space:normal!important;
+  font-size:11px!important;
+  line-height:1.35!important;
+}
+@media(max-width:1050px){
+  .daily-news .daily-brief-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  .daily-news .daily-brief-metric:nth-child(n){grid-column:span 1;border-top:1px solid var(--line)}
+  .daily-news .daily-brief-metric:nth-child(-n+2){border-top:0}
+  .daily-news .daily-brief-metric:nth-child(odd){border-left:0!important}
+  .daily-news .daily-brief-metric:nth-child(even){border-left:1px solid var(--line)!important}
+}
+@media(max-width:560px){
+  .daily-news .daily-brief-grid{grid-template-columns:1fr!important}
+  .daily-news .daily-brief-metric:nth-child(n){border-left:0!important;border-top:1px solid var(--line)}
+  .daily-news .daily-brief-metric:first-child{border-top:0}
+}
 </style>
 </head>
 <body>
@@ -6603,11 +6655,23 @@ body.theme-light .valuation-report #valScatter .val-var-label{
     </div>
   </div>
   <div class="daily-brief-grid" aria-label="Variational daily status metrics">
+    <div class="daily-brief-metric spread-fee">
+      <span>Daily Spread Fees · implied</span>
+      <strong id="dailyBriefSpreadFees">—</strong>
+      <em class="daily-brief-delta" id="dailyBriefSpreadShare">Waiting for report share</em>
+      <small>Gross spreads paid by traders</small>
+    </div>
     <div class="daily-brief-metric revenue">
       <span>Latest ET net treasury inflow</span>
       <strong id="dailyBriefRevenue">—</strong>
       <em class="daily-brief-delta" id="dailyBriefRevenueDelta">Waiting for completed close</em>
       <small id="dailyBriefBurn">Minimum buyback-burn floor —</small>
+    </div>
+    <div class="daily-brief-metric olp-side">
+      <span>Daily OLP-side $ · implied</span>
+      <strong id="dailyBriefOlpSide">—</strong>
+      <em class="daily-brief-delta" id="dailyBriefOlpShare">Spread pool after treasury share</em>
+      <small>Before market-making costs, rewards, and OLP PnL</small>
     </div>
     <div class="daily-brief-metric volume">
       <span>Rolling 24H volume</span>
@@ -6670,7 +6734,7 @@ body.theme-light .valuation-report #valScatter .val-var-label{
       </div>
       <div class="daily-news-source">
         <span>Revenue share + burn floor</span>
-        <p>Docs describe a 10% treasury cut subject to change; the latest three official reports show a 20% observed cut. The burn figure applies the stated 30% minimum to treasury revenue.</p>
+        <p>Daily gross spreads equal net treasury inflow divided by the report-observed treasury share. OLP-side dollars are the remainder before market-making costs, rewards, and OLP PnL. The burn figure applies the stated 30% minimum to treasury inflow.</p>
         <small id="dailySourceReportAsOf">Latest official report window</small>
         <div class="daily-news-source-links">
           <a href="https://docs.variational.io/omni/the-omni-liquidity-provider-olp" target="_blank" rel="noopener noreferrer">Variational Docs ↗</a>
@@ -7508,7 +7572,7 @@ body.theme-light .valuation-report #valScatter .val-var-label{
 <div class="tt" id="tt"></div>
 <script>if(location.hash==="#meme")history.replaceState(null,"",location.pathname+location.search+"#overview");</script>
 <script>addEventListener("load",function(){var e=document.getElementById("calSharePct");try{if(e)e.textContent=Math.round(MKT.spreadShare*100)+"%";}catch(_){}});</script>
-<script src="dashboard.js?v=20260801-comparison-color-fix" defer></script>
+<script src="dashboard.js?v=20260802-daily-post-money-flow" defer></script>
 <script>
   ['trollbox-splitview-widget','trollbox-complete-widget'].forEach(id => {
     const node = document.getElementById(id);
