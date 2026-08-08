@@ -548,6 +548,50 @@ const BIWEEKLY_HISTORY=[
   olpPnl2w:654752,           // 2w OLP PnL
   olpPnlLife:15619555,       // lifetime OLP PnL
   treasuryHoldings:4662552   // current protocol treasury holdings (USDC)
+},
+{
+  asOf:'2026-07-25', src:'https://x.com/search?q=from%3Avariational_io%20biweekly%20update!&src=typed_query',
+  totalVolume:278.10e9,      // Total Volume Traded
+  oi:1.32e9,                 // Current Dual-Sided OI
+  tvl:158.17e6,              // TVL (excludes OLP hedging accounts)
+  markets:517,               // Total markets currently listed
+  rewardsClaimed:7600341,    // Total rewards claimed (lifetime)
+  lossesRefunded:4559196,    // Total losses refunded (Sunset)
+  referralClaimed:3041145,   // Total referral rewards claimed (lifetime)
+  dau:9798,                  // Daily active users, avg over past week
+  wau:16932,                 // Weekly active users
+  spreads2w:2380440,         // 2w spreads paid (gross revenue)
+  mmCosts2w:1365199,         // 2w market making costs (cost of revenue)
+  netRevenue2w:1015241,      // 2w net revenue
+  rewards2w:115932,          // 2w rewards (all referral rewards in this report)
+  referralRewards2w:115932,  // 2w referral rewards
+  netProfit2w:899309,        // 2w net profit
+  treasury2w:476088,         // 2w protocol treasury inflow
+  olpPnl2w:423221,           // 2w OLP PnL
+  olpPnlLife:16042776,       // lifetime OLP PnL
+  treasuryHoldings:5144043   // current protocol treasury holdings (USDC)
+},
+{
+  asOf:'2026-08-07', src:'https://x.com/search?q=from%3Avariational_io%20biweekly%20update!&src=typed_query',
+  totalVolume:289.12e9,      // Total Volume Traded
+  oi:1.42e9,                 // Current Dual-Sided OI
+  tvl:163.02e6,              // TVL (excludes OLP hedging accounts)
+  markets:534,               // Total markets currently listed
+  rewardsClaimed:7750040,    // Total rewards claimed (lifetime)
+  lossesRefunded:4559196,    // Total losses refunded (Sunset)
+  referralClaimed:3190844,   // Total referral rewards claimed (lifetime)
+  dau:10005,                 // Daily active users, avg over past week
+  wau:16206,                 // Weekly active users
+  spreads2w:2768210,         // 2w spreads paid (gross revenue)
+  mmCosts2w:1393457,         // 2w market making costs (cost of revenue)
+  netRevenue2w:1374753,      // 2w net revenue
+  rewards2w:135371,          // 2w rewards (all referral rewards in this report)
+  referralRewards2w:135371,  // 2w referral rewards
+  netProfit2w:1239387,       // 2w net profit
+  treasury2w:553642,         // 2w protocol treasury inflow
+  olpPnl2w:685745,           // 2w OLP PnL
+  olpPnlLife:16728521,       // lifetime OLP PnL
+  treasuryHoldings:5702102   // current protocol treasury holdings (USDC)
 }
 ];
 const BIWEEKLY=BIWEEKLY_HISTORY[BIWEEKLY_HISTORY.length-1];
@@ -2206,7 +2250,9 @@ function renderPointsCalc(){
   $('#ptsFdvBig').textContent='$'+(fdv/1e9).toFixed(fdv>=1e9?1:3)+'B';
   [20,25,30].forEach(p=>{
     const el=$('#ptsTgeMcap'+p);
-    if(el)el.textContent=fmtUSD(fdv*p/100)+' MCAP'+(p===25?' · base':'');
+    // Abbreviated to match the FDV headline above it. The full-precision form
+    // ("$10,000,000,000") cannot fit these three narrow cards and used to break mid-number.
+    if(el)el.textContent=fmtBig(fdv*p/100)+' MCAP'+(p===25?' · base':'');
   });
   // scenario band — grounds expectations vs a live comp (HYPE)
   let band,bcol;
@@ -2226,6 +2272,46 @@ function renderPointsCalc(){
   });
   // highlight matching FDV preset
   document.querySelectorAll('#fdvPresets .preset').forEach(b=>b.classList.toggle('on',+b.dataset.fdv===fdv));
+  renderPointsMatrix(mine,pool,fdv);
+}
+/* FDV x airdrop-share grid. The three cards above answer one FDV at a time; this answers the
+   whole space at once. Cell = FDV * share% / total pool = what one point is worth. */
+const PTS_MATRIX_FDV=[250e6,500e6,1e9,2e9,3.5e9,5e9,10e9,20e9,33.85e9,67.7e9];
+const PTS_MATRIX_PCT=[8,10,15,20,25,30];
+function renderPointsMatrix(mine,pool,fdv){
+  const body=document.querySelector('#ptsMatrix tbody');
+  if(!body)return;
+  const mineEl=$('#ptsMatrixMine');
+  if(mineEl)mineEl.textContent=mine.toLocaleString('en-US');
+  // Heat is ranked across every cell so the ramp spans the full table, not each row.
+  const all=[];
+  PTS_MATRIX_FDV.forEach(f=>PTS_MATRIX_PCT.forEach(p=>all.push(f*(p/100)/pool)));
+  const lo=Math.min.apply(null,all),hi=Math.max.apply(null,all);
+  const span=Math.log10(hi/lo)||1;
+  // Nearest ladder rung to the live slider, so the matrix and the controls stay in sync.
+  let nearest=PTS_MATRIX_FDV[0];
+  PTS_MATRIX_FDV.forEach(f=>{if(Math.abs(f-fdv)<Math.abs(nearest-fdv))nearest=f;});
+  body.innerHTML=PTS_MATRIX_FDV.map(f=>{
+    const label=f>=1e9?'$'+String(+(f/1e9).toFixed(2))+'B':'$'+Math.round(f/1e6)+'M';
+    const cells=PTS_MATRIX_PCT.map(p=>{
+      const perPt=f*(p/100)/pool;
+      const mineOut=perPt*mine;
+      const t=Math.min(1,Math.max(0,Math.log10(perPt/lo)/span));
+      const alpha=(0.05+t*0.62).toFixed(3);
+      return '<td class="'+(p===25?'is-base':'')+'" style="background:rgba(76,154,248,'+alpha+')">'
+        +'<span class="pm-v">'+fmtUSD(perPt,perPt<10?2:0)+'</span>'
+        +'<span class="pm-mine">'+fmtBig(mineOut)+'</span></td>';
+    }).join('');
+    return '<tr class="'+(f===nearest?'is-current':'')+'" data-fdv="'+f+'">'
+      +'<td class="pm-fdv">'+label+'</td>'+cells+'</tr>';
+  }).join('');
+  body.querySelectorAll('tr[data-fdv]').forEach(tr=>{
+    tr.addEventListener('click',()=>{
+      const slider=$('#ptsFdv'); if(!slider)return;
+      slider.value=Math.min(+slider.max,Math.max(+slider.min,+tr.dataset.fdv));
+      renderPointsCalc();
+    });
+  });
 }
 function ptsShareText(){
   const mine=Math.max(0,parseFloat($('#ptsMine').value)||0);
