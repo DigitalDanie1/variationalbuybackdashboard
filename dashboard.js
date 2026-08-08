@@ -2297,7 +2297,9 @@ function renderPointsMatrix(mine,pool,fdv){
       const perPt=f*(p/100)/pool;
       const mineOut=perPt*mine;
       const t=Math.min(1,Math.max(0,Math.log10(perPt/lo)/span));
-      const alpha=(0.05+t*0.62).toFixed(3);
+      // Capped low on purpose: the fill is a hint, not a surface. Above ~0.30 the
+      // accent gets bright enough that the ink on top drops below AA.
+      const alpha=(0.04+t*0.26).toFixed(3);
       return '<td class="'+(p===25?'is-base':'')+'" style="background:rgba(76,154,248,'+alpha+')">'
         +'<span class="pm-v">'+fmtUSD(perPt,perPt<10?2:0)+'</span>'
         +'<span class="pm-mine">'+fmtBig(mineOut)+'</span></td>';
