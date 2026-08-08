@@ -7,7 +7,7 @@
      any injected external script src or exfiltration to another host is blocked. -->
 <meta name="referrer" content="no-referrer">
 <meta name="robots" content="index,follow">
-<title>Variational Money - The first onchain dashboard for Variational</title>
+<title>Variational Money - Dashboard 2.0 Signal Room</title>
 <meta name="application-name" content="Variational Money">
 <meta name="apple-mobile-web-app-title" content="Variational Money">
 <link rel="icon" type="image/png" sizes="64x64" href="/favicon-64.png?v=20260731">
@@ -5574,6 +5574,88 @@
     }
   }
 </style>
+<style id="signal-room-v2-styles">
+  body.v2-overview{background:var(--v2-bg);color:var(--v2-text);overflow-x:hidden}
+  body.v2-overview .sticky-dashboard-head,
+  body.v2-overview .dashboard-shell>.nav-shell,
+  body.v2-overview .donate,
+  body.v2-overview>footer{display:none!important}
+  body.v2-overview .dashboard-shell{max-width:none;margin:0;padding:0}
+  body.v2-overview #main{max-width:none;margin:0;padding:0}
+  body.v2-overview .tsec[data-tg="overview"]:not(.signal-room-v2):not(.earnings-workspace){display:none!important}
+  /* Overview keeps the ET earnings calendar. It is the only daily-resolution view in the product,
+     and the v2 shell had hidden it as collateral damage of the blanket rule above. */
+  body.v2-overview .earnings-workspace{display:block!important;max-width:1360px;margin:0 auto!important;padding:30px 26px 46px!important}
+  body.v2-dashboard{background:var(--v2-bg)!important;color:var(--v2-text)!important;--bg:var(--v2-bg)!important;--panel:var(--v2-panel)!important;--panel2:var(--v2-panel2)!important;--line:var(--v2-line)!important;--text:var(--v2-text)!important;--muted:var(--v2-muted)!important;--cyan:var(--v2-accent)!important;--green:var(--v2-accent)!important;--blue:var(--v2-accent)!important;--amber:#ffc65a!important;--violet:#c9a8ff!important}
+  body.v2-dashboard .sticky-dashboard-head,body.v2-dashboard .dashboard-shell>.nav-shell,body.v2-dashboard .donate,body.v2-dashboard>footer{display:none!important}
+  body.v2-dashboard .dashboard-shell{max-width:none!important;margin:0!important;padding:0!important}
+  body.v2-dashboard #main{max-width:none!important;margin:0 0 0 176px!important;padding:96px 28px 44px!important;min-height:100dvh;background:var(--v2-bg)!important}
+  body.v2-dashboard.v2-overview #main{margin:0!important;padding:0!important}
+  .srv2-global-nav{display:none;position:fixed;left:0;top:0;bottom:0;width:176px;z-index:100;background:var(--v2-bg);border-right:1px solid var(--v2-line);padding:16px 12px;flex-direction:column;gap:7px;font-family:var(--sans)}
+  body.v2-dashboard:not(.v2-overview) .srv2-global-nav{display:flex}
+  .srv2-global-nav .srv2-logo{flex:0 0 auto}.srv2-global-nav button{width:100%;height:39px;border:1px solid transparent;background:transparent;color:var(--v2-dim);font:800 10px var(--mono);cursor:pointer;border-radius:3px;display:grid;grid-template-columns:25px 1fr;align-items:center;text-align:left;padding:0 9px;gap:6px}.srv2-global-nav button span{font-size:9px;color:var(--v2-faint)}.srv2-global-nav button strong{font-size:10px}.srv2-global-nav button:hover,.srv2-global-nav button:focus-visible{border-color:var(--v2-line);color:var(--v2-text);outline:0}.srv2-global-nav button.on{background:var(--v2-accent);color:var(--v2-bg)}.srv2-global-nav button.on span{color:var(--v2-accent-deep)}.srv2-global-nav .srv2-home{margin-top:auto!important}
+  .srv2-global-top{display:none;position:fixed;left:176px;right:0;top:0;height:68px;z-index:90;background:var(--v2-bg);border-bottom:1px solid var(--v2-line);padding:0 28px;align-items:center;justify-content:space-between;font-family:var(--sans)}
+  body.v2-dashboard:not(.v2-overview) .srv2-global-top{display:flex}.srv2-global-top b{font-size:15px}.srv2-global-top div{display:flex;gap:24px}.srv2-global-top span{font:700 9px var(--mono);color:var(--v2-dim);letter-spacing:1px}.srv2-global-top span strong{color:var(--v2-text);margin-left:7px;font-size:12px}.srv2-global-top em{font:700 10px var(--mono);color:var(--v2-accent);font-style:normal}
+  body.v2-dashboard:not(.v2-overview) #main>.tsec:not(.tg-hide){animation:srv2-enter .22s ease-out both}@keyframes srv2-enter{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  body.v2-dashboard #main>.tsec:not(.signal-room-v2):not(.srv2-landing){border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;margin:0!important;padding:24px 0 34px!important;border-top:1px solid var(--v2-line)!important}
+  body.v2-dashboard #main>.tsec:not(.signal-room-v2):not(.srv2-landing):first-of-type{border-top:0!important}
+  body.v2-dashboard .card,body.v2-dashboard .market-card,body.v2-dashboard .metric-card,body.v2-dashboard .daily-brief-metric{background:transparent!important;box-shadow:none!important;border-color:var(--v2-line)!important;border-radius:3px!important}
+  body.v2-dashboard h1,body.v2-dashboard h2,body.v2-dashboard h3{font-family:var(--sans)!important;letter-spacing:-.025em!important;color:var(--v2-text)!important}body.v2-dashboard h2{font-size:clamp(24px,2vw,34px)!important}body.v2-dashboard h3{font-size:18px!important}
+  body.v2-dashboard .cap,body.v2-dashboard p,body.v2-dashboard small,body.v2-dashboard .d,body.v2-dashboard .sub{color:var(--v2-muted)!important;font-size:13px!important;line-height:1.55!important}
+  body.v2-dashboard .tag,body.v2-dashboard .badge{background:transparent!important;border:1px solid var(--v2-line)!important;color:var(--v2-muted)!important;border-radius:3px!important}
+  body.v2-dashboard button,body.v2-dashboard input,body.v2-dashboard select{border-radius:3px!important}body.v2-dashboard button.on,body.v2-dashboard .seg button.on,body.v2-dashboard .zoom-controls button.on{background:var(--v2-accent)!important;color:var(--v2-bg)!important;border-color:var(--v2-accent)!important;box-shadow:none!important}
+  body.v2-dashboard table{width:100%;border-collapse:collapse!important;background:transparent!important}body.v2-dashboard th{font:700 10px var(--mono)!important;letter-spacing:1px!important;color:var(--v2-dim)!important;background:var(--v2-panel)!important}body.v2-dashboard td{font-size:13px!important;color:var(--v2-text)!important;background:transparent!important}body.v2-dashboard th,body.v2-dashboard td{padding:13px 12px!important;border-color:var(--v2-line)!important}
+  body.v2-dashboard svg text{font-family:var(--mono)!important}body.v2-dashboard .legend{font-size:11px!important;color:var(--v2-muted)!important}
+  body.v2-dashboard .daily-brief:not(.tg-hide){display:block!important}.daily-brief-grid{gap:1px!important;background:var(--v2-line)!important}.daily-brief-metric{background:var(--v2-bg)!important;padding:24px!important}.daily-brief-metric strong{color:var(--v2-accent)!important;font-size:clamp(30px,3vw,48px)!important}
+  body.v2-dashboard .comparison-report,body.v2-dashboard .valmodel{max-width:none!important}.comparison-report .cmp-direct,.comparison-report .cmp-leaderboard{background:transparent!important;border-radius:0!important}
+  body.v2-dashboard .earnings-workspace,body.v2-dashboard .historical-combo,body.v2-dashboard .hist-health{padding-top:28px!important}
+  @media(max-width:1100px){body.v2-dashboard #main{margin-left:0!important;padding:136px 18px 36px!important}
+  /* Narrow screens turn the side rail into a horizontal scroller under the title bar. Numbers alone
+     are not navigation, so the workspace name stays visible at every width. */
+  .srv2-global-nav{position:fixed;top:56px;left:0;right:0;bottom:auto;width:auto;height:auto;flex-direction:row;align-items:center;gap:4px;padding:9px 12px;overflow-x:auto;overflow-y:hidden;border-right:0;border-bottom:1px solid var(--v2-line);scrollbar-width:none}
+  .srv2-global-top{height:56px}.srv2-global-nav::-webkit-scrollbar{display:none}
+  .srv2-global-nav .srv2-logo{flex:0 0 auto;width:32px;height:32px;margin:0 6px 0 0}
+  .srv2-global-nav button{width:auto;flex:0 0 auto;height:38px;display:inline-flex;align-items:center;gap:6px;text-align:left;padding:0 12px;white-space:nowrap}.srv2-global-nav button strong{display:inline;font-size:11px}.srv2-global-nav button span{font-size:9px;opacity:.7}.srv2-global-nav .srv2-home{margin-top:0!important;order:99}.srv2-global-nav small{display:none}
+  .srv2-global-top{left:0;padding:0 18px}.srv2-global-top div{display:none}}
+  body.v2-landing{background:var(--v2-bg);color:var(--v2-text);overflow:hidden}
+  body.v2-landing .sticky-dashboard-head,
+  body.v2-landing .dashboard-shell>.nav-shell,
+  body.v2-landing .donate,
+  body.v2-landing>footer{display:none!important}
+  body.v2-landing .dashboard-shell{max-width:none;margin:0;padding:0}
+  body.v2-landing #main{max-width:none;margin:0;padding:0}
+  body.v2-landing #main>.tsec:not(.srv2-landing){display:none!important}
+  .srv2-landing{display:none;min-height:100dvh;background:var(--v2-bg);color:var(--v2-text);font-family:var(--sans);position:relative;overflow:hidden}
+  body.v2-landing .srv2-landing{display:grid!important;grid-template-columns:minmax(0,1.45fr) minmax(360px,.55fr);grid-template-rows:76px 1fr 94px}
+  .srv2-landing:before{content:"";position:absolute;inset:76px 0 94px 55%;border-left:1px solid var(--v2-line);pointer-events:none}
+  .srv2-land-head{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;padding:0 34px;border-bottom:1px solid var(--v2-line);position:relative;z-index:1}
+  .srv2-land-brand{display:flex;align-items:center;gap:13px;font-weight:800}.srv2-land-brand img{width:34px;height:34px;object-fit:contain}.srv2-land-head small{font:700 10px var(--mono);letter-spacing:1.4px;color:var(--v2-dim)}.srv2-land-live{font:700 10px var(--mono);letter-spacing:1.2px;color:var(--v2-accent)}
+  .srv2-land-main{padding:clamp(48px,7vw,108px) 7vw 50px;display:flex;flex-direction:column;justify-content:center;position:relative;z-index:1}.srv2-land-eyebrow{font:700 10px var(--mono);letter-spacing:2px;color:var(--v2-accent)}.srv2-land-main h1{font-size:clamp(58px,7.2vw,116px);line-height:.88;letter-spacing:-.07em;max-width:920px;margin:24px 0 30px}.srv2-land-main h1 em{font-style:normal;color:var(--v2-accent)}.srv2-land-main p{max-width:570px;font-size:16px;line-height:1.55;color:var(--v2-muted);margin:0 0 34px}.srv2-land-actions{display:flex;align-items:center;gap:20px}.srv2-open{height:54px;padding:0 25px;border:0;border-radius:3px;background:var(--v2-accent);color:var(--v2-bg);font-size:14px;font-weight:900;cursor:pointer}.srv2-open:active{transform:translateY(1px)}.srv2-method{font:700 10px var(--mono);color:var(--v2-dim);letter-spacing:.5px}
+  .srv2-land-proof{padding:clamp(48px,7vw,108px) 3vw 50px;display:flex;flex-direction:column;justify-content:center;position:relative;z-index:1}.srv2-land-proof>span{font:700 10px var(--mono);letter-spacing:1.7px;color:var(--v2-dim)}.srv2-land-total{font-size:clamp(56px,5.5vw,92px);line-height:.9;letter-spacing:-.065em;margin:20px 0 12px;color:var(--v2-accent)}.srv2-land-proof>p{font-size:13px;line-height:1.55;color:var(--v2-muted);max-width:380px;margin:0 0 34px}.srv2-land-metrics{border-top:1px solid var(--v2-line)}.srv2-land-metric{display:grid;grid-template-columns:1fr auto;gap:20px;padding:18px 0;border-bottom:1px solid var(--v2-line)}.srv2-land-metric span{font-size:12px;color:var(--v2-dim)}.srv2-land-metric b{font-size:19px}
+  .srv2-land-main>.srv2-land-total{font-size:clamp(76px,8vw,132px);margin:24px 0 20px}.srv2-land-main>.srv2-land-metrics{width:min(620px,100%);margin-top:20px}.srv2-land-main>.srv2-land-metrics .srv2-land-metric{padding:16px 0}
+  .srv2-workspaces{justify-content:flex-start;padding-top:54px;padding-bottom:30px;overflow:auto}.srv2-workspace-hint{display:flex;align-items:center;justify-content:space-between;margin-top:10px;color:var(--v2-text)!important;font-size:14px!important}.srv2-workspace-hint b{color:var(--v2-accent)}.srv2-workspace-hint span{font:700 9px var(--mono);color:var(--v2-dim);letter-spacing:1px}.srv2-workspace-list{display:grid;margin-top:16px;border-top:1px solid var(--v2-line)}.srv2-workspace-list button{display:grid;grid-template-columns:34px minmax(120px,.75fr) 1fr 54px;align-items:center;gap:10px;min-height:52px;padding:9px 8px 9px 4px;border:0;border-bottom:1px solid var(--v2-line);background:transparent;color:var(--v2-text);text-align:left;cursor:pointer;border-radius:0!important;transition:background .15s ease,color .15s ease,padding .15s ease}.srv2-workspace-list button:after{content:"OPEN →";font:700 9px var(--mono);color:var(--v2-faint);text-align:right}.srv2-workspace-list button:hover,.srv2-workspace-list button:focus-visible{background:var(--v2-accent);color:var(--v2-bg);outline:0;padding-left:10px}.srv2-workspace-list button:hover:after,.srv2-workspace-list button:focus-visible:after,.srv2-workspace-list button:hover span,.srv2-workspace-list button:focus-visible span{color:var(--v2-bg)}.srv2-workspace-list button:hover small,.srv2-workspace-list button:focus-visible small{color:var(--v2-line)!important}.srv2-workspace-list button span{font:700 9px var(--mono);color:var(--v2-accent)}.srv2-workspace-list button b{font-size:13px}.srv2-workspace-list button small{font-size:11px!important;color:var(--v2-dim)!important;line-height:1.3!important}.srv2-workspace-list button:first-child b:after{content:"START HERE";display:inline-block;margin-left:9px;padding:3px 5px;border:1px solid var(--v2-accent-deep);color:var(--v2-accent);font:700 8px var(--mono);vertical-align:1px}.srv2-workspace-list button:first-child:hover b:after{border-color:var(--v2-bg);color:var(--v2-bg)}
+  .srv2-land-foot{grid-column:1/-1;display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--v2-line);position:relative;z-index:1}.srv2-land-foot div{padding:20px 34px;border-right:1px solid var(--v2-line)}.srv2-land-foot div:last-child{border:0}.srv2-land-foot span{display:block;font:700 9px var(--mono);letter-spacing:1.2px;color:var(--v2-dim);margin-bottom:7px}.srv2-land-foot b{font-size:14px}
+  .signal-room-v2{min-height:100dvh;display:grid;grid-template-columns:176px minmax(0,1.45fr) minmax(350px,.55fr);grid-template-rows:72px minmax(0,1fr);background:var(--v2-bg);color:var(--v2-text);font-family:var(--sans);margin:0!important;padding:0!important;max-width:none!important}
+  .srv2-rail{grid-row:1/-1;border-right:1px solid var(--v2-line);display:flex;flex-direction:column;align-items:stretch;padding:16px 12px;gap:7px;position:sticky;top:0;height:100dvh}
+  .srv2-logo{width:40px;height:40px;border-radius:4px;background:var(--v2-accent);display:grid;place-items:center;margin:0 0 12px 4px}
+  .srv2-logo img{width:28px;height:28px;object-fit:contain;filter:brightness(0)}
+  .srv2-rail button{width:100%;height:42px;border:1px solid transparent;background:transparent;color:var(--v2-dim);font:800 10px var(--mono);cursor:pointer;border-radius:3px;display:grid;grid-template-columns:25px 1fr;align-items:center;text-align:left;padding:0 10px;gap:7px;letter-spacing:.3px}
+  .srv2-rail button span{color:var(--v2-faint);font-size:9px}.srv2-rail button strong{font-size:10px;color:inherit}
+  .srv2-rail button:hover,.srv2-rail button:focus-visible{border-color:var(--v2-accent-deep);color:var(--v2-text);outline:0}
+  .srv2-rail button.on{color:var(--v2-bg);background:var(--v2-accent);border-color:var(--v2-accent)}
+  .srv2-home{margin-top:auto!important;border-color:var(--v2-line)!important;color:var(--v2-text)!important}.srv2-home span{font-size:14px!important;color:var(--v2-accent)!important}.srv2-rail small{font:700 8px var(--mono);letter-spacing:1.2px;color:var(--v2-faint);padding:9px 10px 0}
+  .srv2-top{grid-column:2/-1;border-bottom:1px solid var(--v2-line);display:flex;align-items:center;justify-content:space-between;padding:0 26px;min-width:0}
+  .srv2-top h1{font-size:16px;margin:0;letter-spacing:0}.srv2-ticker{display:flex;gap:28px}.srv2-ticker span{font:700 9px var(--mono);letter-spacing:1.2px;color:var(--v2-dim);text-transform:uppercase}.srv2-ticker b{color:var(--v2-text);font-size:13px;margin-left:7px}.srv2-sync{color:var(--v2-accent);font:700 10px var(--mono);letter-spacing:1px}
+  .srv2-canvas{padding:26px;display:grid;grid-template-rows:auto minmax(350px,1fr) auto;gap:22px;border-right:1px solid var(--v2-line);min-width:0}
+  .srv2-headline{display:flex;align-items:flex-end;justify-content:space-between;gap:30px}.srv2-kicker{font:700 10px var(--mono);letter-spacing:1.8px;color:var(--v2-muted);text-transform:uppercase}.srv2-balance{display:block;font-size:clamp(58px,7vw,104px);line-height:.82;letter-spacing:-.075em;margin-top:12px}.srv2-balance em{font-style:normal;color:var(--v2-accent)}.srv2-headline p{max-width:300px;color:var(--v2-muted);font-size:13px;line-height:1.55;margin:0}
+  .srv2-chart{position:relative;min-height:380px;border-top:1px solid var(--v2-line);border-bottom:1px solid var(--v2-line);background:repeating-linear-gradient(0deg,transparent 0 86px,rgba(255,255,255,.045) 87px);overflow:hidden}.srv2-chart svg{position:absolute;inset:25px 0;width:100%;height:calc(100% - 50px)}.srv2-axis{position:absolute;left:0;top:16px;font:700 9px var(--mono);letter-spacing:1px;color:var(--v2-faint)}.srv2-latest{position:absolute;left:0;top:52px;text-align:left}.srv2-latest span{font:700 9px var(--mono);color:var(--v2-muted)}.srv2-latest b{display:block;font-size:28px;color:var(--v2-accent)}.srv2-date{position:absolute;bottom:13px;font:700 10px var(--mono);color:var(--v2-dim)}.srv2-date.start{left:0}.srv2-date.end{right:0}
+  .srv2-strip{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--v2-line)}.srv2-strip div{padding:15px;border-right:1px solid var(--v2-line)}.srv2-strip div:last-child{border:0}.srv2-strip span{font:700 9px var(--mono);letter-spacing:1px;color:var(--v2-dim);text-transform:uppercase}.srv2-strip b{display:block;font-size:25px;margin-top:7px;letter-spacing:-.03em}
+  .srv2-intel{border-top:1px solid var(--v2-line);padding-top:28px;margin-top:6px}.srv2-intel-head{display:flex;align-items:flex-end;justify-content:space-between;gap:30px;margin-bottom:20px}.srv2-intel-head span{font:700 9px var(--mono);letter-spacing:1.5px;color:var(--v2-accent)}.srv2-intel-head h2{font-size:30px!important;margin:8px 0 0!important}.srv2-intel-head p{max-width:390px;margin:0;color:var(--v2-muted);font-size:12px;line-height:1.5}.srv2-window-grid,.srv2-market-grid{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--v2-line)}.srv2-window-grid article,.srv2-market-grid article{padding:18px 15px;border-right:1px solid var(--v2-line);border-bottom:1px solid var(--v2-line);min-width:0}.srv2-window-grid article:last-child,.srv2-market-grid article:last-child{border-right:0}.srv2-window-grid span,.srv2-market-grid span{display:block;font:700 9px var(--mono);letter-spacing:1px;color:var(--v2-dim);text-transform:uppercase}.srv2-window-grid strong,.srv2-market-grid strong{display:block;font-size:24px;margin:8px 0 4px;color:var(--v2-text)}.srv2-window-grid article.live strong,.srv2-market-grid article:nth-child(3) strong{color:var(--v2-accent)}.srv2-window-grid small,.srv2-market-grid small{font-size:10px;color:var(--v2-dim)}.srv2-market-grid{margin-top:18px}.srv2-market-chart{margin-top:22px;min-height:340px;border-top:1px solid var(--v2-line);padding-top:15px}.srv2-market-chart .market-chart-head{display:flex!important}.srv2-market-chart #marketActivityChart{display:block!important;width:100%!important;height:330px!important}.srv2-market-chart .market-range button{background:transparent;color:var(--v2-muted);border:1px solid var(--v2-line)}.srv2-market-chart .market-source{display:none!important}
+  .srv2-brief{padding:26px;display:flex;flex-direction:column;gap:24px;min-width:0}.srv2-brief-head{padding-bottom:18px;border-bottom:1px solid var(--v2-line)}.srv2-brief-head span{font:700 10px var(--mono);letter-spacing:1.5px;color:var(--v2-accent)}.srv2-brief-head h2{font-size:clamp(28px,2.4vw,38px);line-height:1.04;letter-spacing:-.045em;margin:13px 0}.srv2-brief-head p{color:var(--v2-muted);font-size:13px;line-height:1.55;margin:0}.srv2-flow{display:grid}.srv2-flow-row{display:grid;grid-template-columns:1fr auto;gap:16px;padding:17px 0;border-bottom:1px solid var(--v2-line)}.srv2-flow-row span{font-size:12px;color:var(--v2-muted)}.srv2-flow-row b{font-size:19px}.srv2-flow-row.primary b{color:var(--v2-accent)}.srv2-note{margin-top:auto;border-left:2px solid var(--v2-accent);padding:12px 0 12px 16px;color:var(--v2-muted);font-size:12px;line-height:1.6}.srv2-action{height:46px;border:0;background:var(--v2-accent);color:var(--v2-bg);font-weight:800;border-radius:3px;cursor:pointer}.srv2-action:active{transform:translateY(1px)}
+  @media(max-width:1100px){.signal-room-v2{grid-template-columns:1fr;grid-template-rows:auto auto auto auto}.srv2-rail{grid-row:1;grid-column:1/-1;align-items:center;position:static}.srv2-logo{margin:0 0 10px}.srv2-rail{flex-direction:row;height:auto;overflow-x:auto;overflow-y:hidden;gap:4px;padding:10px;border-right:0;border-bottom:1px solid var(--v2-line);scrollbar-width:none}.srv2-rail::-webkit-scrollbar{display:none}.srv2-logo{flex:0 0 auto;width:32px;height:32px;margin:0 6px 0 0}.srv2-rail button{width:auto;flex:0 0 auto;height:38px;display:inline-flex;align-items:center;gap:6px;text-align:left;padding:0 12px;white-space:nowrap}.srv2-rail button strong{display:inline;font-size:11px}.srv2-rail button span{font-size:9px;opacity:.7}.srv2-home{margin-top:0!important;order:99}.srv2-rail small{display:none}.srv2-top{grid-column:1}.srv2-canvas{border-right:0}.srv2-brief{grid-column:1;border-top:1px solid var(--v2-line)}.srv2-ticker{display:none}.srv2-strip,.srv2-window-grid,.srv2-market-grid{grid-template-columns:1fr 1fr}.srv2-headline{align-items:flex-start}.srv2-headline p{display:none}}
+  @media(max-width:650px){.signal-room-v2{grid-template-columns:1fr;grid-template-rows:auto auto auto auto}.srv2-rail{grid-row:1;grid-column:1/-1;position:sticky;top:0;z-index:5;width:100%;height:auto;flex-direction:row;padding:8px 10px;border-right:0;border-bottom:1px solid var(--v2-line);overflow-x:auto;overflow-y:hidden;scrollbar-width:none}.srv2-rail::-webkit-scrollbar{display:none}.srv2-logo{flex:0 0 auto;width:30px;height:30px;margin:0 6px 0 0}.srv2-rail small{display:none}.srv2-rail button{width:auto;flex:0 0 auto;height:36px;display:inline-flex;align-items:center;gap:6px;padding:0 11px;white-space:nowrap}.srv2-rail button strong{display:inline;font-size:11px}.srv2-rail button span{font-size:9px;opacity:.7}.srv2-top{grid-column:1;padding:0 16px}.srv2-top h1{font-size:14px}.srv2-canvas,.srv2-brief{grid-column:1;padding:20px 16px}.srv2-balance{font-size:62px}.srv2-chart{min-height:330px}.srv2-strip b{font-size:21px}.srv2-brief-head h2{font-size:32px}}
+  @media(max-width:850px){body.v2-landing{overflow:auto}body.v2-landing .srv2-landing{grid-template-columns:1fr;grid-template-rows:66px auto auto auto}.srv2-landing:before{display:none}.srv2-land-head{padding:0 18px}.srv2-land-main,.srv2-land-proof{padding:54px 20px}.srv2-land-main h1{font-size:60px}.srv2-land-proof{border-top:1px solid var(--v2-line)}.srv2-land-foot{grid-template-columns:1fr}.srv2-land-foot div{border-right:0;border-bottom:1px solid var(--v2-line);padding:17px 20px}}
+</style>
 <style id="v5-system">
 /* ============================================================
    Variational Money v5 — readability pass
@@ -6545,6 +6627,435 @@ body.theme-light .valuation-report #valScatter .val-var-label{
   .daily-news .daily-brief-metric:first-child{border-top:0}
 }
 </style>
+<style id="ethena-inspired-overview">
+  /* Overview editorial pass: one message, one number, then the evidence. */
+  .overview-story,.overview-money{font-family:var(--sans);color:var(--ink)}
+  .overview-story{min-height:clamp(560px,72vh,760px);display:grid;grid-template-columns:minmax(0,.9fr) minmax(520px,1.25fr);grid-template-rows:1fr auto;gap:36px 56px;align-items:center;padding:clamp(56px,7vw,108px) clamp(20px,4vw,72px) 34px;margin:0 calc(var(--shell-pad, 0px) * -1) 18px;position:relative;overflow:hidden;border-bottom:1px solid var(--line);background:radial-gradient(circle at 75% 45%,rgba(77,144,255,.14),transparent 25%),radial-gradient(circle at 75% 45%,rgba(34,230,160,.055),transparent 44%)}
+  .overview-story:before{content:"";position:absolute;width:min(52vw,720px);aspect-ratio:1;right:5%;top:4%;border:1px solid rgba(85,184,255,.12);border-radius:50%;box-shadow:0 0 100px rgba(77,144,255,.08),inset 0 0 80px rgba(77,144,255,.05);pointer-events:none}
+  .overview-story-copy,.overview-story-number,.overview-story-proof{position:relative;z-index:1}
+  .overview-story-kicker,.overview-section-no{display:flex;align-items:center;gap:10px;font:800 11px var(--mono);letter-spacing:2px;text-transform:uppercase;color:var(--sub)}
+  .overview-story-kicker span{width:24px;height:1px;background:var(--cyan);box-shadow:0 0 10px rgba(85,184,255,.55)}
+  .overview-story h1{max-width:760px;margin:20px 0 18px;font:850 clamp(54px,7.2vw,112px)/.88 var(--sans);letter-spacing:-.065em;color:var(--ink)}
+  .overview-story-copy>p{max-width:650px;margin:0;font:400 15px/1.65 var(--sans);color:var(--sub)}
+  .overview-story-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:28px}
+  .overview-story-actions a,.overview-story-actions button{min-height:44px;padding:0 18px;border:1px solid var(--line);border-radius:999px;background:transparent;color:var(--ink);font:700 12px var(--sans);display:inline-flex;align-items:center;gap:12px;cursor:pointer;text-decoration:none}
+  .overview-story-actions a{background:var(--ink);color:var(--bg)}
+  .overview-story-number{align-self:center;text-align:right}
+  .overview-story-number>span{display:block;font:700 12px var(--mono);letter-spacing:1.6px;text-transform:uppercase;color:var(--sub)}
+  .overview-story-number strong{display:block;margin:14px 0 10px;font:800 clamp(58px,8.3vw,132px)/.83 var(--sans);letter-spacing:-.075em;color:#eef5ff;text-shadow:0 0 38px rgba(77,144,255,.2)}
+  .overview-story-number small{font:600 12px var(--mono);color:var(--cyan)}
+  .overview-story-proof{grid-column:1/-1;display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--line)}
+  .overview-story-proof article{padding:20px 24px 4px;border-right:1px solid var(--line)}
+  .overview-story-proof article:last-child{border-right:0}
+  .overview-story-proof span,.overview-money-flow span{display:block;font:700 10px var(--mono);letter-spacing:1.5px;text-transform:uppercase;color:var(--sub)}
+  .overview-story-proof strong{display:block;margin-top:9px;font:750 clamp(28px,3vw,44px)/1 var(--sans);letter-spacing:-.045em;color:var(--ink)}
+  .overview-story-proof small,.overview-money-flow small{display:block;margin-top:7px;font:500 12px var(--sans);color:var(--dim)}
+  .overview-money{padding:clamp(56px,6vw,92px) clamp(20px,4vw,72px);border-bottom:1px solid var(--line)}
+  .overview-money-head{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(300px,.65fr);gap:48px;align-items:end}
+  .overview-money h2{max-width:850px;margin:14px 0 0;font:800 clamp(38px,5vw,72px)/.95 var(--sans);letter-spacing:-.055em}
+  .overview-money-head>p{margin:0;font:400 14px/1.65 var(--sans);color:var(--sub)}
+  .overview-money-flow{display:grid;grid-template-columns:1fr auto 1fr auto 1fr auto 1fr;gap:14px;align-items:center;margin-top:50px;padding:28px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+  .overview-money-flow article{min-width:0;padding:0 12px}
+  .overview-money-flow strong{display:block;margin-top:8px;font:750 clamp(25px,2.7vw,42px)/1 var(--sans);letter-spacing:-.045em;white-space:nowrap}
+  .overview-money-flow>i,.overview-money-flow>b{font:500 26px var(--sans);color:var(--dim);font-style:normal}
+  .overview-money-flow .is-treasury strong{color:var(--cyan);text-shadow:0 0 22px rgba(85,184,255,.22)}
+  .overview-policy{max-width:1150px;margin-top:18px;font:500 12px/1.6 var(--sans);color:var(--dim)}
+  .overview-legacy-pulse{display:none!important}
+  .earnings-workspace{margin-top:18px}
+  body:has(#tab-overview.on) .header-terminal{grid-template-columns:minmax(420px,1fr) minmax(420px,.85fr);min-height:0;padding-top:18px;padding-bottom:18px;align-items:center}
+  body:has(#tab-overview.on) .header-signal{display:none}
+  body:has(#tab-overview.on) .brandwrap{align-self:center}
+  body:has(#tab-overview.on) .header-var-logo{width:58px;height:48px;object-fit:contain}
+  body:has(#tab-overview.on) .brand strong{font-size:clamp(28px,3vw,46px);line-height:.9}
+  body:has(#tab-overview.on) .brand .kd{min-height:54px}
+  body:has(#tab-overview.on) .contract{margin-top:7px}
+  body:has(#tab-overview.on) .top-ref{margin-top:8px}
+  body:has(#tab-overview.on) .hero-total{justify-self:end;align-self:center}
+  body:has(#tab-overview.on) .hero-total .lbl{font-size:9px}
+  body:has(#tab-overview.on) .hero-total .val{font-size:clamp(42px,5.2vw,74px);line-height:.88}
+  body:has(#tab-overview.on) .hero-total .sub{margin-top:8px}
+  body:has(#tab-overview.on) .theme-toggle-liquid{transform:scale(.82);transform-origin:right center}
+  body:has(#tab-overview.on) .nav-shell{margin-top:0}
+  body.theme-light .overview-story{background:radial-gradient(circle at 75% 45%,rgba(0,122,255,.11),transparent 27%),#f7f9fc}
+  body.theme-light .overview-story-number strong{color:#071627;text-shadow:none}
+  body.theme-light .overview-story-actions a{background:#071627;color:#fff}
+  @media(max-width:1050px){body:has(#tab-overview.on) .header-terminal{grid-template-columns:1fr}body:has(#tab-overview.on) .hero-total{justify-self:start}.overview-story{grid-template-columns:1fr;grid-template-rows:auto auto auto;min-height:0}.overview-story-number{text-align:left}.overview-story-proof{grid-column:1}.overview-money-head{grid-template-columns:1fr}.overview-money-flow{grid-template-columns:1fr 1fr}.overview-money-flow>i,.overview-money-flow>b{display:none}}
+  @media(max-width:680px){.overview-story{padding-top:44px;gap:34px}.overview-story h1{font-size:54px}.overview-story-number strong{font-size:52px}.overview-story-proof{grid-template-columns:1fr}.overview-story-proof article{border-right:0;border-bottom:1px solid var(--line);padding-left:0}.overview-money{padding-top:48px}.overview-money-flow{grid-template-columns:1fr}.overview-money-flow article{padding:14px 0;border-bottom:1px solid var(--line)}.overview-money h2{font-size:40px}}
+</style>
+<style id="v2-flow-fixes">
+  /* Money Mechanic: the source node held two large numbers in a 2-column grid inside the
+     narrowest track of a 7-column flow map, so "30D volume" and "open interest" overlapped.
+     Stack them and let the whole map wrap instead of crushing the first cell. */
+  .flow-map{grid-template-columns:minmax(210px,1.25fr) 54px minmax(160px,1fr) 54px minmax(160px,1fr) 54px minmax(160px,1fr)}
+  .money-source .source-pair{grid-template-columns:1fr;gap:10px}
+  .money-source .source-pair b{font-size:clamp(19px,2vw,26px);letter-spacing:-.5px;white-space:nowrap}
+  .money-source .source-pair span{white-space:normal;line-height:1.3}
+  /* The label used to be clipped by the 24px pill. Give it its own line above the flow bar
+     instead of overlaying the animated stroke. */
+  .money-stream{height:auto;min-height:38px;border-radius:12px;padding:5px 0 13px}
+  .money-stream span{position:static;display:block;padding:0 11px;white-space:nowrap}
+  .money-stream::before{top:auto;bottom:6px;inset-inline:10px}
+  .money-stream::after{top:auto;bottom:2px}
+  @media(max-width:1000px){
+    .flow-map{grid-template-columns:1fr}
+    .flow-map .flow-arrow{transform:rotate(90deg);justify-self:center}
+  }
+  /* Official Reports is the longest workspace in the product. Its three teaching cards and the
+     two-lane source rail pushed the first real number past the fold, so they collapse by default. */
+  .bw-easy-guide,.bw-source-rail{display:none}
+  body.bw-guide-open .bw-easy-guide,body.bw-guide-open .bw-source-rail{display:grid}
+  .bw-guide-toggle{display:inline-flex;align-items:center;gap:8px;margin:0 0 16px;padding:8px 13px;border:1px solid var(--line);border-radius:4px;background:transparent;color:var(--muted);font:800 10px var(--mono);letter-spacing:1px;text-transform:uppercase;cursor:pointer}
+  .bw-guide-toggle:hover,.bw-guide-toggle:focus-visible{border-color:var(--cyan);color:var(--cyan);outline:0}
+  /* Daily Earnings repeated the seven numbers Overview already leads with. Its one unique job is
+     shipping the post, so the post comes first and the metrics become the post's evidence. */
+  body.v2-dashboard .daily-brief:not(.tg-hide){display:flex!important;flex-direction:column}
+  body.v2-dashboard .daily-brief-head{order:1}
+  body.v2-dashboard .daily-news-postbox{order:2}
+  body.v2-dashboard .daily-brief-evidence-head{order:3}
+  body.v2-dashboard .daily-brief-grid{order:4}
+  body.v2-dashboard .daily-news-sources{order:5}
+  body.v2-dashboard .daily-brief-foot{order:6}
+  .daily-brief-evidence-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:10px;margin:26px 0 12px;padding-top:20px;border-top:1px solid var(--line)}
+  .daily-brief-evidence-head b{font:800 12px var(--mono);letter-spacing:1.2px;text-transform:uppercase;color:var(--text)}
+  .daily-brief-evidence-head span{font-size:12px;color:var(--muted)}
+</style>
+<style id="v2-type-system">
+  /* ------------------------------------------------------------------
+     TYPE SYSTEM. Two families, one boundary.
+       var(--sans) = Geist Sans  -> prose, headlines, nav, buttons
+       var(--mono) = Geist Mono  -> every numeric readout, every micro-label, addresses
+     The v2 shell used to hardcode Arial and ui-monospace, so the same currency amount
+     rendered in three different faces depending on which workspace you were in.
+     ------------------------------------------------------------------ */
+  /* 0. Form controls do not inherit font-family from their ancestors, so every button,
+        input and select on this page was rendering in the UA default face. This one rule
+        pulls the landing workspace picker, the CTAs, the points inputs and the report
+        select back into the system. Only the family is inherited: inheriting font-size would
+        override the explicit sizes these controls set and blow up compact rows such as the
+        FDV presets. */
+  button,input,select,textarea,optgroup{font-family:inherit}
+  /* <code> and <pre> also fall back to the UA monospace face rather than Geist Mono. */
+  code,pre,kbd,samp{font-family:var(--mono)}
+
+  :root{
+    --t-label:11px;          /* micro-label, uppercase, mono */
+    --t-label-track:1.1px;
+    --t-num-s:20px;          /* number scale: dense table / chip */
+    --t-num-m:26px;          /* card metric */
+    --t-num-l:38px;          /* section KPI */
+    --t-num-xl:72px;         /* single hero readout, one per workspace */
+  }
+
+  /* 1. Micro-labels: one recipe everywhere. */
+  .srv2-kicker,.srv2-axis,.srv2-strip span,.srv2-window-grid article span,
+  .srv2-market-grid article span,.srv2-intel-head span,.srv2-flow-row span,
+  .srv2-land-eyebrow,.srv2-land-metric span,.srv2-brief-head span,
+  .pm-metric>span,.daily-brief-metric>span,.cmp-kpi span,.market-kpi span{
+    font-family:var(--mono);
+    font-size:var(--t-label);
+    font-weight:500;
+    letter-spacing:var(--t-label-track);
+    text-transform:uppercase;
+  }
+
+  /* 2. Numeric readouts: mono with tabular figures so live values do not jitter
+        the layout on every tick, and columns of money line up. */
+  .srv2-balance,.srv2-strip b,.srv2-flow-row b,.srv2-land-total,.srv2-land-metric b,
+  .srv2-window-grid article strong,.srv2-market-grid article strong,
+  .srv2-latest b,.srv2-global-top strong,.srv2-ticker b,
+  .daily-brief-metric strong,.pm-metric strong,.er-v,
+  .flow-node .v,.source-pair b,.spread-slice .v,.pts-card b,.pts-fdv{
+    font-family:var(--mono);
+    font-variant-numeric:tabular-nums;
+    font-feature-settings:"tnum" 1,"zero" 1;
+  }
+
+  /* 3. Number scale. Mono is wider than sans, so the hero steps down from 104px
+        and drops the tight tracking that only worked on a proportional face.
+        Weight is 700 across the board because v5-system already forces
+        font-weight:700!important on every b/strong inside .dashboard-shell;
+        the div-based readouts below are stated explicitly so they match. */
+  .srv2-balance,.srv2-land-total{font-size:clamp(46px,5.4vw,var(--t-num-xl));letter-spacing:-2px;font-weight:700}
+  .srv2-strip b,.daily-brief-metric strong,.pm-metric strong{font-size:var(--t-num-m);letter-spacing:-.6px}
+  .er-v,.flow-node .v,.pts-fdv{font-size:var(--t-num-l);letter-spacing:-1px;font-weight:700}
+  .cmp-kpi strong{font-size:var(--t-num-l);letter-spacing:-1px}
+  .srv2-flow-row b,.pts-card b{font-size:var(--t-num-s);letter-spacing:-.3px}
+  /* Money columns align only if the table figures are tabular too. */
+  #tbl td,#tbl th,.bw-hist td,.bw-hist th,.rank-board{font-variant-numeric:tabular-nums;font-feature-settings:"tnum" 1}
+
+  /* 4. Headlines and prose stay on the sans face. Mixed text+number KPIs such as
+        "Variational 1.6x" read as a sentence, so they keep sans. */
+  body.v2-dashboard h1,body.v2-dashboard h2,body.v2-dashboard h3,
+  .srv2-brief-head h2,.srv2-top h1,.cmp-kpi strong,.cmp-verdict h3{
+    font-family:var(--sans)!important;
+  }
+  .cmp-kpi strong{font-variant-numeric:tabular-nums}
+  .srv2-rail button strong,.srv2-global-nav button strong,.srv2-workspace-list button b{
+    font-family:var(--sans);letter-spacing:.2px;
+  }
+
+  /* 5. Fit adjustments. Geist Mono sets wider than the ui-monospace it replaced, so a few
+        deliberately tight cells need a step down rather than a wrap. */
+  .srv2-rail small,.srv2-global-nav small{font-size:9px;letter-spacing:.6px;white-space:nowrap}
+  .rank-board-metric small{font-size:11.5px;letter-spacing:-.2px}
+  .pm-growth-cell b{font-size:12px;letter-spacing:-.3px}
+  .pm-growth-cell span{font-size:9.5px;letter-spacing:.6px}
+
+  /* 6. Points: the TGE scenario cards used repeat(3,1fr), which floors each track at the
+        min-content width of "$10,000,000,000 MCAP". The row demanded 404px inside a 228px
+        column and spilled over the slider and preset buttons next to it. minmax(0,1fr) lets
+        the figures wrap instead of overflowing. */
+  .pts-tge-scenarios{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .pts-tge-scenario{min-width:0}
+  .pts-tge-scenario small{font-size:9.5px;line-height:1.35}
+  .pts-tge-scenario b{font-size:13px}
+
+  /* 7. Treasury chart axis. The two dates were absolutely positioned in the bottom corners
+        of the plot itself. On a curve that climbs left-to-right that puts the start date 12px
+        under its data point but strands the end date ~317px below its own, floating in the
+        middle of the gradient fill. Give the plot a real axis band underneath instead: the
+        SVG stops above it, both labels sit on the chart background at the same height, and a
+        hairline separates axis from plot. */
+  .srv2-chart{--axis-h:30px}
+  .srv2-chart svg{inset:25px 0 var(--axis-h) 0!important;height:calc(100% - 25px - var(--axis-h))!important}
+  .srv2-chart::after{content:"";position:absolute;left:0;right:0;bottom:var(--axis-h);height:1px;background:var(--v2-line);opacity:.75;pointer-events:none}
+  .srv2-date{bottom:0;height:var(--axis-h);display:flex;align-items:center;letter-spacing:.6px}
+</style>
+<style id="v2-landing-chart">
+  /* The landing column is 884px wide but its content was capped at 620px, so the right third
+     sat empty while the treasury curve, the page's whole subject, was only visible after you
+     opened a workspace. Widen the content and give the curve the space between the copy and
+     the metrics, with a dated axis so the range is readable at a glance. */
+  .srv2-land-metrics{width:100%!important}
+  .srv2-land-chart{
+    --axis-h:24px;
+    position:relative;
+    width:100%;
+    height:clamp(150px,20vh,220px);
+    margin-top:26px;
+    border-top:1px solid var(--v2-line);
+    background:repeating-linear-gradient(0deg,transparent 0 48px,rgba(255,255,255,.04) 49px);
+    overflow:hidden;
+  }
+  .srv2-land-chart svg{position:absolute;inset:22px 0 var(--axis-h) 0;width:100%;height:calc(100% - 22px - var(--axis-h))}
+  .srv2-land-chart::after{content:"";position:absolute;left:0;right:0;bottom:var(--axis-h);height:1px;background:var(--v2-line);opacity:.75;pointer-events:none}
+  .srv2-land-chart-cap{position:absolute;left:0;top:6px;z-index:1;font-family:var(--mono);font-size:9px;font-weight:500;letter-spacing:1.1px;color:var(--v2-faint)}
+  /* Tick labels are positioned by data date, not evenly spaced, so the gaps stay honest. */
+  .srv2-land-axis{position:absolute;left:0;right:0;bottom:0;height:var(--axis-h)}
+  .srv2-land-axis i{
+    position:absolute;top:0;height:100%;display:flex;align-items:center;
+    font-family:var(--mono);font-size:9.5px;font-weight:500;letter-spacing:.6px;
+    color:var(--v2-dim);white-space:nowrap;font-style:normal;
+  }
+  .srv2-land-axis i.is-start{left:0}
+  .srv2-land-axis i.is-end{right:0;color:var(--v2-muted)}
+  .srv2-land-axis i.is-mid{transform:translateX(-50%)}
+  .srv2-land-axis i::before{content:"";position:absolute;top:-5px;left:50%;width:1px;height:4px;background:var(--v2-line)}
+  .srv2-land-axis i.is-start::before{left:0}
+  .srv2-land-axis i.is-end::before{left:auto;right:0}
+  /* The decorative divider was pinned at left:55% while the real column boundary sits at
+     1.45fr/0.55fr (~72.5%). With the left column empty nobody noticed; now it would run
+     straight through the chart. Draw the rule on the actual column edge instead. */
+  .srv2-landing::before{display:none!important}
+  .srv2-land-proof{border-left:1px solid var(--v2-line)}
+  /* The canvas rows were auto / minmax(350px,1fr) / auto, where the 350px floor existed for the
+     chart. With the chart gone that row is the window strip, which was stretching a single row
+     of four figures to 350px tall. */
+  .srv2-canvas{grid-template-rows:auto auto 1fr}
+  .srv2-strip div{display:flex;flex-direction:column;justify-content:center}
+  /* These grids used repeat(N,1fr). 1fr floors at min-content, and mono figures like
+     "+$1,074,353" are wide, so the strip rendered 392px inside a 339px canvas and clipped the
+     right-hand cells on narrow screens. A fixed 4-track row also cannot hold "+$1,074,362"
+     at 26px inside the ~110px cell the canvas allows at 1280px, so the tracks auto-fit:
+     four across on a wide canvas, two when the shell squeezes it, one on a phone. The
+     figures scale with the viewport to match. */
+  .srv2-strip,.srv2-window-grid,.srv2-market-grid{
+    grid-template-columns:repeat(auto-fit,minmax(min(100%,225px),1fr));
+  }
+  /* Points matrix, modelled on the Moonsheet layout: FDV down the side, airdrop share across
+     the top, one figure per cell. The heat ramp uses the brand accent rather than a second
+     hue so the table stays inside the palette. */
+  .pts-matrix{margin-top:22px;padding-top:18px;border-top:1px solid var(--v2-line)}
+  .pts-matrix-head{display:flex;flex-wrap:wrap;gap:14px;justify-content:space-between;align-items:flex-start;margin-bottom:14px}
+  .pts-matrix-head>div>b{display:block;font-family:var(--sans);font-size:15px;color:var(--v2-text)}
+  .pts-matrix-head span{display:block;max-width:62ch;margin-top:5px;font-size:12px;line-height:1.5;color:var(--v2-muted)}
+  .pts-matrix-head span b{font-family:var(--mono);font-size:12px;color:var(--v2-text)}
+  .pts-matrix-head code{font-family:var(--mono);font-size:11.5px;color:var(--v2-accent)}
+  .pts-matrix-legend{display:flex;align-items:center;gap:5px;flex:0 0 auto}
+  .pts-matrix-legend i{font-style:normal;font-family:var(--mono);font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--v2-faint)}
+  .pts-matrix-legend .sc{width:20px;height:9px;border-radius:2px;background:var(--v2-accent)}
+  .pts-matrix-legend .s1{opacity:.10}.pts-matrix-legend .s2{opacity:.24}.pts-matrix-legend .s3{opacity:.42}
+  .pts-matrix-legend .s4{opacity:.62}.pts-matrix-legend .s5{opacity:.85}
+  .pts-matrix-scroll{overflow-x:auto}
+  #ptsMatrix{width:100%;border-collapse:separate;border-spacing:3px;font-variant-numeric:tabular-nums}
+  #ptsMatrix th{
+    padding:8px 10px;text-align:right;white-space:nowrap;
+    font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;
+    color:var(--v2-dim);border-bottom:1px solid var(--v2-line);
+  }
+  #ptsMatrix thead th:first-child{text-align:left}
+  #ptsMatrix td{padding:9px 10px;text-align:right;white-space:nowrap;border-radius:4px}
+  #ptsMatrix .pm-fdv{
+    text-align:left;font-family:var(--mono);font-size:12.5px;font-weight:700;
+    color:var(--v2-text);cursor:pointer;
+  }
+  #ptsMatrix tbody tr:hover .pm-fdv{color:var(--v2-accent)}
+  #ptsMatrix tbody tr.is-current .pm-fdv{color:var(--v2-accent)}
+  #ptsMatrix tbody tr.is-current .pm-fdv::before{content:"▸ ";color:var(--v2-accent)}
+  #ptsMatrix .pm-v{display:block;font-family:var(--mono);font-size:13px;font-weight:700;color:var(--v2-text)}
+  #ptsMatrix .pm-mine{display:block;margin-top:2px;font-family:var(--mono);font-size:9.5px;color:var(--v2-dim)}
+  #ptsMatrix td.is-base{box-shadow:inset 0 0 0 1px var(--v2-accent)}
+  #ptsMatrix tbody tr.is-current td{background-image:linear-gradient(0deg,rgba(255,255,255,.04),rgba(255,255,255,.04))}
+  @media(max-width:700px){
+    #ptsMatrix .pm-mine{display:none}
+    .pts-matrix-head span{font-size:11.5px}
+  }
+
+  .srv2-strip b{font-size:clamp(18px,1.5vw,26px);letter-spacing:-.4px}
+  .srv2-window-grid article strong,.srv2-market-grid article strong{font-size:clamp(18px,1.5vw,26px);letter-spacing:-.4px}
+
+  @media(max-width:900px){
+    .srv2-land-chart{height:140px;margin-top:20px}
+    .srv2-land-axis i.is-mid{display:none}
+    .srv2-land-proof{border-left:0}
+  }
+</style>
+<style id="v2-brand-palette">
+  /* ------------------------------------------------------------------
+     BRAND PALETTE. The accent is sampled from the logo mark itself:
+     variational-symbol-transparent.png is #4c9af8 across 48,497 of its
+     opaque pixels. The v2 shell previously ran a lime (#dfff55) accent on
+     an olive-tinted neutral ramp, which matched nothing in the brand.
+     Neutrals are re-cast cool so they sit under a blue accent.
+     ------------------------------------------------------------------ */
+  :root{
+    --v2-accent:#4c9af8;
+    --v2-accent-soft:#7db4fa;
+    --v2-accent-deep:#2b7ae0;
+    --v2-bg:#0a0e14;
+    --v2-panel:#0f1520;
+    --v2-panel2:#131b28;
+    --v2-line:#212c3d;
+    --v2-text:#e9eef6;
+    --v2-muted:#9aabc0;
+    --v2-dim:#8496ab;
+    --v2-faint:#75879d;
+    --v2-on-accent:#06101d;
+    --v2-pos:#4fd39a;
+    --v2-neg:#ff8b8b;
+  }
+  body.theme-light{
+    --v2-accent:#1f6fd0;         /* logo blue is only 2.6:1 on white, so text-weight uses a deeper step */
+    --v2-accent-soft:#4c9af8;
+    --v2-accent-deep:#155bb0;
+    /* Tone follows the Moonsheet reference: near-white ground, white panels, soft neutral
+       rules, near-black ink. Colour is carried by the accent, not by the surfaces. */
+    --v2-bg:#fbfcfe;
+    --v2-panel:#ffffff;
+    --v2-panel2:#f2f6fb;
+    --v2-line:#e3e9f2;
+    --v2-text:#14141a;
+    --v2-accent:#1a63bd;
+    --v2-muted:#4c5f76;
+    --v2-dim:#55687f;
+    --v2-faint:#5f7288;
+    --v2-on-accent:#ffffff;
+    --v2-pos:#0d7a54;
+    --v2-neg:#c0304a;
+  }
+
+  /* v5-system still carried the olive/lime ramp (--ink #f3f5f1, --dim #7b837a, --grn #c7f284)
+     and had collapsed --cyan/--vio/--amber into a single grey. Bind the whole v1 token set to
+     the brand ramp so the older cards match the shell. --red and the direction pair stay
+     semantic: on this dashboard green/red still mean inflow and outflow. */
+  body.v2-dashboard,body.v2-landing{
+    --ink:var(--v2-text)!important;
+    --sub:var(--v2-muted)!important;
+    --dim:var(--v2-dim)!important;
+    --grn:var(--v2-accent)!important;
+    --grn2:var(--v2-accent-deep)!important;
+    --cyan:var(--v2-accent)!important;
+    --vio:var(--v2-accent-soft)!important;
+    --red:var(--v2-neg)!important;
+  }
+  /* Anything sitting on the accent needs the on-accent ink, in both themes. */
+  .dashboard-shell :is(.seg,.zoom-controls,.hist-row,.eff-window-tabs,.tabs) button.on{
+    color:var(--v2-on-accent)!important;background:var(--v2-accent)!important;
+  }
+  /* Index numerals inside an active nav pill inherited the dim grey and dropped to 1.3:1. */
+  .srv2-rail button.on span,.srv2-global-nav button.on span{color:var(--v2-on-accent)!important;opacity:.72}
+  /* "MTD VIEW" is a filled accent chip, so it needs on-accent ink rather than page ink. */
+  .eff-window-status b{color:var(--v2-on-accent)!important}
+  /* Amber is a light fill in both themes, so anything painted ON it takes dark ink.
+     .pts-card.base small is not on the fill though, it sits on the card, so it stays amber. */
+  .var-scenario.base em,.bw-verdict .tag{color:#1a1200!important}
+  .pts-card.base small{color:var(--amber)!important}
+  .activity-period{color:var(--v2-on-accent)!important}
+  /* Share buttons were white-on-white once the shell went light (1.0:1, fully invisible). */
+  .share-btn{background:var(--v2-accent)!important;color:var(--v2-on-accent)!important;border-color:transparent!important}
+  .share-btn.ghost{background:transparent!important;color:var(--v2-accent)!important;border:1px solid var(--v2-accent)!important}
+  /* Amber as text needs a darker step on a light page. */
+  body.theme-light{--amber:#8a5b00!important}
+  body.theme-light .pts-band,body.theme-light .pts-tge-scenario.base b{color:#8a5b00!important}
+  /* Pending roadmap dots kept a dark chip in light mode with near-dark digits on top. */
+  body.theme-light .road-stop.pending .road-dot{background:var(--v2-panel2)!important;color:var(--v2-accent)!important;border:1px solid var(--v2-accent)}
+
+  /* Landing curve takes its colour from CSS so it follows the accent and the theme. */
+  .srv2-grad-in{stop-color:var(--v2-accent)}
+  .srv2-grad-out{stop-color:var(--v2-accent)}
+  #v2LandCurveLine{stroke:var(--v2-accent)}
+
+  /* The only theme control lived in the v1 header, which the v2 shell hides, so there was no
+     way to reach light mode from any workspace. This one appears in all three v2 headers and
+     forwards to the existing #themeToggle so persistence stays in one place. */
+  .srv2-head-right{display:flex;align-items:center;gap:14px;min-width:0}
+  .v2-theme-toggle{
+    display:inline-flex;align-items:center;gap:0;flex:0 0 auto;
+    padding:2px;border:1px solid var(--v2-line);border-radius:999px;
+    background:transparent;cursor:pointer;line-height:1;
+  }
+  .v2-theme-toggle span{
+    padding:5px 11px;border-radius:999px;
+    font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:1px;
+    color:var(--v2-dim);transition:background .16s ease,color .16s ease;
+  }
+  .v2-theme-toggle span:first-child{background:var(--v2-accent);color:var(--v2-bg)}
+  body.theme-light .v2-theme-toggle span:first-child{background:transparent;color:var(--v2-dim)}
+  body.theme-light .v2-theme-toggle span:last-child{background:var(--v2-accent);color:var(--v2-on-accent)}
+  .v2-theme-toggle:hover,.v2-theme-toggle:focus-visible{border-color:var(--v2-accent);outline:0}
+
+  /* Light mode has to reach the v2 shell itself, not just the v1 cards underneath it. */
+  body.theme-light.v2-dashboard,body.theme-light.v2-landing,
+  body.theme-light .signal-room-v2,body.theme-light .srv2-landing{
+    background:var(--v2-bg)!important;color:var(--v2-text)!important;
+  }
+  body.theme-light.v2-dashboard{
+    --bg:var(--v2-bg)!important;--panel:var(--v2-panel)!important;--panel2:var(--v2-panel2)!important;
+    --line:var(--v2-line)!important;--text:var(--v2-text)!important;--muted:var(--v2-muted)!important;
+    --cyan:var(--v2-accent)!important;--green:var(--v2-accent)!important;--blue:var(--v2-accent)!important;
+  }
+  body.theme-light .srv2-rail,body.theme-light .srv2-global-nav,body.theme-light .srv2-global-top{
+    background:var(--v2-panel);
+  }
+  body.theme-light .srv2-rail button.on,body.theme-light .srv2-global-nav button.on{
+    color:var(--v2-on-accent);background:var(--v2-accent);border-color:var(--v2-accent);
+  }
+  body.theme-light .srv2-workspace-list button:hover,
+  body.theme-light .srv2-workspace-list button:focus-visible{
+    background:var(--v2-accent);color:var(--v2-on-accent);
+  }
+  body.theme-light .srv2-workspace-list button:hover span,
+  body.theme-light .srv2-workspace-list button:focus-visible span,
+  body.theme-light .srv2-workspace-list button:hover:after,
+  body.theme-light .srv2-workspace-list button:focus-visible:after{color:var(--v2-on-accent)}
+  body.theme-light .srv2-workspace-list button:hover small,
+  body.theme-light .srv2-workspace-list button:focus-visible small{color:rgba(255,255,255,.82)!important}
+  body.theme-light .srv2-logo{background:var(--v2-accent)}
+  body.theme-light .srv2-logo img{filter:brightness(0) invert(1)}
+  body.theme-light .srv2-land-chart,body.theme-light .srv2-chart{
+    background:repeating-linear-gradient(0deg,transparent 0 48px,rgba(13,24,38,.05) 49px);
+  }
+</style>
 </head>
 <body>
 <div class="tipbar" id="tipbar" hidden>
@@ -6640,7 +7151,154 @@ body.theme-light .valuation-report #valScatter .val-var-label{
   </nav>
 </div>
 
+<aside class="srv2-global-nav" aria-label="Dashboard 2.0 navigation">
+  <div class="srv2-logo"><img src="variational-symbol-transparent.png?v=2" alt="Variational"></div>
+  <button type="button" data-open-tab="overview" aria-label="01 Overview"><span>01</span><strong>Overview</strong></button>
+  <button type="button" data-open-tab="daily-news" aria-label="02 Daily Earnings"><span>02</span><strong>Daily Earnings</strong></button>
+  <button type="button" data-open-tab="efficiency" aria-label="03 Fundamentals"><span>03</span><strong>Fundamentals</strong></button>
+  <button type="button" data-open-tab="comparison" aria-label="04 Comparison"><span>04</span><strong>Comparison</strong></button>
+  <button type="button" data-open-tab="historical" aria-label="05 Historical Data"><span>05</span><strong>Historical Data</strong></button>
+  <button type="button" data-open-tab="biweekly" aria-label="06 Official Reports"><span>06</span><strong>Official Reports</strong></button>
+  <button type="button" data-open-tab="implied" aria-label="07 Money Mechanic"><span>07</span><strong>Money Mechanic</strong></button>
+  <button type="button" data-open-tab="roadmap" aria-label="08 Roadmap"><span>08</span><strong>Roadmap</strong></button>
+  <button type="button" data-open-tab="points" aria-label="09 Points Calculator"><span>09</span><strong>Points Calculator</strong></button>
+  <button type="button" class="srv2-home" data-back-home aria-label="Back to home"><span>‹</span><strong>Back to Home</strong></button>
+  <small>SIGNAL ROOM 2.0</small>
+</aside>
+<header class="srv2-global-top">
+  <b id="v2SectionTitle">Dashboard</b>
+  <div><span>24H VOLUME <strong id="v2GlobalVolume">—</strong></span><span>OPEN INTEREST <strong id="v2GlobalOi">—</strong></span><span>TREASURY <strong id="v2GlobalTreasury">—</strong></span></div>
+  <div class="srv2-head-right">
+    <em>LIVE DATA</em>
+    <button class="v2-theme-toggle" type="button" data-theme-toggle aria-label="Switch between dark and light mode"><span>DARK</span><span>LIGHT</span></button>
+  </div>
+</header>
+
 <main id="main">
+
+<section class="srv2-landing tsec" data-tg="overview" aria-label="Variational Money control index">
+  <header class="srv2-land-head">
+    <div class="srv2-land-brand"><img src="variational-symbol-transparent.png?v=2" alt="Variational"><span>Variational Signal Room</span></div>
+    <small>CONTROL INDEX · LIVE PROTOCOL DATA</small>
+    <div class="srv2-head-right">
+      <span class="srv2-land-live">SYSTEM ONLINE</span>
+      <button class="v2-theme-toggle" type="button" data-theme-toggle aria-label="Switch between dark and light mode"><span>DARK</span><span>LIGHT</span></button>
+    </div>
+  </header>
+  <div class="srv2-land-main">
+    <span class="srv2-land-eyebrow">CURRENT PROTOCOL STATE</span>
+    <strong class="srv2-land-total" id="v2LandBalance">—</strong>
+    <p>USDC held in the on-chain protocol treasury. Select a workspace to inspect the activity, economics, and assumptions behind this number.</p>
+    <!-- Same on-chain SERIES as the Overview hero and the Historical tab, drawn by
+         drawTreasuryCurve(). Paths start empty so nothing decorative ships as evidence. -->
+    <div class="srv2-land-chart" aria-label="Treasury accumulation since the first recorded day">
+      <span class="srv2-land-chart-cap">CUMULATIVE USDC ON-CHAIN</span>
+      <svg id="v2LandCurve" viewBox="0 0 1000 260" preserveAspectRatio="none" role="img" aria-label="Cumulative treasury growth">
+        <!-- Colours come from CSS so the curve follows the brand accent and the theme. -->
+        <defs><linearGradient id="srv2LandArea" x1="0" y1="0" x2="0" y2="1"><stop class="srv2-grad-in" offset="0" stop-opacity=".28"/><stop class="srv2-grad-out" offset="1" stop-opacity="0"/></linearGradient></defs>
+        <path id="v2LandCurveArea" d="" fill="url(#srv2LandArea)"/>
+        <path id="v2LandCurveLine" d="" fill="none" stroke-width="2.5" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
+      </svg>
+      <div class="srv2-land-axis" id="v2LandAxis" aria-hidden="true"></div>
+    </div>
+    <div class="srv2-land-metrics">
+      <div class="srv2-land-metric"><span>Latest completed day</span><b id="v2LandDay">—</b></div>
+      <div class="srv2-land-metric"><span>24H trading volume</span><b id="v2LandVolume">—</b></div>
+      <div class="srv2-land-metric"><span>Open interest</span><b id="v2LandOi">—</b></div>
+    </div>
+  </div>
+  <aside class="srv2-land-proof srv2-workspaces">
+    <span>SELECT WORKSPACE</span>
+    <p class="srv2-workspace-hint"><b>Choose a workspace to open</b><span>CLICK ANY ROW</span></p>
+    <div class="srv2-workspace-list">
+      <button type="button" data-open-tab="overview"><span>01</span><b>Live Overview</b><small>Treasury and daily money path</small></button>
+      <button type="button" data-open-tab="daily-news"><span>02</span><b>Daily Earnings</b><small>Latest completed ET day</small></button>
+      <button type="button" data-open-tab="efficiency"><span>03</span><b>Fundamentals</b><small>Volume, OI, fees, and revenue</small></button>
+      <button type="button" data-open-tab="comparison"><span>04</span><b>Comparison</b><small>Positioning and implied valuation</small></button>
+      <button type="button" data-open-tab="historical"><span>05</span><b>Historical Data</b><small>Accumulation and interval growth</small></button>
+      <button type="button" data-open-tab="biweekly"><span>06</span><b>Official Reports</b><small>Biweekly operating history</small></button>
+      <button type="button" data-open-tab="implied"><span>07</span><b>Money Mechanic</b><small>Verify every formula</small></button>
+      <button type="button" data-open-tab="roadmap"><span>08</span><b>Roadmap</b><small>Shipped and remaining work</small></button>
+      <button type="button" data-open-tab="points"><span>09</span><b>Points Calculator</b><small>FDV and TGE scenarios</small></button>
+    </div>
+  </aside>
+  <footer class="srv2-land-foot">
+    <div><span>PRIMARY SOURCE</span><b>Arbitrum treasury wallet</b></div>
+    <div><span>OPERATING SOURCE</span><b>Official biweekly reports</b></div>
+    <div><span>MARKET SOURCE</span><b>Official API and DeFiLlama</b></div>
+  </footer>
+</section>
+
+<section class="signal-room-v2 tsec" data-tg="overview" aria-label="Variational Signal Room overview">
+  <nav class="srv2-rail" aria-label="Signal Room navigation">
+    <div class="srv2-logo"><img src="variational-symbol-transparent.png?v=2" alt="Variational"></div>
+    <button type="button" class="on" data-open-tab="overview" title="Overview" aria-label="01 Overview"><span>01</span><strong>Overview</strong></button>
+    <button type="button" data-open-tab="daily-news" title="Daily Earnings" aria-label="02 Daily Earnings"><span>02</span><strong>Daily Earnings</strong></button>
+    <button type="button" data-open-tab="efficiency" title="Fundamentals" aria-label="03 Fundamentals"><span>03</span><strong>Fundamentals</strong></button>
+    <button type="button" data-open-tab="comparison" title="Peer Comparison" aria-label="04 Peer Comparison"><span>04</span><strong>Comparison</strong></button>
+    <button type="button" data-open-tab="historical" title="Historical Data" aria-label="05 Historical Data"><span>05</span><strong>Historical Data</strong></button>
+    <button type="button" data-open-tab="biweekly" title="Official Reports" aria-label="06 Official Reports"><span>06</span><strong>Official Reports</strong></button>
+    <button type="button" data-open-tab="implied" title="Money Mechanic" aria-label="07 Money Mechanic"><span>07</span><strong>Money Mechanic</strong></button>
+    <button type="button" data-open-tab="roadmap" title="Roadmap" aria-label="08 Roadmap"><span>08</span><strong>Roadmap</strong></button>
+    <button type="button" data-open-tab="points" title="Points Calculator" aria-label="09 Points Calculator"><span>09</span><strong>Points Calculator</strong></button>
+    <button type="button" class="srv2-home" id="v2BackHome" title="Back to landing page" aria-label="Back to home"><span>‹</span><strong>Back to Home</strong></button>
+    <small>SIGNAL ROOM 2.0</small>
+  </nav>
+  <header class="srv2-top">
+    <h1>Protocol Value Monitor</h1>
+    <div class="srv2-ticker" aria-label="Live protocol metrics">
+      <span>24H Volume <b id="v2Volume">—</b></span>
+      <span>Open Interest <b id="v2Oi">—</b></span>
+      <span>Wallet <b>0x5e91…d645</b></span>
+    </div>
+    <div class="srv2-head-right">
+      <div class="srv2-sync" id="v2Sync">LIVE DATA</div>
+      <button class="v2-theme-toggle" type="button" data-theme-toggle aria-label="Switch between dark and light mode"><span>DARK</span><span>LIGHT</span></button>
+    </div>
+  </header>
+  <div class="srv2-canvas">
+    <div class="srv2-headline">
+      <div><span class="srv2-kicker">On-chain treasury accumulation</span><strong class="srv2-balance" id="v2Balance">—</strong></div>
+      <p>Net USDC held on-chain. This is the clearest observable record of protocol value accumulating in the treasury wallet.</p>
+    </div>
+    <!-- The cumulative curve now lives on the landing page. Keeping a second copy here only
+         repeated the same 193-point series one click later, so the window strip moves up to
+         sit directly under the balance. -->
+    <div class="srv2-strip">
+      <div><span>Latest day</span><b id="v2Day">—</b></div>
+      <div><span>Trailing 7 days</span><b id="v2Week">—</b></div>
+      <div><span>Trailing 30 days</span><b id="v2Month">—</b></div>
+      <div><span>30D daily pace</span><b id="v2Pace">—</b></div>
+    </div>
+    <section class="srv2-intel" aria-label="Overview operating intelligence">
+      <div class="srv2-intel-head"><div><span>OPERATING INTELLIGENCE</span><h2>What is happening now</h2></div><p>Short windows show the current earning speed. Market windows show the activity supporting it.</p></div>
+      <div class="srv2-window-grid">
+        <article class="live"><span id="v2HourLabel">Current ET hour</span><strong id="v2Hour">—</strong><small>Earned so far</small></article>
+        <article><span>Rolling 12 hours</span><strong id="v2Twelve">—</strong><small>Net treasury inflow</small></article>
+        <article><span>Rolling 24 hours</span><strong id="v2TwentyFour">—</strong><small>Net treasury inflow</small></article>
+        <article><span>Rolling 7 days</span><strong id="v2SevenWindow">—</strong><small>Net treasury inflow</small></article>
+      </div>
+      <div class="srv2-market-grid">
+        <article><span>7D trading volume</span><strong id="v2Volume7">—</strong><small>Daily observations</small></article>
+        <article><span>30D trading volume</span><strong id="v2Volume30">—</strong><small>Daily observations</small></article>
+        <article><span>Month-to-date treasury</span><strong id="v2Mtd">—</strong><small id="v2MtdRange">Current ET month</small></article>
+        <article><span>Current treasury held</span><strong id="v2Held">—</strong><small>On-chain USDC</small></article>
+      </div>
+      <div class="srv2-market-chart" id="v2MarketChartHost"></div>
+    </section>
+  </div>
+  <aside class="srv2-brief">
+    <div class="srv2-brief-head"><span>TODAY'S OPERATING READ</span><h2>One screen.<br>The whole money path.</h2><p>Activity creates trader spreads. The official report share then separates the OLP side from treasury inflow.</p></div>
+    <div class="srv2-flow">
+      <div class="srv2-flow-row"><span>24H trading volume</span><b id="v2FlowVolume">—</b></div>
+      <div class="srv2-flow-row"><span>Daily trader spreads, implied</span><b id="v2Spreads">—</b></div>
+      <div class="srv2-flow-row"><span>Daily OLP side, implied</span><b id="v2Olp">—</b></div>
+      <div class="srv2-flow-row primary"><span>Protocol treasury inflow</span><b id="v2Treasury">—</b></div>
+    </div>
+    <div class="srv2-note">Treasury inflow is measured from changes in the on-chain USDC wallet balance. Implied gross spreads use allocation ratios observed in official biweekly reports. Non-revenue transfers and exact policy-change dates are not independently verified.</div>
+    <button class="srv2-action" type="button" data-open-tab="daily-news">OPEN DAILY LEDGER</button>
+  </aside>
+</section>
 
 <section class="daily-brief daily-news tsec tg-hide" id="dailyBrief" data-tg="daily-news" data-status="steady" aria-labelledby="dailyBriefHeadline">
   <div class="daily-brief-head">
@@ -6654,6 +7312,7 @@ body.theme-light .valuation-report #valScatter .val-var-label{
       <strong id="dailyBriefStatus">SYNCING</strong>
     </div>
   </div>
+  <div class="daily-brief-evidence-head"><b>Numbers behind the post</b><span>Every figure quoted above, with its source and comparison window.</span></div>
   <div class="daily-brief-grid" aria-label="Variational daily status metrics">
     <div class="daily-brief-metric spread-fee">
       <span>Daily Spread Fees · implied</span>
@@ -6922,7 +7581,49 @@ body.theme-light .valuation-report #valScatter .val-var-label{
   </div>
 </div>
 
-<section class="card var-pulse tsec" data-tg="overview" aria-labelledby="varPulseTitle">
+<section class="overview-story tsec" data-tg="overview" aria-labelledby="overviewStoryTitle">
+  <div class="overview-story-copy">
+    <div class="overview-story-kicker"><span></span> Variational protocol treasury</div>
+    <h1 id="overviewStoryTitle">The treasury<br>keeps growing.</h1>
+    <p>USDC accumulated on-chain from Variational's protocol revenue cut. Start with the money earned, then see the activity that produced it.</p>
+    <div class="overview-story-actions">
+      <a href="https://arbiscan.io/address/0x5e91b40467fb8902c46a7b6cb90482363188d645" target="_blank" rel="noopener">Verify on Arbiscan <span>↗</span></a>
+      <button type="button" id="overviewJumpEarnings">Explore daily earnings ↓</button>
+    </div>
+  </div>
+  <div class="overview-story-number">
+    <span>On-chain treasury balance</span>
+    <strong id="overviewTreasuryHero">—</strong>
+    <small id="overviewTreasuryStamp">Syncing live wallet</small>
+  </div>
+  <div class="overview-story-proof" aria-label="Treasury growth windows">
+    <article><span>Latest completed day</span><strong id="overviewDayEarn">—</strong><small>Net wallet inflow</small></article>
+    <article><span>Trailing 7 days</span><strong id="overviewWeekEarn">—</strong><small>Net wallet inflow</small></article>
+    <article><span>Trailing 30 days</span><strong id="overviewMonthEarn">—</strong><small>Net wallet inflow</small></article>
+  </div>
+</section>
+
+<section class="overview-money tsec" data-tg="overview" aria-labelledby="overviewMoneyTitle">
+  <div class="overview-money-head">
+    <div>
+      <span class="overview-section-no">02 · How the money moves</span>
+      <h2 id="overviewMoneyTitle">Trading activity becomes treasury revenue.</h2>
+    </div>
+    <p>Treasury inflow is directly measured from the on-chain wallet. Gross spreads and the OLP side are estimates based on the report-observed protocol share.</p>
+  </div>
+  <div class="overview-money-flow">
+    <article><span>Trading activity</span><strong id="overviewVolume">—</strong><small>Rolling 24H volume</small></article>
+    <i aria-hidden="true">→</i>
+    <article><span>Trader spread pool</span><strong id="overviewSpreads">—</strong><small>Modeled gross spreads</small></article>
+    <i aria-hidden="true">→</i>
+    <article><span>OLP side</span><strong id="overviewOlp">—</strong><small>Before costs and OLP PnL</small></article>
+    <b aria-hidden="true">+</b>
+    <article class="is-treasury"><span>Protocol treasury</span><strong id="overviewProtocol">—</strong><small>Latest completed day</small></article>
+  </div>
+  <div class="overview-policy">Treasury inflow is measured from changes in the on-chain USDC wallet balance. Non-revenue transfers and exact policy-change dates are not independently verified.</div>
+</section>
+
+<section class="card var-pulse tsec overview-legacy-pulse" data-tg="overview" aria-labelledby="varPulseTitle">
   <div class="var-pulse-head">
     <div>
       <div class="var-pulse-eyebrow"><i aria-hidden="true"></i> Today’s VAR Pulse · why open this dashboard</div>
@@ -7149,7 +7850,8 @@ body.theme-light .valuation-report #valScatter .val-var-label{
   <h2>Is Variational Getting Bigger and Making More Money? <span class="tag">official report · every 2 weeks</span></h2>
   <div class="cap">This page keeps every number Variational published. It shows how many people use the exchange, how much they trade, what it costs to run, and how much money is left. <span id="bwAsOf" class="muted">—</span></div>
   <div class="bw full" id="bwBlock">
-    <div class="bw-easy-guide">
+    <button class="bw-guide-toggle" id="bwGuideToggle" type="button" aria-expanded="false" aria-controls="bwGuideRegion">How to read this page</button>
+    <div class="bw-easy-guide" id="bwGuideRegion">
       <div><strong>1. Is it growing?</strong><span>Look at <b>trading volume, open interest, TVL, and users.</b> Bigger numbers usually mean more people and money are using the exchange.</span></div>
       <div><strong>2. Is it making money?</strong><span>Traders pay spreads. Subtract market-making costs and rewards. What remains is <b>net profit.</b></span></div>
       <div><strong>3. Is cash really arriving?</strong><span><b>Treasury</b> means real USDC held by the protocol. The on-chain check verifies that wallet separately.</span></div>
@@ -7353,6 +8055,23 @@ body.theme-light .valuation-report #valScatter .val-var-label{
         <div class="pts-card base"><b id="pts25">—</b><span id="ptv25">—</span><small>25% airdrop</small></div>
         <div class="pts-card"><b id="pts30">—</b><span id="ptv30">—</span><small>30% airdrop</small></div>
       </div>
+    </div>
+  </div>
+  <!-- Matrix view: the three cards above answer one FDV at a time. This answers the whole
+       grid at once, which is the question people actually ask about points. -->
+  <div class="pts-matrix">
+    <div class="pts-matrix-head">
+      <div>
+        <b>What a point is worth, across every scenario</b>
+        <span>Each cell is <code>FDV × airdrop % ÷ total pool</code>. The small figure is your own payout at <b id="ptsMatrixMine">—</b> points. Click any row to load that FDV above.</span>
+      </div>
+      <div class="pts-matrix-legend"><i>lower</i><span class="sc s1"></span><span class="sc s2"></span><span class="sc s3"></span><span class="sc s4"></span><span class="sc s5"></span><i>higher</i></div>
+    </div>
+    <div class="pts-matrix-scroll">
+      <table id="ptsMatrix">
+        <thead><tr><th>FDV at launch</th><th>8%</th><th>10%</th><th>15%</th><th>20%</th><th>25%</th><th>30%</th></tr></thead>
+        <tbody></tbody>
+      </table>
     </div>
   </div>
   <div class="pts-share-row">
@@ -7572,11 +8291,263 @@ body.theme-light .valuation-report #valScatter .val-var-label{
 <div class="tt" id="tt"></div>
 <script>if(location.hash==="#meme")history.replaceState(null,"",location.pathname+location.search+"#overview");</script>
 <script>addEventListener("load",function(){var e=document.getElementById("calSharePct");try{if(e)e.textContent=Math.round(MKT.spreadShare*100)+"%";}catch(_){}});</script>
-<script src="dashboard.js?v=20260802-daily-post-money-flow" defer></script>
+<script src="dashboard.js?v=20260804-points-matrix" defer></script>
+<script>
+  window.addEventListener("DOMContentLoaded", function () {
+    const pairs = [
+      ["totalVal", "overviewTreasuryHero"],
+      ["stamp", "overviewTreasuryStamp"],
+      ["dailyBriefRevenue", "overviewDayEarn"],
+      ["marketEarn7", "overviewWeekEarn"],
+      ["marketEarn30", "overviewMonthEarn"],
+      ["headVol24", "overviewVolume"],
+      ["dailyBriefSpreadFees", "overviewSpreads"],
+      ["dailyBriefOlpSide", "overviewOlp"],
+      ["dailyBriefRevenue", "overviewProtocol"]
+    ];
+    const syncOverview = function () {
+      pairs.forEach(function (pair) {
+        const source = document.getElementById(pair[0]);
+        const target = document.getElementById(pair[1]);
+        if (source && target && source.textContent.trim()) target.textContent = source.textContent.trim();
+      });
+    };
+    const observer = new MutationObserver(syncOverview);
+    pairs.forEach(function (pair) {
+      const source = document.getElementById(pair[0]);
+      if (source) observer.observe(source, { childList: true, characterData: true, subtree: true });
+    });
+    syncOverview();
+    const jump = document.getElementById("overviewJumpEarnings");
+    const earnings = document.querySelector(".earnings-workspace");
+    if (jump && earnings) jump.addEventListener("click", function () { earnings.scrollIntoView({ behavior: "smooth", block: "start" }); });
+  });
+</script>
 <script>
   ['trollbox-splitview-widget','trollbox-complete-widget'].forEach(id => {
     const node = document.getElementById(id);
     if (node) node.remove();
+  });
+</script>
+<script>
+  window.addEventListener('DOMContentLoaded', function () {
+    const toggle = document.getElementById('bwGuideToggle');
+    if (!toggle) return;
+    toggle.addEventListener('click', function () {
+      const open = document.body.classList.toggle('bw-guide-open');
+      toggle.setAttribute('aria-expanded', String(open));
+      toggle.textContent = open ? 'Hide the reading guide' : 'How to read this page';
+    });
+  });
+</script>
+<script>
+  // The v2 theme buttons forward to the original #themeToggle, so localStorage persistence and
+  // the renderMemeLab/aria bookkeeping in setRadarTheme() stay the single source of truth.
+  window.addEventListener('DOMContentLoaded', function () {
+    const buttons = [].slice.call(document.querySelectorAll('[data-theme-toggle]'));
+    if (!buttons.length) return;
+    const source = document.getElementById('themeToggle');
+    const reflect = function () {
+      const light = document.body.classList.contains('theme-light');
+      buttons.forEach(function (b) {
+        b.setAttribute('aria-pressed', String(light));
+        b.setAttribute('aria-label', light ? 'Switch to dark mode' : 'Switch to light mode');
+      });
+    };
+    buttons.forEach(function (b) {
+      b.addEventListener('click', function () {
+        if (source) source.click();
+        else document.body.classList.toggle('theme-light');
+        reflect();
+      });
+    });
+    reflect();
+    // dashboard.js restores the saved theme on load, which can land after this listener runs.
+    new MutationObserver(reflect).observe(document.body, {attributes: true, attributeFilter: ['class']});
+  });
+</script>
+<script id="signal-room-v2-runtime">
+  window.addEventListener('DOMContentLoaded', function () {
+    const links = {
+      totalVal: ['v2Balance', 'v2LandBalance', 'v2GlobalTreasury'],
+      headVol24: ['v2Volume', 'v2FlowVolume', 'v2LandVolume', 'v2GlobalVolume'],
+      headOi: ['v2Oi', 'v2LandOi', 'v2GlobalOi'],
+      dailyBriefRevenue: ['v2Latest', 'v2Day', 'v2Treasury', 'v2LandDay'],
+      dailyBriefSpreadFees: ['v2Spreads'],
+      dailyBriefOlpSide: ['v2Olp'],
+      marketEarn7: ['v2Week'],
+      marketEarn30: ['v2Month'],
+      ticker: ['v2Hour'],
+      liveHourLabel: ['v2HourLabel'],
+      ac12h: ['v2Twelve'],
+      ac24h: ['v2TwentyFour'],
+      ac7d: ['v2SevenWindow'],
+      marketVol7d: ['v2Volume7'],
+      marketVol30d: ['v2Volume30'],
+      marketEarnMtd: ['v2Mtd'],
+      marketEarnMtdRange: ['v2MtdRange'],
+      marketEarnAll: ['v2Held'],
+      pmDailyRevenue: ['v2Pace'],
+      stamp: ['v2Sync']
+    };
+    const normalizeBalance = function (value) {
+      const match = String(value || '').replace(/,/g, '').match(/\$?([\d.]+)/);
+      if (!match) return value;
+      const amount = Number(match[1]);
+      if (!Number.isFinite(amount)) return value;
+      if (String(value).includes('M') || String(value).includes('B') || amount < 1000000) return value;
+      return '$' + (amount / 1000000).toFixed(2) + '<em>M</em>';
+    };
+    const sync = function () {
+      Object.entries(links).forEach(function (entry) {
+        const source = document.getElementById(entry[0]);
+        if (!source || !source.textContent.trim()) return;
+        entry[1].forEach(function (targetId) {
+          const target = document.getElementById(targetId);
+          if (!target) return;
+          if (targetId === 'v2Balance' || targetId === 'v2LandBalance') target.innerHTML = normalizeBalance(source.textContent.trim());
+          else if (targetId === 'v2Sync') target.textContent = source.textContent.trim().replace(/^verified\s*/i, 'LIVE ');
+          else target.textContent = source.textContent.trim();
+        });
+      });
+      drawTreasuryCurve();
+    };
+    // Both axis ends label the data, not the wall clock. Using today's date on the right put
+    // the axis up to a day ahead of the last plotted point.
+    const toUTC = function (iso) {
+      const parts = String(iso || '').split('-');
+      if (parts.length !== 3) return null;
+      const dt = new Date(Date.UTC(+parts[0], +parts[1] - 1, +parts[2]));
+      return isNaN(dt) ? null : dt;
+    };
+    const stamp = function (iso, opts) {
+      const dt = toUTC(iso);
+      if (!dt) return null;
+      return dt.toLocaleDateString('en-US', Object.assign({month:'short', day:'numeric', year:'numeric', timeZone:'UTC'}, opts || {})).toUpperCase();
+    };
+    const getSeries = function () {
+      const s = (typeof SERIES !== 'undefined' && Array.isArray(SERIES)) ? SERIES : null;
+      return (s && s.length > 1) ? s : null;
+    };
+    // Plots one cumulative curve into an <svg> whose viewBox is W x H.
+    const plotCurve = function (lineId, areaId, W, H, PAD) {
+      const line = document.getElementById(lineId);
+      const area = document.getElementById(areaId);
+      const series = getSeries();
+      if (!line || !area || !series) return;
+      const values = series.map(function (p) { return p.v; });
+      const min = Math.min.apply(null, values), max = Math.max.apply(null, values);
+      const span = (max - min) || 1;
+      const d = series.map(function (p, i) {
+        const x = (i / (series.length - 1)) * W;
+        const y = H - PAD - ((p.v - min) / span) * (H - PAD * 2);
+        return (i ? 'L' : 'M') + (Math.round(x * 100) / 100) + ' ' + (Math.round(y * 100) / 100);
+      }).join(' ');
+      line.setAttribute('d', d);
+      area.setAttribute('d', d + ' L' + W + ' ' + H + ' L0 ' + H + 'Z');
+    };
+    // Month ticks placed by real elapsed time, so an uneven gap in the data shows as an uneven
+    // gap on the axis rather than being evenly spaced into a lie.
+    const renderLandingAxis = function () {
+      const host = document.getElementById('v2LandAxis');
+      const series = getSeries();
+      if (!host || !series) return;
+      const firstISO = series[0].d, lastISO = series[series.length - 1].d;
+      const t0 = toUTC(firstISO), t1 = toUTC(lastISO);
+      if (!t0 || !t1 || t1 <= t0) return;
+      const total = t1 - t0;
+      const parts = [];
+      parts.push('<i class="is-start">' + (stamp(firstISO) || '') + '</i>');
+      // First day of each month strictly inside the range, skipping ticks that would collide
+      // with either end label.
+      const cursor = new Date(Date.UTC(t0.getUTCFullYear(), t0.getUTCMonth() + 1, 1));
+      while (cursor < t1) {
+        const pct = (cursor - t0) / total * 100;
+        if (pct > 9 && pct < 88) {
+          parts.push('<i class="is-mid" style="left:' + pct.toFixed(2) + '%">'
+            + cursor.toLocaleDateString('en-US', {month:'short', timeZone:'UTC'}).toUpperCase() + '</i>');
+        }
+        cursor.setUTCMonth(cursor.getUTCMonth() + 1);
+      }
+      parts.push('<i class="is-end">' + (stamp(lastISO) || '') + '</i>');
+      host.innerHTML = parts.join('');
+    };
+    // Draws every treasury curve from the same on-chain SERIES that feeds the Historical tab,
+    // so the headline visuals and the verifiable data are the same object.
+    const drawTreasuryCurve = function () {
+      const series = getSeries();
+      if (!series) return;
+      plotCurve('v2CurveLine', 'v2CurveArea', 1000, 400, 14);
+      plotCurve('v2LandCurveLine', 'v2LandCurveArea', 1000, 260, 10);
+      const startLabel = document.getElementById('v2StartDate');
+      const endLabel = document.getElementById('v2EndDate');
+      const startText = stamp(series[0] && series[0].d);
+      const endText = stamp(series[series.length - 1] && series[series.length - 1].d);
+      if (startLabel && startText) startLabel.textContent = startText;
+      if (endLabel && endText) endLabel.textContent = endText;
+      renderLandingAxis();
+    };
+    const setView = function () {
+      const overview = document.getElementById('tab-overview');
+      const isOverview = Boolean(overview && overview.classList.contains('on'));
+      const isLanding = isOverview && (location.hash === '' || location.hash === '#landing');
+      document.body.classList.toggle('v2-landing', isLanding);
+      document.body.classList.toggle('v2-dashboard', !isLanding);
+      document.body.classList.toggle('v2-overview', isOverview && !isLanding);
+      const active = document.querySelector('#tabs button.on[data-tab]');
+      // The rail is the navigation the user actually sees, so its label is the canonical workspace
+      // name. Reading the legacy #tabs strip here made the header and the rail disagree
+      // ("Daily Earnings" vs "Daily VAR News", "Money Mechanic" vs "Mechanic").
+      const railLabel = active && document.querySelector('.srv2-rail [data-open-tab="' + active.dataset.tab + '"] strong');
+      const activeName = railLabel ? railLabel.textContent.trim() : (active ? active.textContent.trim() : 'Dashboard');
+      const title = document.getElementById('v2SectionTitle');
+      if (title) title.textContent = activeName;
+      document.querySelectorAll('.srv2-global-nav [data-open-tab], .srv2-rail [data-open-tab]').forEach(function (button) {
+        button.classList.toggle('on', Boolean(active && button.dataset.openTab === active.dataset.tab));
+      });
+    };
+    const observer = new MutationObserver(function () { sync(); setView(); });
+    Object.keys(links).forEach(function (id) {
+      const source = document.getElementById(id);
+      if (source) observer.observe(source, {subtree:true, childList:true, characterData:true, attributes:true});
+    });
+    const tabs = document.getElementById('tabs');
+    if (tabs) observer.observe(tabs, {subtree:true, attributes:true, attributeFilter:['class','aria-selected']});
+    document.querySelectorAll('[data-open-tab]').forEach(function (button) {
+      button.addEventListener('click', function () {
+        const target = document.getElementById('tab-' + button.dataset.openTab);
+        history.replaceState(null, '', location.pathname + location.search + '#' + button.dataset.openTab);
+        if (target) target.click();
+        setView();
+        window.scrollTo(0, 0);
+      });
+    });
+    const marketHost = document.getElementById('v2MarketChartHost');
+    const marketChart = document.getElementById('marketActivityChart');
+    const marketChartHead = marketChart && marketChart.parentElement ? marketChart.parentElement.querySelector('.market-chart-head') : null;
+    if (marketHost && marketChart) {
+      if (marketChartHead) marketHost.appendChild(marketChartHead);
+      marketHost.appendChild(marketChart);
+    }
+    const openDashboard = document.getElementById('v2OpenDashboard');
+    if (openDashboard) openDashboard.addEventListener('click', function () {
+      history.replaceState(null, '', location.pathname + location.search + '#overview');
+      setView();
+      window.scrollTo(0, 0);
+    });
+    const goHome = function () {
+      const overviewTab = document.getElementById('tab-overview');
+      if (overviewTab && !overviewTab.classList.contains('on')) overviewTab.click();
+      history.replaceState(null, '', location.pathname + location.search + '#landing');
+      setView();
+      window.scrollTo(0, 0);
+    };
+    const backHome = document.getElementById('v2BackHome');
+    if (backHome) backHome.addEventListener('click', goHome);
+    document.querySelectorAll('[data-back-home]').forEach(function (button) { button.addEventListener('click', goHome); });
+    window.addEventListener('hashchange', setView);
+    sync(); setView();
+    setTimeout(sync, 400); setTimeout(sync, 1400); setTimeout(sync, 3500);
   });
 </script>
 </body>
