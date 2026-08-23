@@ -731,14 +731,14 @@
     background:linear-gradient(135deg,var(--grn),var(--cyan));box-shadow:0 0 18px rgba(38,230,194,.3)}
   .road-stop.pending .road-dot{color:var(--cyan);background:#07101f;border:1px dashed rgba(85,184,255,.5);box-shadow:none}
   /* "you are here" — the first pending gate pulses */
-  .road-stop.pending:nth-child(6) .road-dot{border-style:solid;border-color:var(--grn);color:var(--grn);
+  .road-stop:not(.pending)+.road-stop.pending .road-dot{border-style:solid;border-color:var(--grn);color:var(--grn);
     animation:gatePulse 2.4s ease-out infinite}
-  .road-stop.pending:nth-child(6)::before{content:"UP NEXT";position:absolute;top:-13px;left:50%;transform:translateX(-50%);
+  .road-stop:not(.pending)+.road-stop.pending::before{content:"UP NEXT";position:absolute;top:-13px;left:50%;transform:translateX(-50%);
     font:950 8px var(--mono);letter-spacing:1.6px;color:var(--grn);text-shadow:0 0 10px rgba(38,230,194,.5);white-space:nowrap}
   @keyframes gatePulse{0%{box-shadow:0 0 0 0 rgba(38,230,194,.4)}75%{box-shadow:0 0 0 13px rgba(38,230,194,0)}100%{box-shadow:0 0 0 0 rgba(38,230,194,0)}}
   .road-stop b{font:950 12px/1.15 var(--sans);color:var(--ink)}
   .road-stop.pending b{color:var(--sub)}
-  .road-stop.pending:nth-child(6) b{color:var(--ink)}
+  .road-stop:not(.pending)+.road-stop.pending b{color:var(--ink)}
   .road-stop span{font:10px/1.4 var(--mono);color:var(--dim);max-width:17ch}
   .road-next{counter-reset:gate;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:12px}
   .road-card{counter-increment:gate;position:relative;min-height:122px;border:1px solid rgba(85,184,255,.16);border-radius:14px;
@@ -805,11 +805,11 @@
     .road-stop>span:last-child{grid-column:2;margin-top:-4px}
     .road-stop .road-dot{grid-row:1/3}
     .road-stop span{max-width:none}
-    .road-stop.pending:nth-child(6)::before{top:50%;left:auto;right:0;transform:translateY(-50%)}
+    .road-stop:not(.pending)+.road-stop.pending::before{top:50%;left:auto;right:0;transform:translateY(-50%)}
   }
   @media(prefers-reduced-motion:reduce){
     .road-meter span,.road-path::after{animation:none}
-    .road-stop.pending:nth-child(6) .road-dot{animation:none;box-shadow:0 0 14px rgba(38,230,194,.35)}
+    .road-stop:not(.pending)+.road-stop.pending .road-dot{animation:none;box-shadow:0 0 14px rgba(38,230,194,.35)}
     .road-card,.road-card:hover{transform:none;transition:none}
   }
 
@@ -6111,7 +6111,7 @@
 .road-progress-head span{font-size:11px!important}
 .road-stat span{font-size:11px!important}
 .road-stop span{font-size:11px!important}
-.road-stop.pending:nth-child(6)::before{font-size:11px!important}
+.road-stop:not(.pending)+.road-stop.pending::before{font-size:11px!important}
 .ry-col.ahead li.ok + li:not(.ok)::after{font-size:11px!important}
 .ry-col.ahead li.ok::after{font-size:11px!important}
 .ry-head span{font-size:11px!important}
@@ -7564,6 +7564,212 @@ body.theme-light .valuation-report #valScatter .val-var-label{
     .srv2-chart{min-height:280px!important}
   }
 </style>
+<style id="calendar-readability-20260822">
+  /* The calendar is an evidence table. Labels stay visible so readers never have to
+     remember which line is measured treasury inflow and which line is modeled spreads. */
+  .earnings-workspace{font-size:15px}
+  .earnings-workspace .section-head h2,
+  .earnings-workspace .cal-title{font-size:clamp(22px,2vw,30px)!important;font-weight:800!important}
+  .earnings-workspace .section-head p,
+  .earnings-workspace .cap-note p{font-size:14px!important;line-height:1.6!important}
+  .earnings-controls .seg button,.cal-nav button,.hist-row button{min-height:40px;font-size:13px!important;font-weight:750!important}
+  .cal-metric-key{
+    display:flex;align-items:center;gap:20px;flex-wrap:wrap;margin:4px 0 12px;padding:11px 0;
+    border-top:1px solid var(--line);border-bottom:1px solid var(--line);
+    color:var(--sub);font-size:13px;line-height:1.35;
+  }
+  .cal-metric-key span{display:flex;align-items:center;gap:7px}
+  .cal-metric-key b{color:var(--ink);font-weight:800}
+  .cal-metric-key i{width:9px;height:9px;flex:0 0 9px;border-radius:2px;background:var(--cyan)}
+  .cal-metric-key i.modeled{background:var(--grn)}
+  .earnings-calendar-pane .cal-weekdays span{font-size:12px!important;font-weight:800!important;letter-spacing:.8px!important}
+  .earnings-calendar-pane .cal-cell{
+    min-height:132px!important;padding:11px 10px!important;display:flex!important;flex-direction:column;
+  }
+  /* Exact values already communicate magnitude. The old bottom-up heat fill made
+     each day look like two unrelated panels, so cells now use one continuous surface. */
+  .earnings-calendar-pane .cal-fill{display:none!important}
+  .cal-grid.period-summary{grid-template-columns:repeat(auto-fit,minmax(300px,1fr))!important;gap:10px!important}
+  .cal-summary-card{min-height:150px!important;padding:16px!important;background:var(--panel)!important;box-shadow:none!important}
+  .cal-summary-period{font-size:11px!important;color:var(--dim)!important}
+  .cal-summary-metrics{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));margin-top:14px;border-top:1px solid var(--line)}
+  .cal-summary-metrics>div{min-width:0;padding:14px 14px 4px 0}
+  .cal-summary-metrics>div+div{padding-left:14px;border-left:1px solid var(--line)}
+  .cal-summary-metrics span,.cal-summary-metrics small{display:block}
+  .cal-summary-metrics span{font:800 10px/1.3 var(--mono);letter-spacing:.55px;text-transform:uppercase;color:var(--dim)}
+  .cal-summary-metrics strong{display:block;margin:7px 0 5px;font:800 clamp(20px,2vw,28px)/1 var(--mono);color:var(--cyan)}
+  .cal-summary-metrics>div+div strong{color:var(--ink)}
+  .cal-summary-metrics small{font-size:11px;line-height:1.35;color:var(--sub)}
+  .earnings-calendar-pane .cal-num{font-size:16px!important;font-weight:850!important}
+  .earnings-calendar-pane .cal-wd{font-size:11px!important;font-weight:750!important}
+  .earnings-calendar-pane .cal-dual{width:100%;gap:8px!important;margin-top:12px!important}
+  .earnings-calendar-pane .cal-money-row,
+  body.v2-overview .earnings-workspace .cal-money-row{
+    display:grid!important;grid-template-columns:minmax(0,1fr)!important;gap:3px!important;
+    padding:0!important;background:transparent!important;border:0!important;
+  }
+  .earnings-calendar-pane .cal-money-row .tz,
+  body.v2-overview .earnings-workspace .cal-money-row .tz{
+    display:block!important;font:800 10px/1.25 var(--mono)!important;letter-spacing:.55px!important;
+    color:var(--dim)!important;text-transform:uppercase!important;white-space:normal!important;
+  }
+  .earnings-calendar-pane .cal-money-row .money,
+  body.v2-overview .earnings-workspace .cal-money-row .money{
+    display:block!important;font:800 clamp(17px,1.25vw,21px)/1.05 var(--mono)!important;
+    letter-spacing:-.5px!important;overflow:visible!important;text-overflow:clip!important;
+  }
+  .earnings-calendar-pane .cal-money-row.total .money,
+  body.v2-overview .earnings-workspace .cal-money-row.total .money{color:var(--cyan)!important}
+  .earnings-calendar-pane .cal-money-row.fee,
+  body.v2-overview .earnings-workspace .cal-money-row.fee{display:grid!important}
+  .earnings-calendar-pane .cal-money-row.fee .money,
+  body.v2-overview .earnings-workspace .cal-money-row.fee .money{color:var(--ink)!important;font-size:clamp(15px,1.05vw,18px)!important}
+  .earnings-summary-cell>span{font-size:12px!important;font-weight:800!important;letter-spacing:.8px!important}
+  .earnings-summary-cell>strong{font-size:clamp(23px,2vw,31px)!important}
+  .earnings-summary-cell>small{font-size:12px!important}
+  .cal-legend{font-size:12px!important}
+
+  @media(min-width:1101px) and (max-width:1512px){
+    body.v2-overview .earnings-workspace .cal-scroll{overflow-x:auto!important;padding-bottom:8px}
+    body.v2-overview .earnings-workspace .cal-head,
+    body.v2-overview .earnings-workspace .cal-weekdays,
+    body.v2-overview .earnings-workspace .cal-grid{min-width:1050px!important}
+    body.v2-overview .earnings-workspace .cal-weekdays,
+    body.v2-overview .earnings-workspace .cal-grid{grid-template-columns:repeat(7,minmax(146px,1fr))!important}
+  }
+  @media(max-width:1100px){
+    body.v2-overview .earnings-workspace .cal-head,
+    body.v2-overview .earnings-workspace .cal-weekdays,
+    body.v2-overview .earnings-workspace .cal-grid{min-width:1050px!important}
+    body.v2-overview .earnings-workspace .cal-weekdays,
+    body.v2-overview .earnings-workspace .cal-grid{grid-template-columns:repeat(7,minmax(146px,1fr))!important}
+  }
+  @media(max-width:600px){
+    .earnings-workspace .section-head h2,.earnings-workspace .cal-title{font-size:22px!important}
+    .cal-metric-key{display:grid;gap:8px;font-size:12px}
+    .earnings-calendar-pane .cal-cell{min-height:128px!important}
+    .earnings-calendar-pane .cal-money-row .money,
+    body.v2-overview .earnings-workspace .cal-money-row .money{font-size:18px!important}
+    .cal-summary-metrics{grid-template-columns:1fr}
+    .cal-summary-metrics>div+div{padding-left:0;border-left:0;border-top:1px solid var(--line)}
+  }
+</style>
+<style id="navigation-readability-20260822">
+  /* The workspace rail is navigation, not metadata. Keep labels comfortably readable
+     and enlarge the rail with them so type never feels squeezed. */
+  @media (min-width:1101px){
+    body.v2-dashboard #main{
+      margin-left:208px!important;
+      padding-left:32px!important;
+      padding-right:32px!important;
+    }
+    body.v2-dashboard.v2-overview #main{margin-left:0!important;padding:0!important}
+    body.v2-overview .signal-room-v2,
+    .signal-room-v2{grid-template-columns:208px minmax(0,1.45fr) minmax(350px,.55fr)!important}
+    body.v2-overview .signal-room-v2{grid-template-columns:208px minmax(0,1fr)!important}
+    .srv2-global-nav{width:208px!important;padding:18px 14px!important;gap:8px!important}
+    .srv2-global-top{left:calc(208px + clamp(12px,2vw,28px))!important}
+    .srv2-rail{padding:18px 14px!important;gap:8px!important}
+    .srv2-rail button,.srv2-global-nav button{
+      height:48px!important;min-height:48px!important;
+      grid-template-columns:28px minmax(0,1fr)!important;
+      gap:10px!important;padding:0 12px!important;
+    }
+    .srv2-rail button strong,.srv2-global-nav button strong{
+      font-size:13px!important;font-weight:750!important;line-height:1.15!important;
+    }
+    .srv2-rail button span,.srv2-global-nav button span{
+      font-size:10px!important;line-height:1!important;
+    }
+    .srv2-logo{width:44px!important;height:44px!important;margin-bottom:14px!important}
+    .srv2-logo img{width:38px!important;height:38px!important}
+  }
+  .srv2-top h1,.srv2-global-top b{font-size:18px!important}
+  .srv2-ticker span,.srv2-global-top span{font-size:10px!important}
+  .srv2-ticker b,.srv2-global-top span strong{font-size:14px!important}
+  .srv2-intel-head span,.srv2-window-grid span,.srv2-market-grid span{font-size:10px!important}
+  .srv2-intel-head p,.srv2-note{font-size:13px!important}
+  .srv2-window-grid small,.srv2-market-grid small{font-size:11px!important}
+
+  @media (max-width:1100px){
+    .srv2-rail button,.srv2-global-nav button{min-height:44px!important;height:44px!important}
+    .srv2-rail button strong,.srv2-global-nav button strong{font-size:12px!important}
+    .srv2-rail button span,.srv2-global-nav button span{font-size:10px!important}
+  }
+  @media (max-width:650px){
+    .srv2-rail button,.srv2-global-nav button{padding-inline:12px!important}
+    .srv2-top h1,.srv2-global-top b{font-size:16px!important}
+  }
+</style>
+<style id="biweekly-product-20260822">
+  .bw-product {
+    display: grid;
+    grid-template-columns: minmax(220px, .34fr) minmax(0, 1fr);
+    margin: 0 0 22px;
+    border-top: 1px solid var(--v2-line);
+    border-bottom: 1px solid var(--v2-line);
+  }
+  .bw-product:empty { display: none; }
+  .bw-product-release {
+    padding: 18px 20px;
+    border-right: 1px solid var(--v2-line);
+  }
+  .bw-product-release span {
+    display: block;
+    color: var(--v2-dim);
+    font: 700 10px var(--mono);
+    letter-spacing: 1.4px;
+    text-transform: uppercase;
+  }
+  .bw-product-release strong {
+    display: block;
+    margin: 9px 0 7px;
+    color: var(--v2-accent);
+    font: 800 30px/1 var(--sans);
+  }
+  .bw-product-release small {
+    color: var(--v2-muted);
+    font: 700 11px var(--mono);
+  }
+  .bw-product-items {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .bw-product-items > div {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 10px;
+    align-items: start;
+    padding: 18px;
+    border-right: 1px solid var(--v2-line);
+  }
+  .bw-product-items > div:last-child { border-right: 0; }
+  .bw-product-items span {
+    color: var(--v2-accent);
+    font: 700 10px var(--mono);
+    letter-spacing: 1px;
+  }
+  .bw-product-items b {
+    color: var(--v2-text);
+    font-size: 14px;
+    line-height: 1.35;
+  }
+  @media (max-width: 900px) {
+    .bw-product { grid-template-columns: 1fr; }
+    .bw-product-release {
+      border-right: 0;
+      border-bottom: 1px solid var(--v2-line);
+    }
+  }
+  @media (max-width: 650px) {
+    .bw-product-items { grid-template-columns: 1fr; }
+    .bw-product-items > div {
+      border-right: 0;
+      border-bottom: 1px solid var(--v2-line);
+    }
+    .bw-product-items > div:last-child { border-bottom: 0; }
+  }
+</style>
 </head>
 <body>
 <div class="tipbar" id="tipbar" hidden>
@@ -7979,7 +8185,7 @@ body.theme-light .valuation-report #valScatter .val-var-label{
   <div class="cap">A clean read of the official Variational roadmap: what has shipped, where the project is on the path, and what gates are still ahead.</div>
   <div class="road-journey">
     <div class="road-path" aria-label="Roadmap path">
-      <div class="road-stop-grid">
+      <div class="road-stop-grid" id="roadStopGrid">
         <div class="road-stop">
           <span class="road-dot">✓</span>
           <b>Q1 2025</b>
@@ -8005,24 +8211,24 @@ body.theme-light .valuation-report #valScatter .val-var-label{
           <b>Undated · shipped</b>
           <span>Read-only API · mobile · CSV · RWA P1</span>
         </div>
-        <div class="road-stop pending">
-          <span class="road-dot">1</span>
+        <div class="road-stop">
+          <span class="road-dot">✓</span>
           <b>2026 · Omni v3</b>
-          <span>UI rework ✓ · isolated margin next</span>
+          <span>UI rework ✓ · isolated margin ✓</span>
         </div>
         <div class="road-stop pending">
-          <span class="road-dot">2</span>
+          <span class="road-dot">1</span>
           <b>2026 · Swaps &amp; APIs</b>
           <span>Swaps P2–P3 · partial fills · API trading · stats</span>
         </div>
         <div class="road-stop pending">
-          <span class="road-dot">3</span>
+          <span class="road-dot">2</span>
           <b>2026 · Launch era</b>
           <span>Public mainnet · $VAR · OLP vault · Pro</span>
         </div>
       </div>
     </div>
-    <div class="road-years">
+    <div class="road-years" id="roadYears">
       <div class="ry-col">
         <div class="ry-head"><b>2025</b><span>14/14 dated shipped<br>+5 undated ✓</span></div>
         <div class="ry-qgrid">
@@ -8058,10 +8264,10 @@ body.theme-light .valuation-report #valScatter .val-var-label{
         </div>
       </div>
       <div class="ry-col ahead">
-        <div class="ry-head"><b>2026</b><span>1/11 · the road ahead</span></div>
+        <div class="ry-head"><b>Living roadmap</b><span>7/16 complete · 9 left</span></div>
         <div class="ry-q"><h4>Undated backlog · docs order <i>slotted 2026</i></h4><ul>
           <li class="ok">Major UI rework ("Omni v3")</li>
-          <li>Isolated margin</li>
+          <li class="ok">Isolated margin</li>
           <li>Launch swaps ("Phase 2")</li>
           <li>Partial fills of limit orders</li>
           <li>Enable API trading</li>
@@ -8072,11 +8278,11 @@ body.theme-light .valuation-report #valScatter .val-var-label{
           <li>Open community vault for OLP</li>
           <li>Launch of Variational Pro</li>
         </ul></div>
-        <div class="ry-note">Major UI rework is marked complete. The remaining ten items are still undated; this board keeps them in the exact order listed by the docs.</div>
+        <div class="ry-note">Major UI rework and isolated margin are marked complete. The remaining nine items are still undated; this board keeps them in the exact order listed by the docs.</div>
       </div>
     </div>
     <div class="road-backlog">
-      <div class="road-source">Source: <a href="https://docs.variational.io/roadmap" target="_blank" rel="noopener">Variational Docs Roadmap</a>. The docs describe this as a living roadmap, not a fixed promised timeline.</div>
+      <div class="road-source" id="roadSource">Embedded snapshot · <a href="https://docs.variational.io/getting-started/roadmap" target="_blank" rel="noopener">Variational Docs Roadmap</a>. Checking the official living roadmap…</div>
     </div>
   </div>
 </div>
@@ -8285,6 +8491,10 @@ body.theme-light .valuation-report #valScatter .val-var-label{
           </div>
         </div>
         <div class="hist-row" id="histMonths"></div>
+        <div class="cal-metric-key" aria-label="Calendar metric definitions">
+          <span><i class="measured"></i><b>Treasury inflow</b> measured from the on-chain wallet</span>
+          <span><i class="modeled"></i><b>Gross spreads*</b> implied from the official report share</span>
+        </div>
         <div class="cal-scroll">
           <div class="cal-months" id="calMonths"></div>
           <div class="cal-weekdays"><span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span></div>
@@ -8424,6 +8634,7 @@ body.theme-light .valuation-report #valScatter .val-var-label{
       <div class="bw-lane"><span class="n">1</span><div><b>Official report</b><span>Metrics copied from Variational's biweekly X post. New posts are appended, never overwritten. <a href="https://x.com/search?q=from%3Avariational_io%20biweekly%20update!&src=typed_query" target="_blank" rel="noopener">Open official post search</a></span></div></div>
       <div class="bw-lane"><span class="n">2</span><div><b>On-chain check</b><span>Six consecutive 14-day treasury inflow windows calculated from the Arbitrum USDC balance history. This updates without waiting for a post.</span></div></div>
     </div>
+    <section class="bw-product" id="bwProduct" aria-label="Latest product update"></section>
     <section class="bw-command">
       <div class="bw-command-read">
         <div class="bw-head first"><b>Latest Report Verdict</b><span>growth and momentum at a glance</span></div>
@@ -8438,6 +8649,14 @@ body.theme-light .valuation-report #valScatter .val-var-label{
     </section>
     <div class="bw-head bw-priority-head"><b>Eight Numbers That Tell the Story</b><span>current value · change since first comparable report · change vs previous report</span></div>
     <div class="bw-deltas" id="bwDeltas"></div>
+    <section class="bw-research" aria-labelledby="bwResearchTitle">
+      <div class="bw-head bw-research-head"><b id="bwResearchTitle">Full Research Atlas</b><span>18 original views from the 20-report analysis, updated with every new disclosure</span></div>
+      <div class="bw-research-intro">
+        <p><strong>Growth is real. Cost quality is the open question.</strong> These views reconstruct every chart and infographic from the full research article using the stored official reports.</p>
+        <a href="https://x.com/0xdefidaniel/status/2087186925476262362" target="_blank" rel="noopener">Read the original analysis ↗</a>
+      </div>
+      <div class="bw-research-grid" id="bwResearchGrid"></div>
+    </section>
     <div class="bw-head"><b>Real Cash Added Every 14 Days</b><span>USDC entering the treasury wallet before the next report arrives</span></div>
     <div class="bw-trend" id="bwTrend"></div>
     <div class="bw-head bw-evidence-head"><b>Full Evidence Library</b><span>every published number, definition change, and original report date</span></div>
@@ -8723,8 +8942,41 @@ body.theme-light .valuation-report #valScatter .val-var-label{
 
 <section class="comparison-report tsec tg-hide" data-tg="comparison">
   <div class="cmp-heading">
-    <h2>Perp DEX Positioning</h2>
-    <p>Variational, Lighter, and Extended are compared on matched windows. Hyperliquid is shown separately as the market ceiling. Treasury inflow is measured from changes in the on-chain USDC wallet balance; implied gross spreads use allocation ratios observed in official biweekly reports. Non-revenue transfers and exact policy-change dates are not independently verified.</p>
+    <span class="cmp-eyebrow">MARKET DECISION ROOM</span>
+    <h2>Perp DEX Comparison</h2>
+    <p>Read the market in four layers: scale, activity, capital efficiency, and valuation. Metrics that do not share an accounting basis are deliberately separated.</p>
+  </div>
+
+  <nav class="cmp-command" aria-label="Jump to comparison layer">
+    <span>VIEW</span>
+    <button type="button" class="on" data-cmp-jump="cmpDecision">Decision</button>
+    <button type="button" data-cmp-jump="cmpDirect">Peer metrics</button>
+    <button type="button" data-cmp-jump="cmpEfficiency">Efficiency</button>
+    <button type="button" data-cmp-jump="cmpValuation">Valuation</button>
+    <div class="cmp-freshness"><i></i><span id="cmpFreshness">Syncing market and fee sources</span></div>
+  </nav>
+
+  <div class="cmp-signal-grid" id="cmpDecision" aria-label="Comparison decision signals">
+    <article class="cmp-signal scale">
+      <div class="cmp-signal-top"><span>01 · SCALE</span><em class="high">HIGH CONFIDENCE</em></div>
+      <strong id="cmpSignalScale">—</strong>
+      <p id="cmpSignalScaleSub">Calculating current OI position and market share.</p>
+    </article>
+    <article class="cmp-signal activity">
+      <div class="cmp-signal-top"><span>02 · ACTIVITY</span><em class="high">HIGH CONFIDENCE</em></div>
+      <strong id="cmpSignalActivity">—</strong>
+      <p id="cmpSignalActivitySub">Comparing volume generated per dollar of open interest.</p>
+    </article>
+    <article class="cmp-signal efficiency">
+      <div class="cmp-signal-top"><span>03 · EFFICIENCY</span><em class="medium">MODELED</em></div>
+      <strong id="cmpSignalEfficiency">—</strong>
+      <p id="cmpSignalEfficiencySub">Estimating trader-fee capture from matched 30-day windows.</p>
+    </article>
+    <article class="cmp-signal valuation">
+      <div class="cmp-signal-top"><span>04 · VALUATION</span><em class="medium">MODEL</em></div>
+      <strong id="cmpSignalValuation">—</strong>
+      <p id="cmpSignalValuationSub">Mapping current OI to an implied circulating market cap.</p>
+    </article>
   </div>
 
   <div class="cmp-summary">
@@ -8748,7 +9000,7 @@ body.theme-light .valuation-report #valScatter .val-var-label{
     <div><strong id="kingRev">-</strong><span>30D revenue</span></div>
   </div>
 
-  <section class="cmp-direct">
+  <section class="cmp-direct" id="cmpDirect">
     <div class="cmp-section-head">
       <h3>Variational vs Lighter vs Extended</h3>
       <p>OI and volume use matched windows. Fee pools and monetization signals retain their source labels because the accounting definitions differ by venue.</p>
@@ -8773,6 +9025,19 @@ body.theme-light .valuation-report #valScatter .val-var-label{
     </div>
   </section>
 
+  <section class="cmp-efficiency" id="cmpEfficiency">
+    <div class="cmp-section-head split">
+      <div><span class="cmp-eyebrow">NORMALIZED COMPARISON</span><h3>Capital Efficiency</h3></div>
+      <p>Absolute size can hide operating quality. These ratios put every venue on the same unit basis; modeled values remain marked.</p>
+    </div>
+    <div class="cmp-eff-table" id="cmpEfficiencyTable" role="table" aria-label="Capital efficiency comparison"></div>
+    <div class="cmp-basis-strip">
+      <span><i class="live"></i><b>Comparable</b> OI and volume use the same market snapshot.</span>
+      <span><i class="model"></i><b>Modeled</b> Variational fee pool is inferred from treasury allocation.</span>
+      <span><i class="blocked"></i><b>Do not compare</b> wallet inflow is not booked protocol revenue.</span>
+    </div>
+  </section>
+
   <section class="cmp-leaderboard">
     <div class="cmp-leaderboard-head">
       <div>
@@ -8787,7 +9052,7 @@ body.theme-light .valuation-report #valScatter .val-var-label{
 
 </section>
 
-<section class="valmodel valuation-report tsec tg-hide" data-tg="comparison">
+<section class="valmodel valuation-report tsec tg-hide" data-tg="comparison" id="cmpValuation">
   <div class="cmp-heading">
     <h2>Implied Valuation</h2>
     <p>The model estimates circulating market cap from open interest. Premium or discount means actual token MCAP versus this statistical model, not versus FDV.</p>
@@ -8815,6 +9080,14 @@ body.theme-light .valuation-report #valScatter .val-var-label{
     </div>
     <div class="val-side" id="valSide"></div>
   </div>
+  <section class="val-scenarios" aria-label="Valuation scenario matrix">
+    <div class="cmp-section-head split">
+      <div><span class="cmp-eyebrow">WHAT MUST BE TRUE?</span><h3>Float × Model Scenario</h3></div>
+      <p>FDV changes mechanically with circulating float. Columns apply a conservative, base, and expansion case around the model-implied market cap.</p>
+    </div>
+    <div class="val-scenario-table" id="valScenarioTable"></div>
+    <p class="val-scenario-note" id="valScenarioNote">Scenario values are model outputs, not price targets.</p>
+  </section>
   <details class="val-method"><summary>Model, sources, and limitations</summary><div class="val-note" id="valNote"></div></details>
 </section>
 
@@ -8884,6 +9157,44 @@ body.theme-light .valuation-report #valScatter .val-var-label{
   .bw-deltas .d .bw-mini{height:38px;margin-top:auto;padding-top:8px}
   .bw-evidence-head{margin-top:34px;padding:18px 16px;border:1px solid var(--line);background:color-mix(in srgb,var(--panel) 72%,transparent)}
   .bw-evidence-head b{font-size:16px;color:var(--cyan)}
+  .bw-research{margin:34px 0 30px;padding-top:22px;border-top:1px solid var(--line)}
+  .bw-research-head{margin-bottom:10px}
+  .bw-research-head b{font-size:18px;color:var(--cyan)}
+  .bw-research-intro{display:flex;align-items:end;justify-content:space-between;gap:24px;margin-bottom:18px;padding:14px 0;border-bottom:1px solid var(--line)}
+  .bw-research-intro p{max-width:820px;margin:0;color:var(--muted);font-size:13px;line-height:1.65}
+  .bw-research-intro strong{color:var(--text)}
+  .bw-research-intro a{flex:none;color:var(--cyan);font:700 11px var(--mono);text-decoration:none}
+  .bw-research-grid{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:12px}
+  .bw-viz{grid-column:span 6;min-width:0;padding:16px;border:1px solid var(--line);background:color-mix(in srgb,var(--panel) 88%,transparent)}
+  .bw-viz.wide{grid-column:1/-1}
+  .bw-viz-kicker{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:5px;color:var(--muted);font:700 9px var(--mono);letter-spacing:.9px;text-transform:uppercase}
+  .bw-viz-kicker span:first-child{color:var(--cyan)}
+  .bw-viz h3{margin:0;color:var(--text);font:800 15px/1.3 var(--sans)}
+  .bw-viz-sub{min-height:34px;margin:5px 0 10px;color:var(--muted);font-size:11px;line-height:1.5}
+  .bw-viz svg{display:block;width:100%;height:auto;overflow:visible}
+  .bw-viz .grid{stroke:var(--line);stroke-width:1}
+  .bw-viz .axis{fill:var(--muted);font:9px var(--mono)}
+  .bw-viz .value{fill:var(--text);font:700 9px var(--mono)}
+  .bw-viz .series-a{stroke:var(--cyan);fill:none;stroke-width:2.5;vector-effect:non-scaling-stroke}
+  .bw-viz .series-b{stroke:var(--amber);fill:none;stroke-width:2.5;vector-effect:non-scaling-stroke}
+  .bw-viz .series-c{stroke:var(--grn);fill:none;stroke-width:2.5;vector-effect:non-scaling-stroke}
+  .bw-viz .series-d{stroke:var(--red);fill:none;stroke-width:2.5;vector-effect:non-scaling-stroke}
+  .bw-viz .dot-a{fill:var(--cyan)}.bw-viz .dot-b{fill:var(--amber)}.bw-viz .dot-c{fill:var(--grn)}.bw-viz .dot-d{fill:var(--red)}
+  .bw-viz-legend{display:flex;flex-wrap:wrap;gap:12px;margin:0 0 8px;color:var(--muted);font:9px var(--mono)}
+  .bw-viz-legend i{display:inline-block;width:15px;height:2px;margin-right:5px;vertical-align:middle;background:var(--cyan)}
+  .bw-viz-legend .b{background:var(--amber)}.bw-viz-legend .c{background:var(--grn)}.bw-viz-legend .d{background:var(--red)}
+  .bw-viz-note{margin-top:10px;padding-top:9px;border-top:1px solid var(--line);color:var(--muted);font-size:10px;line-height:1.55}
+  .bw-viz-note b{color:var(--text)}
+  .bw-watch{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:stretch;margin-top:10px}
+  .bw-watch>div{padding:12px;border:1px solid var(--line);text-align:center}
+  .bw-watch .source{grid-column:1/-1;color:var(--text);font:700 12px var(--mono)}
+  .bw-watch .good{border-color:color-mix(in srgb,var(--grn) 45%,var(--line));background:color-mix(in srgb,var(--grn) 10%,transparent)}
+  .bw-watch .risk{border-color:color-mix(in srgb,var(--red) 45%,var(--line));background:color-mix(in srgb,var(--red) 10%,transparent)}
+  .bw-watch .arrow{display:flex;align-items:center;border:0;color:var(--muted)}
+  .bw-watch b,.bw-watch span{display:block}.bw-watch span{margin-top:4px;color:var(--muted);font-size:10px;line-height:1.4}
+  .bw-formula{display:grid;grid-template-columns:1fr auto 1fr;gap:12px;align-items:center;margin:10px 0 14px}
+  .bw-formula>div{padding:14px;border:1px solid var(--line);text-align:center}.bw-formula b{display:block;font-size:15px}.bw-formula span{color:var(--muted);font-size:10px}
+  .bw-formula .oi{border-color:color-mix(in srgb,var(--cyan) 42%,var(--line))}.bw-formula .tvl{border-color:color-mix(in srgb,var(--grn) 42%,var(--line))}
   @media(max-width:900px){
     .bw-command{grid-template-columns:1fr}
     .bw-command-money{padding-left:0!important;border-left:0;border-top:1px solid var(--line)}
@@ -8893,9 +9204,66 @@ body.theme-light .valuation-report #valScatter .val-var-label{
     .bw-command .bw-pnl .step{border-bottom:1px solid var(--line)}
     .bw-command .bw-pnl .step+ .step{border-left:0;padding-left:0}
     .bw-command .bw-pnl .step:nth-child(even){padding-left:14px;border-left:1px solid var(--line)}
+    .bw-research-intro{display:block}.bw-research-intro a{display:inline-block;margin-top:10px}
+    .bw-viz,.bw-viz.wide{grid-column:1/-1;padding:13px}
+    .bw-viz-sub{min-height:0}
   }
 </style>
-<script src="dashboard.js?v=20260809-daily-period" defer></script>
+<style id="comparison-decision-room">
+  .cmp-eyebrow{display:block;margin-bottom:8px;color:var(--cyan);font:800 10px/1 var(--mono);letter-spacing:1.5px}
+  .cmp-command{position:sticky;top:66px;z-index:12;display:flex;align-items:center;gap:4px;margin:0 0 18px;padding:8px;border:1px solid var(--line);background:color-mix(in srgb,var(--bg) 91%,transparent);backdrop-filter:blur(16px)}
+  .cmp-command>span{padding:0 9px;color:var(--dim);font:800 9px var(--mono);letter-spacing:1.2px}
+  .cmp-command button{appearance:none;padding:8px 11px;border:1px solid transparent;border-radius:5px;background:transparent;color:var(--sub);font:750 11px var(--sans);cursor:pointer;white-space:nowrap}
+  .cmp-command button:hover{color:var(--ink);border-color:var(--line)}
+  .cmp-command button:active{transform:translateY(1px)}
+  .cmp-command button.on{color:var(--bg);background:var(--grn)}
+  .cmp-freshness{display:flex;align-items:center;gap:7px;margin-left:auto;padding:0 8px;color:var(--dim);font:10px var(--mono)}
+  .cmp-freshness i{width:6px;height:6px;border-radius:50%;background:var(--grn);box-shadow:0 0 0 4px color-mix(in srgb,var(--grn) 12%,transparent)}
+  .cmp-signal-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));margin-bottom:20px;border-block:1px solid var(--line)}
+  .cmp-signal{min-width:0;min-height:176px;padding:17px 16px 15px;border-left:1px solid var(--line)}
+  .cmp-signal:first-child{border-left:0}
+  .cmp-signal-top{display:flex;align-items:center;justify-content:space-between;gap:8px}
+  .cmp-signal-top span{color:var(--cyan);font:850 9px var(--mono);letter-spacing:1px}
+  .cmp-signal-top em{padding:3px 5px;border:1px solid var(--line);border-radius:3px;color:var(--dim);font:800 7px var(--mono);font-style:normal;letter-spacing:.6px}
+  .cmp-signal-top em.high{color:var(--grn);border-color:color-mix(in srgb,var(--grn) 38%,var(--line))}
+  .cmp-signal-top em.medium{color:var(--amber);border-color:color-mix(in srgb,var(--amber) 38%,var(--line))}
+  .cmp-signal>strong{display:block;margin-top:25px;color:var(--ink);font:770 clamp(25px,2.3vw,38px)/1 var(--sans);letter-spacing:-1.4px;font-variant-numeric:tabular-nums}
+  .cmp-signal.scale>strong{color:var(--grn)}
+  .cmp-signal p{margin-top:11px;color:var(--sub);font:11.5px/1.5 var(--sans)}
+  .cmp-section-head.split{display:flex;align-items:flex-end;justify-content:space-between;gap:24px}
+  .cmp-section-head.split p{max-width:590px;text-align:right}
+  .cmp-efficiency{margin-top:24px;padding-top:22px;border-top:1px solid var(--line);scroll-margin-top:130px}
+  .cmp-direct,.cmp-leaderboard,.valuation-report{scroll-margin-top:130px}
+  .cmp-eff-table{margin-top:14px;border-top:1px solid var(--line);border-left:1px solid var(--line)}
+  .cmp-eff-row{display:grid;grid-template-columns:minmax(190px,1.15fr) repeat(3,minmax(130px,1fr)) minmax(190px,1.15fr)}
+  .cmp-eff-row>div{min-width:0;padding:12px 14px;border-right:1px solid var(--line);border-bottom:1px solid var(--line)}
+  .cmp-eff-row.head>div{padding-block:9px;background:color-mix(in srgb,var(--panel) 74%,transparent);color:var(--dim);font:800 9px var(--mono);letter-spacing:.8px;text-transform:uppercase}
+  .cmp-eff-row:not(.head)>div:first-child b{display:block;color:var(--ink);font:750 12px var(--sans)}
+  .cmp-eff-row:not(.head)>div:first-child small{display:block;margin-top:4px;color:var(--dim);font:9px/1.35 var(--mono)}
+  .cmp-eff-value{text-align:right}
+  .cmp-eff-value strong{display:block;color:var(--ink);font:760 16px var(--sans);font-variant-numeric:tabular-nums}
+  .cmp-eff-value small{display:block;margin-top:4px;color:var(--dim);font:9px var(--mono)}
+  .cmp-eff-value.best strong{color:var(--grn)}
+  .cmp-eff-read{color:var(--sub);font:11px/1.45 var(--sans)}
+  .cmp-basis-strip{display:flex;flex-wrap:wrap;gap:10px 22px;padding:12px 0;color:var(--dim);font:10px/1.5 var(--sans)}
+  .cmp-basis-strip span{display:flex;align-items:center;gap:6px}.cmp-basis-strip b{color:var(--sub)}
+  .cmp-basis-strip i{width:7px;height:7px;border-radius:50%}.cmp-basis-strip i.live{background:var(--grn)}.cmp-basis-strip i.model{background:var(--amber)}.cmp-basis-strip i.blocked{background:var(--red)}
+  .val-scenarios{margin-top:26px;padding-top:22px;border-top:1px solid var(--line)}
+  .val-scenario-table{margin-top:14px;border:1px solid var(--line)}
+  .val-scenario-row{display:grid;grid-template-columns:minmax(140px,.7fr) repeat(3,minmax(150px,1fr))}
+  .val-scenario-row>div{padding:13px 15px;border-left:1px solid var(--line);border-top:1px solid var(--line)}
+  .val-scenario-row>div:first-child{border-left:0}.val-scenario-row:first-child>div{border-top:0}
+  .val-scenario-row.head>div{background:color-mix(in srgb,var(--panel) 74%,transparent);color:var(--dim);font:800 9px var(--mono);letter-spacing:.8px;text-transform:uppercase}
+  .val-scenario-row:not(.head)>div:first-child b{display:block;color:var(--ink);font:750 13px var(--sans)}
+  .val-scenario-row:not(.head)>div:first-child small{display:block;margin-top:4px;color:var(--dim);font:9px var(--mono)}
+  .val-scenario-cell{text-align:right}.val-scenario-cell strong{display:block;color:var(--ink);font:760 18px var(--sans);font-variant-numeric:tabular-nums}.val-scenario-cell small{display:block;margin-top:4px;color:var(--dim);font:9px var(--mono)}
+  .val-scenario-cell.base{background:color-mix(in srgb,var(--grn) 5%,transparent)}.val-scenario-cell.base strong{color:var(--grn)}
+  .val-scenario-note{margin-top:10px;color:var(--dim);font:10px/1.5 var(--mono)}
+  body.theme-light .cmp-command{background:rgba(247,251,255,.93)}
+  @media(max-width:1050px){.cmp-signal-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.cmp-signal:nth-child(3){border-left:0;border-top:1px solid var(--line)}.cmp-signal:nth-child(4){border-top:1px solid var(--line)}.cmp-eff-table{overflow-x:auto}.cmp-eff-row{min-width:900px}}
+  @media(max-width:700px){.cmp-command{top:54px;overflow-x:auto}.cmp-command>span,.cmp-freshness{display:none}.cmp-signal-grid{grid-template-columns:1fr}.cmp-signal{min-height:0;border-left:0!important;border-top:1px solid var(--line)}.cmp-signal:first-child{border-top:0}.cmp-signal>strong{margin-top:17px}.cmp-section-head.split{display:block}.cmp-section-head.split p{text-align:left}.val-scenario-table{overflow-x:auto}.val-scenario-row{min-width:650px}}
+</style>
+<script src="dashboard.js?v=20260822-comparison-room" defer></script>
 <script src="app-inline.js?v=20260809-theme-toggle" defer></script>
 </body>
 </html>
