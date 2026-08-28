@@ -3262,6 +3262,12 @@
   .cmp-rank-current{flex:none;min-width:210px;padding:11px 14px;border:1px solid rgba(34,230,160,.32);border-radius:7px;background:rgba(34,230,160,.045);text-align:right}
   .cmp-rank-current span{display:block;font:800 8.5px/1 var(--mono);letter-spacing:1.2px;text-transform:uppercase;color:var(--grn)}
   .cmp-rank-current strong{display:block;margin-top:6px;font:760 18px/1.1 var(--sans);color:var(--ink)}
+
+  /* mixed-basis marker: shown when a live figure sits in a snapshot denominator */
+  .cmp-basis-chip{display:inline-flex;align-items:center;margin-left:8px;padding:2px 8px;border-radius:999px;
+    border:1px solid var(--red);color:var(--red);font:700 9.5px/1.5 var(--mono,monospace);letter-spacing:.8px}
+  .cmp-basis-chip.inline{vertical-align:middle;margin-left:10px}
+  .cmp-signal-top em.mixed{color:var(--red);border-color:var(--red)}
   .cmp-rank-toolbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 12px;border:1px solid var(--line);border-bottom:0;border-radius:7px 7px 0 0;background:var(--panel);font:11px/1.4 var(--sans);color:var(--sub)}
   .cmp-rank-toolbar a{margin-left:auto;color:var(--cyan)}
   .cmp-leaderboard .pulse-table-wrap{margin:0;border-color:var(--line);border-radius:0 0 7px 7px;overflow-x:auto;background:rgba(3,10,18,.5)}
@@ -7770,6 +7776,80 @@ body.theme-light .valuation-report #valScatter .val-var-label{
     .bw-product-items > div:last-child { border-bottom: 0; }
   }
 </style>
+<style id="responsive-device-system">
+  /* Device-wide interaction and viewport contract. */
+  html{min-width:320px;scroll-padding-top:calc(76px + env(safe-area-inset-top));-webkit-text-size-adjust:100%;text-size-adjust:100%}
+  body{min-width:320px;overflow-x:hidden;overscroll-behavior-y:none}
+  button,a,input,select,textarea{touch-action:manipulation}
+  button,a{-webkit-tap-highlight-color:transparent}
+  :focus-visible{outline:2px solid var(--v2-accent,#4c9af8);outline-offset:3px}
+  .dashboard-shell,.dashboard-shell *{min-inline-size:0}
+  img,svg,canvas{max-inline-size:100%}
+
+  /* Large phones and tablets: preserve density without forcing desktop geometry. */
+  @media(max-width:1100px){
+    button,[role="button"],.srv2-land-utility a{min-height:44px!important}
+    body.v2-dashboard #main{padding-left:max(18px,env(safe-area-inset-left))!important;padding-right:max(18px,env(safe-area-inset-right))!important}
+    .srv2-global-nav,.srv2-rail{padding-left:max(10px,env(safe-area-inset-left))!important;padding-right:max(10px,env(safe-area-inset-right))!important;scroll-snap-type:x proximity}
+    .srv2-global-nav button,.srv2-rail button{scroll-snap-align:start;min-height:44px!important}
+    .srv2-global-top{padding-left:max(18px,env(safe-area-inset-left))!important;padding-right:max(18px,env(safe-area-inset-right))!important}
+  }
+
+  @media(max-width:850px){
+    body.v2-landing{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}
+    body.v2-landing .srv2-landing{min-height:100dvh!important}
+    .srv2-land-head{height:66px;padding-left:max(18px,env(safe-area-inset-left));padding-right:max(18px,env(safe-area-inset-right))}
+    .srv2-land-head>small,.srv2-land-live{display:none}
+    .srv2-land-brand img{width:32px;height:32px}
+    .srv2-land-main,.srv2-land-proof{padding-left:max(20px,env(safe-area-inset-left))!important;padding-right:max(20px,env(safe-area-inset-right))!important}
+    .srv2-land-routes{grid-template-columns:1fr!important}
+    .srv2-land-routes button{min-height:72px;text-align:left}
+    .srv2-land-utility{grid-template-columns:1fr!important}
+    .srv2-land-utility>*{min-height:48px}
+    .srv2-land-foot div{padding-left:max(20px,env(safe-area-inset-left));padding-right:max(20px,env(safe-area-inset-right))}
+  }
+
+  /* iPhone-class widths, including compact and Pro Max layouts. */
+  @media(max-width:650px){
+    html{scroll-padding-top:calc(54px + env(safe-area-inset-top))}
+    .srv2-rail{top:env(safe-area-inset-top)!important;padding-top:8px!important}
+    .srv2-rail button{min-height:44px!important;padding-inline:13px!important}
+    .srv2-top{min-height:58px;padding-left:max(16px,env(safe-area-inset-left))!important;padding-right:max(16px,env(safe-area-inset-right))!important}
+    .srv2-canvas,.srv2-brief{padding-left:max(16px,env(safe-area-inset-left))!important;padding-right:max(16px,env(safe-area-inset-right))!important}
+    .srv2-balance{font-size:clamp(46px,15vw,64px)!important;line-height:.92;letter-spacing:-1.8px}
+    .srv2-strip,.srv2-window-grid,.srv2-market-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+    .srv2-strip>div,.srv2-window-grid article,.srv2-market-grid article{padding:15px 10px!important}
+    .srv2-strip b,.srv2-window-grid article strong,.srv2-market-grid article strong{font-size:clamp(17px,5vw,22px)!important;overflow-wrap:anywhere}
+    .srv2-intel-head{display:block}.srv2-intel-head p{margin-top:10px}
+    .srv2-market-chart{min-height:260px}.srv2-market-chart #marketActivityChart{height:250px!important}
+    .seg button,.zoom-controls button,.eff-window-tabs button,.tabs button{min-height:44px}
+    input,select,textarea{font-size:16px!important}
+    .srv2-land-main{gap:24px!important}
+    .srv2-land-hero>.srv2-land-total{font-size:clamp(46px,17vw,68px)!important;line-height:.94;letter-spacing:-2px}
+    .srv2-land-hero>p{font-size:14px!important;line-height:1.55;max-width:38ch}
+    .srv2-land-chart{height:150px!important}
+    .srv2-land-ops .srv2-strip,.srv2-land-ops .srv2-window-grid,.srv2-land-ops .srv2-market-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+    .srv2-workspace-list button{min-height:56px;padding:9px 4px;grid-template-columns:30px minmax(0,1fr) 48px}
+    .srv2-workspace-list button small{display:none}
+  }
+
+  /* Narrowest supported devices: keep money figures readable and controls reachable. */
+  @media(max-width:374px){
+    .srv2-land-brand{gap:9px}.srv2-land-brand>div>span{font-size:15px}.srv2-land-head small{font-size:8px}
+    .theme-toggle-liquid{transform:scale(.9);transform-origin:right center}
+    .srv2-land-main,.srv2-land-proof{padding-left:16px!important;padding-right:16px!important}
+    .srv2-land-hero>.srv2-land-total,.srv2-balance{font-size:46px!important;letter-spacing:-1.5px}
+    .srv2-strip b,.srv2-window-grid article strong,.srv2-market-grid article strong{font-size:16px!important;letter-spacing:-.3px}
+    .srv2-strip span,.srv2-window-grid article span,.srv2-market-grid article span{font-size:9px!important;letter-spacing:.65px}
+    .srv2-land-utility .direct-ref-open{display:none}
+  }
+
+  @media(pointer:coarse){
+    button,a,[role="button"]{min-height:44px}
+    .srv2-workspace-list button,.srv2-land-routes button{cursor:default}
+  }
+  @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto!important}}
+</style>
 </head>
 <body>
 <div class="tipbar" id="tipbar" hidden>
@@ -7862,6 +7942,8 @@ body.theme-light .valuation-report #valScatter .val-var-label{
     <button id="tab-roadmap" type="button" role="tab" aria-selected="false" data-tab="roadmap">Roadmap</button>
     <button id="tab-points" type="button" role="tab" aria-selected="false" data-tab="points">Points</button>
     <button id="tab-comparison" type="button" role="tab" aria-selected="false" data-tab="comparison">Comparison</button>
+    <button id="tab-pretge" type="button" role="tab" aria-selected="false" data-tab="pretge">Pre-TGE Comparison</button>
+    <button id="tab-tradfi" type="button" role="tab" aria-selected="false" data-tab="tradfi">TradFi</button>
   </nav>
 </div>
 
@@ -7871,11 +7953,13 @@ body.theme-light .valuation-report #valScatter .val-var-label{
   <button type="button" data-open-tab="daily-news" aria-label="02 Daily Earnings"><span>02</span><strong>Daily Earnings</strong></button>
   <button type="button" data-open-tab="efficiency" aria-label="03 Fundamentals"><span>03</span><strong>Fundamentals</strong></button>
   <button type="button" data-open-tab="comparison" aria-label="04 Comparison"><span>04</span><strong>Comparison</strong></button>
-  <button type="button" data-open-tab="historical" aria-label="05 Historical Data"><span>05</span><strong>Historical Data</strong></button>
-  <button type="button" data-open-tab="biweekly" aria-label="06 Official Reports"><span>06</span><strong>Official Reports</strong></button>
-  <button type="button" data-open-tab="implied" aria-label="07 Money Mechanic"><span>07</span><strong>Money Mechanic</strong></button>
-  <button type="button" data-open-tab="roadmap" aria-label="08 Roadmap"><span>08</span><strong>Roadmap</strong></button>
-  <button type="button" data-open-tab="points" aria-label="09 Points Calculator"><span>09</span><strong>Points Calculator</strong></button>
+  <button type="button" data-open-tab="pretge" aria-label="05 Pre-TGE Comparison"><span>05</span><strong>Pre-TGE</strong></button>
+  <button type="button" data-open-tab="tradfi" aria-label="06 TradFi"><span>06</span><strong>TradFi</strong></button>
+  <button type="button" data-open-tab="historical" aria-label="07 Historical Data"><span>07</span><strong>Historical Data</strong></button>
+  <button type="button" data-open-tab="biweekly" aria-label="08 Official Reports"><span>08</span><strong>Official Reports</strong></button>
+  <button type="button" data-open-tab="implied" aria-label="09 Money Mechanic"><span>09</span><strong>Money Mechanic</strong></button>
+  <button type="button" data-open-tab="roadmap" aria-label="10 Roadmap"><span>10</span><strong>Roadmap</strong></button>
+  <button type="button" data-open-tab="points" aria-label="11 Points Calculator"><span>11</span><strong>Points Calculator</strong></button>
   <button type="button" class="srv2-home" data-back-home aria-label="Back to home"><span>‹</span><strong>Back to Home</strong></button>
   <small>SIGNAL ROOM 2.0</small>
 </aside>
@@ -7993,11 +8077,13 @@ body.theme-light .valuation-report #valScatter .val-var-label{
       <button type="button" data-open-tab="daily-news"><span>02</span><b>Daily Earnings</b><small>Latest completed ET day</small></button>
       <button type="button" data-open-tab="efficiency"><span>03</span><b>Fundamentals</b><small>Volume, OI, fees, and revenue</small></button>
       <button type="button" data-open-tab="comparison"><span>04</span><b>Comparison</b><small>Positioning and implied valuation</small></button>
-      <button type="button" data-open-tab="historical"><span>05</span><b>Historical Data</b><small>Accumulation and interval growth</small></button>
-      <button type="button" data-open-tab="biweekly"><span>06</span><b>Official Reports</b><small>Biweekly operating history</small></button>
-      <button type="button" data-open-tab="implied"><span>07</span><b>Money Mechanic</b><small>Verify every formula</small></button>
-      <button type="button" data-open-tab="roadmap"><span>08</span><b>Roadmap</b><small>Shipped and remaining work</small></button>
-      <button type="button" data-open-tab="points"><span>09</span><b>Points Calculator</b><small>FDV and TGE scenarios</small></button>
+      <button type="button" data-open-tab="pretge"><span>05</span><b>Pre-TGE Comparison</b><small>Lighter as the priced comparable</small></button>
+      <button type="button" data-open-tab="tradfi"><span>06</span><b>TradFi</b><small>The traditional book, from Variational’s own API</small></button>
+      <button type="button" data-open-tab="historical"><span>07</span><b>Historical Data</b><small>Accumulation and interval growth</small></button>
+      <button type="button" data-open-tab="biweekly"><span>08</span><b>Official Reports</b><small>Biweekly operating history</small></button>
+      <button type="button" data-open-tab="implied"><span>09</span><b>Money Mechanic</b><small>Verify every formula</small></button>
+      <button type="button" data-open-tab="roadmap"><span>10</span><b>Roadmap</b><small>Shipped and remaining work</small></button>
+      <button type="button" data-open-tab="points"><span>11</span><b>Points Calculator</b><small>FDV and TGE scenarios</small></button>
     </div>
   </aside>
   <footer class="srv2-land-foot">
@@ -8014,11 +8100,13 @@ body.theme-light .valuation-report #valScatter .val-var-label{
     <button type="button" data-open-tab="daily-news" title="Daily Earnings" aria-label="02 Daily Earnings"><span>02</span><strong>Daily Earnings</strong></button>
     <button type="button" data-open-tab="efficiency" title="Fundamentals" aria-label="03 Fundamentals"><span>03</span><strong>Fundamentals</strong></button>
     <button type="button" data-open-tab="comparison" title="Peer Comparison" aria-label="04 Peer Comparison"><span>04</span><strong>Comparison</strong></button>
-    <button type="button" data-open-tab="historical" title="Historical Data" aria-label="05 Historical Data"><span>05</span><strong>Historical Data</strong></button>
-    <button type="button" data-open-tab="biweekly" title="Official Reports" aria-label="06 Official Reports"><span>06</span><strong>Official Reports</strong></button>
-    <button type="button" data-open-tab="implied" title="Money Mechanic" aria-label="07 Money Mechanic"><span>07</span><strong>Money Mechanic</strong></button>
-    <button type="button" data-open-tab="roadmap" title="Roadmap" aria-label="08 Roadmap"><span>08</span><strong>Roadmap</strong></button>
-    <button type="button" data-open-tab="points" title="Points Calculator" aria-label="09 Points Calculator"><span>09</span><strong>Points Calculator</strong></button>
+    <button type="button" data-open-tab="pretge" title="Pre-TGE Comparison" aria-label="05 Pre-TGE Comparison"><span>05</span><strong>Pre-TGE</strong></button>
+    <button type="button" data-open-tab="tradfi" title="TradFi" aria-label="06 TradFi"><span>06</span><strong>TradFi</strong></button>
+    <button type="button" data-open-tab="historical" title="Historical Data" aria-label="07 Historical Data"><span>07</span><strong>Historical Data</strong></button>
+    <button type="button" data-open-tab="biweekly" title="Official Reports" aria-label="08 Official Reports"><span>08</span><strong>Official Reports</strong></button>
+    <button type="button" data-open-tab="implied" title="Money Mechanic" aria-label="09 Money Mechanic"><span>09</span><strong>Money Mechanic</strong></button>
+    <button type="button" data-open-tab="roadmap" title="Roadmap" aria-label="10 Roadmap"><span>10</span><strong>Roadmap</strong></button>
+    <button type="button" data-open-tab="points" title="Points Calculator" aria-label="11 Points Calculator"><span>11</span><strong>Points Calculator</strong></button>
     <button type="button" class="srv2-home" id="v2BackHome" title="Back to landing page" aria-label="Back to home"><span>‹</span><strong>Back to Home</strong></button>
     <small>SIGNAL ROOM 2.0</small>
   </nav>
@@ -8982,14 +9070,14 @@ body.theme-light .valuation-report #valScatter .val-var-label{
   <div class="cmp-summary">
     <div class="cmp-verdict">
       <span>Bottom line</span>
-      <h3 id="cmpVerdict">Compare activity first. Read monetization on its own basis.</h3>
+      <h3 id="cmpVerdict">Compare activity first. Read what each protocol keeps on its own basis.</h3>
       <p id="cmpVerdictSub">OI and volume are comparable market metrics. Variational wallet inflow and Lighter protocol revenue are different measurements, so this page does not declare a revenue winner from them.</p>
     </div>
     <div class="cmp-key-metrics">
       <div class="cmp-kpi"><span>Market rank</span><strong id="cmpRank">#-</strong><small id="cmpRankSub">loading market data</small></div>
       <div class="cmp-kpi var"><span>Open interest</span><strong id="valOiEdge">-</strong><small id="valOiEdgeSub">loading</small></div>
       <div class="cmp-kpi var"><span>30D fee pool</span><strong id="valFeeEdge">-</strong><small id="valFeeEdgeSub">loading</small></div>
-      <div class="cmp-kpi lighter"><span>30D monetization signals</span><strong id="cmpRevenueEdge">-</strong><small id="cmpRevenueEdgeSub">different definitions · shown side by side</small></div>
+      <div class="cmp-kpi lighter"><span>30D kept by protocol</span><strong id="cmpRevenueEdge">-</strong><small id="cmpRevenueEdgeSub">different definitions · shown side by side</small></div>
     </div>
   </div>
 
@@ -9003,7 +9091,7 @@ body.theme-light .valuation-report #valScatter .val-var-label{
   <section class="cmp-direct" id="cmpDirect">
     <div class="cmp-section-head">
       <h3>Variational vs Lighter vs Extended</h3>
-      <p>OI and volume use matched windows. Fee pools and monetization signals retain their source labels because the accounting definitions differ by venue.</p>
+      <p>OI and volume use matched windows. Fee pools and the amount each protocol keeps retain their source labels because the accounting definitions differ by venue.</p>
     </div>
     <div class="cmp-direct-grid">
       <div class="cmp-table-pane">
@@ -9091,6 +9179,296 @@ body.theme-light .valuation-report #valScatter .val-var-label{
   <details class="val-method"><summary>Model, sources, and limitations</summary><div class="val-note" id="valNote"></div></details>
 </section>
 
+<!-- tradfi:begin -->
+<section class="tradfi-report tsec tg-hide" data-tg="tradfi">
+  <div class="cmp-heading">
+    <span class="cmp-eyebrow">TRADITIONAL MARKETS</span>
+    <h2>The TradFi Book</h2>
+    <p>Both venues list traditional markets. The question is how much of each venue actually is one. Every figure here is measured the same way on both sides — taker long plus taker short, from each venue's own API — and cross-checked against the TradFi section Entropy publishes on arbdata.</p>
+  </div>
+
+  <nav class="cmp-command" data-tf-command aria-label="Jump to section">
+    <span>VIEW</span>
+    <button type="button" class="on" data-tf-jump="tfBook">The book</button>
+    <button type="button" data-tf-jump="tfInside">What is in it</button>
+    <button type="button" data-tf-jump="tfSide">Who takes the other side</button>
+    <button type="button" data-tf-jump="tfExec">What it costs</button>
+    <button type="button" data-tf-jump="tfLimits">Limits</button>
+    <div class="cmp-freshness"><i></i><span id="tfAsOf">Snapshot</span></div>
+  </nav>
+
+  <div class="cmp-signal-grid">
+    <article class="cmp-signal tf-sig-lead">
+      <div class="cmp-signal-top"><span>01 · HOW MUCH OF THE BOOK IS TRADITIONAL</span><em class="high">MEASURED</em></div>
+      <strong id="tfSig1">—</strong>
+      <span class="tf-sig-sub">Traditional share of open interest — Variational vs Lighter</span>
+      <p id="tfSig1Sub">Reading both books.</p>
+    </article>
+    <article class="cmp-signal">
+      <div class="cmp-signal-top"><span>02 · HOW MUCH OF THE FLOW</span><em class="high">MEASURED</em></div>
+      <strong id="tfSig2">—</strong>
+      <span class="tf-sig-sub">Traditional share of 24-hour volume — VAR vs LIT</span>
+      <p id="tfSig2Sub">Reading both tapes.</p>
+    </article>
+    <article class="cmp-signal">
+      <div class="cmp-signal-top"><span>03 · WHAT IS ACTUALLY LISTED</span><em class="high">MEASURED</em></div>
+      <strong id="tfSig3">—</strong>
+      <span class="tf-sig-sub">Traditional markets on Variational, of all markets listed</span>
+      <p id="tfSig3Sub">Counting the shelf.</p>
+    </article>
+    <article class="cmp-signal">
+      <div class="cmp-signal-top"><span>04 · WHO TAKES THE OTHER SIDE</span><em class="high">MEASURED</em></div>
+      <strong id="tfSig4">—</strong>
+      <span class="tf-sig-sub">Net long skew across the single-name equity book</span>
+      <p id="tfSig4Sub">Reading the imbalance.</p>
+    </article>
+  </div>
+
+  <section class="pt-block" id="tfBook">
+    <div class="cmp-section-head split">
+      <div><span class="cmp-eyebrow">01 · THE BOOK</span><h3>How much of each venue is traditional</h3></div>
+      <p>Two books on one dollar axis, each split into its traditional and its crypto half. Both are the gross basis — taker long plus taker short — which is what arbdata's own per-market rows sum to. Lighter is measured identically from its own API, across all its markets rather than the four visible in its top ten.</p>
+    </div>
+    <div class="tf-chart"><svg id="tfBookChart" role="img" aria-label="Open interest by venue, traditional and crypto halves, on one dollar scale"></svg></div>
+    <div class="tf-xcheck">
+      <span>CROSS-CHECK</span>
+      <p id="tfXcheck">Comparing the published figure with an independent classification.</p>
+    </div>
+  </section>
+
+  <section class="pt-block" id="tfInside">
+    <div class="cmp-section-head split">
+      <div><span class="cmp-eyebrow">02 · WHAT IS IN IT</span><h3>Metals, energy, index funds, single names</h3></div>
+      <p>"TradFi" on most venues means a gold market and an S&amp;P tracker. Here it is four distinct asset classes with real depth in each, including three pre-IPO markets that have no equivalent on any order-book venue.</p>
+    </div>
+    <div class="tf-classes" id="tfClasses"></div>
+    <div class="tf-table" id="tfTop"></div>
+    <p class="tf-note">Gold is the anchor — $61.1M of open interest, more than a quarter of the entire traditional book, and the single most traded market on the venue after Bitcoin and Ether. Entropy's cumulative view puts commodities at 56.1% of all TradFi volume ever traded here, equities at 28.4% and ETFs at 15.5%.</p>
+  </section>
+
+  <section class="pt-block" id="tfSide">
+    <div class="cmp-section-head split">
+      <div><span class="cmp-eyebrow">03 · WHO TAKES THE OTHER SIDE</span><h3>The demand is one-directional</h3></div>
+      <p>This is the part that decides whether a venue can carry traditional markets at all. Nobody shorts Alphabet on a perp DEX. The long side is crowded, the short side is thin, and something has to hold the difference.</p>
+    </div>
+    <div class="tf-chart"><svg id="tfSkewChart" role="img" aria-label="Long versus short open interest across the largest single-name equity markets"></svg></div>
+    <div class="tf-argue">
+      <div class="tf-argue-k">
+        <span>WHY IT MATTERS</span>
+        <p>An anonymous order book only makes a market where both sides show up. Where they do not — a single-name equity that everyone wants to own and nobody wants to short — there is no book to trade against, and the market either goes unlisted or sits empty.</p>
+        <p>Variational is bilateral: the OLP is the counterparty to every taker position, so it absorbs the imbalance directly onto its own balance sheet. That is why <b>73 single names</b> can be listed here and why the equity book runs at <b>+41.8% net long</b> without breaking.</p>
+        <p>It is also the honest cost of the model. That skew is real inventory risk carried by the pool, and it is the number to watch if this book keeps growing.</p>
+      </div>
+      <div class="tf-argue-s">
+        <div class="tf-stat">
+          <span>Traditional turnover vs crypto</span>
+          <strong id="tfTurn">—</strong>
+          <small>Volume per dollar of book, per day. Traditional positions turn over more slowly than crypto ones on the same venue — held rather than farmed — though the gap on any single day is modest.</small>
+        </div>
+        <div class="tf-stat">
+          <span>The one they are fading</span>
+          <strong>MSTR −70.8%</strong>
+          <small>Strategy Inc is the only large traditional market where the book is net short. Everything else on the shelf is a crowded long.</small>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="pt-block" id="tfExec">
+    <div class="cmp-section-head split">
+      <div><span class="cmp-eyebrow">04 · WHAT IT COSTS</span><h3>Execution, including the part that cuts against us</h3></div>
+      <p>Variational's API publishes a quoted base spread for every market. Lighter publishes an all-in cost for a $100K Bitcoin trade. These are not the same measurement and are shown separately for that reason — but anyone comparing the two venues will look at both, so both are here.</p>
+    </div>
+    <div class="tf-exec">
+      <div class="tf-exec-c">
+        <div class="tf-chart"><svg id="tfSpreadChart" role="img" aria-label="Quoted base spread by market, Variational"></svg></div>
+        <p class="tf-note">Crypto majors quote inside 1.3 bps. The traditional shelf sits between 2.6 and 5.3 — wider, which is what a market with one-sided demand and an inventory-carrying counterparty should cost.</p>
+      </div>
+      <div class="tf-exec-c">
+        <div class="tf-k">Cost to trade $100K of BTC · Lighter's published grid</div>
+        <div id="tfCostGrid"></div>
+        <p class="tf-note"><b>Lighter is genuinely cheap and it is their number, not ours</b> — 1.1 bps all-in against Hyperliquid's 5.1. Variational's quoted base spread on Bitcoin is 1.08 bps, which lands in the same band, but a quoted spread is not slippage at size. Read it as parity not yet disproved, not as a win. Read 2026-08-27 from app.lighter.xyz/stats.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="pt-block" id="tfLimits">
+    <div class="cmp-section-head split">
+      <div><span class="cmp-eyebrow">05 · READ THIS FIRST</span><h3>What these numbers cannot carry</h3></div>
+      <p>Stated before anyone else states it.</p>
+    </div>
+    <ol class="pt-limits">
+      <li><b>The basis is gross, not the headline.</b> Every open-interest figure here is taker long plus taker short. Variational's own headline number is twice this because it also counts the OLP's mirror of every position. Lighter is measured the same gross way, so the comparison holds — but do not set these figures next to a headline from either venue without saying which basis you are on.</li>
+      <li><b>The classification is ours.</b> All 545 listings were sorted into traditional and crypto by ticker and instrument name, not by a category either venue reports. It lands within half a point of the figure Entropy publishes, which is reassuring rather than conclusive.</li>
+      <li><b>Tokenised gold sits in neither column.</b> XAUT and PAXG carry $49.3M of open interest — gold exposure in a crypto wrapper. Counting them as traditional would move Variational's share from 31.0% to 37.8%. They are excluded here because Entropy excludes them.</li>
+      <li><b>One day, one reading.</b> These are snapshots taken 2026-08-27. Open interest moves, and a single heavy day in gold moves the turnover figures noticeably.</li>
+      <li><b>Skew is a risk as well as a moat.</b> A +41.8% net long equity book means the OLP is carrying that exposure. It is what lets these markets exist and it is also the thing that would hurt most in a sharp drawdown.</li>
+      <li><b>Spread is not slippage.</b> A quoted base spread and an executed cost at $100K are different measurements. Until Variational publishes taker slippage at stated sizes, the execution comparison stays incomplete.</li>
+    </ol>
+    <div class="pt-src">
+      <span>SOURCES</span>
+      <ul>
+        <li><b>Variational</b> <code>omni-client-api.prod.ap-northeast-1.variational.io/metadata/stats</code> — 545 listings, taker long/short, base spread and funding per market</li>
+        <li><b>Lighter</b> <code>mainnet.zklighter.elliot.ai/api/v1/orderBookDetails</code> — 230 perps, open interest × mark price</li>
+        <li><b>Published</b> <code>arbdata.com/variational/tradfi</code> — Entropy Advisors, TradFi share, category splits and the per-market gross table</li>
+        <li><b>Lighter cost grid</b> <code>app.lighter.xyz/stats</code></li>
+      </ul>
+    </div>
+  </section>
+</section>
+<!-- tradfi:end -->
+<!-- pretge:begin -->
+<section class="pretge-report tsec tg-hide" data-tg="pretge">
+  <div class="cmp-heading">
+    <span class="cmp-eyebrow">PRE-TGE VALUATION ROOM</span>
+    <h2>Pre-TGE Comparison</h2>
+    <p>Lighter is the one perp DEX that ran the same kind of pre-TGE points program and then let a market put a number on the result. This tab reads Variational against that run day-for-day, checks whether the two books are even quoted on the same basis, and uses what was actually paid for Lighter at its TGE to bound what Variational's could be worth.</p>
+  </div>
+
+  <nav class="cmp-command" data-pt-command aria-label="Jump to section">
+    <span>VIEW</span>
+    <button type="button" class="on" data-pt-jump="ptDay252">The tape</button>
+    <button type="button" data-pt-jump="ptAudit">Book audit</button>
+    <button type="button" data-pt-jump="ptModel">Implied value</button>
+    <button type="button" data-pt-jump="ptLimits">Limits</button>
+    <div class="cmp-freshness"><i></i><span id="ptAsOf">Snapshot</span></div>
+  </nav>
+
+  <div class="cmp-signal-grid">
+    <article class="cmp-signal">
+      <div class="cmp-signal-top"><span>01 · WHAT LIGHTER WAS WORTH</span><em class="high">MEASURED</em></div>
+      <strong id="ptSigComparable">—</strong>
+      <span class="pt-sig-sub" id="ptSigComparableK">LIT fully diluted, on its TGE day</span>
+      <p id="ptSigComparableSub">Reading Lighter's TGE pricing.</p>
+    </article>
+    <article class="cmp-signal">
+      <div class="cmp-signal-top"><span>02 · WHO HOLDS THE BIGGER BOOK</span><em class="high">MEASURED</em></div>
+      <strong id="ptSigBook">—</strong>
+      <span class="pt-sig-sub" id="ptSigBookK">Variational's open interest vs Lighter's</span>
+      <p id="ptSigBookSub">Comparing both books on a confirmed basis.</p>
+    </article>
+    <article class="cmp-signal">
+      <div class="cmp-signal-top"><span>03 · WHOSE MARKET WAS HARDER</span><em class="high">MEASURED</em></div>
+      <strong id="ptSigTape">—</strong>
+      <span class="pt-sig-sub" id="ptSigTapeK">Days Bitcoin sat below its high — VAR vs LIT</span>
+      <p id="ptSigTapeSub">Measuring the market each program was built in.</p>
+    </article>
+    <article class="cmp-signal pt-sig-lead">
+      <div class="cmp-signal-top"><span>04 · WHAT VARIATIONAL COULD BE WORTH</span><em class="medium">MODEL</em></div>
+      <strong id="ptSigImplied">—</strong>
+      <span class="pt-sig-sub" id="ptSigImpliedK">Implied fully diluted, base case</span>
+      <p id="ptSigImpliedSub">Applying the comparable to Variational's book.</p>
+    </article>
+  </div>
+
+  <section class="pt-block" id="ptDay252">
+    <div class="cmp-section-head split">
+      <div><span class="cmp-eyebrow">01 · THE TAPE</span><h3>The market each one was handed</h3></div>
+      <p>Real BTCUSDT daily candles from Binance over each venue's own 252 days, with that venue's book directly underneath on the same day axis. Both price panels share one dollar scale and both book panels share another, so the columns read against each other. Shaded stretches are days Bitcoin spent more than 15% below its running high.</p>
+    </div>
+
+    <div class="pt-duel">
+      <article class="pt-col" data-pt-col="v">
+        <header class="pt-col-head">
+          <div class="pt-col-id"><img src="variational-symbol-transparent.png?v=4" alt="Variational" width="20" height="20"><b>Variational</b><span>2025-12-17 → day 252 · still pre-TGE</span></div>
+          <div class="pt-col-stat dn"><strong>82.2%</strong><small>of days below the high</small></div>
+        </header>
+        <div class="pt-tv">
+          <div class="pt-tv-head"><span>BTCUSDT · 1D · BINANCE</span><em class="pt-ohlc" id="ptOhlcV"></em></div>
+          <svg id="ptBtcV" role="img" aria-label="Bitcoin daily candles, 2025-12-17 to 2026-08-26"></svg>
+          <div class="pt-tv-foot"><span>BTC over the window</span><b class="dn">−9.5%</b><span>peak to trough</span><b class="dn">−39.5%</b></div>
+        </div>
+        <div class="pt-oi-pan">
+          <span class="pt-plab">Variational open interest</span>
+          <svg id="ptOiV" role="img" aria-label="Variational open interest over the same 252 days"></svg>
+          <div class="pt-tv-foot"><span>book over the window</span><b class="acc">+67.6%</b><span>average</span><b class="acc">$943M</b></div>
+        </div>
+        <div class="pt-dayaxis"><span>day 0</span><span>day 63</span><span>day 126</span><span>day 189</span><span>day 252</span></div>
+      </article>
+
+      <article class="pt-col" data-pt-col="l">
+        <header class="pt-col-head">
+          <div class="pt-col-id"><img src="lighter-logo.png" alt="Lighter" width="20" height="20"><b>Lighter · Season 1</b><span>2025-01-18 → day 252 · TGE 94 days later</span></div>
+          <div class="pt-col-stat"><strong>21.3%</strong><small>of days below the high</small></div>
+        </header>
+        <div class="pt-tv">
+          <div class="pt-tv-head"><span>BTCUSDT · 1D · BINANCE</span><em class="pt-ohlc" id="ptOhlcL"></em></div>
+          <svg id="ptBtcL" role="img" aria-label="Bitcoin daily candles, 2025-01-18 to 2025-09-27"></svg>
+          <div class="pt-tv-foot"><span>BTC over the window</span><b class="up">+4.9%</b><span>peak to trough</span><b class="dn">−28.1%</b></div>
+        </div>
+        <div class="pt-oi-pan">
+          <span class="pt-plab">Lighter open interest</span>
+          <svg id="ptOiL" role="img" aria-label="Lighter open interest over the same 252 days"></svg>
+          <div class="pt-tv-foot"><span>book over the window</span><b class="na">from zero · n/m</b><span>average</span><b>$302M</b></div>
+        </div>
+        <div class="pt-dayaxis"><span>day 0</span><span>day 63</span><span>day 126</span><span>day 189</span><span>day 252</span></div>
+      </article>
+    </div>
+
+    <div class="pt-legend">
+      <span><i class="cd up"></i>BTC up day</span>
+      <span><i class="cd dn"></i>BTC down day</span>
+      <span><i class="cd band"></i>Bitcoin more than 15% below its running high</span>
+      <span class="pt-legend-note">Hover a column for the day's open, high, low, close and the book that day.</span>
+    </div>
+
+    <div class="pt-table" id="ptH2H"></div>
+  </section>
+
+  <section class="pt-block" id="ptAudit">
+    <div class="cmp-section-head split">
+      <div><span class="cmp-eyebrow">02 · THE GATE</span><h3>Are the two books even the same measure?</h3></div>
+      <p>Every number above rests on this. Variational's reported open interest counts both sides of every position. If Lighter's did not, the comparison would be off by a factor of two and the book claim would invert. Both venues' own APIs answer it.</p>
+    </div>
+    <div class="pt-audit" id="ptAuditGrid"></div>
+    <div class="pt-verdict">
+      <span>VERDICT</span>
+      <p><b>Same basis, so the comparison stands.</b> Both venues publish two-sided open interest and DeFiLlama passes both through unchanged — Variational's API figure and its DeFiLlama print differ by 0.4%, Lighter's by 1.8%. On the published basis the books are $1.44B against $1.12B; on the one-sided basis taken from each venue's own API they are $718M against $489M. Variational leads on either, by 1.29× or 1.47×.</p>
+      <small>The one thing this does not settle: Lighter publishes no statement of its convention, so the two-sided reading is inferred from the ratio, not quoted from documentation. It is a strong inference — no market on the venue reads near 1.0× — but it is an inference.</small>
+    </div>
+  </section>
+
+  <section class="pt-block" id="ptModel">
+    <div class="cmp-section-head split">
+      <div><span class="cmp-eyebrow">03 · THE MODEL</span><h3>What Variational's TGE implies</h3></div>
+      <p>Four ways to carry Lighter's TGE pricing across, each answering a different question about what a book is worth. They disagree by an order of magnitude, and the disagreement is the finding: Variational prices well on capital and badly on flow.</p>
+    </div>
+    <div class="pt-table wide" id="ptMethods"></div>
+
+    <div class="pt-scn-wrap">
+      <div class="cmp-section-head"><h4>Float × case</h4><p>The methods produce a fully diluted valuation. Circulating market cap on day one is that number times whatever float the token launches with — the lever Variational has not announced.</p></div>
+      <div class="pt-scn-table" id="ptScenarios"></div>
+      <p class="pt-scn-note">Model outputs, not price targets. Lighter's own day-one float was 25%. The Points Calculator tab converts any of these into a per-point value.</p>
+    </div>
+  </section>
+
+  <section class="pt-block" id="ptLimits">
+    <div class="cmp-section-head split">
+      <div><span class="cmp-eyebrow">04 · READ THIS FIRST</span><h3>What this comparison cannot carry</h3></div>
+      <p>Every objection a desk raises about this page, stated before it gets raised.</p>
+    </div>
+    <ol class="pt-limits">
+      <li><b>One comparable is not a comp set.</b> Lighter is the only pre-TGE points program on a perp DEX that has since been priced. A single observation cannot produce a confidence interval, and none is claimed here.</li>
+      <li><b>The books do not start alike.</b> Lighter opens at zero — day 0 is the venue's first recorded trade. Variational opens at $859M because Omni Points was announced retroactively over traders already there. Compare levels and averages; growth percentages are meaningless across the pair.</li>
+      <li><b>Day 252 means different things.</b> Variational's is 252 days of a program on a running venue. Lighter's is 252 days of the venue's whole existence, most of it an invite-only beta with deposit caps.</li>
+      <li><b>The window was chosen by the subject.</b> 252 days because that is where Variational stands today. It moves every day, and the party making the claim set the frame.</li>
+      <li><b>Turnover crosses market structures.</b> Variational is bilateral with an OLP; Lighter is an anonymous order book. OLP inventory may enter open interest differently from order-book maker inventory, so part of the turnover gap could be plumbing rather than behaviour.</li>
+      <li><b>Volume is protocol-reported.</b> DeFiLlama passes through self-reported figures. Wash and incentivised flow are unaudited on both venues, which cuts for Variational on Lighter's number and against it on its own.</li>
+      <li><b>Lighter's TGE price is one venue on one day.</b> It carried a 25% unlocked airdrop with no vesting into a specific December tape. A different supply design or a different month would have printed a different number, and the whole model rests on that one print.</li>
+    </ol>
+    <div class="pt-src">
+      <span>SOURCES</span>
+      <ul>
+        <li><b>Variational</b> <code>omni-client-api.prod.ap-northeast-1.variational.io/metadata/stats</code> — 544 listings, taker long/short per market</li>
+        <li><b>Lighter</b> <code>mainnet.zklighter.elliot.ai/api/v1/orderBookDetails</code> — 229 perps, open interest × mark price</li>
+        <li><b>Both books</b> <code>api.llama.fi/v2/chart/{open-interest,derivatives}/protocol/{variational,lighter}</code></li>
+        <li><b>LIT price</b> <code>api.coingecko.com/api/v3/coins/lighter</code> — 240 daily closes since TGE, 1B supply</li>
+        <li><b>Bitcoin tape</b> <code>api.binance.com/api/v3/klines</code> — BTCUSDT 1d closes</li>
+      </ul>
+    </div>
+  </section>
+</section>
+<!-- pretge:end -->
 
 </main>
 </div>
@@ -9263,7 +9641,429 @@ body.theme-light .valuation-report #valScatter .val-var-label{
   @media(max-width:1050px){.cmp-signal-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.cmp-signal:nth-child(3){border-left:0;border-top:1px solid var(--line)}.cmp-signal:nth-child(4){border-top:1px solid var(--line)}.cmp-eff-table{overflow-x:auto}.cmp-eff-row{min-width:900px}}
   @media(max-width:700px){.cmp-command{top:54px;overflow-x:auto}.cmp-command>span,.cmp-freshness{display:none}.cmp-signal-grid{grid-template-columns:1fr}.cmp-signal{min-height:0;border-left:0!important;border-top:1px solid var(--line)}.cmp-signal:first-child{border-top:0}.cmp-signal>strong{margin-top:17px}.cmp-section-head.split{display:block}.cmp-section-head.split p{text-align:left}.val-scenario-table{overflow-x:auto}.val-scenario-row{min-width:650px}}
 </style>
-<script src="dashboard.js?v=20260822-comparison-room" defer></script>
+
+
+
+
+
+
+
+
+
+
+<style id="tradfi-book-room">
+  /* TradFi. Prefixed .tf- and scoped under [data-tg="tradfi"]. It reuses the
+     Pre-TGE tab's .pt-block / .pt-limits / .pt-src shells deliberately — the two
+     tabs are a pair and should read as one voice. Colour: Variational takes the
+     accent, Lighter the pale steel, and the asset classes get a four-step ramp
+     off the accent so they read as one family rather than four brands. */
+  [data-tg="tradfi"]{
+    --tf-var:var(--grn);
+    /* Lighter was a pale blue, half a step from the accent — in the book chart
+       and in a "31.0% vs 11.4%" headline the two venues read as one colour.
+       It moves off the blue ramp to bone, and its fills are hatched as well,
+       so the pair separates by hue AND by texture. */
+    --tf-lit:#e6ecf5;
+    --tf-lg:var(--grn);
+    --tf-sh:#e0736f;
+  }
+  body.theme-light [data-tg="tradfi"]{--tf-lit:#2c3b4d;--tf-sh:#c0304a}
+
+  [data-tg="tradfi"] .pt-block{margin-top:30px;padding-top:24px;border-top:1px solid var(--line);scroll-margin-top:132px}
+  [data-tg="tradfi"] .cmp-section-head h3{font:760 clamp(18px,1.7vw,24px)/1.15 var(--sans);letter-spacing:-.7px;color:var(--ink)}
+  [data-tg="tradfi"] .cmp-section-head p{color:var(--sub);font:12.5px/1.6 var(--sans)}
+  [data-tg="tradfi"] .tf-sig-lead>strong{color:var(--grn)}
+  [data-tg="tradfi"] .cmp-signal>strong{margin-top:20px!important;font-size:clamp(21px,1.9vw,30px)!important;letter-spacing:-1px!important}
+  [data-tg="tradfi"] .tf-sig-sub{display:block;margin-top:9px;color:var(--sub);font:750 11px/1.4 var(--sans)}
+  [data-tg="tradfi"] .cmp-signal p{margin-top:8px!important;color:var(--dim)!important;font-size:11px!important}
+  [data-tg="tradfi"] .cmp-signal{min-height:214px}
+  [data-tg="tradfi"] .cmp-signal-top span{font-size:8.5px;letter-spacing:.8px;line-height:1.35}
+
+  /* Two-venue headline. The logo is the identity — colour alone put Variational
+     and Lighter half a step apart and the reader had to fall back on the caption. */
+  [data-tg="tradfi"] .pt-vs,[data-tg="tradfi"] .tf-vs{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+  [data-tg="tradfi"] .pt-vs-h,[data-tg="tradfi"] .tf-vs-h{display:flex;align-items:center;gap:7px;min-width:0}
+  [data-tg="tradfi"] .pt-vs-h img,[data-tg="tradfi"] .tf-vs-h img{flex:0 0 20px;width:20px;height:20px;object-fit:contain;border-radius:4px;background:rgba(255,255,255,.06);padding:1px}
+  [data-tg="tradfi"] .pt-vs-h b,[data-tg="tradfi"] .tf-vs-h b{font-weight:inherit;font-variant-numeric:tabular-nums;letter-spacing:-1px}
+  [data-tg="tradfi"] .pt-vs-h.var b,[data-tg="tradfi"] .tf-vs-h.var b{color:var(--grn)}
+  [data-tg="tradfi"] .pt-vs-h.lit b,[data-tg="tradfi"] .tf-vs-h.lit b{color:var(--tf-lit,#e6ecf5)}
+  [data-tg="tradfi"] .pt-vs-x,[data-tg="tradfi"] .tf-vs-x{color:var(--dim);font:500 12px var(--sans);letter-spacing:0}
+  body.theme-light [data-tg="tradfi"] .pt-vs-h img,body.theme-light [data-tg="tradfi"] .tf-vs-h img{background:#f4f9ff;border:1px solid rgba(11,111,232,.18)}
+
+  /* hatch — Lighter's slab in the book chart */
+  [data-tg="tradfi"] .tf-hatch-bg{fill:var(--tf-lit);opacity:.22}
+  [data-tg="tradfi"] .tf-hatch-l{stroke:var(--tf-lit);stroke-width:2.6}
+
+  [data-tg="tradfi"] .tf-chart{margin-top:16px}
+  [data-tg="tradfi"] .tf-chart svg{display:block;width:100%;height:auto;overflow:visible}
+  [data-tg="tradfi"] .tf-grid{stroke:var(--line);stroke-width:1;opacity:.5}
+  [data-tg="tradfi"] .tf-mid{stroke:var(--line);stroke-width:1}
+  [data-tg="tradfi"] .tf-ax{fill:var(--dim);font:9.5px var(--mono);font-variant-numeric:tabular-nums}
+  [data-tg="tradfi"] .tf-cap{fill:var(--dim);font:800 8.5px var(--mono);letter-spacing:1.1px}
+
+  /* the book columns */
+  [data-tg="tradfi"] .tf-blk.trad.var{fill:var(--tf-var);opacity:.9}
+  [data-tg="tradfi"] .tf-blk.trad.lit{opacity:1}
+  [data-tg="tradfi"] .tf-blk.crypto{fill:var(--sub);opacity:.13}
+  [data-tg="tradfi"] .tf-blab{font:760 17px var(--mono);font-variant-numeric:tabular-nums}
+  [data-tg="tradfi"] .tf-blab.var{fill:var(--tf-var)}
+  [data-tg="tradfi"] .tf-blab.lit{fill:var(--tf-lit)}
+  [data-tg="tradfi"] .tf-bsub{fill:var(--sub);font:10.5px var(--sans)}
+  [data-tg="tradfi"] .tf-bcry{fill:var(--dim);font:10px var(--mono)}
+  [data-tg="tradfi"] .tf-bname{font:750 13px var(--sans)}
+  [data-tg="tradfi"] .tf-bname.var{fill:var(--tf-var)}
+  [data-tg="tradfi"] .tf-bname.lit{fill:var(--tf-lit)}
+  [data-tg="tradfi"] .tf-bnsub{fill:var(--dim);font:9.5px var(--mono)}
+
+  [data-tg="tradfi"] .tf-xcheck{margin-top:16px;padding:14px 16px;border:1px solid color-mix(in srgb,var(--grn) 30%,var(--line));background:color-mix(in srgb,var(--grn) 4%,transparent)}
+  [data-tg="tradfi"] .tf-xcheck>span{display:block;margin-bottom:7px;color:var(--grn);font:800 9px var(--mono);letter-spacing:1.4px}
+  [data-tg="tradfi"] .tf-xcheck p{color:var(--ink);font:12.5px/1.65 var(--sans)}
+
+  /* asset classes */
+  [data-tg="tradfi"] .tf-classes{margin-top:18px}
+  [data-tg="tradfi"] .tf-cbar{display:flex;height:34px;overflow:hidden;border:1px solid var(--line)}
+  [data-tg="tradfi"] .tf-cbar i{display:block;height:100%}
+  [data-tg="tradfi"] .c1{background:var(--grn)}
+  [data-tg="tradfi"] .c2{background:color-mix(in srgb,var(--grn) 70%,var(--sub))}
+  [data-tg="tradfi"] .c3{background:color-mix(in srgb,var(--grn) 34%,var(--sub))}
+  [data-tg="tradfi"] .c4{background:color-mix(in srgb,var(--sub) 78%,var(--bg))}
+  [data-tg="tradfi"] .tf-cbar i+i{border-left:1px solid var(--bg)}
+  [data-tg="tradfi"] .tf-crow{display:grid;grid-template-columns:14px minmax(90px,.7fr) minmax(80px,.6fr) minmax(90px,.6fr) minmax(170px,1.1fr) minmax(120px,.8fr);align-items:baseline;gap:12px;padding:11px 2px;border-bottom:1px solid var(--line)}
+  [data-tg="tradfi"] .tf-cdot{width:10px;height:10px;border-radius:2px}
+  [data-tg="tradfi"] .tf-crow b{color:var(--ink);font:750 12.5px var(--sans)}
+  [data-tg="tradfi"] .tf-crow em{color:var(--dim);font:9.5px var(--mono);font-style:normal}
+  [data-tg="tradfi"] .tf-crow strong{color:var(--ink);font:760 15px var(--mono);font-variant-numeric:tabular-nums}
+  [data-tg="tradfi"] .tf-crow u{color:var(--sub);font:11px var(--sans);text-decoration:none}
+  [data-tg="tradfi"] .tf-crow>i{color:var(--dim);font:10px var(--mono);font-style:normal}
+
+  /* market table */
+  [data-tg="tradfi"] .tf-table{margin-top:20px;border-top:1px solid var(--line)}
+  [data-tg="tradfi"] .tf-trow{display:grid;grid-template-columns:minmax(200px,1.5fr) repeat(4,minmax(96px,.7fr));border-bottom:1px solid var(--line)}
+  [data-tg="tradfi"] .tf-trow>div{min-width:0;padding:10px 14px;border-left:1px solid var(--line)}
+  [data-tg="tradfi"] .tf-trow>div:first-child{border-left:0;padding-left:0}
+  [data-tg="tradfi"] .tf-trow.head>div{padding-block:8px;background:color-mix(in srgb,var(--panel) 70%,transparent);color:var(--dim);font:800 9px var(--mono);letter-spacing:.9px;text-transform:uppercase}
+  [data-tg="tradfi"] .tf-trow .n{text-align:right}
+  [data-tg="tradfi"] .tf-trow b{display:block;color:var(--ink);font:750 12.5px var(--sans)}
+  [data-tg="tradfi"] .tf-trow small{display:block;margin-top:3px;color:var(--dim);font:9.5px/1.35 var(--mono)}
+  [data-tg="tradfi"] .tf-trow strong{color:var(--ink);font:760 14px var(--mono);font-variant-numeric:tabular-nums}
+  [data-tg="tradfi"] .tf-trow strong.lg{color:var(--tf-lg)}
+  [data-tg="tradfi"] .tf-trow strong.sh{color:var(--tf-sh)}
+  [data-tg="tradfi"] .tf-note{margin-top:12px;color:var(--sub);font:11.5px/1.65 var(--sans)}
+  [data-tg="tradfi"] .tf-note b{color:var(--ink)}
+
+  /* skew */
+  [data-tg="tradfi"] .tf-sk.lg{fill:var(--tf-lg);opacity:.85}
+  [data-tg="tradfi"] .tf-sk.sh{fill:var(--tf-sh);opacity:.7}
+  [data-tg="tradfi"] .tf-sk-t{fill:var(--ink);font:750 11px var(--mono)}
+  [data-tg="tradfi"] .tf-sk-v{fill:var(--sub);font:10.5px var(--mono);font-variant-numeric:tabular-nums}
+  [data-tg="tradfi"] .tf-argue{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(240px,.8fr);gap:24px;margin-top:20px;padding-top:18px;border-top:1px solid var(--line)}
+  [data-tg="tradfi"] .tf-argue-k>span{display:block;margin-bottom:9px;color:var(--grn);font:800 9px var(--mono);letter-spacing:1.4px}
+  [data-tg="tradfi"] .tf-argue-k p{margin-bottom:11px;color:var(--sub);font:12.5px/1.7 var(--sans)}
+  [data-tg="tradfi"] .tf-argue-k b{color:var(--ink)}
+  [data-tg="tradfi"] .tf-stat{padding:14px 16px;border:1px solid var(--line);margin-bottom:10px}
+  [data-tg="tradfi"] .tf-stat>span{display:block;color:var(--dim);font:800 9px var(--mono);letter-spacing:1px;text-transform:uppercase}
+  [data-tg="tradfi"] .tf-stat strong{display:block;margin-top:8px;color:var(--grn);font:760 22px var(--mono);letter-spacing:-.5px;font-variant-numeric:tabular-nums}
+  [data-tg="tradfi"] .tf-stat small{display:block;margin-top:7px;color:var(--sub);font:10.5px/1.55 var(--sans)}
+
+  /* execution */
+  [data-tg="tradfi"] .tf-sp{fill:var(--sub);opacity:.5}
+  [data-tg="tradfi"] .tf-sp.cr{fill:var(--grn);opacity:.9}
+  [data-tg="tradfi"] .tf-exec{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1px;margin-top:18px;background:var(--line);border:1px solid var(--line)}
+  [data-tg="tradfi"] .tf-exec-c{min-width:0;padding:16px;background:var(--bg)}
+  [data-tg="tradfi"] .tf-k{color:var(--dim);font:800 9px var(--mono);letter-spacing:1.1px;text-transform:uppercase}
+  [data-tg="tradfi"] .tf-cost-row{display:grid;grid-template-columns:minmax(84px,.5fr) minmax(0,1fr) 66px 56px;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}
+  [data-tg="tradfi"] .tf-cost-row b{color:var(--ink);font:750 12px var(--sans)}
+  [data-tg="tradfi"] .tf-cost-bar{height:10px;background:color-mix(in srgb,var(--line) 60%,transparent)}
+  [data-tg="tradfi"] .tf-cost-bar i{display:block;height:100%;background:var(--sub);opacity:.55}
+  [data-tg="tradfi"] .tf-cost-row.best .tf-cost-bar i{background:var(--tf-lit);opacity:1}
+  [data-tg="tradfi"] .tf-cost-row strong{text-align:right;color:var(--ink);font:760 13px var(--mono);font-variant-numeric:tabular-nums}
+  [data-tg="tradfi"] .tf-cost-row small{text-align:right;color:var(--dim);font:10px var(--mono)}
+
+  /* shared shells with the Pre-TGE tab — the rules there are scoped to that
+     tab, so they are restated here rather than unscoped globally */
+  [data-tg="tradfi"] .pt-limits{margin-top:18px;padding:0;list-style:none;counter-reset:tfl;border-top:1px solid var(--line)}
+  [data-tg="tradfi"] .pt-limits li{position:relative;padding:13px 0 13px 40px;border-bottom:1px solid var(--line);color:var(--sub);font:12.5px/1.65 var(--sans)}
+  [data-tg="tradfi"] .pt-limits li::before{counter-increment:tfl;content:counter(tfl,decimal-leading-zero);position:absolute;left:0;top:15px;color:var(--dim);font:800 10px var(--mono);letter-spacing:.6px}
+  [data-tg="tradfi"] .pt-limits b{color:var(--ink);font-weight:700}
+  [data-tg="tradfi"] .pt-src{margin-top:20px;padding:16px 0 0;border-top:1px solid var(--line)}
+  [data-tg="tradfi"] .pt-src>span{display:block;margin-bottom:10px;color:var(--dim);font:800 9px var(--mono);letter-spacing:1.3px}
+  [data-tg="tradfi"] .pt-src ul{list-style:none;padding:0;display:grid;gap:7px}
+  [data-tg="tradfi"] .pt-src li{color:var(--sub);font:11px/1.5 var(--sans)}
+  [data-tg="tradfi"] .pt-src b{display:inline-block;min-width:88px;color:var(--ink);font:750 11px var(--sans)}
+  [data-tg="tradfi"] .pt-src code{color:var(--dim);font:10px var(--mono);word-break:break-all}
+
+  @media(max-width:1050px){
+    [data-tg="tradfi"] .tf-argue{grid-template-columns:1fr}
+    [data-tg="tradfi"] .tf-exec{grid-template-columns:1fr}
+    [data-tg="tradfi"] .tf-table{overflow-x:auto}
+    [data-tg="tradfi"] .tf-trow{min-width:800px}
+    [data-tg="tradfi"] .tf-crow{grid-template-columns:14px minmax(80px,1fr) minmax(70px,.7fr) minmax(80px,.7fr);row-gap:4px}
+    [data-tg="tradfi"] .tf-crow u,[data-tg="tradfi"] .tf-crow>i{grid-column:2/-1}
+  }
+  @media(max-width:700px){
+    [data-tg="tradfi"] .cmp-command button{flex:0 0 auto}
+    [data-tg="tradfi"] .cmp-section-head.split{display:block}
+    [data-tg="tradfi"] .cmp-section-head.split p{margin-top:8px;max-width:none;text-align:left}
+  }
+</style>
+
+
+
+<style id="pretge-comparison-room">
+  /* Pre-TGE Comparison. Every selector is prefixed .pt- and every rule that
+     could reach outside is scoped under [data-tg="pretge"], so this block
+     cannot touch any other workspace. Colour comes from the shell's own
+     tokens: Variational takes the accent, Lighter the pale steel it already
+     carries in the Comparison legend. */
+  [data-tg="pretge"]{
+    --pt-var:var(--grn);
+    /* Lighter sat at #93a9c6 — a pale blue half a step from the accent. Against
+       Variational's blue the two venues read as one colour. Bone puts real hue
+       distance between them, in both themes. */
+    --pt-lit:#dde5f0;
+    --pt-line:var(--line);
+    --pt-up:#8fa2b8;
+    --pt-dn:#e0736f;
+  }
+  body.theme-light [data-tg="pretge"]{--pt-lit:#33475e;--pt-up:#5d738d;--pt-dn:#c0304a}
+
+  [data-tg="pretge"] .pt-sig-lead>strong{color:var(--grn)}
+  /* the headline number needs a plain-language label under it — on its own a big
+     figure with a jargon eyebrow does not say what it is or whose it is */
+  [data-tg="pretge"] .cmp-signal>strong{margin-top:20px!important;font-size:clamp(21px,1.9vw,30px)!important;letter-spacing:-1px!important}
+  [data-tg="pretge"] .pt-sig-sub{display:block;margin-top:9px;color:var(--sub);font:750 11px/1.4 var(--sans)}
+  [data-tg="pretge"] .cmp-signal p{margin-top:8px!important;color:var(--dim)!important;font-size:11px!important}
+  [data-tg="pretge"] .cmp-signal{min-height:214px}
+  [data-tg="pretge"] .cmp-signal-top span{font-size:8.5px;letter-spacing:.8px;line-height:1.35}
+  /* Two-venue headline. The logo is the identity — colour alone put Variational
+     and Lighter half a step apart and the reader had to fall back on the caption. */
+  [data-tg="pretge"] .pt-vs,[data-tg="pretge"] .tf-vs{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+  [data-tg="pretge"] .pt-vs-h,[data-tg="pretge"] .tf-vs-h{display:flex;align-items:center;gap:7px;min-width:0}
+  [data-tg="pretge"] .pt-vs-h img,[data-tg="pretge"] .tf-vs-h img{flex:0 0 20px;width:20px;height:20px;object-fit:contain;border-radius:4px;background:rgba(255,255,255,.06);padding:1px}
+  [data-tg="pretge"] .pt-vs-h b,[data-tg="pretge"] .tf-vs-h b{font-weight:inherit;font-variant-numeric:tabular-nums;letter-spacing:-1px}
+  [data-tg="pretge"] .pt-vs-h.var b,[data-tg="pretge"] .tf-vs-h.var b{color:var(--grn)}
+  [data-tg="pretge"] .pt-vs-h.lit b,[data-tg="pretge"] .tf-vs-h.lit b{color:var(--pt-lit)}
+  [data-tg="pretge"] .pt-vs-x,[data-tg="pretge"] .tf-vs-x{color:var(--dim);font:500 12px var(--sans);letter-spacing:0}
+  body.theme-light [data-tg="pretge"] .pt-vs-h img,body.theme-light [data-tg="pretge"] .tf-vs-h img{background:#f4f9ff;border:1px solid rgba(11,111,232,.18)}
+
+  [data-tg="pretge"] .pt-block{margin-top:30px;padding-top:24px;border-top:1px solid var(--line);scroll-margin-top:132px}
+  [data-tg="pretge"] .cmp-section-head h3{font:760 clamp(18px,1.7vw,24px)/1.15 var(--sans);letter-spacing:-.7px;color:var(--ink)}
+  [data-tg="pretge"] .cmp-section-head h4{margin-bottom:4px;font:760 15px/1.2 var(--sans);letter-spacing:-.3px;color:var(--ink)}
+  [data-tg="pretge"] .cmp-section-head p{color:var(--sub);font:12.5px/1.6 var(--sans)}
+
+  /* ---------- charts ---------- */
+  [data-tg="pretge"] .pt-chart{margin-top:18px}
+  [data-tg="pretge"] .pt-chart svg{display:block;width:100%;height:auto;overflow:visible}
+  /* without an explicit width these fall back to the 300px SVG default and the
+     candles are drawn into a third of the column. */
+  [data-tg="pretge"] .pt-tv svg,
+  [data-tg="pretge"] .pt-oi-pan svg{display:block;width:100%;height:auto}
+  [data-tg="pretge"] .pt-grid{stroke:var(--line);stroke-width:1;opacity:.55}
+  [data-tg="pretge"] .pt-split{stroke:var(--line);stroke-width:1;stroke-dasharray:2 4}
+  [data-tg="pretge"] .pt-ax{fill:var(--dim);font:9.5px var(--mono);letter-spacing:.4px}
+  [data-tg="pretge"] .pt-cap{fill:var(--dim);font:800 8.5px var(--mono);letter-spacing:1.1px}
+  [data-tg="pretge"] .pt-cap.var{fill:var(--grn)}
+  [data-tg="pretge"] .pt-note{fill:var(--sub);font:10px var(--mono)}
+  [data-tg="pretge"] .pt-note.off{fill:var(--dim)}
+  [data-tg="pretge"] .pt-lit-line{fill:none;stroke:var(--pt-lit);stroke-width:1.7;stroke-linejoin:round}
+  [data-tg="pretge"] .pt-lit-area{fill:var(--pt-lit);opacity:.07}
+  [data-tg="pretge"] .pt-dot{fill:var(--pt-lit);stroke:var(--panel);stroke-width:1.5}
+  [data-tg="pretge"] .pt-dot.var{fill:var(--grn)}
+  [data-tg="pretge"] .pt-dot.var.hollow{fill:var(--bg);stroke:var(--grn);stroke-width:1.8}
+  [data-tg="pretge"] .pt-dot.low{fill:var(--pt-lit);opacity:.75}
+  /* the implied column */
+  [data-tg="pretge"] .pt-span{fill:var(--grn);opacity:.08}
+  [data-tg="pretge"] .pt-core{fill:var(--grn);opacity:.16}
+  [data-tg="pretge"] .pt-mk{stroke:var(--grn);stroke-width:1.2;opacity:.5}
+  [data-tg="pretge"] .pt-mk.base{stroke-width:2.4;opacity:1}
+  [data-tg="pretge"] .pt-mklab{fill:var(--sub);font:11px var(--mono);font-variant-numeric:tabular-nums}
+  [data-tg="pretge"] .pt-mklab.base{fill:var(--grn);font-weight:700;font-size:13px}
+  [data-tg="pretge"] .pt-mkname{fill:var(--dim);font:9px var(--mono);letter-spacing:.4px}
+
+  /* ---------- the tape: candles over each venue's own 252 days ---------- */
+  [data-tg="pretge"] .pt-duel{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1px;margin-top:18px;background:var(--line);border:1px solid var(--line)}
+  [data-tg="pretge"] .pt-col{min-width:0;padding:14px 15px 12px;background:var(--bg)}
+  [data-tg="pretge"] .pt-col-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;padding-bottom:12px}
+  /* the venue logo leads the column — a coloured dot alone was not enough to
+     tell the two panels apart at a glance */
+  [data-tg="pretge"] .pt-col-id{display:grid;grid-template-columns:20px 1fr;column-gap:9px;align-items:center}
+  [data-tg="pretge"] .pt-col-id img{grid-row:1/3;width:20px;height:20px;object-fit:contain;border-radius:4px;background:rgba(255,255,255,.06);padding:1px}
+  body.theme-light [data-tg="pretge"] .pt-col-id img{background:#f4f9ff;border:1px solid rgba(11,111,232,.18)}
+  [data-tg="pretge"] .pt-col-id b{display:block;color:var(--ink);font:750 13px var(--sans)}
+  [data-tg="pretge"] .pt-col-id span{display:block;margin-top:3px;color:var(--dim);font:9.5px var(--mono);letter-spacing:.3px}
+  [data-tg="pretge"] .pt-col-stat{flex:0 0 auto;text-align:right}
+  [data-tg="pretge"] .pt-col-stat strong{display:block;color:var(--sub);font:760 22px var(--mono);letter-spacing:-.6px;font-variant-numeric:tabular-nums}
+  [data-tg="pretge"] .pt-col-stat.dn strong{color:var(--pt-dn)}
+  [data-tg="pretge"] .pt-col-stat small{display:block;margin-top:3px;color:var(--dim);font:9px var(--mono);letter-spacing:.4px}
+
+  [data-tg="pretge"] .pt-tv{border:1px solid var(--line);background:color-mix(in srgb,var(--panel) 60%,transparent)}
+  [data-tg="pretge"] .pt-tv-head{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;padding:6px 9px 5px;border-bottom:1px solid var(--line)}
+  [data-tg="pretge"] .pt-tv-head>span{color:var(--sub);font:9px var(--mono);letter-spacing:1.1px;text-transform:uppercase}
+  [data-tg="pretge"] .pt-ohlc{margin-left:auto;color:var(--dim);font:9.5px var(--mono);font-style:normal;font-variant-numeric:tabular-nums;white-space:nowrap}
+  [data-tg="pretge"] .pt-ohlc i{font-style:normal;margin-right:4px;opacity:.6}
+  [data-tg="pretge"] .pt-ohlc em{font-style:normal;margin:0 2px 0 7px;opacity:.55}
+  [data-tg="pretge"] .pt-ohlc b{color:var(--sub);font-weight:600}
+  [data-tg="pretge"] .pt-ohlc b.up{color:var(--pt-up)}
+  [data-tg="pretge"] .pt-ohlc b.dn{color:var(--pt-dn)}
+  [data-tg="pretge"] .pt-ohlc b.oi{color:var(--grn)}
+  [data-tg="pretge"] .pt-tv-foot{display:flex;align-items:baseline;gap:7px;flex-wrap:wrap;padding:6px 9px;border-top:1px solid var(--line)}
+  [data-tg="pretge"] .pt-tv-foot span{color:var(--dim);font:9px var(--mono);letter-spacing:.5px;text-transform:uppercase}
+  [data-tg="pretge"] .pt-tv-foot b{margin-right:10px;font:750 12px var(--mono);font-variant-numeric:tabular-nums}
+  [data-tg="pretge"] .pt-tv-foot b.up{color:var(--pt-up)}
+  [data-tg="pretge"] .pt-tv-foot b.dn{color:var(--pt-dn)}
+  [data-tg="pretge"] .pt-tv-foot b.acc{color:var(--grn)}
+  [data-tg="pretge"] .pt-tv-foot b.na{color:var(--dim);font-weight:500}
+
+  [data-tg="pretge"] .pt-oi-pan{position:relative;margin-top:9px;border:1px solid var(--line);background:color-mix(in srgb,var(--panel) 60%,transparent)}
+  [data-tg="pretge"] .pt-plab{display:block;padding:6px 9px 3px;color:var(--dim);font:800 9px var(--mono);letter-spacing:1.1px;text-transform:uppercase}
+  [data-tg="pretge"] .pt-dayaxis{display:flex;justify-content:space-between;padding:7px 2px 0;color:var(--dim);font:9px var(--mono);letter-spacing:.4px}
+
+  /* candle marks */
+  [data-tg="pretge"] .pt-band{fill:var(--pt-dn);opacity:.055}
+  [data-tg="pretge"] .pt-body{fill:var(--pt-up)}
+  [data-tg="pretge"] .pt-body.dn{fill:var(--pt-dn)}
+  [data-tg="pretge"] .pt-wick{stroke:var(--pt-up);stroke-width:.9;opacity:.75}
+  [data-tg="pretge"] .pt-wick.dn{stroke:var(--pt-dn)}
+  [data-tg="pretge"] .pt-px{fill:var(--dim);font:9px var(--mono);font-variant-numeric:tabular-nums}
+  [data-tg="pretge"] .pt-open{stroke:var(--sub);stroke-width:1;stroke-dasharray:2 4;opacity:.5}
+  [data-tg="pretge"] .pt-mark{fill:var(--dim);font:9px var(--mono);font-variant-numeric:tabular-nums}
+  [data-tg="pretge"] .pt-mark.dn{fill:var(--pt-dn)}
+  [data-tg="pretge"] .pt-trough{fill:var(--pt-dn);stroke:var(--bg);stroke-width:1.4}
+  [data-tg="pretge"] .pt-last{fill:var(--pt-up)}
+  [data-tg="pretge"] .pt-last.dn{fill:var(--pt-dn)}
+  [data-tg="pretge"] .pt-lastv{fill:var(--bg);font:750 9.5px var(--mono);font-variant-numeric:tabular-nums}
+  [data-tg="pretge"] .pt-cross{stroke:var(--sub);stroke-width:1;stroke-dasharray:3 3;opacity:.7;pointer-events:none}
+  [data-tg="pretge"] .pt-oi-line{fill:none;stroke:var(--pt-lit);stroke-width:1.6;stroke-linejoin:round}
+  [data-tg="pretge"] .pt-oi-line.var{stroke:var(--grn);stroke-width:1.9}
+  [data-tg="pretge"] .pt-oi-area{fill:var(--pt-lit);opacity:.1}
+  [data-tg="pretge"] .pt-oi-area.var{fill:var(--grn);opacity:.13}
+  [data-tg="pretge"] .pt-oiv{font:750 11px var(--mono);font-variant-numeric:tabular-nums;fill:var(--pt-lit)}
+  [data-tg="pretge"] .pt-oiv.var{fill:var(--grn)}
+  [data-tg="pretge"] .pt-dot.lit{fill:var(--pt-lit)}
+
+  [data-tg="pretge"] .pt-legend{display:flex;flex-wrap:wrap;gap:9px 20px;padding:12px 0 0;color:var(--dim);font:10px var(--sans)}
+  [data-tg="pretge"] .pt-legend span{display:flex;align-items:center;gap:7px}
+  [data-tg="pretge"] .pt-legend i.cd{width:7px;height:11px;border-radius:1px;background:var(--pt-up)}
+  [data-tg="pretge"] .pt-legend i.cd.dn{background:var(--pt-dn)}
+  [data-tg="pretge"] .pt-legend i.cd.band{width:16px;background:color-mix(in srgb,var(--pt-dn) 16%,transparent);border:1px solid color-mix(in srgb,var(--pt-dn) 34%,transparent)}
+  [data-tg="pretge"] .pt-legend-note{margin-left:auto;color:var(--dim);font-style:italic}
+
+  /* ---------- the comparable's fact strip ---------- */
+  [data-tg="pretge"] .pt-facts{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));margin-top:18px;border-block:1px solid var(--line)}
+  [data-tg="pretge"] .pt-facts>div{min-width:0;padding:14px 16px;border-left:1px solid var(--line)}
+  [data-tg="pretge"] .pt-facts>div:first-child{border-left:0}
+  [data-tg="pretge"] .pt-facts span{display:block;color:var(--dim);font:800 9px var(--mono);letter-spacing:1px;text-transform:uppercase}
+  [data-tg="pretge"] .pt-facts strong{display:block;margin-top:9px;color:var(--ink);font:760 20px var(--mono);letter-spacing:-.4px;font-variant-numeric:tabular-nums}
+  [data-tg="pretge"] .pt-facts small{display:block;margin-top:5px;color:var(--sub);font:10.5px/1.45 var(--sans)}
+
+  /* ---------- shared row/cell table ---------- */
+  [data-tg="pretge"] .pt-table{margin-top:20px;border-top:1px solid var(--line)}
+  [data-tg="pretge"] .pt-row{display:grid;grid-template-columns:minmax(230px,1.5fr) minmax(150px,1fr) minmax(150px,1fr);border-bottom:1px solid var(--line)}
+  [data-tg="pretge"] .pt-row.m{grid-template-columns:minmax(210px,1.25fr) minmax(150px,.95fr) minmax(230px,1.5fr) minmax(120px,.72fr)}
+  [data-tg="pretge"] .pt-row>div{min-width:0;padding:13px 16px;border-left:1px solid var(--line)}
+  [data-tg="pretge"] .pt-row>div:first-child{border-left:0;padding-left:0}
+  [data-tg="pretge"] .pt-row.head>div{padding-block:9px;background:color-mix(in srgb,var(--panel) 70%,transparent);color:var(--dim);font:800 9px var(--mono);letter-spacing:.9px;text-transform:uppercase}
+  [data-tg="pretge"] .pt-row.head b{display:flex;align-items:center;gap:7px;color:var(--sub);font:800 9px var(--mono);letter-spacing:.9px}
+  [data-tg="pretge"] .pt-row.head b img{flex:0 0 16px;width:16px;height:16px;object-fit:contain;border-radius:3px;background:rgba(255,255,255,.06);padding:1px}
+  body.theme-light [data-tg="pretge"] .pt-row.head b img{background:#f4f9ff;border:1px solid rgba(11,111,232,.18)}
+  [data-tg="pretge"] .pt-row.head .pt-cell.var b{color:var(--grn)}
+  [data-tg="pretge"] .pt-row.head .pt-cell.lit b{color:var(--pt-lit)}
+  [data-tg="pretge"] .pt-row.head small{display:block;margin-top:4px;color:var(--dim);font:9px var(--mono);text-transform:none;letter-spacing:.2px}
+  [data-tg="pretge"] .pt-cell.k b{display:block;color:var(--ink);font:750 12.5px/1.3 var(--sans)}
+  [data-tg="pretge"] .pt-cell.k small{display:block;margin-top:4px;color:var(--dim);font:9.5px/1.4 var(--mono)}
+  [data-tg="pretge"] .pt-cell strong{display:block;color:var(--ink);font:760 16px var(--sans);letter-spacing:-.3px;font-variant-numeric:tabular-nums}
+  [data-tg="pretge"] .pt-cell small{display:block;margin-top:5px;color:var(--sub);font:10.5px/1.45 var(--sans)}
+  [data-tg="pretge"] .pt-cell.win strong{color:var(--grn)}
+  [data-tg="pretge"] .pt-cell.num{text-align:right}
+  [data-tg="pretge"] .pt-cell.num strong{font-size:19px;font-family:var(--mono)}
+  [data-tg="pretge"] .pt-cell.num.base{background:color-mix(in srgb,var(--grn) 6%,transparent)}
+  [data-tg="pretge"] .pt-cell.num.base strong{color:var(--grn)}
+  [data-tg="pretge"] .pt-cell.num small{color:var(--grn);font:800 9px var(--mono);letter-spacing:.8px;text-transform:uppercase}
+
+  /* ---------- the audit ---------- */
+  [data-tg="pretge"] .pt-audit{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1px;margin-top:18px;background:var(--line);border:1px solid var(--line)}
+  [data-tg="pretge"] .pt-proof{min-width:0;padding:18px;background:var(--bg)}
+  [data-tg="pretge"] .pt-proof header{display:flex;align-items:center;gap:9px;padding-bottom:12px;border-bottom:1px solid var(--line)}
+  [data-tg="pretge"] .pt-proof header img{width:18px;height:18px;object-fit:contain;border-radius:4px}
+  [data-tg="pretge"] .pt-proof header b{color:var(--ink);font:750 13px var(--sans)}
+  [data-tg="pretge"] .pt-proof header span{margin-left:auto;color:var(--dim);font:9px var(--mono);letter-spacing:.4px}
+  [data-tg="pretge"] .pt-proof dl{margin-top:4px}
+  [data-tg="pretge"] .pt-proof dl>div{display:flex;align-items:baseline;justify-content:space-between;gap:14px;padding:9px 0;border-bottom:1px solid color-mix(in srgb,var(--line) 55%,transparent)}
+  [data-tg="pretge"] .pt-proof dt{color:var(--sub);font:11.5px var(--sans)}
+  [data-tg="pretge"] .pt-proof dd{color:var(--ink);font:750 13px var(--mono);font-variant-numeric:tabular-nums}
+  [data-tg="pretge"] .pt-proof dl>div.sum dt{color:var(--ink);font-weight:700}
+  [data-tg="pretge"] .pt-proof dl>div.sum dd{color:var(--ink)}
+  [data-tg="pretge"] .pt-proof dt i{display:block;margin-top:3px;color:var(--dim);font:9.5px var(--mono);font-style:normal;letter-spacing:.3px}
+  [data-tg="pretge"] .pt-proof dl>div.ratio{border-bottom:0}
+  [data-tg="pretge"] .pt-proof dl>div.ratio dt{color:var(--grn);font:800 10px var(--mono);letter-spacing:1px;text-transform:uppercase}
+  [data-tg="pretge"] .pt-proof dl>div.ratio dd{color:var(--grn);font-size:20px}
+  [data-tg="pretge"] .pt-proof p{margin-top:12px;color:var(--sub);font:11px/1.6 var(--sans)}
+  [data-tg="pretge"] .pt-verdict{margin-top:16px;padding:16px 18px;border:1px solid color-mix(in srgb,var(--grn) 32%,var(--line));background:color-mix(in srgb,var(--grn) 5%,transparent)}
+  [data-tg="pretge"] .pt-verdict>span{display:block;margin-bottom:8px;color:var(--grn);font:800 9px var(--mono);letter-spacing:1.4px}
+  [data-tg="pretge"] .pt-verdict p{color:var(--ink);font:13px/1.65 var(--sans)}
+  [data-tg="pretge"] .pt-verdict p b{color:var(--grn)}
+  [data-tg="pretge"] .pt-verdict small{display:block;margin-top:10px;padding-top:10px;border-top:1px solid color-mix(in srgb,var(--grn) 20%,var(--line));color:var(--sub);font:11px/1.6 var(--sans)}
+
+  /* ---------- scenarios ---------- */
+  [data-tg="pretge"] .pt-scn-wrap{margin-top:26px;padding-top:20px;border-top:1px solid var(--line)}
+  [data-tg="pretge"] .pt-scn-table{margin-top:14px;border:1px solid var(--line)}
+  [data-tg="pretge"] .pt-scn{display:grid;grid-template-columns:minmax(150px,.75fr) repeat(3,minmax(140px,1fr))}
+  [data-tg="pretge"] .pt-scn>div{padding:13px 15px;border-left:1px solid var(--line);border-top:1px solid var(--line)}
+  [data-tg="pretge"] .pt-scn>div:first-child{border-left:0}
+  [data-tg="pretge"] .pt-scn:first-child>div{border-top:0}
+  [data-tg="pretge"] .pt-scn.head>div{background:color-mix(in srgb,var(--panel) 70%,transparent)}
+  [data-tg="pretge"] .pt-scn b{display:block;color:var(--ink);font:750 12.5px var(--sans)}
+  [data-tg="pretge"] .pt-scn small{display:block;margin-top:4px;color:var(--dim);font:9.5px/1.4 var(--mono)}
+  [data-tg="pretge"] .pt-scn-cell{text-align:right}
+  [data-tg="pretge"] .pt-scn-cell b{text-align:right}
+  [data-tg="pretge"] .pt-scn-cell strong{display:block;color:var(--ink);font:760 20px var(--mono);letter-spacing:-.5px;font-variant-numeric:tabular-nums}
+  [data-tg="pretge"] .pt-scn-cell.base{background:color-mix(in srgb,var(--grn) 5%,transparent)}
+  [data-tg="pretge"] .pt-scn-cell.base strong,[data-tg="pretge"] .pt-scn.head .pt-scn-cell.base b{color:var(--grn)}
+  [data-tg="pretge"] .pt-scn-note{margin-top:10px;color:var(--dim);font:10px/1.55 var(--mono)}
+
+  /* ---------- limits ---------- */
+  [data-tg="pretge"] .pt-limits{margin-top:18px;padding:0;list-style:none;counter-reset:ptl;border-top:1px solid var(--line)}
+  [data-tg="pretge"] .pt-limits li{position:relative;padding:13px 0 13px 40px;border-bottom:1px solid var(--line);color:var(--sub);font:12.5px/1.65 var(--sans)}
+  [data-tg="pretge"] .pt-limits li::before{counter-increment:ptl;content:counter(ptl,decimal-leading-zero);position:absolute;left:0;top:15px;color:var(--dim);font:800 10px var(--mono);letter-spacing:.6px}
+  [data-tg="pretge"] .pt-limits b{color:var(--ink);font-weight:700}
+  [data-tg="pretge"] .pt-src{margin-top:20px;padding:16px 0 0;border-top:1px solid var(--line)}
+  [data-tg="pretge"] .pt-src>span{display:block;margin-bottom:10px;color:var(--dim);font:800 9px var(--mono);letter-spacing:1.3px}
+  [data-tg="pretge"] .pt-src ul{list-style:none;padding:0;display:grid;gap:7px}
+  [data-tg="pretge"] .pt-src li{color:var(--sub);font:11px/1.5 var(--sans)}
+  [data-tg="pretge"] .pt-src b{display:inline-block;min-width:88px;color:var(--ink);font:750 11px var(--sans)}
+  [data-tg="pretge"] .pt-src code{color:var(--dim);font:10px var(--mono);word-break:break-all}
+
+  @media(max-width:1050px){
+    [data-tg="pretge"] .pt-facts{grid-template-columns:repeat(2,minmax(0,1fr))}
+    [data-tg="pretge"] .pt-facts>div:nth-child(odd){border-left:0}
+    [data-tg="pretge"] .pt-facts>div:nth-child(n+3){border-top:1px solid var(--line)}
+    [data-tg="pretge"] .pt-duel{grid-template-columns:1fr}
+    [data-tg="pretge"] .pt-audit{grid-template-columns:1fr}
+    [data-tg="pretge"] .pt-table{overflow-x:auto}
+    [data-tg="pretge"] .pt-row{min-width:760px}
+    [data-tg="pretge"] .pt-row.m{min-width:900px}
+  }
+  @media(max-width:700px){
+    /* the OHLC readout is nowrap and spills its panel at 375px */
+    [data-tg="pretge"] .pt-ohlc{max-width:100%;overflow:hidden;text-overflow:ellipsis}
+    [data-tg="pretge"] .pt-ohlc i{display:none}
+    /* the shared .cmp-command sets overflow-x:auto but its buttons still
+       flex-shrink, so the labels collide. Pin them at their natural width. */
+    [data-tg="pretge"] .cmp-command button{flex:0 0 auto}
+    [data-tg="pretge"] .cmp-section-head.split{display:block}
+    [data-tg="pretge"] .cmp-section-head.split p{margin-top:8px;max-width:none;text-align:left}
+    [data-tg="pretge"] .pt-facts{grid-template-columns:1fr}
+    [data-tg="pretge"] .pt-facts>div{border-left:0;border-top:1px solid var(--line)}
+    [data-tg="pretge"] .pt-facts>div:first-child{border-top:0}
+    [data-tg="pretge"] .pt-scn-table{overflow-x:auto}
+    [data-tg="pretge"] .pt-scn{min-width:620px}
+  }
+</style>
+
+<script src="dashboard.js?v=1787930578" defer></script>
 <script src="app-inline.js?v=20260809-theme-toggle" defer></script>
+<script src="comparison-lab-panels.js?v=1787812360" defer></script>
+<script src="pretge-panels.js?v=1787844401" defer></script>
+<script src="tradfi-panels.js?v=1787844159" defer></script>
 </body>
 </html>
