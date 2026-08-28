@@ -1495,12 +1495,19 @@ async function refreshPerpBoard(){
     PEERS.live=true;
     const t=new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
     PEERS.asOf='Live · CoinGecko · '+t;
+    markBasis();
     renderPeers(); renderPulseTable(); renderVsLighter(); renderKing(); renderValuation();
     setBoardLive('on','Live · '+t);
     refreshLlamaOi();
   }catch(err){
     console.warn('Perp board live sync fell back to snapshot:',err);
-    if(!PEERS.live){PEERS.asOf='Snapshot · '+(PEERS.snapAsOf||'last saved'); renderPeers(); renderPulseTable(); renderVsLighter(); renderValuation();}
+    if(!PEERS.live){
+      PEERS.asOf='Snapshot · '+(PEERS.snapAsOf||'last saved');
+      /* fold the live Variational numbers in first: recalc rewrites total, rank and
+         share, so the renders below all read the same basis */
+      if(MKT&&MKT.oi>0)recalcVariationalPeer(); else markBasis();
+      renderPeers(); renderPulseTable(); renderVsLighter(); renderValuation();
+    }
     renderKing();
     if(!PEERS.live)setBoardLive('err','Snapshot');
     refreshLlamaOi();
@@ -1538,6 +1545,49 @@ function recalcVariationalPeer(){
   const va=PEERS.list.find(p=>p.me),hl=PEERS.list.find(p=>p.n==='Hyperliquid');
   if(va&&PEERS.total)PEERS.varShare=+(va.oi/PEERS.total*100).toFixed(1);
   if(hl&&va&&va.oi)PEERS.vsHl=+(hl.oi/va.oi).toFixed(1);
+  markBasis();
+}
+
+/* Variational's own live feed refreshes its open interest even when the CoinGecko
+   board has fallen back to the saved snapshot. Freshness wins — but a share taken
+   across a live numerator and a snapshot denominator has to say so, and every view
+   that prints one has to be recomputed from the same list. */
+function markBasis(){
+  const stale=PEERS.list.filter(p=>!p.live);
+  PEERS.mixed=!PEERS.live&&stale.length>0&&stale.length<PEERS.list.length;
+  PEERS.mixedNote=PEERS.mixed
+    ? `${PEERS.list.length-stale.length} of ${PEERS.list.length} venues live · ${stale.length} carried from the ${PEERS.snapAsOf||'saved board'}`
+    : '';
+  renderBasisBadge();
+}
+function renderBasisBadge(){
+  const targets=[['#peersAsOf','cmp-basis-chip'],['#cmpSignalScale','cmp-basis-chip inline']];
+  document.querySelectorAll('.cmp-basis-chip').forEach(el=>el.remove());
+  const card=document.querySelector('.cmp-signal.scale .cmp-signal-top em');
+  /* the card's own confidence label has to come back once the basis is clean again */
+  if(card&&card.dataset.baseLabel===undefined){
+    card.dataset.baseLabel=card.textContent;
+    card.dataset.baseClass=card.className;
+  }
+  if(!PEERS.mixed){
+    if(card&&card.dataset.baseLabel!==undefined){
+      card.textContent=card.dataset.baseLabel;
+      card.className=card.dataset.baseClass||'';
+      card.removeAttribute('title');
+    }
+    return;
+  }
+  targets.forEach(([sel,cls])=>{
+    const host=$(sel); if(!host||!host.parentNode)return;
+    const chip=document.createElement('span');
+    chip.className=cls;
+    chip.textContent='MIXED BASIS';
+    chip.title='Mixed basis · '+PEERS.mixedNote;
+    host.parentNode.insertBefore(chip,host.nextSibling);
+  });
+  if(card){card.textContent='MIXED BASIS';card.className='mixed';card.title=PEERS.mixedNote;}
+  const asOf=$('#peersAsOf');
+  if(asOf&&PEERS.mixedNote)asOf.textContent=PEERS.asOf+' · '+PEERS.mixedNote;
 }
 function applyMarketModels(){
   const vols=MARKET_ACTIVITY.volume,ois=MARKET_ACTIVITY.oi,live=MARKET_ACTIVITY.live;
@@ -1811,7 +1861,10 @@ function renderVsLighter(){
         <td><span class="lead ${lead.c}">${lead.t}</span></td>
       </tr>`;
     }).join('')}</tbody></table>`;
-  $('#h2hNote').innerHTML=`Variational's 30D fee pool is an estimate: each day's net treasury-wallet inflow is divided by the latest official report-observed allocation available for that date. This is not audited protocol revenue, and non-revenue wallet transfers could affect it. Current Docs still describe a 10% treasury share; recent official reports imply 20%. OI uses ${OI_SRC==='llama'?'<a href="https://defillama.com/protocol/variational" target="_blank" rel="noopener">DeFiLlama open-interest</a> for all three venues':(PEERS.live?'live CoinGecko derivatives data':'the '+PEERS.snapAsOf+' snapshot')}. Volume uses ${PEERS.live?'live CoinGecko data':'the '+PEERS.snapAsOf+' snapshot'} for the current activity column. Lighter and Extended 30D fee pools come from <a href="https://defillama.com/protocol/lighter" target="_blank" rel="noopener">DeFiLlama Lighter</a> and <a href="https://defillama.com/protocol/extended" target="_blank" rel="noopener">DeFiLlama Extended</a>; Extended's <a href="https://dune.com/extended/extended" target="_blank" rel="noopener">Dune dashboard</a> all-time fee total is shown only as a source check. Extended does not publish a matched booked-revenue series here, so the revenue cell stays unavailable instead of being guessed. Same-basis fee-pool check: ${cB(fees30)} Variational (modeled) vs ${cB(li.fees30)} Lighter and ${cB(extFees30)} Extended over the last 30 days.`;
+  $('#h2hNote').innerHTML=`Variational's 30D fee pool is an estimate: each day's net treasury-wallet inflow is divided by the latest official report-observed allocation available for that date. This is not audited protocol revenue, and non-revenue wallet transfers could affect it. Current Docs still describe a 10% treasury share; recent official reports imply 20%. OI basis: ${PEERS.mixed
+    ?'<b>mixed</b> — Variational is live from its own feed while '+PEERS.mixedNote.replace(/^\d+ of \d+ venues live · /,'')+', so shares across the two are marked on the board'
+    :(PEERS.live?'live CoinGecko derivatives for the peers, Variational from its own live feed'
+               :'the '+PEERS.snapAsOf+' snapshot for every venue')}. Volume uses ${PEERS.live?'live CoinGecko data':'the '+PEERS.snapAsOf+' snapshot'} for the current activity column. Lighter and Extended 30D fee pools come from <a href="https://defillama.com/protocol/lighter" target="_blank" rel="noopener">DeFiLlama Lighter</a> and <a href="https://defillama.com/protocol/extended" target="_blank" rel="noopener">DeFiLlama Extended</a>; Extended's <a href="https://dune.com/extended/extended" target="_blank" rel="noopener">Dune dashboard</a> all-time fee total is shown only as a source check. Extended does not publish a matched booked-revenue series here, so the revenue cell stays unavailable instead of being guessed. Same-basis fee-pool check: ${cB(fees30)} Variational (modeled) vs ${cB(li.fees30)} Lighter and ${cB(extFees30)} Extended over the last 30 days.`;
   renderFeeVs();
 }
 
