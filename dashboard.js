@@ -2069,12 +2069,36 @@ function renderBiweeklyResearch(){
   const leverage=H.map((r,i)=>finite(r.oi)&&finite(r.tvl)?{i,d:r.asOf,v:r.oi/r.tvl,r}:null).filter(Boolean);
   const pnl=series('netProfit2w'), costs=H.map((r,i)=>finite(r.spreads2w)&&finite(r.mmCosts2w)&&finite(r.netProfit2w)?{i,d:r.asOf,c:r.mmCosts2w/r.spreads2w*100,p:r.netProfit2w/r.spreads2w*100,r}:null).filter(Boolean);
   const esc=s=>String(s).replace(/[&<>\"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[c]));
-  const frame=(num,title,sub,body,wide=false,note='')=>`<article class="bw-viz${wide?' wide':''}"><div class="bw-viz-kicker"><span>${String(num).padStart(2,'0')}</span><span>official reports · n=${H.length}</span></div><h3>${title}</h3><p class="bw-viz-sub">${sub}</p>${body}${note?`<div class="bw-viz-note">${note}</div>`:''}</article>`;
+  /* Readers kept asking what a move in these charts actually means, so every view now
+     states its direction and what a rise or a fall is evidence of, above the chart. */
+  const DIRW={up:['\u25b2','Higher is better'],down:['\u25bc','Lower is better'],none:['\u25c6','No single good direction']};
+  const READ={
+    1:{dir:'up',text:'Each bar is the total change from that metric\u2019s <em>first</em> disclosure to the latest report. A longer bar means more compounding since launch, not a bigger absolute number.'},
+    2:{dir:'none',text:'Both lines are shares of the same gross spreads, so they mirror each other. Red rising means more of every dollar goes on running the market; green rising means more of it survives as profit.'},
+    3:{dir:'up',text:'Each point is one two-week window on its own, not a running total. A dip is a weaker fortnight \u2014 it does not erase profit already earned.'},
+    4:{dir:'none',text:'High turnover means positions churn quickly. Low turnover means a deeper book where exposure sits longer. Neither reading is automatically the healthier one.'},
+    5:{dir:'up',text:'Volume is a running total, so it can only rise. Open interest is a live snapshot and can fall \u2014 a drop there is current exposure leaving, not history being lost.'},
+    6:{dir:'none',text:'If listing more markets drove volume, the points would climb from left to right. Read the shape of the whole cloud, not any single point.'},
+    7:{dir:'up',text:'Both lines rising is growth. The <em>gap</em> between them is the real signal: a widening gap would mean visitors who never come back.'},
+    8:{dir:'up',text:'A running total for liquidity providers, so it rarely falls. A flat stretch means a fortnight where LPs earned nothing net.'},
+    9:{dir:'none',text:'Rising means more trading exposure sits on each deposited dollar. A steady one-way climb is the shape to worry about; cycling up and down is ordinary.'},
+    10:{dir:'none',text:'The same series as 09 with the division spelled out. The number is exposure per $1 of reported deposits \u2014 it is not a borrowing rate or a margin requirement.'},
+    11:{dir:'down',text:'A longer bar means that metric jumps around more between reports. This measures <em>steadiness</em> only \u2014 not size, and not whether the moves were up or down.'},
+    12:{dir:'none',text:'Blue is what traders paid, red is what serving them cost, green is what was left. Watch red as a share of blue; blue growing on its own proves little.'},
+    13:{dir:'none',text:'A zoom on the last five points of 04. The direction of the streak carries more information than any single reading.'},
+    14:{dir:'none',text:'All three series are rescaled to 0\u2013100 inside their own range, so only the <em>timing</em> of the moves is comparable. The levels are not.'},
+    15:{dir:'up',text:'The same series as 03 with the peak, trough and latest marked, so you can see where the current fortnight sits inside the full range.'},
+    16:{dir:'none',text:'1.00 means the pair moves in lockstep, 0 means unrelated. It shows co-movement only \u2014 it does not say which one causes the other.'},
+    17:{dir:'down',text:'This cost line is the open question on the page. A narrowing range would make profit predictable; staying erratic means profit keeps swinging whatever volume does.'},
+    18:{dir:'none',text:'Volume here is the <em>change</em> in cumulative volume between two reports; open interest is the snapshot at the end of that window.'}
+  };
+  const frame=(num,title,sub,body,wide=false,note='')=>{const rd=READ[num];return `<article class="bw-viz${wide?' wide':''}"><div class="bw-viz-kicker"><span>${String(num).padStart(2,'0')}</span><span>official reports · n=${H.length}</span></div><h3>${title}</h3><p class="bw-viz-sub">${sub}</p>${rd?`<div class="bw-viz-read"><span class="dir ${rd.dir}"><i>${DIRW[rd.dir][0]}</i>${DIRW[rd.dir][1]}</span><span class="what">${rd.text}</span></div>`:''}${body}${note?`<div class="bw-viz-note">${note}</div>`:''}</article>`;};
+  const colourKey=`<div class="bw-key"><b>Colour code</b><span><i></i><em>Scale</em> \u2014 volume, open interest, markets</span><span><i class="b"></i><em>Paired series</em> \u2014 the second line in a comparison</span><span><i class="c"></i><em>Profit</em> \u2014 money kept</span><span><i class="d"></i><em>Cost</em> \u2014 money spent running the market</span></div>`;
   const line=(sets,{w=620,h=245,min=null,max=null,labels=true,area=false}={})=>{
     const all=sets.flatMap(s=>s.pts.map(p=>p.v)).filter(finite), lo=min??Math.min(...all),hi=max??Math.max(...all),span=hi-lo||1,P={l:48,r:18,t:15,b:32};
     const indices=sets.flatMap(s=>s.pts.map((p,i)=>finite(p.i)?p.i:i)),xMin=Math.min(...indices),xMax=Math.max(...indices),x=i=>P.l+(w-P.l-P.r)*((i-xMin)/(xMax-xMin||1)),y=v=>P.t+(h-P.t-P.b)*(1-(v-lo)/span);
     const grids=[0,.25,.5,.75,1].map(t=>`<line class="grid" x1="${P.l}" y1="${y(lo+span*t)}" x2="${w-P.r}" y2="${y(lo+span*t)}"/><text class="axis" x="${P.l-7}" y="${y(lo+span*t)+3}" text-anchor="end">${esc(nfmt(lo+span*t))}</text>`).join('');
-    const paths=sets.map((s,si)=>{const xi=(p,i)=>x(finite(p.i)?p.i:i),d=s.pts.map((p,i)=>(i?'L':'M')+xi(p,i)+' '+y(p.v)).join(' '),cls='series-'+String.fromCharCode(97+si),dots=s.pts.map((p,i)=>`<circle class="dot-${String.fromCharCode(97+si)}" cx="${xi(p,i)}" cy="${y(p.v)}" r="2.6"><title>${p.d} · ${nfmt(p.v)}</title></circle>`).join('');return `${area?`<path d="${d}L${xi(s.pts.at(-1),s.pts.length-1)} ${h-P.b}L${xi(s.pts[0],0)} ${h-P.b}Z" fill="var(--cyan)" opacity=".08"/>`:''}<path class="${cls}" d="${d}"/>${dots}`}).join('');
+    const paths=sets.map((s,si)=>{const key=s.cls||String.fromCharCode(97+si),xi=(p,i)=>x(finite(p.i)?p.i:i),d=s.pts.map((p,i)=>(i?'L':'M')+xi(p,i)+' '+y(p.v)).join(' '),cls='series-'+key,dots=s.pts.map((p,i)=>`<circle class="dot-${key}" cx="${xi(p,i)}" cy="${y(p.v)}" r="2.6"><title>${p.d} · ${nfmt(p.v)}</title></circle>`).join('');return `${area?`<path d="${d}L${xi(s.pts.at(-1),s.pts.length-1)} ${h-P.b}L${xi(s.pts[0],0)} ${h-P.b}Z" fill="var(--cyan)" opacity=".08"/>`:''}<path class="${cls}" d="${d}"/>${dots}`}).join('');
     const first=sets[0].pts[0]?.d?.slice(2,7)||'',last=sets[0].pts.at(-1)?.d?.slice(2,7)||'';
     return `<svg viewBox="0 0 ${w} ${h}" role="img">${grids}${paths}${labels?`<text class="axis" x="${P.l}" y="${h-8}">${first}</text><text class="axis" x="${w-P.r}" y="${h-8}" text-anchor="end">${last}</text>`:''}</svg>`;
   };
@@ -2092,24 +2116,106 @@ function renderBiweeklyResearch(){
   const correlations=[['Volume × markets',corr('totalVolume','markets')],['Volume × OI',corr('totalVolume','oi')],['Volume × DAU',corr('totalVolume','dau')],['DAU × WAU',corr('dau','wau')]].map(([l,v],i)=>({l,v,f:v.toFixed(2),cls:i===3?'dot-c':i===0?'dot-d':'dot-b'}));
   const recentTurn=turnover.slice(-5), nextLabel=recentTurn.length?recentTurn.at(-1).v.toFixed(1):'—',turnRebounded=recentTurn.length>1&&recentTurn.at(-1).v>recentTurn.at(-2).v;
   host.innerHTML=
+    colourKey+
     frame(1,'Long-run growth by metric','Change from the first comparable disclosure to the latest report.',bars(growth,{max:Math.max(600,...growth.map(x=>x.v))}),false,'<b>TVL is the weakest long-run growth metric.</b> Every series uses its own first disclosed value, so starting dates can differ.')+
-    frame(2,'Market-making cost and net profit margin','Share of gross spreads for every report with full P&L disclosure.',`<div class="bw-viz-legend"><span><i class="d"></i>MM cost</span><span><i class="c"></i>Net profit margin</span></div>${line([{pts:costs.map(x=>({v:x.c,d:x.d}))},{pts:costs.map(x=>({v:x.p,d:x.d}))}],{min:0,max:100})}`,false,'The mirror-like movement shows that <b>cost, not gross revenue, drives profit volatility.</b>')+
+    frame(2,'Market-making cost and net profit margin','Share of gross spreads for every report with full P&L disclosure.',`<div class="bw-viz-legend"><span><i class="d"></i>MM cost</span><span><i class="c"></i>Net profit margin</span></div>${line([{cls:'d',pts:costs.map(x=>({v:x.c,d:x.d}))},{cls:'c',pts:costs.map(x=>({v:x.p,d:x.d}))}],{min:0,max:100})}`,false,'The mirror-like movement shows that <b>cost, not gross revenue, drives profit volatility.</b>')+
     frame(3,'Net profit by two-week report','Contribution margin after disclosed market-making costs and rewards.',line([{pts:pnl}],{min:0,area:true}),false,`Peak ${nfmt(maxP.v)}, trough ${nfmt(minP.v)}, latest ${nfmt(latestP.v)}.`)+
     frame(4,'Volume-to-OI turnover','Incremental two-week volume divided by reported open interest.',line([{pts:turnover}],{min:0}),false,'Lower turnover means more open exposure sits behind each dollar of new trading volume.')+
-    frame(5,'Cumulative volume and open interest','Cumulative volume in $B and OI in $M, indexed to their own axes.',`<div class="bw-viz-legend"><span><i></i>Cumulative volume</span><span><i class="b"></i>Open interest</span></div>${line([{pts:volOi},{pts:oi}],{min:0})}`,true,'Both grew strongly, but OI moved through larger cycles while cumulative volume advanced continuously.')+
+    frame(5,'Cumulative volume and open interest','Cumulative volume in $B and OI in $M, indexed to their own axes.',`<div class="bw-viz-legend"><span><i class="a"></i>Cumulative volume</span><span><i class="b"></i>Open interest</span></div>${line([{pts:volOi},{pts:oi}],{min:0})}`,true,'Both grew strongly, but OI moved through larger cycles while cumulative volume advanced continuously.')+
     frame(6,'Cumulative volume vs listed markets','Each point is one official report at a shared biweekly grain.',scatter(volMarkets),false,'The point cloud does not support a simple “more listings equals more volume” relationship.')+
-    frame(7,'Daily and weekly active users','DAU and WAU move together across the complete reporting history.',`<div class="bw-viz-legend"><span><i class="c"></i>DAU</span><span><i class="d"></i>WAU</span></div>${line([{pts:dau},{pts:wau}],{min:0})}`,false,`Pearson r = <b>${corr('dau','wau').toFixed(2)}</b>. The strong relationship is consistent with repeat usage, though correlation alone does not prove retention.`)+
+    frame(7,'Daily and weekly active users','DAU and WAU move together across the complete reporting history.',`<div class="bw-viz-legend"><span><i class="a"></i>DAU</span><span><i class="b"></i>WAU</span></div>${line([{pts:dau},{pts:wau}],{min:0})}`,false,`Pearson r = <b>${corr('dau','wau').toFixed(2)}</b>. The strong relationship is consistent with repeat usage, though correlation alone does not prove retention.`)+
     frame(8,'Lifetime OLP PnL','Cumulative liquidity-provider PnL disclosed in official reports.',line([{pts:life}],{min:0,area:true}),false,`${nfmt(pct(life[0].v,life.at(-1).v),'%')} since the first report, with only ${life.slice(1).filter((p,i)=>p.v<life[i].v).length} declining periods.`)+
     frame(9,'Implied leverage over time','Open interest divided by TVL. TVL excludes some hedging accounts.',line([{pts:leverage}],{min:0}),true,`Range: <b>${Math.min(...leverage.map(x=>x.v)).toFixed(2)}x-${Math.max(...leverage.map(x=>x.v)).toFixed(2)}x</b>. It cycled rather than rising without interruption.`)+
     frame(10,'How to read implied leverage','Trading exposure per $1 of reported deposited capital.',`<div class="bw-formula"><div class="oi"><b>Open interest</b><span>trading exposure</span></div><b>÷</b><div class="tvl"><b>TVL</b><span>reported deposited capital</span></div></div>${line([{pts:leverage}],{min:0,h:165})}`,false,'The riskier pattern would be a persistent climb. The observed series falls, ranges, and later recovers.')+
     frame(11,'Volatility of report-over-report changes','Standard deviation of percentage changes, measured in percentage points.',bars(volat,{max:Math.max(...volat.map(x=>x.v))*1.12}),false,'Net profit is the most volatile disclosed metric by a wide margin.')+
-    frame(12,'Gross spreads, market-making cost, and net profit','Latest six reports with complete, directly comparable P&L fields.',`<div class="bw-viz-legend"><span><i></i>Gross spreads</span><span><i class="d"></i>MM cost</span><span><i class="c"></i>Net profit</span></div>${grouped}`,true,'These are contribution-margin components. They do not include every corporate operating expense.')+
+    frame(12,'Gross spreads, market-making cost, and net profit','Latest six reports with complete, directly comparable P&L fields.',`<div class="bw-viz-legend"><span><i class="a"></i>Gross spreads</span><span><i class="d"></i>MM cost</span><span><i class="c"></i>Net profit</span></div>${grouped}`,true,'These are contribution-margin components. They do not include every corporate operating expense.')+
     frame(13,'Recent turnover close-up','The latest five completed volume-to-OI observations.',line([{pts:recentTurn}],{min:0,h:190}),false,`Latest: <b>${nextLabel}x</b>. ${turnRebounded?'The fifth checkpoint rebounded, breaking the prior four-report decline.':'Another sequential decline would strengthen the case for a structural efficiency trend.'}`)+
-    frame(14,'The May 2026 joint slowdown','Listed markets, DAU, and net profit are normalized within each series so timing can be compared.',`<div class="bw-viz-legend"><span><i></i>Markets</span><span><i class="c"></i>DAU</span><span><i class="b"></i>Net profit</span></div>${line(['markets','dau','profit'].map((k)=>{const pts=may.filter(x=>finite(x[k])),lo=Math.min(...pts.map(x=>x[k])),hi=Math.max(...pts.map(x=>x[k]));return {pts:pts.map(x=>({i:x.i,d:x.d,v:(x[k]-lo)/(hi-lo||1)*100}))}}),{min:0,max:100})}`,true,'The synchronized dip suggests a broader protocol activity slowdown, not an isolated profitability event.')+
+    frame(14,'The May 2026 joint slowdown','Listed markets, DAU, and net profit are normalized within each series so timing can be compared.',`<div class="bw-viz-legend"><span><i class="a"></i>Markets</span><span><i class="b"></i>DAU</span><span><i class="c"></i>Net profit</span></div>${line(['markets','dau','profit'].map((k,ki)=>{const pts=may.filter(x=>finite(x[k])),lo=Math.min(...pts.map(x=>x[k])),hi=Math.max(...pts.map(x=>x[k]));return {cls:'abc'[ki],pts:pts.map(x=>({i:x.i,d:x.d,v:(x[k]-lo)/(hi-lo||1)*100}))}}),{min:0,max:100})}`,true,'The synchronized dip suggests a broader protocol activity slowdown, not an isolated profitability event.')+
     frame(15,'Net profit: peak, trough, and latest','Annotated landmarks from the directly comparable P&L era.',line([{pts:pnl}],{min:0}),false,`Peak <b>${maxP.d}: ${nfmt(maxP.v)}</b>. Trough <b>${minP.d}: ${nfmt(minP.v)}</b>. Latest <b>${latestP.d}: ${nfmt(latestP.v)}</b>.`)+
     frame(16,'What moves together','Pearson correlation across matched official-report observations.',bars(correlations,{max:1}),false,'Volume and listed markets have the weakest relationship. DAU and WAU have the strongest.')+
     frame(17,'What to watch: MM cost share','Current disclosed range and the two interpretation paths.',`<div class="bw-watch"><div class="source">MM cost has ranged ${Math.min(...costs.map(x=>x.c)).toFixed(0)}%-${Math.max(...costs.map(x=>x.c)).toFixed(0)}% of gross spreads</div><div class="good"><b>Narrows</b><span>Net profit volatility likely resolves</span></div><div class="arrow">→</div><div class="risk"><b>Stays erratic</b><span>Profit keeps swinging regardless of volume</span></div></div>`,false,'This is the highest-priority cost-quality monitor.')+
     frame(18,'What to watch: volume-to-OI turnover',turnRebounded?'The fifth checkpoint rebounded after four consecutive declines.':'A fifth straight decline would require a deeper operational explanation.',`${line([{pts:recentTurn}],{min:0,h:165})}<div class="bw-watch"><div class="source">Latest checkpoint: ${nextLabel}x ${turnRebounded?'and the decline streak broke':'with the decline still active'}</div><div class="good"><b>${turnRebounded?'Rebounded':'Stabilizes'}</b><span>${turnRebounded?'Current evidence favors a cyclical slowdown':'Recent decline may be cyclical'}</span></div><div class="arrow">→</div><div class="risk"><b>Watch next</b><span>A renewed decline would reopen the efficiency question</span></div></div>`,false,'Volume is calculated from the change in cumulative volume between reports; OI is the ending snapshot for each window.');
+}
+/* ---------- what changed since the previous official report ----------
+   Readers could see every number but not what the move meant, so this block states it.
+   Everything is derived from BIWEEKLY_HISTORY: append the next post and this rewrites
+   itself, including the record-high checks and the lead paragraph. */
+function renderBiweeklyChange(){
+  const host=$('#bwChange'); if(!host)return;
+  const H=BIWEEKLY_HISTORY;
+  if(H.length<2){host.hidden=true;return;}
+  host.hidden=false;
+  const iNow=H.length-1, iPrev=H.length-2, B=H[iNow], P=H[iPrev], fin=Number.isFinite;
+  const money=v=>{if(!fin(v))return '—';const a=Math.abs(v),sg=v<0?'-':'';
+    return sg+'$'+(a>=1e9?(a/1e9).toFixed(2)+'B':a>=1e6?(a/1e6).toFixed(2)+'M':Math.round(a).toLocaleString());};
+  const share=v=>fin(v)?v.toFixed(1)+'%':'—';
+  const count=v=>fin(v)?Math.round(v).toLocaleString():'—';
+  const newVol=(r,i)=>i>0&&fin(r.totalVolume)&&fin(H[i-1].totalVolume)?r.totalVolume-H[i-1].totalVolume:null;
+  const MEAS=[
+    {l:'Net profit',dir:'up',f:money,v:r=>r.netProfit2w,why:'what was left after every cost the report lists'},
+    {l:'Money paid by traders',dir:'up',f:money,v:r=>r.spreads2w,why:'gross spreads collected over the two weeks'},
+    {l:'Kept per $1 of spreads',dir:'up',f:share,pp:1,v:r=>fin(r.netProfit2w)&&r.spreads2w?r.netProfit2w/r.spreads2w*100:null,why:'net profit as a share of what traders paid — the rest goes on market-making and rewards'},
+    {l:'Treasury inflow',dir:'up',f:money,v:r=>r.treasury2w,why:'money routed to the protocol treasury in the window'},
+    {l:'OLP profit',dir:'up',f:money,v:r=>r.olpPnl2w,why:'what liquidity providers earned in the window'},
+    {l:'Treasury holdings',dir:'up',f:money,v:r=>r.treasuryHoldings,why:'real USDC the protocol holds today'},
+    {l:'TVL',dir:'up',f:money,v:r=>r.tvl,why:'deposited capital, excluding OLP hedging accounts'},
+    {l:'Open interest',dir:'up',f:money,v:r=>r.oi,why:'live dual-sided exposure on the report date'},
+    {l:'New volume traded',dir:'up',f:money,v:newVol,why:'volume added between the two reports'},
+    {l:'Markets listed',dir:'up',f:count,v:r=>r.markets,why:'instruments available to trade'}
+  ];
+  const rows=MEAS.map(m=>{
+    const now=m.v(B,iNow), was=m.v(P,iPrev);
+    if(!fin(now)||!fin(was))return null;
+    const abs=now-was, rel=was!==0?(now/was-1)*100:null;
+    const same=Math.abs(abs)<1e-9, better=m.dir==='up'?abs>0:abs<0;
+    const all=H.map((r,i)=>m.v(r,i)).filter(fin);
+    const canFall=all.some((v,i)=>i&&v<all[i-1]);
+    const record=all.length>2&&canFall&&(m.dir==='up'?now>=Math.max(...all):now<=Math.min(...all));
+    const delta=m.pp?(abs>=0?'+':'')+abs.toFixed(1)+'pp'
+                    :m.f===count?(abs>=0?'+':'')+Math.round(abs).toLocaleString()
+                    :fin(rel)?(rel>=0?'+':'')+rel.toFixed(1)+'%':'—';
+    return {...m,now,was,abs,rel,same,better,record,delta};
+  }).filter(Boolean);
+
+  const moved=rows.filter(r=>!r.same);
+  const up=moved.filter(r=>r.better), dn=moved.filter(r=>!r.better);
+  const esc=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  const find=l=>rows.find(r=>r.l===l);
+  const profit=find('Net profit'), spreads=find('Money paid by traders'), margin=find('Kept per $1 of spreads');
+  const costOf=r=>fin(r.mmCosts2w)&&r.spreads2w?r.mmCosts2w/r.spreads2w*100:null;
+  const cost=(fin(costOf(B))&&fin(costOf(P)))?{now:costOf(B),was:costOf(P),better:costOf(B)<costOf(P)}:null;
+
+  /* Lead paragraph: state the headline move, then the honest counterweight. */
+  const bits=[];
+  if(profit) bits.push(`Net profit came in at <b>${money(profit.now)}</b>${profit.record?` — the highest of the ${H.length} reports on record`:''}, <b>${profit.delta}</b> on the previous report`+(spreads?`, on <b>${money(spreads.now)}</b> paid by traders (<b>${spreads.delta}</b>)`:'')+'.');
+  if(cost&&margin){
+    bits.push(cost.better
+      ? `Costs improved with it: running the market took <b>${share(cost.now)}</b> of every spread dollar, down from ${share(cost.was)}, so the share kept rose to <b>${share(margin.now)}</b>.`
+      : `Costs grew faster than revenue, though: running the market took <b>${share(cost.now)}</b> of every spread dollar, up from ${share(cost.was)}, so the share kept slipped to <b>${share(margin.now)}</b> from ${share(margin.was)}.`);
+  }
+  const rel=(B.release&&P.release&&B.release!==P.release)?B.release:null;
+  const ships=Array.isArray(B.product)?B.product:[];
+  if(rel||ships.length) bits.push(`Product moved from <b>${esc(P.release||'the previous build')}</b> to <b>${esc(B.release||'the latest build')}</b>${ships.length?`, shipping ${ships.map(x=>esc(x.replace(/^(Added|Launched|Final preparations for) /i,'').toLowerCase())).join(', ')}`:''}.`);
+
+  const verdictCls=dn.length===0?'all-up':up.length>dn.length?'mostly-up':'mixed';
+  const rowHtml=r=>`<div class="bwc-row${r.record?' record':''}">
+      <div class="bwc-name"><b>${esc(r.l)}</b>${r.record?'<em class="up">record</em>':''}<small>${esc(r.why)}</small></div>
+      <div class="bwc-move"><span class="was">${r.f(r.was)}</span><i>→</i><span class="now">${r.f(r.now)}</span></div>
+      <div class="bwc-delta ${r.better?'up':'dn'}">${r.delta}</div>
+    </div>`;
+
+  const win=$('#bwChangeWindow');
+  if(win) win.textContent=`${P.asOf} → ${B.asOf} · ${moved.length} of ${rows.length} tracked measures moved`;
+
+  host.innerHTML=`<div class="bwc-lead ${verdictCls}">
+      <div class="bwc-score"><strong>${up.length}/${rows.length}</strong><span>tracked measures improved against the previous report</span></div>
+      <p>${bits.join(' ')}</p>
+    </div>
+    <div class="bwc-cols">
+      <div class="bwc-col gain"><h4><i class="up">▲</i>Better than last report<span>${up.length}</span></h4>${up.length?up.map(rowHtml).join(''):'<div class="bwc-empty">Nothing improved in this window.</div>'}</div>
+      <div class="bwc-col loss"><h4><i class="dn">▼</i>Worse, or worth watching<span>${dn.length}</span></h4>${dn.length?dn.map(rowHtml).join(''):'<div class="bwc-empty">No tracked measure moved the wrong way.</div>'}</div>
+    </div>
+    <div class="bwc-foot">Every figure is the official two-week disclosure for ${B.asOf} against ${P.asOf}. Shares are computed from the same report’s own fields, so they are internally consistent. “Record” marks the best value across all ${H.length} stored reports, and is only shown for measures that have fallen at least once — a series that only ever rises would earn the badge every report and tell you nothing.</div>`;
 }
 function renderBiweekly(){
   if(!$('#bwBlock'))return;
@@ -2175,6 +2281,7 @@ function renderBiweekly(){
       `<div class="delta-line"><em>since ${x.first.r.asOf}</em><i class="${x.long>=0?'up':'dn'}">${signed(x.long)}</i></div>`+
       `<div class="delta-line"><em>vs ${x.prior?.r.asOf||'prior'}</em><i class="${x.recent>=0?'up':'dn'}">${signed(x.recent)}</i></div>${spark(x.pts).replace('<svg','<svg class="bw-mini"')}</div>`).join('');
   }
+  renderBiweeklyChange();
   renderBiweeklyResearch();
   /* on-chain progress available today: treasury inflow per trailing 14-day window */
   if($('#bwTrend')&&typeof cumAt==='function'&&Array.isArray(SERIES)&&SERIES.length){
