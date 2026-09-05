@@ -626,6 +626,32 @@ const BIWEEKLY_HISTORY=[
   olpPnl2w:690353,           // OLP PnL
   olpPnlLife:17418874,       // lifetime OLP PnL
   treasuryHoldings:6336268   // current protocol treasury holdings (USDC)
+},
+{
+  asOf:'2026-09-05', src:'https://x.com/search?q=from%3Avariational_io%20biweekly%20update!&src=typed_query',
+  release:'v0.32.2',
+  product:[
+    'Launched swaps'
+  ],
+  totalVolume:318.68e9,      // Total Volume Traded
+  oi:1.67e9,                 // Current Dual-Sided OI
+  tvl:208.36e6,              // TVL (excludes OLP hedging accounts)
+  markets:551,               // Total markets currently listed
+  rewardsClaimed:8094935,    // Total rewards claimed (lifetime)
+  lossesRefunded:4559196,    // Total losses refunded (Sunset)
+  referralClaimed:3535739,   // Total referral rewards claimed (lifetime)
+  dau:null,                  // not published in this report
+  wau:null,                  // not published in this report
+  spreads2w:5080820,         // 2w spreads paid (gross revenue)
+  mmCosts2w:2802179,         // derived: spreads minus net revenue
+  netRevenue2w:2278641,      // 2w net revenue
+  rewards2w:247501,          // 2w rewards (all referral rewards in this report)
+  referralRewards2w:247501,  // 2w referral rewards
+  netProfit2w:2031140,       // 2w net profit
+  treasury2w:1016164,        // protocol treasury
+  olpPnl2w:1014976,          // OLP PnL
+  olpPnlLife:18433850,       // lifetime OLP PnL
+  treasuryHoldings:7361084   // current protocol treasury holdings (USDC)
 }
 ];
 const BIWEEKLY=BIWEEKLY_HISTORY[BIWEEKLY_HISTORY.length-1];
@@ -2121,7 +2147,7 @@ function renderBiweekly(){
   $('#bwPnl').innerHTML=
     `<div class="step"><span>1 · Money paid by traders</span><b>${M(B.spreads2w)}</b><small>spread payments during these 2 weeks</small></div>`+
     `<div class="step neg"><span>2 · Cost to run the market</span><b>-${M(B.mmCosts2w)}</b><small>market-making cost</small></div>`+
-    `<div class="step"><span>3 · Money after market cost</span><b>${M(B.netRevenue2w)}</b><small>corrected net revenue${B.netRevenue2wOriginal?` · originally ${M(B.netRevenue2wOriginal)}`:''}</small></div>`+
+    `<div class="step"><span>3 · Money after market cost</span><b>${M(B.netRevenue2w)}</b><small>${B.netRevenue2wOriginal?`corrected net revenue · originally ${M(B.netRevenue2wOriginal)}`:'net revenue'}</small></div>`+
     `<div class="step neg"><span>4 · Rewards paid to users</span><b>-${M(B.rewards2w)}</b><small>includes referral rewards</small></div>`+
     `<div class="step pos"><span>5 · Final money left over</span><b>${M(B.netProfit2w)}</b><small>net profit · ${margin.toFixed(0)} cents kept per $1 of spread payments</small></div>`;
   $('#bwGrid').innerHTML=[
