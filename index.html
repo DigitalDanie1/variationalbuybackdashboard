@@ -7595,7 +7595,21 @@ body.theme-light .valuation-report #valScatter .val-var-label{
   /* Exact values already communicate magnitude. The old bottom-up heat fill made
      each day look like two unrelated panels, so cells now use one continuous surface. */
   .earnings-calendar-pane .cal-fill{display:none!important}
-  .cal-grid.period-summary{grid-template-columns:repeat(auto-fit,minmax(300px,1fr))!important;gap:10px!important}
+  /* Weekly/Monthly reuses #calGrid, but the day-calendar rules pin it to a 7-column,
+     1050px-wide scroll strip with !important at a higher specificity (0,3,1) than the
+     old 0,2,0 selector here — so the summary cards inherited 146px columns and the
+     dollar amounts spilled out of them. This has to out-specify those rules, and the
+     Sun-Sat header is meaningless once each cell is a week or month total. */
+  body.v2-overview .earnings-workspace .cal-grid.period-summary,
+  body .earnings-calendar-pane .cal-grid.period-summary,
+  .cal-grid.period-summary{
+    grid-template-columns:repeat(auto-fit,minmax(300px,1fr))!important;
+    grid-auto-rows:auto!important;min-width:0!important;gap:10px!important;
+  }
+  .cal-scroll:has(>.cal-grid.period-summary){overflow-x:visible!important}
+  .cal-scroll:has(>.cal-grid.period-summary) .cal-weekdays{display:none!important}
+  /* The less/more heat ramp describes day-cell shading, which period cards do not use. */
+  .cal-scroll:has(>.cal-grid.period-summary)~.cal-legend{display:none!important}
   .cal-summary-card{min-height:150px!important;padding:16px!important;background:var(--panel)!important;box-shadow:none!important}
   .cal-summary-period{font-size:11px!important;color:var(--dim)!important}
   .cal-summary-metrics{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));margin-top:14px;border-top:1px solid var(--line)}
@@ -7603,7 +7617,7 @@ body.theme-light .valuation-report #valScatter .val-var-label{
   .cal-summary-metrics>div+div{padding-left:14px;border-left:1px solid var(--line)}
   .cal-summary-metrics span,.cal-summary-metrics small{display:block}
   .cal-summary-metrics span{font:800 10px/1.3 var(--mono);letter-spacing:.55px;text-transform:uppercase;color:var(--dim)}
-  .cal-summary-metrics strong{display:block;margin:7px 0 5px;font:800 clamp(20px,2vw,28px)/1 var(--mono);color:var(--cyan)}
+  .cal-summary-metrics strong{display:block;margin:7px 0 5px;font:800 clamp(18px,1.45vw,23px)/1 var(--mono);letter-spacing:-.5px;color:var(--cyan)}
   .cal-summary-metrics>div+div strong{color:var(--ink)}
   .cal-summary-metrics small{font-size:11px;line-height:1.35;color:var(--sub)}
   .earnings-calendar-pane .cal-num{font-size:16px!important;font-weight:850!important}
@@ -8735,6 +8749,8 @@ body.theme-light .valuation-report #valScatter .val-var-label{
         <div class="bw-grid" id="bwGrid"></div>
       </div>
     </section>
+    <div class="bw-head bw-change-head"><b>What Changed Since the Last Report</b><span id="bwChangeWindow">previous report → latest report</span></div>
+    <section class="bw-change" id="bwChange" aria-label="Report-over-report change summary"></section>
     <div class="bw-head bw-priority-head"><b>Eight Numbers That Tell the Story</b><span>current value · change since first comparable report · change vs previous report</span></div>
     <div class="bw-deltas" id="bwDeltas"></div>
     <section class="bw-research" aria-labelledby="bwResearchTitle">
@@ -9553,14 +9569,81 @@ body.theme-light .valuation-report #valScatter .val-var-label{
   .bw-viz .grid{stroke:var(--line);stroke-width:1}
   .bw-viz .axis{fill:var(--muted);font:9px var(--mono)}
   .bw-viz .value{fill:var(--text);font:700 9px var(--mono)}
-  .bw-viz .series-a{stroke:var(--cyan);fill:none;stroke-width:2.5;vector-effect:non-scaling-stroke}
-  .bw-viz .series-b{stroke:var(--amber);fill:none;stroke-width:2.5;vector-effect:non-scaling-stroke}
-  .bw-viz .series-c{stroke:var(--grn);fill:none;stroke-width:2.5;vector-effect:non-scaling-stroke}
-  .bw-viz .series-d{stroke:var(--red);fill:none;stroke-width:2.5;vector-effect:non-scaling-stroke}
-  .bw-viz .dot-a{fill:var(--cyan)}.bw-viz .dot-b{fill:var(--amber)}.bw-viz .dot-c{fill:var(--grn)}.bw-viz .dot-d{fill:var(--red)}
+  /* Series colours own four dedicated tokens instead of --cyan/--grn/--amber/--red.
+     body.v2-dashboard rebinds --cyan AND --grn to the brand accent, so series-a and
+     series-c were rendering the identical blue: chart 12's "gross spreads" and
+     "net profit" bars, and chart 14's two lines, were indistinguishable.
+     Meaning is fixed per colour: blue = scale, amber = the paired second series,
+     green = profit kept, red = cost paid. */
+  .bw-viz,.bw-key,.bw-change{--bwv-a:#4c9af8;--bwv-b:#ffc65a;--bwv-c:#4fd39a;--bwv-d:#ff8b8b}
+  body.theme-light .bw-viz,body.theme-light .bw-key,body.theme-light .bw-change{--bwv-a:#1a63bd;--bwv-b:#9a6300;--bwv-c:#0e7a52;--bwv-d:#c0392b}
+  .bw-viz .series-a{stroke:var(--bwv-a);fill:none;stroke-width:2.5;vector-effect:non-scaling-stroke}
+  .bw-viz .series-b{stroke:var(--bwv-b);fill:none;stroke-width:2.5;vector-effect:non-scaling-stroke;stroke-dasharray:7 4}
+  .bw-viz .series-c{stroke:var(--bwv-c);fill:none;stroke-width:2.5;vector-effect:non-scaling-stroke}
+  .bw-viz .series-d{stroke:var(--bwv-d);fill:none;stroke-width:2.5;vector-effect:non-scaling-stroke;stroke-dasharray:2.5 3.5}
+  .bw-viz .dot-a{fill:var(--bwv-a)}.bw-viz .dot-b{fill:var(--bwv-b)}.bw-viz .dot-c{fill:var(--bwv-c)}.bw-viz .dot-d{fill:var(--bwv-d)}
   .bw-viz-legend{display:flex;flex-wrap:wrap;gap:12px;margin:0 0 8px;color:var(--muted);font:9px var(--mono)}
-  .bw-viz-legend i{display:inline-block;width:15px;height:2px;margin-right:5px;vertical-align:middle;background:var(--cyan)}
-  .bw-viz-legend .b{background:var(--amber)}.bw-viz-legend .c{background:var(--grn)}.bw-viz-legend .d{background:var(--red)}
+  .bw-viz-legend i{display:inline-block;width:15px;height:3px;margin-right:5px;vertical-align:middle;background:var(--bwv-a)}
+  .bw-viz-legend .a{background:var(--bwv-a)}.bw-viz-legend .c{background:var(--bwv-c)}
+  .bw-viz-legend .b{background:repeating-linear-gradient(90deg,var(--bwv-b) 0 7px,transparent 7px 11px)}
+  .bw-viz-legend .d{background:repeating-linear-gradient(90deg,var(--bwv-d) 0 2.5px,transparent 2.5px 6px)}
+  .bw-key .b{background:repeating-linear-gradient(90deg,var(--bwv-b) 0 7px,transparent 7px 11px)}
+  .bw-key .d{background:repeating-linear-gradient(90deg,var(--bwv-d) 0 2.5px,transparent 2.5px 6px)}
+  /* How to read each chart: direction badge + what a rise or a fall actually means. */
+  .bw-viz-read{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 10px;margin:0 0 11px;padding:9px 10px;
+    border-left:2px solid var(--bwv-a);background:color-mix(in srgb,var(--bwv-a) 7%,transparent)}
+  .bw-viz-read .dir{display:inline-flex;align-items:baseline;gap:5px;flex:0 0 auto;
+    font:800 9px var(--mono);letter-spacing:.7px;text-transform:uppercase;color:var(--bwv-a)}
+  .bw-viz-read .dir.up{color:var(--bwv-c)}
+  .bw-viz-read .dir.down{color:var(--bwv-d)}
+  .bw-viz-read .dir.none{color:var(--muted)}
+  .bw-viz-read .dir i{font-style:normal;font-size:10px;line-height:1}
+  .bw-viz-read .what{flex:1 1 220px;min-width:0;color:var(--text);font-size:11px;line-height:1.55}
+  .bw-key{grid-column:1/-1;display:flex;flex-wrap:wrap;align-items:center;gap:8px 20px;margin:0;padding:12px 14px;
+    border:1px solid var(--line);background:color-mix(in srgb,var(--panel) 88%,transparent)}
+  .bw-key>b{color:var(--text);font:800 9px var(--mono);letter-spacing:1.2px;text-transform:uppercase}
+  .bw-key span{display:inline-flex;align-items:center;gap:7px;min-width:0;color:var(--muted);font-size:11px;line-height:1.5}
+  .bw-key i{flex:0 0 auto;width:16px;height:3px;background:var(--bwv-a)}
+  .bw-key .c{background:var(--bwv-c)}
+  .bw-key em{font-style:normal;color:var(--text);font-weight:700}
+  /* What changed since the last report */
+  .bw-change{display:grid;gap:14px;margin:0 0 26px}
+  .bwc-lead{display:grid;grid-template-columns:minmax(180px,.28fr) minmax(0,1fr);gap:18px;align-items:start;
+    padding:16px 18px;border:1px solid var(--line);border-left:3px solid var(--v2-accent,#4c9af8);
+    background:color-mix(in srgb,var(--panel) 88%,transparent)}
+  .bwc-lead.mixed{border-left-color:var(--bwv-b,#ffc65a)}
+  .bwc-score strong{display:block;color:var(--text);font:800 40px/1 var(--mono);letter-spacing:-1.5px}
+  .bwc-score span{display:block;margin-top:8px;color:var(--muted)!important;font-size:11px;line-height:1.5}
+  .bwc-lead p{margin:0;color:var(--text);font-size:13px;line-height:1.7}
+  .bwc-lead p b{font-weight:800}
+  .bwc-cols{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;align-items:start}
+  .bwc-col{min-width:0;border:1px solid var(--line);background:color-mix(in srgb,var(--panel) 88%,transparent)}
+  .bwc-col h4{display:flex;align-items:center;gap:8px;margin:0;padding:11px 14px;border-bottom:1px solid var(--line);
+    color:var(--text);font:800 10px var(--mono);letter-spacing:1.1px;text-transform:uppercase}
+  .bwc-col h4 i{font-style:normal;font-size:11px}
+  .bwc-col h4 span{margin-left:auto;color:var(--muted)!important;font-weight:700}
+
+  .bwc-row{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:10px 14px;align-items:center;
+    padding:11px 14px;border-bottom:1px solid var(--line)}
+  .bwc-row:last-child{border-bottom:0}
+  .bwc-name{min-width:0}
+  .bwc-name b{color:var(--text);font-size:12px;font-weight:800}
+  .bwc-name em{margin-left:6px;padding:1px 5px;border:1px solid currentColor;border-radius:2px;
+    font:800 8px var(--mono);letter-spacing:.8px;text-transform:uppercase;font-style:normal;opacity:.9}
+  .bwc-name small{display:block;margin-top:3px;color:var(--muted)!important;font-size:10px;line-height:1.45}
+  .bwc-move{display:flex;align-items:baseline;gap:6px;font:700 11px var(--mono);white-space:nowrap}
+  .bwc-move .was{color:var(--muted)!important}
+  .bwc-move i{font-style:normal;color:var(--dim)!important}
+  .bwc-move .now{color:var(--text);font-weight:800;font-size:12px}
+  .bwc-delta{min-width:58px;text-align:right;font:800 12px var(--mono);white-space:nowrap}
+  .bwc-delta.up{color:var(--bwv-c,#4fd39a)}
+  .bwc-delta.dn{color:var(--bwv-d,#ff8b8b)}
+  .bwc-empty{padding:14px;color:var(--muted);font-size:11px}
+  .bwc-foot{color:var(--muted)!important;font-size:10px;line-height:1.6}
+  @media(max-width:900px){
+    .bwc-lead{grid-template-columns:1fr}
+    .bwc-cols{grid-template-columns:1fr}
+  }
   .bw-viz-note{margin-top:10px;padding-top:9px;border-top:1px solid var(--line);color:var(--muted);font-size:10px;line-height:1.55}
   .bw-viz-note b{color:var(--text)}
   .bw-watch{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:stretch;margin-top:10px}
@@ -10060,7 +10143,7 @@ body.theme-light .valuation-report #valScatter .val-var-label{
   }
 </style>
 
-<script src="dashboard.js?v=1787930578" defer></script>
+<script src="dashboard.js?v=1788590689" defer></script>
 <script src="app-inline.js?v=20260809-theme-toggle" defer></script>
 <script src="comparison-lab-panels.js?v=1787812360" defer></script>
 <script src="pretge-panels.js?v=1787844401" defer></script>
