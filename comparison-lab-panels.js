@@ -1293,7 +1293,17 @@ function mountLab(){
      duplicate chart goes away while its FDV cards and peer table stay */
   const valChart=document.querySelector('#valScatter');
   if(valChart){ valChart.dataset.clReplacedBy='positioning field · valuation mode';
-    valChart.style.display='none'; }
+    valChart.style.display='none';
+    /* The scatter was the whole left column of a two-column grid, and .val-chart-wrap is
+       a flex column sized to hold it (align-self:stretch + height:100%, with the svg on
+       flex:1). Hiding the svg alone left the FDV cards floating above ~684px of empty box
+       beside the peer table. Both of those rules carry !important, so a plain inline style
+       loses to them — these have to be set at the same priority. */
+    const vgrid=valChart.closest('.val-grid');
+    if(vgrid) vgrid.style.setProperty('grid-template-columns','minmax(0,1fr)','important');
+    const vwrap=valChart.closest('.val-chart-wrap');
+    if(vwrap){ vwrap.style.setProperty('height','auto','important');
+      vwrap.style.setProperty('align-self','start','important'); } }
   /* that pane was one half of a two-column grid; without it the head-to-head table
      would sit in a 50% column with dead space beside it */
   const dgrid=report.querySelector('.cmp-direct-grid');

@@ -1685,28 +1685,47 @@ function renderMarketActivity(){
   for(let i=0;i<=4;i++){
     const y=pt+(H-pt-pb)*i/4,v=vMax*(1-i/4),o=oMax*(1-i/4);
     grid+=`<line x1="${pl}" y1="${y}" x2="${W-pr}" y2="${y}" stroke="#243244" stroke-opacity=".55"/>`+
-      `<text class="axis" x="${pl-9}" y="${y+4}" text-anchor="end">${marketBig(v).replace('$','')}</text>`+
-      `<text class="axis" x="${W-pr+9}" y="${y+4}">${marketBig(o).replace('$','')}</text>`;
+      `<text class="axis axis-vol" x="${pl-9}" y="${y+4}" text-anchor="end">${marketBig(v).replace('$','')}</text>`+
+      `<text class="axis axis-oi" x="${W-pr+9}" y="${y+4}">${marketBig(o).replace('$','')}</text>`;
   }
-  const volumeLine=rows.map((x,i)=>`${i?'L':'M'}${X(i).toFixed(1)} ${YV(x.vol).toFixed(1)}`).join(' ');
-  const oiLine=rows.map((x,i)=>`${i?'L':'M'}${X(i).toFixed(1)} ${YO(x.oi).toFixed(1)}`).join(' ');
-  const ticks=Math.min(W<520?5:7,n);
-  const tickIndices=[...new Set(Array.from({length:ticks},(_,i)=>Math.round(i*(n-1)/Math.max(1,ticks-1))))];
-  const dates=tickIndices.map(i=>`<text class="axis-date" x="${X(i)}" y="${H-14}" text-anchor="${i===0?'start':i===n-1?'end':'middle'}">${mdShort(rows[i].d)}</text>`).join('');
-  const last=rows[n-1],lx=X(n-1);
+  /* Volume is a per-day quantity, so it reads as bars — one bar is one day, which also
+     makes every recorded day visible. Open interest is a level at close, so it stays a
+     line drawn over them. A band scale puts each day in its own slot; the previous
+     point scale pinned the first and last samples to the plot edges, which would clip
+     half of the end bars. */
+  const band=(W-pl-pr)/n, XB=i=>pl+band*(i+.5);
+  const barW=Math.max(1.5,Math.min(26,band*(band>6?.62:.86)));
+  const baseY=H-pb;
+  const bars=rows.map((x,i)=>{
+    const h=Math.max(0,baseY-YV(x.vol));
+    return `<rect class="vol-bar" x="${(XB(i)-barW/2).toFixed(1)}" y="${YV(x.vol).toFixed(1)}" width="${barW.toFixed(1)}" height="${h.toFixed(1)}" rx="${Math.min(1.5,barW/3).toFixed(1)}"/>`;
+  }).join('');
+  const oiLine=rows.map((x,i)=>`${i?'L':'M'}${XB(i).toFixed(1)} ${YO(x.oi).toFixed(1)}`).join(' ');
+  /* Every day gets a tick. Labels go daily when a day-number fits, otherwise they thin
+     out; the first day of each month keeps the full MM/DD so the axis stays locatable. */
+  const dayTicks=rows.map((x,i)=>`<line class="day-tick" x1="${XB(i).toFixed(1)}" y1="${baseY}" x2="${XB(i).toFixed(1)}" y2="${baseY+4}"/>`).join('');
+  const monthStart=i=>i===0||rows[i].d.slice(0,7)!==rows[i-1].d.slice(0,7);
+  const label=(x,i,txt)=>`<text class="axis-date${monthStart(i)?' month':''}" x="${XB(i).toFixed(1)}" y="${H-13}" text-anchor="middle">${txt}</text>`;
+  const step=band>=20?1:Math.max(1,Math.ceil(34/band));
+  const dates=rows.map((x,i)=>{
+    if(i%step!==0&&i!==n-1&&!(step>1&&monthStart(i)))return '';
+    return label(x,i,step===1&&!monthStart(i)?x.d.slice(8,10):mdShort(x.d));
+  }).join('');
+  const last=rows[n-1],lx=XB(n-1);
   svg.innerHTML=`
-    <text class="axis" x="${pl}" y="${pt-10}" fill="#55a8ff">DAILY PERP VOLUME</text>
-    <text class="axis" x="${W-pr}" y="${pt-10}" fill="#ff7ba0" text-anchor="end">OPEN INTEREST · DAILY CLOSE</text>
+    <text class="axis axis-vol" x="${pl}" y="${pt-10}">▮ DAILY PERP VOLUME · bars · left axis</text>
+    <text class="axis axis-oi" x="${W-pr}" y="${pt-10}" text-anchor="end">OPEN INTEREST · DAILY CLOSE · line · right axis</text>
     ${grid}
-    <path d="${volumeLine}" fill="none" stroke="#4c9eff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="${oiLine}" fill="none" stroke="#ff4d83" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
-    <circle cx="${lx}" cy="${YV(last.vol)}" r="3.6" fill="#4c9eff"/>
+    ${bars}
+    <line class="day-base" x1="${pl}" y1="${baseY}" x2="${W-pr}" y2="${baseY}"/>
+    ${dayTicks}
+    <path d="${oiLine}" fill="none" stroke="#ff4d83" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
     <circle cx="${lx}" cy="${YO(last.oi)}" r="3.6" fill="#ff4d83"/>
     ${dates}<rect x="${pl}" y="${pt}" width="${W-pl-pr}" height="${H-pt-pb}" fill="transparent"/>`;
   const tt=$('#tt');
   svg.onmousemove=e=>{
     const rc=svg.getBoundingClientRect();
-    let i=Math.round((((e.clientX-rc.left)/rc.width*W)-pl)/(W-pl-pr)*(n-1));i=clamp(i,0,n-1);
+    let i=Math.floor((((e.clientX-rc.left)/rc.width*W)-pl)/band);i=clamp(i,0,n-1);
     const d=rows[i];
     tt.innerHTML=`<b>${d.d} · UTC daily observation</b><br>Perp Volume <b>${marketExact(d.vol)}</b><br>Open Interest <b>${marketExact(d.oi)}</b>`;
     placeTT(e);
