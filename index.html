@@ -2805,8 +2805,199 @@
   .market-legend{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
   .market-legend b{color:var(--sub);font:700 10px/1 var(--mono)}
   .market-legend i{display:inline-block;width:18px;height:3px;margin-right:6px;border-radius:999px;vertical-align:2px}
-  .market-legend .vol{background:#4c9eff;box-shadow:0 0 7px rgba(76,158,255,.28)}
+  .market-legend .vol{width:12px;height:11px;border-radius:1px;background:#4c9eff;
+    box-shadow:-5px 0 0 -2px #4c9eff,5px 0 0 -2px #4c9eff;vertical-align:-1px}
   .market-legend .oi{background:#ff4d83;box-shadow:0 0 7px rgba(255,77,131,.28)}
+  .market-legend b span{margin-left:7px;padding:1px 5px;border:1px solid var(--line);border-radius:2px;
+    color:var(--dim);font:700 9px var(--mono);letter-spacing:.5px;text-transform:uppercase}
+  /* each y-axis is tinted to the series that reads it */
+  /* ---- Tab · Two Paths ---- */
+  .tge-legend{display:flex;align-items:center;gap:18px;flex-wrap:wrap;margin:0 0 6px}
+  .tge-legend span{display:inline-flex;align-items:center;gap:7px;color:var(--muted)!important;font:700 10px var(--mono)}
+  .tge-legend i{width:16px;height:3px;border-radius:2px;background:currentColor}
+  .tge-legend .hype{color:#4fd6c3!important}
+  .tge-legend .lit{color:#b98cff!important}
+  .tge-legend .band i{width:12px;height:9px;border-radius:1px;border:0}
+  .tge-legend .band.up i{background:#4fd39a;opacity:.34}
+  .tge-legend .band.dn i{background:#ff8b8b;opacity:.34}
+  body.theme-light .tge-legend .band.up i{background:#0e7a52;opacity:.3}
+  body.theme-light .tge-legend .band.dn i{background:#c0392b;opacity:.3}
+  .tge-legend .swing{gap:5px}
+  .tge-legend .swing b{font-size:9px;line-height:1}
+  .tge-legend .swing b.up{color:#4fd39a;margin-left:9px}
+  .tge-legend .swing b.dn{color:#ff8b8b}
+  body.theme-light .tge-legend .swing b.up{color:#0e7a52}
+  body.theme-light .tge-legend .swing b.dn{color:#c0392b}
+  .tge-legend .now{color:#4c9af8!important}
+  .tge-legend .ref{color:var(--dim)!important}
+  .macro-chart{margin-bottom:10px}
+  .mc-tag{fill:var(--dim);font:800 9px var(--mono);letter-spacing:1px}
+  .mc-price{fill:none;stroke:#e9eef6;stroke-width:1.3;vector-effect:non-scaling-stroke}
+  .mc-ma{fill:none;stroke:var(--dim);stroke-width:1;stroke-dasharray:4 4;vector-effect:non-scaling-stroke}
+  .mc-dom{fill:none;stroke:#ffc65a;stroke-width:1.4;vector-effect:non-scaling-stroke}
+  .mc-hist.up{fill:#4fd6c3;fill-opacity:.85}
+  .mc-hist.dn{fill:#e2637a;fill-opacity:.85}
+  .mc-mark{stroke-width:1.6;opacity:.85}
+  .mc-mark.hype{stroke:#4fd6c3}
+  .mc-mark.lit{stroke:#b98cff}
+  .mc-mark.now{stroke:#4c9af8;stroke-dasharray:4 3}
+  .mc-mark-t{font:800 9px var(--mono);letter-spacing:.6px}
+  .mc-mark-t.hype{fill:#4fd6c3}
+  .mc-mark-t.lit{fill:#b98cff}
+  .mc-mark-t.now{fill:#4c9af8}
+  .zoomchips button{font-size:10.5px}
+  body.theme-light .mc-price{stroke:#14141a}
+  body.theme-light .mc-dom{stroke:#a86a00}
+  body.theme-light .mc-hist.up{fill:#0e7a52}
+  body.theme-light .mc-hist.dn{fill:#c0392b}
+  .btc-line{fill:none;stroke-width:2.1;vector-effect:non-scaling-stroke;stroke-linejoin:round}
+  .btc-line.hype{stroke:#4fd6c3}
+  .btc-line.lit{stroke:#b98cff}
+  .btc-line.now{stroke:#4c9af8;stroke-width:2.8}
+  .btc-zero{stroke:var(--dim);stroke-width:1;stroke-dasharray:3 4}
+  .btc-dot{fill:#4c9af8}
+  .tge-v.up{color:#4fd39a!important}
+  .tge-v.dn{color:#ff8b8b!important}
+  body.theme-light .btc-line.hype{stroke:#0d8f7c}
+  body.theme-light .btc-line.lit{stroke:#7c4dd6}
+  body.theme-light .btc-line.now{stroke:#1a63bd}
+  body.theme-light .btc-dot{fill:#1a63bd}
+  body.theme-light .tge-legend .now{color:#1a63bd!important}
+  body.theme-light .tge-v.up{color:#0e7a52!important}
+  body.theme-light .tge-v.dn{color:#c0392b!important}
+
+  .tge-legend .ref i{height:0;border-top:1px dashed currentColor;background:none}
+  .tge-legend em{font-style:normal}
+  .tge-chart{display:block;width:100%;height:auto;overflow:visible;margin:0 0 14px}
+  .tge-grid{stroke:var(--line);stroke-width:1}
+  .tge-grid.one{stroke:var(--dim);stroke-dasharray:4 4}
+  .tge-axis{fill:var(--muted);font:700 10px var(--mono)}
+  .tge-axis.one{fill:var(--text);font-weight:800}
+  .tge-line{fill:none;stroke-width:2.2;vector-effect:non-scaling-stroke;stroke-linejoin:round;stroke-linecap:round}
+  .tge-line.hype{stroke:#4fd6c3}
+  .tge-line.lit{stroke:#b98cff}
+  .tge-end{font:800 11px var(--mono)}
+  .tge-end.hype{fill:#4fd6c3}
+  .tge-end.lit{fill:#b98cff}
+  /* strength / weakness banding and the swing arrows between them */
+  .tge-zone.up{fill:#4fd39a;fill-opacity:.05}
+  .tge-zone.dn{fill:#ff8b8b;fill-opacity:.06}
+  .tge-zone-t{font:800 8.5px var(--mono);letter-spacing:1px;text-transform:uppercase}
+  .tge-zone-t.up{fill:#4fd39a;fill-opacity:.65}
+  .tge-zone-t.dn{fill:#ff8b8b;fill-opacity:.6}
+  /* down triangle above a high, up triangle below a low */
+  .tge-arrow{stroke:none}
+  .tge-arrow.dnsig{fill:#ff8b8b}
+  .tge-arrow.upsig{fill:#4fd39a}
+  .tge-arrow-t{font:800 9.5px var(--mono)}
+  .tge-arrow-t.hype{fill:#4fd6c3}
+  .tge-arrow-t.lit{fill:#b98cff}
+  .tge-arrow-c{font:800 9px var(--mono)}
+  .tge-arrow-c.up{fill:#4fd39a}
+  .tge-arrow-c.dn{fill:#ff8b8b}
+  body.theme-light .tge-arrow.dnsig{fill:#c0392b}
+  body.theme-light .tge-arrow.upsig{fill:#0e7a52}
+  body.theme-light .tge-arrow-t.hype{fill:#0d8f7c}
+  body.theme-light .tge-arrow-t.lit{fill:#7c4dd6}
+  body.theme-light .tge-arrow-c.up{fill:#0e7a52}
+  body.theme-light .tge-arrow-c.dn{fill:#c0392b}
+  body.theme-light .tge-zone-t.up{fill:#0e7a52}
+  body.theme-light .tge-zone-t.dn{fill:#c0392b}
+  .tge-table td.tge-v{font:800 13px var(--mono);color:var(--text)!important;white-space:nowrap}
+  .tge-table td.tge-v i{display:block;margin-top:2px;color:var(--muted)!important;font:700 9.5px var(--mono);font-style:normal}
+  body.theme-light .tge-line.hype{stroke:#0d8f7c}
+  body.theme-light .tge-line.lit{stroke:#7c4dd6}
+  body.theme-light .tge-end.hype{fill:#0d8f7c}
+  body.theme-light .tge-end.lit{fill:#7c4dd6}
+  body.theme-light .tge-legend .hype{color:#0d8f7c!important}
+  body.theme-light .tge-legend .lit{color:#7c4dd6!important}
+
+  .paths-report{padding:0 0 34px}
+  .tp-verdict{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(230px,.7fr);gap:18px;
+    margin:0 0 24px;padding:20px;border:1px solid var(--line);border-left:3px solid #f7b955;
+    background:color-mix(in srgb,var(--panel) 88%,transparent)}
+  .tp-eyebrow{display:block;color:var(--dim)!important;font:800 9px var(--mono);letter-spacing:1.5px;text-transform:uppercase}
+  .tp-verdict h3{margin:10px 0 10px;color:var(--text);font:800 21px/1.35 var(--sans)}
+  .tp-verdict h3 b.h{color:#4fd6c3}
+  .tp-verdict h3 b.l{color:#b98cff}
+  .tp-verdict p{margin:0;color:var(--muted)!important;font-size:12.5px;line-height:1.7}
+  .tp-verdict-side{display:grid;gap:10px;align-content:start}
+  .tp-score{padding:12px 14px;border:1px solid var(--line);background:var(--panel2)}
+  .tp-score span{display:block;color:var(--muted)!important;font:700 9.5px var(--mono);letter-spacing:.6px;text-transform:uppercase}
+  .tp-score strong{display:block;margin:7px 0 4px;color:var(--text);font:800 26px/1 var(--mono);letter-spacing:-.6px}
+  .tp-score small{color:var(--muted)!important;font-size:10.5px}
+  .tp-listings{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin:0 0 26px}
+  .tp-listing{padding:16px;border:1px solid var(--line);background:var(--panel);min-width:0}
+  .tp-listing.hype{border-top:2px solid #4fd6c3}
+  .tp-listing.lit{border-top:2px solid #b98cff}
+  .tp-tag{display:block;color:var(--dim)!important;font:800 9.5px var(--mono);letter-spacing:1.1px;text-transform:uppercase}
+  .tp-listing b{display:block;margin:9px 0 3px;color:var(--text);font:800 30px/1 var(--mono);letter-spacing:-1px}
+  .tp-listing em{display:block;color:var(--muted)!important;font-style:normal;font:700 10px var(--mono)}
+  .tp-listing p{margin:11px 0 8px;color:var(--text);font-size:13px;line-height:1.6}
+  .tp-listing small{color:var(--muted)!important;font-size:10.5px;line-height:1.5}
+  .tp-tablewrap{overflow-x:auto;margin:0 0 10px}
+  .tp-table{width:100%;min-width:0!important;border-collapse:collapse;font-size:12px}
+  .tp-table th{padding:9px 10px;border-bottom:1px solid var(--line);color:var(--muted)!important;
+    font:800 9.5px var(--mono);letter-spacing:.7px;text-transform:uppercase;text-align:right}
+  .tp-table th:first-child{text-align:left}
+  .tp-table td{padding:10px;border-bottom:1px solid var(--line);text-align:right;vertical-align:top}
+  .tp-table td.tp-k{text-align:left;min-width:210px}
+  .tp-k b{display:block;color:var(--text);font-size:12.5px;font-weight:800}
+  .tp-k small{display:block;margin-top:2px;color:var(--muted)!important;font-size:10.5px;line-height:1.45}
+  .tp-v{font:700 12px var(--mono);color:var(--muted)!important;white-space:nowrap}
+  .tp-v.win,.tp-v.now{color:var(--text)!important;font-weight:800}
+  .tp-side{font:800 10px var(--mono);letter-spacing:.6px;white-space:nowrap}
+  .tp-side.hype{color:#4fd6c3!important}
+  .tp-side.lit{color:#b98cff!important}
+  .tp-side i{margin-left:5px;font-style:normal;opacity:.7}
+  .tp-table tfoot td{border-bottom:0;border-top:1px solid var(--line);font:800 12px var(--mono);color:var(--text)!important}
+  .tp-note{margin:0 0 26px;color:var(--muted)!important;font-size:11px;line-height:1.65}
+  .tp-chips{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:0 0 14px}
+  .tp-chips span{color:var(--muted)!important;font:800 9.5px var(--mono);letter-spacing:.8px;text-transform:uppercase}
+  .tp-chips button{padding:6px 12px;border:1px solid var(--line);background:var(--panel);cursor:pointer;
+    color:var(--muted);font:700 11px var(--mono);border-radius:6px}
+  .tp-chips button:hover{color:var(--text)}
+  .tp-chips button.on{background:var(--v2-accent,#4c9af8);border-color:var(--v2-accent,#4c9af8);color:#04101d}
+  body.theme-light .tp-chips button.on{color:#fff}
+  .tp-bands{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:0 0 26px}
+  .tp-band{padding:14px;border:1px solid var(--line);background:var(--panel);opacity:.55;min-width:0}
+  .tp-band.on{opacity:1;border-color:var(--v2-accent,#4c9af8);box-shadow:inset 0 0 0 1px var(--v2-accent,#4c9af8)}
+  .tp-band span{display:block;color:var(--muted)!important;font:800 9.5px var(--mono);letter-spacing:.7px;text-transform:uppercase}
+  .tp-band b{display:block;margin:8px 0 4px;color:var(--text);font:800 20px/1 var(--mono)}
+  .tp-band em{display:block;margin-bottom:7px;color:var(--text);font-style:normal;font-size:11.5px;font-weight:800}
+  .tp-band p{margin:0;color:var(--muted)!important;font-size:10.5px;line-height:1.55}
+  .tp-caveat{padding:15px 17px;border:1px dashed var(--line);background:color-mix(in srgb,var(--panel) 70%,transparent)}
+  .tp-caveat b{display:block;margin-bottom:7px;color:var(--text);font:800 11px var(--mono);letter-spacing:.7px;text-transform:uppercase}
+  .tp-caveat p{margin:0;color:var(--muted)!important;font-size:11.5px;line-height:1.7}
+  @media(max-width:1100px){.tp-verdict{grid-template-columns:1fr}.tp-bands{grid-template-columns:repeat(2,minmax(0,1fr))}}
+  @media(max-width:760px){.tp-listings,.tp-bands{grid-template-columns:1fr}.tp-verdict h3{font-size:18px}}
+  /* language picker · sits beside the theme toggle in the global header */
+  .lang-picker{display:inline-flex;align-items:center;gap:1px;margin-right:12px;
+    border:1px solid var(--line);border-radius:7px;overflow:hidden;background:var(--panel)}
+  .lang-picker button{min-width:30px;padding:5px 8px;border:0;background:transparent;cursor:pointer;
+    color:var(--dim);font:800 10px var(--mono);letter-spacing:.4px;line-height:1.2}
+  .lang-picker button:hover{color:var(--ink)}
+  .lang-picker button.on{background:var(--v2-accent,#4c9af8);color:#04101d}
+  body.theme-light .lang-picker button.on{color:#fff}
+  /* Korean and Chinese need a fallback that actually has the glyphs; Geist has neither,
+     and without this the labels drop to a serif that breaks the header rhythm. */
+  :root{--cjk:"Pretendard Variable",Pretendard,"Noto Sans KR","Noto Sans SC",
+    "Apple SD Gothic Neo","PingFang SC","Microsoft YaHei",sans-serif}
+  html[lang="ko"] body,html[lang="zh-Hans"] body{font-family:var(--cjk)}
+  html[lang="ko"] .lang-picker button,html[lang="zh-Hans"] .lang-picker button{font-family:var(--cjk)}
+  @media(max-width:700px){.lang-picker{margin-right:8px}.lang-picker button{min-width:26px;padding:4px 6px}}
+  .chart .axis-vol{fill:#4c9eff}
+  /* one bar per day for the flow series, one tick per day on the baseline */
+  .chart .vol-bar{fill:#4c9eff;fill-opacity:.82}
+  .chart .day-base{stroke:#2c3d55;stroke-width:1}
+  .chart .day-tick{stroke:#2c3d55;stroke-width:1}
+  .chart .axis-date.month{fill:#c8d6ea;font-weight:800}
+  body.theme-light .chart .vol-bar{fill:#2f7fd6;fill-opacity:.9}
+  body.theme-light .chart .day-base,body.theme-light .chart .day-tick{stroke:#b9c7d9}
+  body.theme-light .chart .axis-date.month{fill:#1b2c42}
+  .chart .axis-oi{fill:#ff4d83}
+  body.theme-light .chart .axis-vol{fill:#1a63bd}
+  body.theme-light .chart .axis-oi{fill:#c0264f}
   .market-range{
     display:flex;
     gap:2px;
@@ -8664,7 +8855,7 @@ body.theme-light .valuation-report #valScatter .val-var-label{
     </div>
   </div>
   <div class="market-chart-head">
-    <div class="market-legend"><b><i class="vol"></i>Perp Volume · daily</b><b><i class="oi"></i>Open Interest · daily close</b></div>
+    <div class="market-legend"><b><i class="vol"></i>Perp Volume · daily bars<span>left axis</span></b><b><i class="oi"></i>Open Interest · daily close line<span>right axis</span></b></div>
     <div class="market-range" id="marketRange" aria-label="Market activity chart range">
       <button type="button" data-market-days="30">30D</button>
       <button type="button" data-market-days="90" class="on">90D</button>
@@ -10143,9 +10334,11 @@ body.theme-light .valuation-report #valScatter .val-var-label{
   }
 </style>
 
-<script src="dashboard.js?v=1788590689" defer></script>
+<script src="dashboard.js?v=1788879364" defer></script>
+<script src="paths-panels.js?v=1788879364" defer></script>
+<script src="i18n.js?v=1788879364" defer></script>
 <script src="app-inline.js?v=20260809-theme-toggle" defer></script>
-<script src="comparison-lab-panels.js?v=1787812360" defer></script>
+<script src="comparison-lab-panels.js?v=1788879364" defer></script>
 <script src="pretge-panels.js?v=1787844401" defer></script>
 <script src="tradfi-panels.js?v=1787844159" defer></script>
 </body>
