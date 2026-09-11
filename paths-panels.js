@@ -21,7 +21,7 @@
   var LISTINGS = {
     hype: { label: 'HYPE', who: 'Hyperliquid', tge: '2024-11-29', open: 3.20, supply: 952.31e6,
       fdv: 3.05e9, accent: '#4fd6c3',
-      shape: '×11 within 22 days of listing, then a deep retrace',
+      shape: '+901% within 22 days of listing, then a deep retrace',
       note: 'First print on listing day $3.20 × total supply 952.31M' },
     lit: { label: 'LIT', who: 'Lighter', tge: '2025-12-22', open: 3.9955, supply: 1e9,
       fdv: 4.00e9, accent: '#b98cff',
@@ -111,8 +111,42 @@
     return piv;
   }
 
+
+  var PIVOT_ROWS = null;
+
+  /* Every swing turn in one aligned grid. A table is the precise form for this — the same
+     numbers floating at per-point offsets on the plot could not be scanned or compared. */
+  function swingTable() {
+    if (!PIVOT_ROWS) return '';
+    var rows = [];
+    ['hype', 'lit'].forEach(function (k) {
+      PIVOT_ROWS[k].forEach(function (p, idx) {
+        var prev = idx ? PIVOT_ROWS[k][idx - 1] : null;
+        rows.push({ k: k, i: p.i, t: p.t, v: p.v,
+          leg: prev ? (p.v / prev.v - 1) * 100 : null,
+          days: prev ? p.i - prev.i : null });
+      });
+    });
+    rows.sort(function (a, b) { return a.i - b.i || (a.k === 'hype' ? -1 : 1); });
+    var body = rows.map(function (r) {
+      var up = r.t === 'low';
+      return '<tr>' +
+        '<td class="sw-tok ' + r.k + '">' + (r.k === 'hype' ? 'HYPE' : 'LIT') + '</td>' +
+        '<td class="sw-turn"><i class="' + (up ? 'up' : 'dn') + '">' + (up ? '\u25b2' : '\u25bc') + '</i>' +
+        (up ? 'low' : 'high') + '</td>' +
+        '<td class="sw-day">D+' + r.i + '</td>' +
+        '<td class="sw-val">' + fromListing(r.v) + '</td>' +
+        '<td class="sw-leg ' + (r.leg === null ? '' : r.leg >= 0 ? 'up' : 'dn') + '">' +
+        (r.leg === null ? '\u2014' : (r.leg >= 0 ? '+' : '\u2212') + Math.abs(r.leg).toFixed(0) + '%') + '</td>' +
+        '<td class="sw-days">' + (r.days === null ? '\u2014' : r.days + 'd') + '</td></tr>';
+    }).join('');
+    return '<div class="tp-tablewrap"><table class="tp-table sw-table"><thead><tr>' +
+      '<th>Token</th><th>Turn</th><th>Day</th><th>From listing</th><th>Leg move</th><th>Days in leg</th>' +
+      '</tr></thead><tbody>' + body + '</tbody></table></div>';
+  }
+
   function tgeChart() {
-    var W = 960, pl = 52, pr = 96, pt = 46, plotH = 340, pb = 40;
+    var W = 960, pl = 96, pr = 128, pt = 50, plotH = 380, pb = 56;
     var H = pt + plotH + pb;
     var h = parseSeries('hype').slice(0, WINDOW);
     var l = parseSeries('lit').slice(0, WINDOW);
@@ -132,73 +166,73 @@
       '" height="' + (pt + plotH - yOne).toFixed(1) + '"/>' +
       '';
 
-    var ticks = [0.2, 0.5, 1, 2, 5, 10, 20].filter(function (t) { return t >= lo * 0.78 && t <= hi * 1.30; });
-    var grid = ticks.map(function (t) {
+    /* A log axis with only round decades hides how far apart the two paths really are,
+       so the ladder is the full 1-2-3-5-7 sequence per decade: labelled majors, plain
+       tick marks for the rest. */
+    var MAJOR = [0.2, 0.5, 1, 2, 5, 10, 20], MINOR = [0.3, 0.7, 1.5, 3, 7, 15];
+    var inRange = function (t) { return t >= lo * 0.78 && t <= hi * 1.30; };
+    var grid = MAJOR.filter(inRange).map(function (t) {
       var one = t === 1;
       return '<line class="tge-grid' + (one ? ' one' : '') + '" x1="' + pl + '" y1="' + Y(t).toFixed(1) +
         '" x2="' + (W - pr) + '" y2="' + Y(t).toFixed(1) + '"/>' +
-        '<text class="tge-axis' + (one ? ' one' : '') + '" x="' + (pl - 8) + '" y="' + (Y(t) + 4).toFixed(1) +
-        '" text-anchor="end">\u00d7' + t + '</text>';
-    }).join('');
+        '<line class="tge-tick" x1="' + (pl - 5) + '" y1="' + Y(t).toFixed(1) + '" x2="' + pl +
+        '" y2="' + Y(t).toFixed(1) + '"/>' +
+        '<text class="tge-axis' + (one ? ' one' : '') + '" x="' + (pl - 9) + '" y="' + (Y(t) + 4).toFixed(1) +
+        '" text-anchor="end">' + (one ? '0%' : fromListing(t)) + '</text>';
+    }).join('') + MINOR.filter(inRange).map(function (t) {
+      return '<line class="tge-grid minor" x1="' + pl + '" y1="' + Y(t).toFixed(1) + '" x2="' + (W - pr) +
+        '" y2="' + Y(t).toFixed(1) + '"/>' +
+        '<line class="tge-tick minor" x1="' + (pl - 3) + '" y1="' + Y(t).toFixed(1) + '" x2="' + pl +
+        '" y2="' + Y(t).toFixed(1) + '"/>' +
+        '<text class="tge-axis minor" x="' + (pl - 9) + '" y="' + (Y(t) + 3.5).toFixed(1) +
+        '" text-anchor="end">' + fromListing(t) + '</text>';
+    }).join('') +
+      '<line class="tge-spine" x1="' + pl + '" y1="' + pt + '" x2="' + pl + '" y2="' + (pt + plotH) + '"/>' +
+      '<line class="tge-spine" x1="' + pl + '" y1="' + (pt + plotH) + '" x2="' + (W - pr) +
+      '" y2="' + (pt + plotH) + '"/>';
 
     var path = function (a) {
       return a.map(function (v, i) { return (i ? 'L' : 'M') + X(i).toFixed(1) + ' ' + Y(v).toFixed(1); }).join(' ');
     };
 
-    /* TradingView convention: a down triangle sits ABOVE a swing high, an up triangle
-       sits BELOW a swing low, so the marker never covers the candle it refers to. Each
-       one carries the move that produced it. Labels are dropped where two pivots fall
-       within 46px of each other — the arrow still marks the turn, the text would collide. */
+    /* TradingView convention: a down triangle above a swing high, an up triangle below a
+       swing low. No text on the plot — scattered two-line labels at per-point offsets is
+       exactly what made this read as noise. The numbers live in the aligned table below,
+       and each arrow carries its own tooltip. */
     var piv = { hype: zigzag(h, PIVOT_TH), lit: zigzag(l, PIVOT_TH) };
     var marks = '';
-    /* Both series share the plot, so placed labels are tracked together — a per-series
-       check let HYPE's D+0 label land on top of LIT's. */
-    var placed = [];
-    var fits = function (x, y) {
-      for (var i = 0; i < placed.length; i++) {
-        if (Math.abs(placed[i][0] - x) < 46 && Math.abs(placed[i][1] - y) < 24) return false;
-      }
-      return true;
-    };
     ['hype', 'lit'].forEach(function (k) {
       piv[k].forEach(function (p, idx) {
         var x = X(p.i), y = Y(p.v), high = p.t === 'high';
-        var off = high ? -11 : 11, sz = 5.2;
+        var off = high ? -10 : 10, sz = 5.4;
         var tri = high
           ? (x - sz) + ',' + (y + off - sz) + ' ' + (x + sz) + ',' + (y + off - sz) + ' ' + x + ',' + (y + off + 1.5)
           : (x - sz) + ',' + (y + off + sz) + ' ' + (x + sz) + ',' + (y + off + sz) + ' ' + x + ',' + (y + off - 1.5);
         var prev = idx ? piv[k][idx - 1] : null;
         var ch = prev ? (p.v / prev.v - 1) * 100 : null;
         marks += '<polygon class="tge-arrow ' + k + ' ' + (high ? 'dnsig' : 'upsig') + '" points="' + tri + '">' +
-          '<title>D+' + p.i + ' \u00b7 \u00d7' + p.v.toFixed(2) +
-          (ch === null ? '' : ' \u00b7 ' + (ch >= 0 ? '+' : '\u2212') + Math.abs(ch).toFixed(0) + '% from the previous turn') +
-          '</title></polygon>';
-        var ty = high ? y + off - 13 : y + off + 22;
-        var cy = high ? ty - 10 : ty + 10;
-        /* a low sitting near the floor would push its labels into the date axis — flip
-           the pair above the arrow instead of letting them escape the plot */
-        if (Math.max(ty, cy) > pt + plotH - 4) { ty = y + off - 24; cy = ty - 10; }
-        if (Math.min(ty, cy) < pt + 10) { ty = y + off + 26; cy = ty + 10; }
-        if (fits(x, ty)) {
-          placed.push([x, ty], [x, cy]);
-          marks += '<text class="tge-arrow-t ' + k + '" x="' + x.toFixed(1) + '" y="' + ty.toFixed(1) +
-            '" text-anchor="middle">\u00d7' + p.v.toFixed(2) + '</text>';
-          if (ch !== null) marks += '<text class="tge-arrow-c ' + (ch >= 0 ? 'up' : 'dn') + '" x="' + x.toFixed(1) +
-            '" y="' + cy.toFixed(1) + '" text-anchor="middle">' +
-            (ch >= 0 ? '+' : '\u2212') + Math.abs(ch).toFixed(0) + '%</text>';
-        }
+          '<title>' + (k === 'hype' ? 'HYPE' : 'LIT') + ' \u00b7 D+' + p.i + ' \u00b7 ' + fromListing(p.v) +
+          ' from listing' + (ch === null ? '' : ' \u00b7 leg ' + (ch >= 0 ? '+' : '\u2212') +
+          Math.abs(ch).toFixed(0) + '%') + '</title></polygon>';
       });
     });
+    PIVOT_ROWS = piv;
 
-    var days = [0, 22, 60, 120, 180, 257].filter(function (d) { return d < n; });
-    var dayLabels = days.map(function (d) {
-      return '<text class="tge-axis" x="' + X(d).toFixed(1) + '" y="' + (H - 12) +
-        '" text-anchor="' + (d === 0 ? 'start' : d === 257 ? 'end' : 'middle') + '">D+' + d + '</text>';
-    }).join('');
+    /* one row of dates, one interval: 30-day majors with 10-day minors between them.
+       The old layout put D+22 and the last day on a second baseline, which is what made
+       the axis look uneven. */
+    var dayLabels = '';
+    for (var dd = 0; dd <= n - 1; dd += 10) {
+      var major = dd % 30 === 0;
+      dayLabels += '<line class="tge-tick' + (major ? '' : ' minor') + '" x1="' + X(dd).toFixed(1) +
+        '" y1="' + (pt + plotH) + '" x2="' + X(dd).toFixed(1) + '" y2="' + (pt + plotH + (major ? 7 : 3.5)) + '"/>';
+      if (major) dayLabels += '<text class="tge-axis" x="' + X(dd).toFixed(1) + '" y="' + (pt + plotH + 24) +
+        '" text-anchor="middle">D+' + dd + '</text>';
+    }
     var endLab = function (a, cls, name) {
       var v = a[a.length - 1];
       return '<text class="tge-end ' + cls + '" x="' + (W - pr + 8) + '" y="' + (Y(v) + 4).toFixed(1) + '">' +
-        name + ' \u00d7' + v.toFixed(1) + '</text>';
+        name + ' ' + fromListing(v) + '</text>';
     };
     return '<svg class="tge-chart" viewBox="0 0 ' + W + ' ' + H + '" role="img" ' +
       'aria-label="Price as a multiple of listing price with swing highs and lows marked by arrows">' +
@@ -210,9 +244,106 @@
   }
 
   /* Same window, same milestones, so the two are actually comparable. */
+
+  /* ---- each token against Bitcoin over its own first 258 days ----
+     Two panels rather than one: HYPE and Lighter listed 13 months apart, so a single
+     calendar axis would compare each token to a different stretch of Bitcoin. Aligning
+     both to their own D+0 puts the question the same way twice — while Bitcoin did this,
+     the token did that — and the two panels are then directly comparable to each other.
+     Every series is indexed to 1.00 on the listing day. */
+  function overlay() {
+    var M = macro();
+    var out = {};
+    [['hype', MACRO.mark.hype], ['lit', MACRO.mark.lit]].forEach(function (pair) {
+      var k = pair[0], at = pair[1];
+      var tok = parseSeries(k).slice(0, WINDOW);
+      var base = M.btc[at];
+      var btc = [];
+      for (var i = 0; i < tok.length && at + i < M.btc.length; i++) btc.push(M.btc[at + i] / base);
+      var n = Math.min(tok.length, btc.length);
+      tok = tok.slice(0, n); btc = btc.slice(0, n);
+      /* daily log returns -> beta and correlation of the token against Bitcoin */
+      var rt = [], rb = [];
+      for (var j = 1; j < n; j++) {
+        rt.push(Math.log(tok[j] / tok[j - 1]));
+        rb.push(Math.log(btc[j] / btc[j - 1]));
+      }
+      var mean = function (a) { return a.reduce(function (x, y) { return x + y; }, 0) / a.length; };
+      var mt = mean(rt), mb = mean(rb), cov = 0, vb = 0, vt = 0;
+      for (var q = 0; q < rt.length; q++) {
+        cov += (rt[q] - mt) * (rb[q] - mb);
+        vb += (rb[q] - mb) * (rb[q] - mb);
+        vt += (rt[q] - mt) * (rt[q] - mt);
+      }
+      out[k] = { tok: tok, btc: btc, n: n,
+        beta: vb ? cov / vb : 0,
+        corr: (vb && vt) ? cov / Math.sqrt(vb * vt) : 0 };
+    });
+    return out;
+  }
+
+  function overlayChart() {
+    var O = overlay();
+    var W = 960, pl = 58, pr = 104, gap = 30, panelH = 190, pt = 26, pb = 34;
+    var H = pt + panelH * 2 + gap + pb;
+    var panels = ['hype', 'lit'].map(function (k, row) {
+      var D = O[k], top = pt + row * (panelH + gap);
+      var all = D.tok.concat(D.btc);
+      var lo = Math.min.apply(null, all), hi = Math.max.apply(null, all);
+      var L = Math.log10(lo * 0.9), Hh = Math.log10(hi * 1.15);
+      var X = function (i) { return pl + (i / Math.max(1, D.n - 1)) * (W - pl - pr); };
+      var Y = function (v) { return top + (1 - (Math.log10(v) - L) / (Hh - L)) * panelH; };
+      var path = function (a) {
+        return a.map(function (v, i) { return (i ? 'L' : 'M') + X(i).toFixed(1) + ' ' + Y(v).toFixed(1); }).join(' ');
+      };
+      var ladder = [0.2, 0.5, 1, 2, 5, 10, 20].filter(function (t) { return t >= lo * 0.9 && t <= hi * 1.15; });
+      var grid = ladder.map(function (t) {
+        var one = t === 1;
+        return '<line class="tge-grid' + (one ? ' one' : '') + '" x1="' + pl + '" y1="' + Y(t).toFixed(1) +
+          '" x2="' + (W - pr) + '" y2="' + Y(t).toFixed(1) + '"/>' +
+          '<line class="tge-tick" x1="' + (pl - 5) + '" y1="' + Y(t).toFixed(1) + '" x2="' + pl + '" y2="' + Y(t).toFixed(1) + '"/>' +
+          '<text class="tge-axis' + (one ? ' one' : '') + '" x="' + (pl - 9) + '" y="' + (Y(t) + 4).toFixed(1) +
+          '" text-anchor="end">\u00d7' + t + '</text>';
+      }).join('');
+      var xt = '';
+      for (var dd = 0; dd < D.n; dd += 30) {
+        xt += '<line class="tge-tick" x1="' + X(dd).toFixed(1) + '" y1="' + (top + panelH) +
+          '" x2="' + X(dd).toFixed(1) + '" y2="' + (top + panelH + 5) + '"/>';
+        if (row === 1) xt += '<text class="tge-axis" x="' + X(dd).toFixed(1) + '" y="' + (H - 14) +
+          '" text-anchor="middle">D+' + dd + '</text>';
+      }
+      var lastT = D.tok[D.n - 1], lastB = D.btc[D.n - 1];
+      var yT = Y(lastT), yB = Y(lastB);
+      if (Math.abs(yT - yB) < 13) { var mid = (yT + yB) / 2; yT = mid + (lastT >= lastB ? -7 : 7); yB = mid + (lastT >= lastB ? 7 : -7); }
+      return '<g>' + grid + xt +
+        '<line class="tge-spine" x1="' + pl + '" y1="' + top + '" x2="' + pl + '" y2="' + (top + panelH) + '"/>' +
+        '<line class="tge-spine" x1="' + pl + '" y1="' + (top + panelH) + '" x2="' + (W - pr) + '" y2="' + (top + panelH) + '"/>' +
+        '<path class="ov-btc" d="' + path(D.btc) + '"/>' +
+        '<path class="ov-tok ' + k + '" d="' + path(D.tok) + '"/>' +
+        '<text class="ov-title ' + k + '" x="' + pl + '" y="' + (top - 8) + '">' +
+        (k === 'hype' ? 'HYPE vs Bitcoin' : 'LIT vs Bitcoin') + '</text>' +
+        '<text class="ov-stat" x="' + (W - pr) + '" y="' + (top - 8) + '" text-anchor="end">beta ' +
+        D.beta.toFixed(2) + ' \u00b7 correlation ' + D.corr.toFixed(2) + '</text>' +
+        '<text class="tge-end ' + k + '" x="' + (W - pr + 8) + '" y="' + (yT + 4).toFixed(1) + '">' +
+        (k === 'hype' ? 'HYPE' : 'LIT') + ' \u00d7' + lastT.toFixed(2) + '</text>' +
+        '<text class="ov-btc-end" x="' + (W - pr + 8) + '" y="' + (yB + 4).toFixed(1) + '">BTC \u00d7' +
+        lastB.toFixed(2) + '</text></g>';
+    }).join('');
+    return '<svg class="tge-chart" viewBox="0 0 ' + W + ' ' + H + '" role="img" ' +
+      'aria-label="Each token against Bitcoin over its own first 258 days, both indexed to the listing day">' +
+      panels + '</svg>';
+  }
+
+  /* Everything the reader compares is quoted as a change from the listing price. Multiples
+     and percentages side by side were the confusing part: x0.54 and -46% are the same fact. */
+  var fromListing = function (mult) {
+    var pc = (mult - 1) * 100;
+    return (pc >= 0 ? '+' : '\u2212') + Math.abs(pc).toFixed(0) + '%';
+  };
+
   function milestones() {
     var rows = [
-      { k: 'Day 22', why: 'where HYPE had already run ×10' },
+      { k: 'Day 22', why: 'where HYPE had already run +901%' },
       { k: 'Worst point', why: 'lowest close in the window' },
       { k: 'Day 257', why: 'end of the shared window' },
       { k: 'Best point', why: 'highest close in the window' }
@@ -224,9 +355,9 @@
     };
     var H = get('hype'), Lt = get('lit');
     var cell = function (v, d) {
-      return '<td class="tge-v">×' + v.toFixed(2) + (d != null ? '<i>D+' + d + '</i>' : '') + '</td>';
+      return '<td class="tge-v">' + fromListing(v) + (d != null ? '<i>D+' + d + '</i>' : '') + '</td>';
     };
-    return '<div class="tp-tablewrap"><table class="tp-table tge-table"><thead><tr>' +
+    return '<div class="tp-tablewrap"><table class="tp-table tge-table hl-cols"><thead><tr>' +
       '<th>Milestone</th><th>HYPE</th><th>LIT</th></tr></thead><tbody>' +
       '<tr><td class="tp-k"><b>' + rows[0].k + '</b><small>' + rows[0].why + '</small></td>' + cell(H.d22) + cell(Lt.d22) + '</tr>' +
       '<tr><td class="tp-k"><b>' + rows[1].k + '</b><small>' + rows[1].why + '</small></td>' + cell(H.min, H.minD) + cell(Lt.min, Lt.minD) + '</tr>' +
@@ -518,13 +649,18 @@
       '<div class="bw-head"><b>The Two Listings, On The Record</b><span>what actually happened to each</span></div>' +
       '<div class="tp-listings">' + listings + '</div>' +
 
-      '<div class="bw-head"><b>What Each One Actually Did</b><span><i>price as a multiple of its own listing price · first 258 days · log scale</i></span></div>' +
+      '<div class="bw-head"><b>What Each One Actually Did</b><span><i>change from its own listing price · first 258 days · log scale</i></span></div>' +
       '<div class="tge-legend"><span class="hype"><i></i>HYPE · Hyperliquid</span><span class="lit"><i></i>LIT · Lighter</span>' +
-      '<span class="ref"><i></i><em>×1 = listing price</em></span>' +
+      '<span class="ref"><i></i><em>0% = listing price</em></span>' +
       '<span class="swing"><b class="dn">\u25bc</b><em>swing high</em><b class="up">\u25b2</b><em>swing low</em></span>' +
       '<span class="band up"><i></i><em>above listing price</em></span>' +
       '<span class="band dn"><i></i><em>below listing price</em></span></div>' +
-      tgeChart() + milestones() +
+      tgeChart() + swingTable() + milestones() +
+      '<div class="bw-head"><b>Each One Against Bitcoin</b><span><i>both indexed to 1.00 on the listing day \u00b7 same 258-day window</i></span></div>' +
+      '<div class="tge-legend"><span class="btcref"><i></i>Bitcoin</span>' +
+      '<span class="hype"><i></i>HYPE</span><span class="lit"><i></i>LIT</span></div>' +
+      overlayChart() +
+      '<div class="tp-note"><b>Beta</b> is how much the token moved per 1% Bitcoin move, <b>correlation</b> how tightly the two moved together, both from daily log returns over the window. This is what separates the two listings: one rose while Bitcoin fell, the other did not.</div>' +
       '<div class="tp-note"><b>Arrows mark the swing turns</b> — down above a high, up below a low — and each is labelled with the move that produced it. A turn is only recorded once the price reversed more than 28% from its running extreme, so noise never becomes a signal. Hover any arrow for the exact day and move. Both curves are cut to 258 days — Lighter\'s full life so far — so the two are read over the same window. Over its own longer run HYPE went on to ×27.5. Day 0 is each listing day, not a shared calendar date: the macro table above is what puts them on the same clock.</div>' +
 
       '<div class="bw-head"><b>The Three Listings On One Bitcoin Chart</b><span><i>where each listing sits in Bitcoin\'s own history</i></span></div>' +
@@ -543,7 +679,7 @@
       '<div class="tp-note">Hyperliquid listed into a Bitcoin that had run hard for three months. Lighter listed into one that had been falling. Today sits between them — rising, but from a lower base and with less force. That is the same reading the table below scores metric by metric; this is what it looks like.</div>' +
 
       '<div class="bw-head"><b>Macro Conditions: Then vs Now</b><span><i>each row goes to the listing today sits closer to</i> · ' + ASOF + '</span></div>' +
-      '<div class="tp-tablewrap"><table class="tp-table"><thead><tr>' +
+      '<div class="tp-tablewrap"><table class="tp-table hl-cols"><thead><tr>' +
       '<th>Condition</th><th>HYPE listing day</th><th>LIT listing day</th><th>Today</th><th>Closer to</th>' +
       '</tr></thead><tbody>' + rows + '</tbody>' +
       '<tfoot><tr><td>Weighted tally</td><td class="tp-v' + (t.hype > t.lit ? ' win' : '') + '">' + t.hype + '</td>' +
