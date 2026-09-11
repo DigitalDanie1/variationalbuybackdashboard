@@ -56,12 +56,23 @@
       'below listing price': '상장가 아래 · 약세',
       'swing high': '고점 전환',
       'swing low': '저점 전환',
+      'Each One Against Bitcoin': '각각 비트코인 대비',
+      'both indexed to 1.00 on the listing day · same 258-day window': '둘 다 상장일 1.00 지수화 · 동일 258일 구간',
+      'Bitcoin': '비트코인',
       'What Each One Actually Did': '각각 실제로 어떻게 됐나',
-      'price as a multiple of its own listing price · first 258 days · log scale': '자기 상장가 대비 배수 · 상장 후 258일 · 로그 눈금',
-      '×1 = listing price': '×1 = 상장가',
+      'change from its own listing price · first 258 days · log scale': '자기 상장가 대비 등락 · 상장 후 258일 · 로그 눈금',
+      '0% = listing price': '0% = 상장가',
+      'Token': '토큰',
+      'Turn': '전환',
+      'Day': '일차',
+      'From listing': '상장가 대비',
+      'Leg move': '구간 등락',
+      'Days in leg': '구간 일수',
+      'high': '고점',
+      'low': '저점',
       'Milestone': '분기점',
       'Day 22': '22일차',
-      'where HYPE had already run ×10': 'HYPE가 이미 ×10을 찍은 시점',
+      'where HYPE had already run +901%': 'HYPE가 이미 +901%를 찍은 시점',
       'Worst point': '최저점',
       'lowest close in the window': '해당 구간 최저 종가',
       'Best point': '최고점',
@@ -78,7 +89,7 @@
       'The early listing price looks like': '상장 초반 가격은 이쪽을 닮았습니다',
       'Volume, open interest, listed markets and disclosed profit are all growing together — that is the HYPE shape. But $61.8M raised, roughly 50% of supply to insiders, and an unannounced day-one float make a straight HYPE-style run hard to assume. Those two readings point in different directions, so they are scored separately below.': '거래량·미결제약정·상장 마켓 수·공시 순이익이 함께 커지고 있습니다 — HYPE의 모양입니다. 다만 투자금 $61.8M, 관계자 몫 약 50%, 그리고 아직 공개되지 않은 초기 유통량 때문에 HYPE처럼 곧장 직선으로 오른다고 보기는 어렵습니다. 두 판단이 서로 다른 방향을 가리키므로 아래에서 따로 채점합니다.',
       'FDV at listing': '상장 시점 FDV',
-      '×11 within 22 days of listing, then a deep retrace': '상장 22일 만에 ×11, 그 뒤 큰 되돌림',
+      '+901% within 22 days of listing, then a deep retrace': '상장 22일 만에 +901%, 그 뒤 큰 되돌림',
       'First print on listing day $3.20 × total supply 952.31M': '상장일 최초가 $3.20 × 총공급 952.31M',
       'Top right at listing, −80% to the bottom, back to listing price 8 months later': '상장 직후가 고점, 바닥까지 −80%, 8개월 만에 상장가 회복',
       'First listing candle open $4.00 × total supply 1B · first close $3.89': '상장 첫 캔들 시가 $4.00 × 총공급 10억 · 첫 종가 $3.89',
@@ -283,12 +294,23 @@
       'below listing price': '低于上市价 · 弱势',
       'swing high': '高点拐点',
       'swing low': '低点拐点',
+      'Each One Against Bitcoin': '各自与比特币对比',
+      'both indexed to 1.00 on the listing day · same 258-day window': '两者均以上市日为 1.00 指数化 · 相同 258 天区间',
+      'Bitcoin': '比特币',
       'What Each One Actually Did': '各自实际走势如何',
-      'price as a multiple of its own listing price · first 258 days · log scale': '相对自身上市价的倍数 · 上市后 258 天 · 对数刻度',
-      '×1 = listing price': '×1 = 上市价',
+      'change from its own listing price · first 258 days · log scale': '相对自身上市价的涨跌 · 上市后 258 天 · 对数刻度',
+      '0% = listing price': '0% = 上市价',
+      'Token': '代币',
+      'Turn': '拐点',
+      'Day': '天数',
+      'From listing': '相对上市价',
+      'Leg move': '区间涨跌',
+      'Days in leg': '区间天数',
+      'high': '高点',
+      'low': '低点',
       'Milestone': '关键节点',
       'Day 22': '第 22 天',
-      'where HYPE had already run ×10': 'HYPE 此时已涨 10 倍',
+      'where HYPE had already run +901%': 'HYPE 此时已 +901%',
       'Worst point': '最低点',
       'lowest close in the window': '该区间最低收盘',
       'Best point': '最高点',
@@ -305,7 +327,7 @@
       'The early listing price looks like': '上市初期价格更像',
       'Volume, open interest, listed markets and disclosed profit are all growing together — that is the HYPE shape. But $61.8M raised, roughly 50% of supply to insiders, and an unannounced day-one float make a straight HYPE-style run hard to assume. Those two readings point in different directions, so they are scored separately below.': '交易量、未平仓合约、上线市场数与披露利润同步增长 — 这是 HYPE 的形态。但已融资 $61.8M、约 50% 供应量归内部人、且首日流通量尚未公布，因此很难假设会像 HYPE 那样一路直线上涨。两项判断方向相反，故在下方分开计分。',
       'FDV at listing': '上市时 FDV',
-      '×11 within 22 days of listing, then a deep retrace': '上市 22 天内涨 11 倍，随后大幅回撤',
+      '+901% within 22 days of listing, then a deep retrace': '上市 22 天内 +901%，随后大幅回撤',
       'First print on listing day $3.20 × total supply 952.31M': '上市日首笔成交 $3.20 × 总供应 952.31M',
       'Top right at listing, −80% to the bottom, back to listing price 8 months later': '上市即为顶部，最低下跌 80%，8 个月后回到上市价',
       'First listing candle open $4.00 × total supply 1B · first close $3.89': '上市首根K线开盘 $4.00 × 总供应 10 亿 · 首日收盘 $3.89',
@@ -481,6 +503,181 @@
     }
   };
 
+  /* The bulk content dictionary ships in i18n-dict.js (loaded just before this file) so
+     the engine stays readable. Missing file simply means chrome-only coverage. */
+  var BULK = (typeof window !== 'undefined' && window.__VDICT) || null;
+  if (BULK) {
+    ['ko', 'zh'].forEach(function (code) {
+      var add = BULK[code];
+      if (!add) return;
+      for (var k in add) if (!DICT[code][k]) DICT[code][k] = add[k];
+    });
+  }
+
+  /* Numbers move. "Variational is 1.29x the larger" becomes 1.31x on the next data drop,
+     and "Aug 14, 2026" becomes tomorrow's date every day. An exact-match table would go
+     silently back to English at that point, so every entry whose translation reuses the
+     source's own figures is ALSO registered under a token-blind key, with the live values
+     spliced back in at apply time.
+
+     Month names count as tokens because Korean and Chinese write them as digits and put
+     them in a different order: "Aug 14, 2026" becomes "2026 8 14". Each figure in the
+     translation is matched back to the source token it came from, so order is free. An
+     entry is registered only when that mapping is total and unambiguous - anything that
+     drops, duplicates or invents a figure is skipped rather than guessed at. */
+  /* Built rather than written out because the page uses "Aug", "August" and "AUG" in
+     different panels, and a case-sensitive list silently misses two of the three. Lowercase
+     is deliberately NOT accepted: "may" and "march" are ordinary words in the prose. */
+  function casedAlternation(words) {
+    var alts = [];
+    words.forEach(function (w) {
+      [w, w.slice(0, 3)].forEach(function (f) {
+        if (alts.indexOf(f) < 0) alts.push(f);
+        if (alts.indexOf(f.toUpperCase()) < 0) alts.push(f.toUpperCase());
+      });
+    });
+    return alts.sort(function (a, b) { return b.length - a.length; }).join('|');
+  }
+  var MONTHS = casedAlternation(['January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'Sept', 'October', 'November', 'December']);
+  var MONTH_IX = { jan: 1, feb: 2, mar: 3, apr: 4, may: 5, jun: 6, jul: 7, aug: 8, sep: 9, oct: 10, nov: 11, dec: 12 };
+  /* The sign is part of the token: a page that reads "+3.6% DoD" today reads
+     "-0.3% DoD" tomorrow, and leaving + and - in the literal text would make those
+     two different shapes. */
+  var NUM = '[\\u2212+-]?\\d+(?:,\\d+)*(?:\\.\\d+)?';
+  /* The up/down arrows in the share post flip with the data exactly like the figures
+     they sit beside, so they are tokens too - otherwise one metric turning red is
+     enough to make the whole post read as a string nobody translated. */
+  var TREND = '\\u2191|\\u2193|\\u25b2|\\u25bc|\\ud83d\\udcc8|\\ud83d\\udcc9';
+  var TOKRE = new RegExp(NUM + '|' + TREND + '|\\b(?:' + MONTHS + ')\\b', 'g');
+  var NUMRE = new RegExp(NUM + '|' + TREND, 'g');
+  var TRENDRE = new RegExp('^(?:' + TREND + ')$');
+  var BLIND = '\u0001';
+  var WBLIND = '\u0002';
+  var MBLIND = '\u0003';
+  var YBLIND = '\u0004';
+  var TBLIND = '\u0005';
+
+  /* Weekday names are not figures, so the number machinery cannot carry them and a
+     hard-coded "Monday" in a translation would be wrong by tomorrow. A translation writes
+     %W wherever the source had a weekday; each one is filled from the live string in
+     order, so "Wed / ... Wed" stays consistent when the day rolls over. */
+  var WDRE = new RegExp('\\b(?:' + casedAlternation(['Monday', 'Tuesday', 'Wednesday',
+    'Thursday', 'Friday', 'Saturday', 'Sunday']) + ')\\b', 'g');
+  var WD_IX = { mon: 0, tue: 1, wed: 2, thu: 3, fri: 4, sat: 5, sun: 6 };
+  var WD_NAMES = {
+    ko: ['월요일', '화요일', '수요일', '목요일', '금요일', '토요일', '일요일'],
+    zh: ['周一', '周二', '周三', '周四', '周五', '周六', '周日']
+  };
+
+  function fillWeekdays(text, src, code) {
+    if (text.indexOf('%W') < 0) return text;
+    WDRE.lastIndex = 0;
+    var found = src.match(WDRE) || [], names = WD_NAMES[code] || [], i = 0;
+    return text.replace(/%W/g, function () {
+      var raw = found[i] || found[0];
+      i++;
+      if (!raw) return '';
+      var ix = WD_IX[raw.slice(0, 3).toLowerCase()];
+      return (ix === undefined || !names[ix]) ? raw : names[ix];
+    });
+  }
+
+  function monthOf(tok) {
+    if (/^\d/.test(tok)) return 0;
+    return MONTH_IX[tok.slice(0, 3).toLowerCase()] || 0;
+  }
+  function unpad(t) { return t.replace(/^([\u2212+-]?)0+(?=\d)/, '$1'); }
+  function tokensOf(str, re) { re.lastIndex = 0; return str.match(re) || []; }
+  /* Three markers, not one. "AUG 5" and "Jul 2026" are the same shape if every token
+     blinds alike, so the pair poisons each other and both stop generalising. Separating
+     month names and four-digit years from ordinary figures keeps a day label a day label. */
+  function markerFor(tok) {
+    if (TRENDRE.test(tok)) return TBLIND;
+    if (monthOf(tok)) return MBLIND;
+    return /^\d{4}$/.test(tok) && +tok >= 1900 && +tok <= 2199 ? YBLIND : BLIND;
+  }
+  function blind(str) {
+    TOKRE.lastIndex = 0; WDRE.lastIndex = 0;
+    return str.replace(TOKRE, markerFor).replace(WDRE, WBLIND);
+  }
+
+  var PATTERNS = { ko: null, zh: null };
+
+  function patternsFor(code) {
+    if (PATTERNS[code]) return PATTERNS[code];
+    var table = DICT[code] || {}, out = Object.create(null);
+    for (var k in table) {
+      var src = tokensOf(k, TOKRE);
+      if (!src.length) continue;
+      var v = table[k], got = tokensOf(v, NUMRE);
+      if (got.length !== src.length) continue;
+
+      /* Match every figure in the translation back to one source token, left to right,
+         taking the first token not already claimed. The greedy pass is what makes repeated
+         figures work: "08:00-09:00" has two 00s and "MCAP $88M ... FDV $88M" two $88Ms,
+         and demanding a unique match would throw both entries away. An entry whose figures
+         cannot all be accounted for is still skipped rather than guessed at. */
+      var slot = [], used = {}, ok = true;
+      for (var g = 0; g < got.length && ok; g++) {
+        var hit = -1;
+        for (var i = 0; i < src.length; i++) {
+          if (used[i]) continue;
+          var mo = monthOf(src[i]);
+          /* "Sep 09" is written "9월 09일" or "9 月 9 日" depending on the translator's
+             ear, so leading zeros are ignored on both sides of the comparison. The live
+             token is what gets substituted back, so its own formatting survives. */
+          var same = mo ? (String(mo) === unpad(got[g])) : (unpad(src[i]) === unpad(got[g]));
+          if (same) { hit = i; break; }
+        }
+        if (hit < 0) ok = false; else { used[hit] = 1; slot.push(hit); }
+      }
+      if (!ok) continue;
+
+      var shape = blind(k);
+      /* A shape made of nothing but placeholders would match any bare figure on the page.
+         Every month name is already in the dictionary by name, so there is nothing to gain
+         and a "2026" rendered as "2026월" to lose. */
+      if (!/[^\u0001-\u0005]/.test(shape)) continue;
+      var tpl = [], last = 0, mm, gi = 0;
+      NUMRE.lastIndex = 0;
+      while ((mm = NUMRE.exec(v))) { tpl.push(v.slice(last, mm.index), slot[gi++]); last = mm.index + mm[0].length; }
+      tpl.push(v.slice(last));
+
+      /* Two entries can blind to the same shape. Usually that is exactly what we want -
+         185 separate "+5.4% vs prior" entries collapse into one reusable template. But
+         "Aug 14" and "Aug 2026" also collide, and there the two templates disagree. So a
+         repeat that matches the stored template is kept and a repeat that contradicts it
+         poisons the shape, leaving both keys on exact matching only. */
+      if (shape in out) {
+        var prev = out[shape];
+        if (prev && prev.length === tpl.length && prev.join('\u0002') === tpl.join('\u0002')) continue;
+        out[shape] = null;
+        continue;
+      }
+      out[shape] = tpl;
+    }
+    PATTERNS[code] = out;
+    return out;
+  }
+
+  function lookup(key, code) {
+    var table = DICT[code];
+    if (!table) return null;
+    if (table[key]) return fillWeekdays(table[key], key, code);
+    TOKRE.lastIndex = 0;
+    if (!TOKRE.test(key)) { TOKRE.lastIndex = 0; return null; }
+    var tpl = patternsFor(code)[blind(key)];
+    if (!tpl) return null;
+    var live = tokensOf(key, TOKRE), out = '';
+    for (var i = 0; i < tpl.length; i++) {
+      if (typeof tpl[i] !== 'number') { out += tpl[i]; continue; }
+      var t = live[tpl[i]], mo = monthOf(t);
+      out += mo ? String(mo) : t;
+    }
+    return fillWeekdays(out, key, code);
+  }
+
   var lang = 'en';
   try { lang = localStorage.getItem(LANG_KEY) || 'en'; } catch (e) {}
   if (!DICT[lang] && lang !== 'en') lang = 'en';
@@ -490,24 +687,52 @@
   var originals = new WeakMap();
   var applying = false;
 
-  function translateNode(node, table) {
+  function translateNode(node) {
     var base = originals.get(node);
     if (base === undefined) {
       base = node.nodeValue;
       if (!/[A-Za-z]/.test(base)) return;
       originals.set(node, base);
     }
-    var key = base.trim();
+    var flat = base.trim();
+    /* Markup wraps long paragraphs, so the same sentence reaches here with newlines and
+       runs of spaces inside it. Keys are stored flattened; the node's own leading and
+       trailing whitespace is preserved on write so layout is untouched. */
+    var key = flat.replace(/\s+/g, ' ');
     if (!key || KEEP.indexOf(key) >= 0) return;
-    var hit = table && table[key];
-    var next = hit ? base.replace(key, hit) : base;
+    var hit = lang === 'en' ? null : lookup(key, lang);
+    var next = hit ? base.replace(flat, hit) : base;
     if (node.nodeValue !== next) node.nodeValue = next;
+  }
+
+  /* Tooltips and screen-reader labels carry as much explanation as the visible copy on the
+     chart panels, so they get the same treatment. Originals are held per element. */
+  var ATTRS = ['title', 'aria-label', 'placeholder'];
+  var attrOriginals = new WeakMap();
+
+  function translateAttrs(el) {
+    var store = attrOriginals.get(el);
+    for (var i = 0; i < ATTRS.length; i++) {
+      var a = ATTRS[i];
+      if (!el.hasAttribute(a)) continue;
+      var base = store && store[a];
+      if (base === undefined) {
+        base = el.getAttribute(a);
+        if (!/[A-Za-z]/.test(base)) continue;
+        if (!store) { store = {}; attrOriginals.set(el, store); }
+        store[a] = base;
+      }
+      var flat = base.trim(), key = flat.replace(/\s+/g, ' ');
+      if (!key || KEEP.indexOf(key) >= 0) continue;
+      var hit = lang === 'en' ? null : lookup(key, lang);
+      var next = hit ? base.replace(flat, hit) : base;
+      if (el.getAttribute(a) !== next) el.setAttribute(a, next);
+    }
   }
 
   function apply(root) {
     var host = root || document.querySelector('.dashboard-shell') || document.body;
     if (!host) return;
-    var table = DICT[lang];
     applying = true;
     var walker = document.createTreeWalker(host, NodeFilter.SHOW_TEXT, {
       acceptNode: function (n) {
@@ -519,7 +744,10 @@
       }
     });
     var n;
-    while ((n = walker.nextNode())) translateNode(n, table);
+    while ((n = walker.nextNode())) translateNode(n);
+    var sel = ATTRS.map(function (a) { return '[' + a + ']'; }).join(',');
+    [].forEach.call(host.querySelectorAll(sel), translateAttrs);
+    if (host.matches && host.matches(sel)) translateAttrs(host);
     applying = false;
     document.documentElement.setAttribute('lang', lang === 'zh' ? 'zh-Hans' : lang);
     [].forEach.call(document.querySelectorAll('.lang-picker button'), function (b) {
@@ -562,16 +790,53 @@
   }
 
   /* The dashboard re-renders panels whenever live data lands, which puts fresh English
-     back into the DOM. Re-apply on a debounce, ignoring the mutations this makes itself. */
+     back into the DOM. A debounced full-document pass is the wrong tool here: the money
+     map and the comparison board repaint many times a second, so the debounce either never
+     settles or lands after the reader has already seen English flash through. Instead each
+     mutation record is translated on the spot - only the nodes that actually changed - with
+     a coarse trailing sweep behind it to catch anything a record could not describe.
+
+     Re-entry is safe: writes made while `applying` is set are ignored on the way back in,
+     and a node that is already translated compares equal and is left alone. */
+  function translateTree(root) {
+    if (!root) return;
+    if (root.nodeType === 3) { translateNode(root); return; }
+    if (root.nodeType !== 1) return;
+    var walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+      acceptNode: function (n) {
+        var tag = n.parentNode && n.parentNode.nodeName;
+        if (tag === 'SCRIPT' || tag === 'STYLE' || tag === 'TEXTAREA') return NodeFilter.FILTER_REJECT;
+        return n.nodeValue && n.nodeValue.trim() ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
+      }
+    });
+    var n;
+    while ((n = walker.nextNode())) translateNode(n);
+    var sel = ATTRS.map(function (a) { return '[' + a + ']'; }).join(',');
+    if (root.matches && root.matches(sel)) translateAttrs(root);
+    if (root.querySelectorAll) [].forEach.call(root.querySelectorAll(sel), translateAttrs);
+  }
+
   function watch() {
     var host = document.querySelector('.dashboard-shell') || document.body;
     if (!host || typeof MutationObserver !== 'function') return;
     var timer = null;
-    new MutationObserver(function () {
+    new MutationObserver(function (records) {
       if (applying || lang === 'en') return;
+      applying = true;
+      try {
+        for (var i = 0; i < records.length; i++) {
+          var r = records[i];
+          if (r.type === 'characterData') { translateNode(r.target); continue; }
+          if (r.type === 'attributes') { translateAttrs(r.target); continue; }
+          for (var j = 0; j < r.addedNodes.length; j++) translateTree(r.addedNodes[j]);
+        }
+      } finally { applying = false; }
       clearTimeout(timer);
-      timer = setTimeout(function () { apply(); }, 120);
-    }).observe(host, { childList: true, subtree: true, characterData: true });
+      timer = setTimeout(function () { apply(); }, 400);
+    }).observe(host, {
+      childList: true, subtree: true, characterData: true,
+      attributes: true, attributeFilter: ATTRS
+    });
   }
 
   function boot() { mountPicker(); apply(); watch(); }
