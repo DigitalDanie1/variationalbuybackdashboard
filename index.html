@@ -2813,7 +2813,7 @@
   /* each y-axis is tinted to the series that reads it */
   /* ---- Tab · Two Paths ---- */
   .tge-legend{display:flex;align-items:center;gap:18px;flex-wrap:wrap;margin:0 0 6px}
-  .tge-legend span{display:inline-flex;align-items:center;gap:7px;color:var(--muted)!important;font:700 10px var(--mono)}
+  .tge-legend span{display:inline-flex;align-items:center;gap:7px;color:var(--muted)!important;font:700 12px var(--mono)}
   .tge-legend i{width:16px;height:3px;border-radius:2px;background:currentColor}
   .tge-legend .hype{color:#4fd6c3!important}
   .tge-legend .lit{color:#b98cff!important}
@@ -2831,23 +2831,23 @@
   .tge-legend .now{color:#4c9af8!important}
   .tge-legend .ref{color:var(--dim)!important}
   .macro-chart{margin-bottom:10px}
-  .mc-tag{fill:var(--dim);font:800 9px var(--mono);letter-spacing:1px}
-  .mc-price{fill:none;stroke:#e9eef6;stroke-width:1.3;vector-effect:non-scaling-stroke}
+  .mc-tag{fill:var(--dim);font:800 11px var(--mono);letter-spacing:1px}
+  .mc-price{fill:none;stroke:#ff8a3d;stroke-width:1.3;vector-effect:non-scaling-stroke}
   .mc-ma{fill:none;stroke:var(--dim);stroke-width:1;stroke-dasharray:4 4;vector-effect:non-scaling-stroke}
-  .mc-dom{fill:none;stroke:#ffc65a;stroke-width:1.4;vector-effect:non-scaling-stroke}
+  .mc-dom{fill:none;stroke:#9aabc0;stroke-width:1.4;vector-effect:non-scaling-stroke}
   .mc-hist.up{fill:#4fd6c3;fill-opacity:.85}
   .mc-hist.dn{fill:#e2637a;fill-opacity:.85}
   .mc-mark{stroke-width:1.6;opacity:.85}
   .mc-mark.hype{stroke:#4fd6c3}
   .mc-mark.lit{stroke:#b98cff}
   .mc-mark.now{stroke:#4c9af8;stroke-dasharray:4 3}
-  .mc-mark-t{font:800 9px var(--mono);letter-spacing:.6px}
+  .mc-mark-t{font:800 11.5px var(--mono);letter-spacing:.6px}
   .mc-mark-t.hype{fill:#4fd6c3}
   .mc-mark-t.lit{fill:#b98cff}
   .mc-mark-t.now{fill:#4c9af8}
   .zoomchips button{font-size:10.5px}
-  body.theme-light .mc-price{stroke:#14141a}
-  body.theme-light .mc-dom{stroke:#a86a00}
+  body.theme-light .mc-price{stroke:#c2560a}
+  body.theme-light .mc-dom{stroke:#4c5f76}
   body.theme-light .mc-hist.up{fill:#0e7a52}
   body.theme-light .mc-hist.dn{fill:#c0392b}
   .btc-line{fill:none;stroke-width:2.1;vector-effect:non-scaling-stroke;stroke-linejoin:round}
@@ -2871,28 +2871,54 @@
   .tge-chart{display:block;width:100%;height:auto;overflow:visible;margin:0 0 14px}
   .tge-grid{stroke:var(--line);stroke-width:1}
   .tge-grid.one{stroke:var(--dim);stroke-dasharray:4 4}
-  .tge-axis{fill:var(--muted);font:700 10px var(--mono)}
+  .tge-grid.minor{stroke:var(--line);stroke-opacity:.45}
+  .tge-tick{stroke:var(--dim);stroke-width:1}
+  .tge-tick.minor{stroke:var(--line);stroke-width:1}
+  .tge-tick.key{stroke:var(--text);stroke-width:1.4}
+  .tge-spine{stroke:var(--dim);stroke-width:1;stroke-opacity:.65}
+  /* token vs Bitcoin overlay */
+  .ov-btc{fill:none;stroke:#ff8a3d;stroke-width:1.5;stroke-dasharray:5 3;vector-effect:non-scaling-stroke}
+  .ov-tok{fill:none;stroke-width:2.3;vector-effect:non-scaling-stroke;stroke-linejoin:round}
+  .ov-tok.hype{stroke:#4fd6c3}
+  .ov-tok.lit{stroke:#b98cff}
+  .ov-title{font:800 14px var(--mono);letter-spacing:.6px}
+  .ov-title.hype{fill:#4fd6c3}
+  .ov-title.lit{fill:#b98cff}
+  .ov-stat{fill:var(--muted);font:700 12.5px var(--mono)}
+  .ov-btc-end{fill:#ff8a3d;font:800 14px var(--mono)}
+  .tge-legend .btcref{color:#ff8a3d!important}
+  .tge-legend .btcref i{border-top:2px dashed currentColor;background:none;height:0}
+  body.theme-light .ov-btc{stroke:#c2560a}
+  body.theme-light .ov-btc-end{fill:#c2560a}
+  body.theme-light .tge-legend .btcref{color:#c2560a!important}
+  body.theme-light .ov-tok.hype{stroke:#0d8f7c}
+  body.theme-light .ov-tok.lit{stroke:#7c4dd6}
+  body.theme-light .ov-title.hype{fill:#0d8f7c}
+  body.theme-light .ov-title.lit{fill:#7c4dd6}
+  .tge-axis.minor{font-size:10.5px;fill:var(--dim);opacity:.8}
+  .tge-axis.key{fill:var(--text);font-weight:800}
+  .tge-axis{fill:var(--muted);font:700 12.5px var(--mono)}
   .tge-axis.one{fill:var(--text);font-weight:800}
   .tge-line{fill:none;stroke-width:2.2;vector-effect:non-scaling-stroke;stroke-linejoin:round;stroke-linecap:round}
   .tge-line.hype{stroke:#4fd6c3}
   .tge-line.lit{stroke:#b98cff}
-  .tge-end{font:800 11px var(--mono)}
+  .tge-end{font:800 14px var(--mono)}
   .tge-end.hype{fill:#4fd6c3}
   .tge-end.lit{fill:#b98cff}
   /* strength / weakness banding and the swing arrows between them */
   .tge-zone.up{fill:#4fd39a;fill-opacity:.05}
   .tge-zone.dn{fill:#ff8b8b;fill-opacity:.06}
-  .tge-zone-t{font:800 8.5px var(--mono);letter-spacing:1px;text-transform:uppercase}
+  .tge-zone-t{font:800 10.5px var(--mono);letter-spacing:1px;text-transform:uppercase}
   .tge-zone-t.up{fill:#4fd39a;fill-opacity:.65}
   .tge-zone-t.dn{fill:#ff8b8b;fill-opacity:.6}
   /* down triangle above a high, up triangle below a low */
   .tge-arrow{stroke:none}
   .tge-arrow.dnsig{fill:#ff8b8b}
   .tge-arrow.upsig{fill:#4fd39a}
-  .tge-arrow-t{font:800 9.5px var(--mono)}
+  .tge-arrow-t{font:800 13px var(--mono)}
   .tge-arrow-t.hype{fill:#4fd6c3}
   .tge-arrow-t.lit{fill:#b98cff}
-  .tge-arrow-c{font:800 9px var(--mono)}
+  .tge-arrow-c{font:800 11.5px var(--mono)}
   .tge-arrow-c.up{fill:#4fd39a}
   .tge-arrow-c.dn{fill:#ff8b8b}
   body.theme-light .tge-arrow.dnsig{fill:#c0392b}
@@ -2903,8 +2929,46 @@
   body.theme-light .tge-arrow-c.dn{fill:#c0392b}
   body.theme-light .tge-zone-t.up{fill:#0e7a52}
   body.theme-light .tge-zone-t.dn{fill:#c0392b}
-  .tge-table td.tge-v{font:800 13px var(--mono);color:var(--text)!important;white-space:nowrap}
-  .tge-table td.tge-v i{display:block;margin-top:2px;color:var(--muted)!important;font:700 9.5px var(--mono);font-style:normal}
+  /* the HYPE and LIT columns are tinted down their whole height so a row can be read
+     across without tracking which header it sat under */
+  .tp-table.hl-cols th:nth-child(2),body.v2-dashboard .tp-table.hl-cols td:nth-child(2){background:rgba(79,214,195,.09)!important}
+  .tp-table.hl-cols th:nth-child(3),body.v2-dashboard .tp-table.hl-cols td:nth-child(3){background:rgba(185,140,255,.09)!important}
+  .tp-table.hl-cols th:nth-child(2){box-shadow:inset 0 -2px 0 #4fd6c3}
+  .tp-table.hl-cols th:nth-child(3){box-shadow:inset 0 -2px 0 #b98cff}
+  body.theme-light .tp-table.hl-cols th:nth-child(2),body.theme-light.v2-dashboard .tp-table.hl-cols td:nth-child(2){background:rgba(13,143,124,.09)!important}
+  body.theme-light .tp-table.hl-cols th:nth-child(3),body.theme-light.v2-dashboard .tp-table.hl-cols td:nth-child(3){background:rgba(124,77,214,.09)!important}
+  body.theme-light .tp-table.hl-cols th:nth-child(2){box-shadow:inset 0 -2px 0 #0d8f7c}
+  body.theme-light .tp-table.hl-cols th:nth-child(3){box-shadow:inset 0 -2px 0 #7c4dd6}
+  /* body.v2-dashboard td{font-size:13px!important} and its padding twin flatten every
+     table in the shell, so this tab's sizes have to be stated at the same priority. */
+  /* swing table: one row per turn, every column on its own baseline */
+  .sw-table td,.sw-table th{text-align:right}
+  .sw-table td:first-child,.sw-table th:first-child,
+  .sw-table td:nth-child(2),.sw-table th:nth-child(2){text-align:left}
+  body.v2-dashboard .sw-table td{padding:11px 12px!important;font-size:14px!important}
+  .sw-tok{font:800 12px var(--mono);letter-spacing:.6px}
+  .sw-tok.hype{color:#4fd6c3!important}
+  .sw-tok.lit{color:#b98cff!important}
+  .sw-turn{color:var(--muted)!important;font:700 12px var(--mono);white-space:nowrap}
+  .sw-turn i{font-style:normal;margin-right:6px;font-size:10px}
+  .sw-turn i.up{color:#4fd39a}
+  .sw-turn i.dn{color:#ff8b8b}
+  .sw-day{color:var(--text)!important;font:800 14px var(--mono);white-space:nowrap}
+  .sw-val{color:var(--text)!important;font:800 16px var(--mono);white-space:nowrap}
+  .sw-leg{font:800 14px var(--mono);white-space:nowrap;color:var(--muted)!important}
+  .sw-leg.up{color:#4fd39a!important}
+  .sw-leg.dn{color:#ff8b8b!important}
+  .sw-days{color:var(--muted)!important;font:700 13px var(--mono);white-space:nowrap}
+  body.theme-light .sw-tok.hype{color:#0d8f7c!important}
+  body.theme-light .sw-tok.lit{color:#7c4dd6!important}
+  body.theme-light .sw-turn i.up,body.theme-light .sw-leg.up{color:#0e7a52!important}
+  body.theme-light .sw-turn i.dn,body.theme-light .sw-leg.dn{color:#c0392b!important}
+  body.v2-dashboard .tp-table td{font-size:14px!important;padding:15px 12px!important}
+  body.v2-dashboard .tp-table th{font:800 11px var(--mono)!important;letter-spacing:.8px!important;padding:12px!important}
+  body.v2-dashboard .tge-table td.tge-v{font:800 19px var(--mono)!important}
+  body.v2-dashboard .tp-table td.tp-k{font-size:15px!important}
+  .tge-table td.tge-v{font:800 19px var(--mono);color:var(--text)!important;white-space:nowrap}
+  .tge-table td.tge-v i{display:block;margin-top:5px;color:var(--muted)!important;font:800 13px var(--mono);font-style:normal;letter-spacing:.4px}
   body.theme-light .tge-line.hype{stroke:#0d8f7c}
   body.theme-light .tge-line.lit{stroke:#7c4dd6}
   body.theme-light .tge-end.hype{fill:#0d8f7c}
@@ -2936,17 +3000,17 @@
   .tp-listing p{margin:11px 0 8px;color:var(--text);font-size:13px;line-height:1.6}
   .tp-listing small{color:var(--muted)!important;font-size:10.5px;line-height:1.5}
   .tp-tablewrap{overflow-x:auto;margin:0 0 10px}
-  .tp-table{width:100%;min-width:0!important;border-collapse:collapse;font-size:12px}
-  .tp-table th{padding:9px 10px;border-bottom:1px solid var(--line);color:var(--muted)!important;
-    font:800 9.5px var(--mono);letter-spacing:.7px;text-transform:uppercase;text-align:right}
+  .tp-table{width:100%;min-width:0!important;border-collapse:collapse;font-size:14px}
+  .tp-table th{padding:12px 12px;border-bottom:1px solid var(--line);color:var(--muted)!important;
+    font:800 11px var(--mono);letter-spacing:.8px;text-transform:uppercase;text-align:right}
   .tp-table th:first-child{text-align:left}
-  .tp-table td{padding:10px;border-bottom:1px solid var(--line);text-align:right;vertical-align:top}
+  .tp-table td{padding:15px 12px;border-bottom:1px solid var(--line);text-align:right;vertical-align:top}
   .tp-table td.tp-k{text-align:left;min-width:210px}
-  .tp-k b{display:block;color:var(--text);font-size:12.5px;font-weight:800}
-  .tp-k small{display:block;margin-top:2px;color:var(--muted)!important;font-size:10.5px;line-height:1.45}
-  .tp-v{font:700 12px var(--mono);color:var(--muted)!important;white-space:nowrap}
+  .tp-k b{display:block;color:var(--text);font-size:15px;font-weight:800}
+  .tp-k small{display:block;margin-top:4px;color:var(--muted)!important;font-size:12.5px;line-height:1.5}
+  .tp-v{font:700 14px var(--mono);color:var(--muted)!important;white-space:nowrap}
   .tp-v.win,.tp-v.now{color:var(--text)!important;font-weight:800}
-  .tp-side{font:800 10px var(--mono);letter-spacing:.6px;white-space:nowrap}
+  .tp-side{font:800 12px var(--mono);letter-spacing:.6px;white-space:nowrap}
   .tp-side.hype{color:#4fd6c3!important}
   .tp-side.lit{color:#b98cff!important}
   .tp-side i{margin-left:5px;font-style:normal;opacity:.7}
@@ -2984,6 +3048,13 @@
   :root{--cjk:"Pretendard Variable",Pretendard,"Noto Sans KR","Noto Sans SC",
     "Apple SD Gothic Neo","PingFang SC","Microsoft YaHei",sans-serif}
   html[lang="ko"] body,html[lang="zh-Hans"] body{font-family:var(--cjk)}
+  /* The theme toggle's two words are mono, uppercased and tracked out at .09em, which is
+     tuned for DARK/LIGHT and wrong for 다크/深色 - CJK glyphs are already full-width, so the
+     extra tracking just pushes them off the pill. Latin numerals elsewhere keep the mono. */
+  html[lang="ko"] .theme-toggle-liquid .tgl-word,
+  html[lang="zh-Hans"] .theme-toggle-liquid .tgl-word{
+    font-family:var(--cjk);letter-spacing:.01em;text-transform:none;font-weight:700
+  }
   html[lang="ko"] .lang-picker button,html[lang="zh-Hans"] .lang-picker button{font-family:var(--cjk)}
   @media(max-width:700px){.lang-picker{margin-right:8px}.lang-picker button{min-width:26px;padding:4px 6px}}
   .chart .axis-vol{fill:#4c9eff}
@@ -10334,11 +10405,12 @@ body.theme-light .valuation-report #valScatter .val-var-label{
   }
 </style>
 
-<script src="dashboard.js?v=1788879364" defer></script>
-<script src="paths-panels.js?v=1788879364" defer></script>
-<script src="i18n.js?v=1788879364" defer></script>
+<script src="dashboard.js?v=1788881009" defer></script>
+<script src="paths-panels.js?v=1788881009" defer></script>
+<script src="i18n-dict.js?v=1788881009" defer></script>
+<script src="i18n.js?v=1788881009" defer></script>
 <script src="app-inline.js?v=20260809-theme-toggle" defer></script>
-<script src="comparison-lab-panels.js?v=1788879364" defer></script>
+<script src="comparison-lab-panels.js?v=1788881009" defer></script>
 <script src="pretge-panels.js?v=1787844401" defer></script>
 <script src="tradfi-panels.js?v=1787844159" defer></script>
 </body>
