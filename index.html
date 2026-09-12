@@ -7,7 +7,7 @@
      any injected external script src or exfiltration to another host is blocked. -->
 <meta name="referrer" content="no-referrer">
 <meta name="robots" content="index,follow">
-<title>Variational Money - Dashboard 2.0 Signal Room</title>
+<title>Variational Money - Dashboard 2.0 </title>
 <meta name="application-name" content="Variational Money">
 <meta name="apple-mobile-web-app-title" content="Variational Money">
 <link rel="icon" type="image/png" sizes="64x64" href="/favicon-64.png?v=20260731">
@@ -2897,7 +2897,42 @@
   body.theme-light .ov-title.lit{fill:#7c4dd6}
   .tge-axis.minor{font-size:10.5px;fill:var(--dim);opacity:.8}
   .tge-axis.key{fill:var(--text);font-weight:800}
-  .tge-axis{fill:var(--muted);font:700 12.5px var(--mono)}
+  /* three tiers only: 12px for figures and axes, 11px for plot annotations, 10px for keys */
+  .tge-axis{fill:var(--muted);font:700 12px var(--mono)}
+  /* The leg annotations are their own layer: series colour so a figure belongs to a
+     visible curve, and a halo so it never blends into the grid or the axis column it
+     sits next to. */
+  .tge-lab{font:800 11px var(--mono);letter-spacing:.2px;
+    paint-order:stroke fill;stroke:var(--bg);stroke-width:3.4px;stroke-linejoin:round}
+  .tge-lab.hype{fill:#4fd6c3;stroke:var(--bg)}
+  .tge-lab.lit{fill:#b98cff;stroke:var(--bg)}
+
+  /* body.theme-light svg text{fill:#153b67!important} paints EVERY svg label one colour,
+     which flattened every series cue on this tab. These win it back where the colour is
+     the meaning, at matching weight and higher specificity. */
+  body.theme-light .paths-report .tge-lab.hype{fill:#0d8f7c!important}
+  body.theme-light .paths-report .tge-lab.lit{fill:#7c4dd6!important}
+  body.theme-light .paths-report .tge-end.hype{fill:#0d8f7c!important}
+  body.theme-light .paths-report .tge-end.lit{fill:#7c4dd6!important}
+  body.theme-light .paths-report .cy-val.dn{fill:#c0392b!important}
+  body.theme-light .paths-report .cy-phase.p1{fill:#1a63bd!important}
+  body.theme-light .paths-report .cy-phase.p2{fill:#0d8f7c!important}
+  body.theme-light .paths-report .cy-phase.p3{fill:#9a6300!important}
+  body.theme-light .paths-report .cy-phase.p4{fill:#c0392b!important}
+  body.theme-light .paths-report .cy-mark-t.hype{fill:#0d8f7c!important}
+  body.theme-light .paths-report .cy-mark-t.lit{fill:#7c4dd6!important}
+  body.theme-light .paths-report .cy-mark-t.var{fill:#1a63bd!important}
+  body.theme-light .paths-report .mc-cyc-k.p1,
+  body.theme-light .paths-report .mc-cyc-n.p1{fill:#1a63bd!important}
+  body.theme-light .paths-report .mc-cyc-k.p2,
+  body.theme-light .paths-report .mc-cyc-n.p2{fill:#0d8f7c!important}
+  body.theme-light .paths-report .mc-cyc-k.p3,
+  body.theme-light .paths-report .mc-cyc-n.p3{fill:#9a6300!important}
+  body.theme-light .paths-report .mc-cyc-k.p4,
+  body.theme-light .paths-report .mc-cyc-n.p4{fill:#c0392b!important}
+  body.theme-light .paths-report .mc-mark-t.hype{fill:#0d8f7c!important}
+  body.theme-light .paths-report .mc-mark-t.lit{fill:#7c4dd6!important}
+  body.theme-light .paths-report .mc-mark-t.var{fill:#1a63bd!important}
   .tge-axis.one{fill:var(--text);font-weight:800}
   .tge-line{fill:none;stroke-width:2.2;vector-effect:non-scaling-stroke;stroke-linejoin:round;stroke-linecap:round}
   .tge-line.hype{stroke:#4fd6c3}
@@ -3033,6 +3068,114 @@
   .tp-caveat{padding:15px 17px;border:1px dashed var(--line);background:color-mix(in srgb,var(--panel) 70%,transparent)}
   .tp-caveat b{display:block;margin-bottom:7px;color:var(--text);font:800 11px var(--mono);letter-spacing:.7px;text-transform:uppercase}
   .tp-caveat p{margin:0;color:var(--muted)!important;font-size:11.5px;line-height:1.7}
+  /* ---- Tab · Monitors ---- */
+  .mn-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin:0 0 22px}
+  .mn-card{display:flex;flex-direction:column;padding:18px 20px;border:1px solid var(--line);
+    background:color-mix(in srgb,var(--panel) 72%,transparent)}
+  .mn-card.wallets{border-left:3px solid #ff8b8b}
+  .mn-card.olp{border-left:3px solid #4fd6c3}
+  .mn-head{display:flex;align-items:flex-start;gap:11px;margin:0 0 10px}
+  .mn-badge-row{margin:0 0 14px;padding-left:27px}
+  .mn-n{color:var(--dim);font:800 11px var(--mono);letter-spacing:.9px;padding-top:3px}
+  .mn-head>div{flex:1 1 auto;min-width:0}
+  .mn-head b{display:block;color:var(--text);font-size:15.5px;letter-spacing:-.01em}
+  .mn-head small{display:block;margin-top:3px;color:var(--muted);font-size:11.5px}
+  .mn-badge{flex:0 0 auto;padding:4px 9px;border:1px solid color-mix(in srgb,#ff8b8b 40%,var(--line));
+    color:#ff8b8b;font:800 9.5px var(--mono);letter-spacing:.5px;text-transform:uppercase;white-space:nowrap}
+  .mn-badge.part{border-color:color-mix(in srgb,#4fd6c3 40%,var(--line));color:#4fd6c3}
+  body.theme-light .mn-badge{color:#c0392b}
+  body.theme-light .mn-badge.part{color:#0d8f7c}
+
+  .mn-live{margin:0 0 15px;border:1px solid var(--line)}
+  .mn-live-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 12px;
+    padding:10px 13px;border-bottom:1px solid var(--line)}
+  .mn-live-row:last-child{border-bottom:0}
+  .mn-live-row span{color:var(--muted);font-size:11.5px}
+  .mn-live-row b{color:var(--text);font:800 16px var(--mono);text-align:right}
+  .mn-live-row em{grid-column:1/-1;color:var(--dim);font-style:normal;font-size:10.5px}
+  .mn-live-row.off b,.mn-live-row.out b{color:var(--dim)}
+  .mn-live-row.out{background:color-mix(in srgb,var(--panel) 55%,transparent)}
+
+  .mn-dl{margin:0 0 15px}
+  .mn-dl dt{margin:0 0 4px;color:var(--text);font:800 10px var(--mono);letter-spacing:.7px;text-transform:uppercase}
+  .mn-dl dd{margin:0 0 11px;color:var(--muted)!important;font-size:12px;line-height:1.65}
+  .mn-dl dd:last-child{margin-bottom:0}
+
+  .mn-need{margin-top:auto;padding-top:14px;border-top:1px dashed var(--line)}
+  .mn-need-h{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin:0 0 9px;
+    color:var(--text);font:800 10px var(--mono);letter-spacing:.7px;text-transform:uppercase}
+  .mn-need-h i{color:var(--dim);font-style:normal;letter-spacing:.3px;text-transform:none}
+  .mn-inputs{margin:0;padding:0;list-style:none}
+  .mn-input{display:grid;grid-template-columns:16px minmax(0,1fr);gap:2px 8px;margin:0 0 9px}
+  .mn-input:last-child{margin-bottom:0}
+  .mn-dot{color:var(--dim);font:800 11px var(--mono);line-height:1.5}
+  .mn-input.has .mn-dot{color:#4fd6c3}
+  body.theme-light .mn-input.has .mn-dot{color:#0d8f7c}
+  .mn-input b{color:var(--muted);font-size:12px;font-weight:700}
+  .mn-input.has b{color:var(--text)}
+  .mn-input em{grid-column:2;color:var(--dim);font-style:normal;font-size:11px;line-height:1.6}
+  @media(max-width:1000px){.mn-grid{grid-template-columns:1fr}}
+  /* ---- Two Paths · four-year cycle ---- */
+  /* Phase colours are declared as tokens once and reused by the bands on the macro chart,
+     the bars, the axis labels and the legend, so a year reads the same everywhere. */
+  .paths-report{--cy1:#4c9af8;--cy2:#4fd6c3;--cy3:#ffc65a;--cy4:#ff6b8b}
+  body.theme-light .paths-report{--cy1:#1a63bd;--cy2:#0d8f7c;--cy3:#9a6300;--cy4:#c0392b}
+
+  .mc-cyc{opacity:.07}
+  .mc-cyc.p1{fill:var(--cy1)}.mc-cyc.p2{fill:var(--cy2)}.mc-cyc.p3{fill:var(--cy3)}.mc-cyc.p4{fill:var(--cy4)}
+  .mc-cyc-k{font:800 9px var(--mono);letter-spacing:.6px;opacity:.85}
+  .mc-cyc-n{font:600 8px var(--mono);letter-spacing:.2px;opacity:.6}
+  .mc-cyc-k.p1,.mc-cyc-n.p1{fill:var(--cy1)}.mc-cyc-k.p2,.mc-cyc-n.p2{fill:var(--cy2)}
+  .mc-cyc-k.p3,.mc-cyc-n.p3{fill:var(--cy3)}.mc-cyc-k.p4,.mc-cyc-n.p4{fill:var(--cy4)}
+  .mc-mark.var{stroke:var(--cy1);stroke-width:1.4;stroke-dasharray:5 4;opacity:.95}
+  .mc-mark-t.var{fill:var(--cy1);font:800 9px var(--mono);letter-spacing:.5px}
+
+  .cy-claim{margin:0 0 18px;padding:16px 18px;border:1px solid var(--line);border-left:3px solid var(--cy1);
+    background:color-mix(in srgb,var(--panel) 74%,transparent)}
+  .cy-claim h3{margin:6px 0 9px;color:var(--text);font-size:17px;line-height:1.35;letter-spacing:-.01em}
+  .cy-claim p{margin:0;color:var(--muted)!important;font-size:12.5px;line-height:1.72}
+
+  /* One compact row instead of four bordered chips: the phases are a key you glance at,
+     not four cards to read. */
+  .cy-legend{display:flex;flex-wrap:wrap;gap:6px 16px;margin:0 0 10px;padding:8px 11px;
+    border:1px solid var(--line);background:color-mix(in srgb,var(--panel) 60%,transparent)}
+  .cy-legend span{display:inline-flex;align-items:center;gap:6px;color:var(--muted);font-size:11px}
+  .cy-legend b{color:var(--text);font:800 10.5px var(--mono);letter-spacing:.5px}
+  .cy-legend i{width:8px;height:8px;border-radius:2px;flex:0 0 auto}
+  .cy-legend .p1 i{background:var(--cy1)}.cy-legend .p2 i{background:var(--cy2)}
+  .cy-legend .p3 i{background:var(--cy3)}.cy-legend .p4 i{background:var(--cy4)}
+
+  .cycle-chart{width:100%;height:auto;margin:0 0 14px}
+  /* the four-year block is a grouping cue, so it sits behind everything as a faint tint */
+  /* plain colour + opacity, never color-mix: an unsupported color-mix in an SVG fill
+     falls back to black, which turned these blocks into solid boxes. */
+  .cy-group{fill:#ffffff;opacity:.035}
+  body.theme-light .cy-group{fill:#14141a;opacity:.045}
+  .cy-group-t{fill:var(--muted);font:800 10px var(--mono);letter-spacing:.9px;opacity:.7}
+  /* bars read by outcome; the phase stays on the axis and in the key above */
+  .cy-bar{opacity:.92}
+  .cy-bar.gain{fill:var(--cy2)}
+  .cy-bar.loss{fill:var(--cy4)}
+  .cy-val{fill:var(--text);font:800 12px var(--mono);letter-spacing:.2px}
+  .cy-val.dn{fill:var(--cy4)}
+  .cy-year{fill:var(--text);font:800 12px var(--mono);letter-spacing:.3px}
+  .cy-phase{font:800 10px var(--mono);letter-spacing:.6px;opacity:.9}
+  .cy-phase.p1{fill:var(--cy1)}.cy-phase.p2{fill:var(--cy2)}.cy-phase.p3{fill:var(--cy3)}.cy-phase.p4{fill:var(--cy4)}
+  .cy-mark{stroke-width:1.4;opacity:.9}
+  .cy-mark.hype{stroke:#4fd6c3}.cy-mark.lit{stroke:#b98cff}
+  .cy-mark.var{stroke:var(--cy1);stroke-dasharray:5 4}
+  .cy-mark-t{font:800 10px var(--mono);letter-spacing:.6px}
+  .cy-mark-t.hype{fill:#4fd6c3}.cy-mark-t.lit{fill:#b98cff}.cy-mark-t.var{fill:var(--cy1)}
+
+  .cy-foot{margin:-8px 0 14px;color:var(--muted)!important;font:600 10.5px var(--mono);letter-spacing:.2px;opacity:.8}
+  .cy-cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:0 0 18px}
+  .cy-card{padding:14px 16px;border:1px solid var(--line);background:color-mix(in srgb,var(--panel) 70%,transparent)}
+  .cy-card.hype{border-left:3px solid #4fd6c3}
+  .cy-card.lit{border-left:3px solid #b98cff}
+  .cy-card.var{border-left:3px solid var(--cy1)}
+  .cy-card b{display:block;margin:8px 0 5px;color:var(--text);font:800 19px var(--mono);letter-spacing:-.01em}
+  .cy-card em{color:var(--muted);font-style:normal;font-size:11.5px;line-height:1.6}
+  @media(max-width:900px){.cy-cards{grid-template-columns:1fr}}
   @media(max-width:1100px){.tp-verdict{grid-template-columns:1fr}.tp-bands{grid-template-columns:repeat(2,minmax(0,1fr))}}
   @media(max-width:760px){.tp-listings,.tp-bands{grid-template-columns:1fr}.tp-verdict h3{font-size:18px}}
   /* language picker · sits beside the theme toggle in the global header */
@@ -10405,13 +10548,16 @@ body.theme-light .valuation-report #valScatter .val-var-label{
   }
 </style>
 
-<script src="dashboard.js?v=1788881009" defer></script>
-<script src="paths-panels.js?v=1788881009" defer></script>
-<script src="i18n-dict.js?v=1788881009" defer></script>
-<script src="i18n.js?v=1788881009" defer></script>
+<script src="dashboard.js?v=1789148292" defer></script>
+<script src="paths-panels.js?v=1789148292" defer></script>
+<script src="playbook-panels.js?v=1789212370" defer></script>
+<script src="monitors-panels.js?v=1789148292" defer></script>
+<script src="i18n-dict.js?v=1789212370" defer></script>
+<script src="i18n.js?v=1789148292" defer></script>
 <script src="app-inline.js?v=20260809-theme-toggle" defer></script>
-<script src="comparison-lab-panels.js?v=1788881009" defer></script>
+<script src="comparison-lab-panels.js?v=1789148292" defer></script>
 <script src="pretge-panels.js?v=1787844401" defer></script>
 <script src="tradfi-panels.js?v=1787844159" defer></script>
+<script src="tge-groups.js?v=1789150085" defer></script>
 </body>
 </html>
