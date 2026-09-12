@@ -196,26 +196,93 @@
     };
 
     /* TradingView convention: a down triangle above a swing high, an up triangle below a
-       swing low. No text on the plot — scattered two-line labels at per-point offsets is
-       exactly what made this read as noise. The numbers live in the aligned table below,
-       and each arrow carries its own tooltip. */
+       swing low, and each is labelled with the run of the previous 30 days.
+
+       Thirty days for every arrow, so the figures are comparable with each other and are
+       plainly not the axis: the axis reads change since listing, a level, while these read
+       change over a fixed window, a rate. Leg-to-leg moves could not do that - they ran
+       anywhere from 11 to 112 days, so +461% and +35% were not the same kind of number,
+       and sitting next to a +900% gridline they were impossible to tell apart. Inside the
+       first 30 days there is no full window, so the label measures from the listing price
+       and says how many days it actually covers. */
+    var ROC = 30;
     var piv = { hype: zigzag(h, PIVOT_TH), lit: zigzag(l, PIVOT_TH) };
-    var marks = '';
+    var marks = '', labs = [], placed = [];
     ['hype', 'lit'].forEach(function (k) {
+      var arr = k === 'hype' ? h : l;
       piv[k].forEach(function (p, idx) {
         var x = X(p.i), y = Y(p.v), high = p.t === 'high';
         var off = high ? -10 : 10, sz = 5.4;
         var tri = high
           ? (x - sz) + ',' + (y + off - sz) + ' ' + (x + sz) + ',' + (y + off - sz) + ' ' + x + ',' + (y + off + 1.5)
           : (x - sz) + ',' + (y + off + sz) + ' ' + (x + sz) + ',' + (y + off + sz) + ' ' + x + ',' + (y + off - 1.5);
-        var prev = idx ? piv[k][idx - 1] : null;
-        var ch = prev ? (p.v / prev.v - 1) * 100 : null;
+
+        var j = Math.max(0, p.i - ROC), span = p.i - j;
+        var roc = span > 0 && arr[j] > 0 ? (p.v / arr[j] - 1) * 100 : null;
+        var txt = roc === null ? null
+          : (roc >= 0 ? '+' : '−') + Math.abs(roc).toFixed(0) + '%/' + span + 'd';
+
         marks += '<polygon class="tge-arrow ' + k + ' ' + (high ? 'dnsig' : 'upsig') + '" points="' + tri + '">' +
-          '<title>' + (k === 'hype' ? 'HYPE' : 'LIT') + ' \u00b7 D+' + p.i + ' \u00b7 ' + fromListing(p.v) +
-          ' from listing' + (ch === null ? '' : ' \u00b7 leg ' + (ch >= 0 ? '+' : '\u2212') +
-          Math.abs(ch).toFixed(0) + '%') + '</title></polygon>';
+          '<title>' + (k === 'hype' ? 'HYPE' : 'LIT') + ' · D+' + p.i + ' · ' + fromListing(p.v) +
+          ' from listing' + (txt === null ? '' : ' · ' + txt + ' run into this turn') +
+          '</title></polygon>';
+        placed.push({ x0: x - sz - 2, x1: x + sz + 2, y0: y + off - sz - 2, y1: y + off + sz + 2 });
+        if (txt === null) return;
+        labs.push({ k: k, high: high, up: roc >= 0, arr: arr, x: x, y: y, t: txt });
       });
     });
+
+    labs.sort(function (a, b) { return a.x - b.x; });
+    labs.forEach(function (L2) {
+      var w = L2.t.length * 6.9 + 6, hgt = 13;
+
+      /* clear the curve, not just the pivot: the price either side of a turn often rides
+         higher than the turn itself */
+      var span2 = Math.max(1, n - 1), half = w / 2;
+      var j0 = Math.max(0, Math.floor((L2.x - half - pl) / (W - pl - pr) * span2));
+      var j1 = Math.min(L2.arr.length - 1, Math.ceil((L2.x + half - pl) / (W - pl - pr) * span2));
+      var ext = L2.arr[Math.max(0, Math.min(j0, L2.arr.length - 1))];
+      for (var q = j0; q <= j1; q++) {
+        var vv = L2.arr[q];
+        if (!vv || !isFinite(vv)) continue;
+        if (L2.high ? vv > ext : vv < ext) ext = vv;
+      }
+      var edge = Y(ext);
+      var base = L2.high ? edge - 22 : edge + 32;
+      /* the curve is an obstacle as well as the other labels, so the ladder runs a good
+         way out on the preferred side before it gives up and flips */
+      var cand = L2.high
+        ? [base, base - 14, base - 28, base - 42, base - 56, L2.y + 34, L2.y + 48, L2.y + 62]
+        : [base, base + 14, base + 28, base + 42, base + 56, L2.y - 26, L2.y - 40, L2.y - 54];
+
+      var pick = null, first = null;
+      for (var c = 0; c < cand.length; c++) {
+        var ly = cand[c];
+        var b2 = { x0: L2.x - w / 2, x1: L2.x + w / 2, y0: ly - hgt + 3, y1: ly + 3 };
+        if (b2.y0 < pt + 1 || b2.y1 > pt + plotH - 1) continue;
+        if (!first) first = { ly: ly, box: b2 };
+        var clash = placed.some(function (z) {
+          return b2.x0 < z.x1 && z.x0 < b2.x1 && b2.y0 < z.y1 && z.y0 < b2.y1;
+        });
+        if (!clash) {
+          /* sample both series across the label's own x-range: a box that any price line
+             passes through is rejected outright rather than merely offset */
+          for (var sIdx = j0; sIdx <= j1 && !clash; sIdx++) {
+            var yy = L2.arr[sIdx];
+            if (!yy || !isFinite(yy)) continue;
+            var py = Y(yy);
+            if (py > b2.y0 - 2 && py < b2.y1 + 2) clash = true;
+          }
+        }
+        if (!clash) { pick = { ly: ly, box: b2 }; break; }
+      }
+      pick = pick || first;
+      if (!pick) return;
+      placed.push(pick.box);
+      marks += '<text class="tge-lab ' + L2.k + (L2.up ? ' up' : ' dn') + '" x="' + L2.x.toFixed(1) +
+        '" y="' + pick.ly.toFixed(1) + '" text-anchor="middle">' + L2.t + '</text>';
+    });
+
     PIVOT_ROWS = piv;
 
     /* one row of dates, one interval: 30-day majors with 10-day minors between them.
@@ -482,6 +549,167 @@
     return MACRO_CACHE;
   }
 
+
+  /* ---- four-year cycle ----------------------------------------------------
+     Bitcoin calendar-year returns, K33 Research / BitQuant. The cycle claim is
+     that year 1 recovers, year 2 expands into the halving, year 3 peaks and
+     year 4 resets - and that where a token lists inside that clock matters as
+     much as the token. 2026 is year to date, not a closed year.
+
+     VAR_LISTING is an ASSUMPTION, not an announcement. Every "days to the next
+     year 1" figure below is only as good as that date, which is why it is
+     labelled on the chart rather than buried. */
+  var VAR_LISTING = '2026-12-01';
+  var NEXT_Y1 = '2027-01-01';
+
+  var PHASES = {
+    1: { k: 'Y1', name: 'Recovery · accumulation' },
+    2: { k: 'Y2', name: 'Expansion · halving' },
+    3: { k: 'Y3', name: 'Peak · distribution' },
+    4: { k: 'Y4', name: 'Bear · reset' }
+  };
+
+  var CYCLE_YEARS = [
+    { y: 2011, p: 1, r: 1319 }, { y: 2012, p: 2, r: 218 },
+    { y: 2013, p: 3, r: 5537 }, { y: 2014, p: 4, r: -57.7 },
+    { y: 2015, p: 1, r: 33.7 }, { y: 2016, p: 2, r: 123 },
+    { y: 2017, p: 3, r: 1414 }, { y: 2018, p: 4, r: -74.7 },
+    { y: 2019, p: 1, r: 94.0 }, { y: 2020, p: 2, r: 308 },
+    { y: 2021, p: 3, r: 57.5 }, { y: 2022, p: 4, r: -63.9 },
+    { y: 2023, p: 1, r: 157 },  { y: 2024, p: 2, r: 121 },
+    { y: 2025, p: 3, r: -6.3 }, { y: 2026, p: 4, r: -10.1, ytd: true },
+    { y: 2027, p: 1, r: null }
+  ];
+
+  var CYCLE_MARKS = [
+    { k: 'hype', label: 'HYPE', d: '2024-11-29' },
+    { k: 'lit',  label: 'LIT',  d: '2025-12-22' },
+    { k: 'var',  label: 'VAR',  d: VAR_LISTING }
+  ];
+
+  var dayNum = function (iso) { return Date.parse(iso + 'T00:00:00Z') / 86400000; };
+  var daysTo = function (iso, to) { return Math.round(dayNum(to) - dayNum(iso)); };
+
+  /* Same rounding the source tables use: thousands keep a separator and no
+     decimal, three figures stay whole, anything under 100 keeps one decimal. */
+  function cyclePct(v, ytd) {
+    if (v == null) return '—';
+    var a = Math.abs(v), body;
+    if (a >= 1000) body = Math.round(a).toLocaleString('en-US');
+    else if (a >= 100) body = String(Math.round(a));
+    else body = a.toFixed(1);
+    return (v >= 0 ? '+' : '−') + body + '%' + (ytd ? ' YTD' : '');
+  }
+
+  function yearOf(iso) { return Number(iso.slice(0, 4)); }
+  function phaseOfYear(y) {
+    for (var i = 0; i < CYCLE_YEARS.length; i++) if (CYCLE_YEARS[i].y === y) return CYCLE_YEARS[i].p;
+    return 0;
+  }
+
+  /* Signed log, one scale for both directions. A linear axis would make +5,537%
+     the only visible bar; two different scales for gains and losses would be
+     worse than either. Every bar carries its exact figure regardless. */
+  function cycleChart() {
+    var W = 960, pt = 40, pb = 44, plotH = 190, H = pt + plotH + pb;
+    var n = CYCLE_YEARS.length, slot = W / n;
+    var mag = function (v) { return Math.log10(1 + Math.abs(v)) * (v < 0 ? -1 : 1); };
+    var top = mag(5537), bot = mag(-74.7) * 1.2;
+    var zeroY = pt + plotH * (top / (top - bot));
+    var Y = function (v) { return pt + plotH * ((top - mag(v)) / (top - bot)); };
+    var xMid = function (i) { return slot * (i + 0.5); };
+
+    var groups = '', bars = '', axis = '';
+    for (var i = 0; i < n; i++) {
+      var c = CYCLE_YEARS[i], x = slot * i, cx = xMid(i);
+
+      /* One tint per four-year block instead of a boxed frame each. The block is a
+         grouping cue, not a thing to read, so it stays behind everything. */
+      if (c.p === 1 && i + 3 < n && CYCLE_YEARS[i + 3].r != null) {
+        if ((i / 4) % 2 === 1) {
+          groups += '<rect class="cy-group" x="' + x.toFixed(1) + '" y="' + pt +
+            '" width="' + (slot * 4).toFixed(1) + '" height="' + plotH + '"/>';
+        }
+        groups += '<text class="cy-group-t" x="' + (x + 6).toFixed(1) + '" y="' + (pt - 8) + '">' +
+          c.y + '–' + (c.y + 3) + '</text>';
+      }
+
+      /* The trailing year has no bar yet; the axis beneath it already says 2027 · Y1, so
+         there is nothing worth writing into the plot. */
+      if (c.r != null) {
+        var y0 = Y(c.r), bw = slot * 0.5, up = c.r >= 0;
+        /* Colour carries the outcome, not the phase. Four phase colours meant decoding a
+           legend to see the point; two means the pattern - every red bar is a Y4 - is the
+           first thing you see, and the one exception in 2025 shows up just as fast. */
+        bars += '<rect class="cy-bar ' + (up ? 'gain' : 'loss') + '" x="' + (cx - bw / 2).toFixed(1) +
+          '" y="' + Math.min(y0, zeroY).toFixed(1) + '" width="' + bw.toFixed(1) +
+          '" height="' + Math.max(1.5, Math.abs(zeroY - y0)).toFixed(1) + '" rx="2">' +
+          '<title>' + c.y + ' · ' + PHASES[c.p].k + ' ' + PHASES[c.p].name + ' · ' +
+          cyclePct(c.r, c.ytd) + '</title></rect>' +
+          '<text class="cy-val' + (up ? '' : ' dn') + '" x="' + cx.toFixed(1) + '" y="' +
+          (up ? y0 - 6 : y0 + 13).toFixed(1) + '" text-anchor="middle">' +
+          cyclePct(c.r) + (c.ytd ? '*' : '') + '</text>';
+      }
+
+      axis += '<text class="cy-year" x="' + cx.toFixed(1) + '" y="' + (H - pb + 17) +
+        '" text-anchor="middle">' + c.y + '</text>' +
+        '<text class="cy-phase p' + c.p + '" x="' + cx.toFixed(1) + '" y="' + (H - pb + 33) +
+        '" text-anchor="middle">' + PHASES[c.p].k + '</text>';
+    }
+
+    /* Just the ticker. The exact dates are on the three cards directly below, so repeating
+       them here only made three long labels fight for the same corner. */
+    var marks = CYCLE_MARKS.map(function (m) {
+      var y = yearOf(m.d), ix = -1;
+      for (var i = 0; i < n; i++) if (CYCLE_YEARS[i].y === y) ix = i;
+      if (ix < 0) return '';
+      var frac = (dayNum(m.d) - dayNum(y + '-01-01')) / 365;
+      var mx = slot * (ix + frac);
+      return '<line class="cy-mark ' + m.k + '" x1="' + mx.toFixed(1) + '" y1="' + (pt - 4) +
+        '" x2="' + mx.toFixed(1) + '" y2="' + (pt + plotH) + '"/>' +
+        '<text class="cy-mark-t ' + m.k + '" x="' + mx.toFixed(1) + '" y="' + (pt - 10) +
+        '" text-anchor="middle">' + m.label + '</text>';
+    }).join('');
+
+    return '<svg class="tge-chart cycle-chart" viewBox="0 0 ' + W + ' ' + H + '" role="img" ' +
+      'aria-label="Bitcoin calendar-year returns grouped into four-year cycles, with the three listing dates marked">' +
+      groups +
+      '<line class="tge-grid" x1="0" y1="' + zeroY.toFixed(1) + '" x2="' + W + '" y2="' + zeroY.toFixed(1) + '"/>' +
+      bars + marks + axis + '</svg>';
+  }
+
+  function cycleCards() {
+    return CYCLE_MARKS.map(function (m) {
+      var y = yearOf(m.d), p = phaseOfYear(y), left = daysTo(m.d, NEXT_Y1);
+      var late = left <= 60 ? 'Late ' : '';
+      return '<article class="cy-card ' + m.k + '">' +
+        '<span class="tp-tag">' + m.label + ' · ' + m.d + '</span>' +
+        '<b>' + late + 'Year ' + p + '</b>' +
+        '<em>' + left + ' days to the next Year 1</em></article>';
+    }).join('');
+  }
+
+  function cycleTable() {
+    var rows = '';
+    for (var i = 0; i + 3 < CYCLE_YEARS.length; i += 4) {
+      var g = CYCLE_YEARS.slice(i, i + 4);
+      if (g[3].r == null) break;
+      rows += '<tr><td class="tp-k"><b>' + g[0].y + '–' + String(g[3].y).slice(2) + '</b></td>' +
+        g.map(function (c) {
+          return '<td class="tp-v' + (c.r < 0 ? ' loss' : ' gain') + '">' + cyclePct(c.r, c.ytd) + '</td>';
+        }).join('') + '</tr>';
+    }
+    return '<div class="tp-tablewrap"><table class="tp-table cy-table"><thead><tr><th>Cycle</th>' +
+      '<th>Year 1</th><th>Year 2</th><th>Year 3</th><th>Year 4</th></tr></thead>' +
+      '<tbody>' + rows + '</tbody></table></div>';
+  }
+
+  function cycleLegend() {
+    return '<div class="cy-legend">' + [1, 2, 3, 4].map(function (p) {
+      return '<span class="p' + p + '"><i></i><b>' + PHASES[p].k + '</b>' + PHASES[p].name + '</span>';
+    }).join('') + '</div>';
+  }
+
   var ZOOMS = [
     { k: 'all', label: 'All' },
     { k: 'hype', label: 'Around HYPE listing' },
@@ -489,22 +717,32 @@
     { k: 'now', label: 'Now' }
   ];
 
-  function zoomRange(k) {
+  /* The assumed VAR listing sits past the end of the price history, so the axis has to
+     run further than the data does. The price path simply stops where the data stops. */
+  function macroSpan() {
     var n = macro().btc.length;
-    if (k === 'all') return [0, n - 1];
-    var c = MACRO.mark[k === 'now' ? 'now' : k];
-    return [Math.max(0, c - 180), Math.min(n - 1, c + 180)];
+    var vi = Math.round(dayNum(VAR_LISTING) - dayNum(MACRO.start));
+    return { n: n, varIx: vi, end: Math.max(n - 1, vi + 14) };
+  }
+
+  function zoomRange(k) {
+    var S = macroSpan();
+    if (k === 'all') return [0, S.end];
+    var c = k === 'now' ? S.varIx : MACRO.mark[k];
+    return [Math.max(0, c - 180), Math.min(S.end, c + 180)];
   }
 
   function macroChart() {
     var M = macro(), R = zoomRange(state.zoom);
     var a = R[0], b = R[1], span = b - a;
     var W = 960, pl = 54, pr = 58;
-    var priceH = 210, domH = 62, macdH = 54, gap = 12, pt = 18, pb = 26;
+    /* pt carries two rows of marker labels now: today and the assumed VAR listing are
+       only weeks apart and cannot share one. */
+    var priceH = 210, domH = 62, macdH = 54, gap = 12, pt = 34, pb = 26;
     var H = pt + priceH + gap + domH + gap + macdH + pb;
     var X = function (i) { return pl + ((i - a) / Math.max(1, span)) * (W - pl - pr); };
 
-    var slice = M.btc.slice(a, b + 1);
+    var slice = M.btc.slice(a, Math.min(b, M.btc.length - 1) + 1);
     var lo = Math.min.apply(null, slice), hi = Math.max.apply(null, slice);
     var L = Math.log10(lo * 0.92), Hh = Math.log10(hi * 1.08);
     var Yp = function (v) { return pt + (1 - (Math.log10(v) - L) / (Hh - L)) * priceH; };
@@ -525,7 +763,7 @@
     }).join('');
 
     var dTop = pt + priceH + gap;
-    var ds = M.dom.slice(a, b + 1);
+    var ds = M.dom.slice(a, Math.min(b, M.dom.length - 1) + 1);
     var dlo = Math.min.apply(null, ds), dhi = Math.max.apply(null, ds);
     var Yd = function (v) { return dTop + (1 - (v - dlo) / Math.max(0.01, dhi - dlo)) * domH; };
 
@@ -542,19 +780,41 @@
         '" height="' + Math.max(0.8, h).toFixed(1) + '"/>';
     }).join('');
 
-    var marks = ['hype', 'lit', 'now'].map(function (k) {
-      var i = MACRO.mark[k];
+    /* Cycle bands behind the price, one tint per phase year. This is the same clock the
+       cycle panel below scores; drawing it here is what makes "LIT listed into a year 4"
+       something you can see rather than something you have to take on trust. */
+    var d0m = dayNum(MACRO.start), cyc = '';
+    CYCLE_YEARS.forEach(function (c) {
+      var s0 = Math.round(dayNum(c.y + '-01-01') - d0m);
+      var s1 = Math.round(dayNum((c.y + 1) + '-01-01') - d0m);
+      var from = Math.max(s0, a), to = Math.min(s1, b);
+      if (to <= from) return;
+      var x0 = X(from), x1 = X(to), w = x1 - x0;
+      cyc += '<rect class="mc-cyc p' + c.p + '" x="' + x0.toFixed(1) + '" y="' + pt +
+        '" width="' + w.toFixed(1) + '" height="' + priceH + '"/>';
+      /* the first band is a part-year at the left edge, where the row tag already sits */
+      if (w < 34 || x0 + w / 2 < pl + 48) return;
+      cyc += '<text class="mc-cyc-k p' + c.p + '" x="' + (x0 + w / 2).toFixed(1) + '" y="' + (pt + 12) +
+        '" text-anchor="middle">' + PHASES[c.p].k + '</text>';
+      if (w < 78) return;
+      cyc += '<text class="mc-cyc-n p' + c.p + '" x="' + (x0 + w / 2).toFixed(1) + '" y="' + (pt + 24) +
+        '" text-anchor="middle">' + PHASES[c.p].name + '</text>';
+    });
+
+    var VIX = macroSpan().varIx;
+    var marks = ['hype', 'lit', 'now', 'var'].map(function (k) {
+      var i = k === 'var' ? VIX : MACRO.mark[k];
       if (i < a || i > b) return '';
-      var lbl = k === 'now' ? 'today' : k.toUpperCase();
+      var lbl = k === 'now' ? 'today' : k === 'var' ? 'VAR listing' : k.toUpperCase();
       return '<line class="mc-mark ' + k + '" x1="' + X(i).toFixed(1) + '" y1="' + pt +
         '" x2="' + X(i).toFixed(1) + '" y2="' + (mTop + macdH) + '"/>' +
-        '<text class="mc-mark-t ' + k + '" x="' + X(i).toFixed(1) + '" y="' + (pt - 5) +
-        '" text-anchor="middle">' + lbl + '</text>';
+        '<text class="mc-mark-t ' + k + '" x="' + X(i).toFixed(1) + '" y="' +
+        (k === 'var' ? pt - 20 : pt - 5) + '" text-anchor="middle">' + lbl + '</text>';
     }).join('');
 
     var years = '';
     var d0 = new Date(MACRO.start + 'T00:00:00Z');
-    for (var y = 2021; y <= 2026; y++) {
+    for (var y = 2021; y <= 2027; y++) {
       var di = Math.round((Date.UTC(y, 0, 1) - d0.getTime()) / 86400000);
       if (di < a || di > b) continue;
       years += '<text class="tge-axis" x="' + X(di).toFixed(1) + '" y="' + (H - 8) +
@@ -568,11 +828,12 @@
       '<path class="mc-ma" d="' + line(M.ma, Yp) + '"/>' + priceAxis +
       '<text class="mc-tag" x="' + pl + '" y="' + (dTop + 10) + '">STABLE.D</text>' +
       '<path class="mc-dom" d="' + line(M.dom, Yd) + '"/>' +
-      '<text class="tge-axis" x="' + (W - pr + 6) + '" y="' + (Yd(M.dom[b]) + 4).toFixed(1) + '">' +
-        M.dom[b].toFixed(2) + '%</text>' +
+      '<text class="tge-axis" x="' + X(Math.min(b, M.dom.length - 1)).toFixed(1) +
+        '" y="' + (Yd(M.dom[Math.min(b, M.dom.length - 1)]) - 6).toFixed(1) + '" text-anchor="end">' +
+        M.dom[Math.min(b, M.dom.length - 1)].toFixed(2) + '%</text>' +
       '<text class="mc-tag" x="' + pl + '" y="' + (mTop + 10) + '">MACD</text>' +
       '<line class="tge-grid" x1="' + pl + '" y1="' + zeroY + '" x2="' + (W - pr) + '" y2="' + zeroY + '"/>' +
-      bars + marks + years + '</svg>';
+      cyc + bars + marks + years + '</svg>';
   }
 
   var state = { fdv: 3.0e9, zoom: 'all' };
@@ -655,13 +916,13 @@
       '<span class="swing"><b class="dn">\u25bc</b><em>swing high</em><b class="up">\u25b2</b><em>swing low</em></span>' +
       '<span class="band up"><i></i><em>above listing price</em></span>' +
       '<span class="band dn"><i></i><em>below listing price</em></span></div>' +
-      tgeChart() + swingTable() + milestones() +
+      tgeChart() + milestones() +
       '<div class="bw-head"><b>Each One Against Bitcoin</b><span><i>both indexed to 1.00 on the listing day \u00b7 same 258-day window</i></span></div>' +
       '<div class="tge-legend"><span class="btcref"><i></i>Bitcoin</span>' +
       '<span class="hype"><i></i>HYPE</span><span class="lit"><i></i>LIT</span></div>' +
       overlayChart() +
       '<div class="tp-note"><b>Beta</b> is how much the token moved per 1% Bitcoin move, <b>correlation</b> how tightly the two moved together, both from daily log returns over the window. This is what separates the two listings: one rose while Bitcoin fell, the other did not.</div>' +
-      '<div class="tp-note"><b>Arrows mark the swing turns</b> — down above a high, up below a low — and each is labelled with the move that produced it. A turn is only recorded once the price reversed more than 28% from its running extreme, so noise never becomes a signal. Hover any arrow for the exact day and move. Both curves are cut to 258 days — Lighter\'s full life so far — so the two are read over the same window. Over its own longer run HYPE went on to ×27.5. Day 0 is each listing day, not a shared calendar date: the macro table above is what puts them on the same clock.</div>' +
+      '<div class="tp-note"><b>Arrows mark the swing turns</b> — down above a high, up below a low — and each carries the run of the previous 30 days, so every figure on the plot is the same kind of number and none of them can be mistaken for the axis, which reads change since listing. Inside the first 30 days the label measures from the listing price and says the span it covers. A turn is only recorded once the price reversed more than 28% from its running extreme, so noise never becomes a signal. Hover any arrow for its exact day and level. Both curves are cut to 258 days — Lighter\'s full life so far — so the two are read over the same window. Over its own longer run HYPE went on to ×27.5. Day 0 is each listing day, not a shared calendar date: the macro table above is what puts them on the same clock.</div>' +
 
       '<div class="bw-head"><b>The Three Listings On One Bitcoin Chart</b><span><i>where each listing sits in Bitcoin\'s own history</i></span></div>' +
       '<div class="tp-chips zoomchips"><span>Zoom</span>' + ZOOMS.map(function (z) {
@@ -669,7 +930,15 @@
           (state.zoom === z.k ? ' class="on"' : '') + '>' + z.label + '</button>';
       }).join('') + '</div>' +
       macroChart() +
-      '<div class="tp-note"><b>White</b> is Bitcoin on a log scale, <b>grey dashes</b> the 200-day line, <b>amber</b> the share of the market sitting in stablecoins, and the bottom strip is the weekly MACD. The three vertical lines are HYPE\'s listing, LIT\'s listing and today. Zoom to either listing to see the shape each one launched into.</div>' +
+      '<div class="tp-note"><b>Orange</b> is Bitcoin on a log scale, <b>dashed grey</b> the 200-day line, <b>the middle strip</b> the share of the market sitting in stablecoins, and the bottom strip is the weekly MACD. The tinted bands behind the price are the four-year cycle years scored below. The vertical lines are HYPE\'s listing, LIT\'s listing, today, and the assumed VAR listing on ' + VAR_LISTING + '. Zoom to either listing to see the shape each one launched into.</div>' +
+
+      '<section class="cy-claim"><span class="tp-eyebrow">The cycle claim</span>' +
+      '<h3>LIT\'s post-listing path should not be copied onto VAR</h3>' +
+      '<p>LIT listed at the end of a Year 3 and walked straight into the Year 4 that has historically been the weak one. VAR would list at the end of a Year 4, with the next recovery Year 1 in front of it. The four-year-cycle argument is simply that the two listings start pointed in opposite directions.</p></section>' +
+      cycleLegend() + cycleChart() +
+      '<div class="cy-foot">* 2026 is year to date, not a closed year.</div>' +
+      '<div class="cy-cards">' + cycleCards() + '</div>' +
+      '<div class="tp-note"><b>How to read it.</b> All three completed Year 4s were negative — \u221257.7%, \u221274.7%, \u221263.9%. But 2025 was a Year 3 and closed at \u22126.3%, which breaks the "years one to three always rise" half of the pattern, so this is a tendency and not a rule. Bars use one signed log scale in both directions, because a linear axis would leave +5,537% as the only bar you could see; every bar carries its own figure. VAR\'s listing date is an assumption, not an announcement — the 31-day figure moves with it. The claim that VAR lists closer to a recovery than LIT did is defensible on this evidence. It is not a guarantee, and four observations is not a sample. <i>Annual returns: K33 Research · BitQuant.</i></div>' +
 
       '<div class="bw-head"><b>Bitcoin At Each Listing</b><span><i>indexed to 1.00 on the listing day · 90 days before, 120 days after</i></span></div>' +
       '<div class="tge-legend"><span class="hype"><i></i>BTC around HYPE listing</span>' +
@@ -802,6 +1071,11 @@
       try { showTab('paths', { push: false }); } catch (_) {}
     }
   }
+
+  /* Shared with playbook-panels.js (Tab 13). That tab runs the same two price paths
+     through a leveraged TWAP, and reading them from here is what stops the two tabs
+     from quietly diverging the way the LIT anchor already has elsewhere. */
+  window.__VPATHS = { series: SERIES, window: WINDOW, listings: LISTINGS, varListing: VAR_LISTING };
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
   else boot();
