@@ -8317,6 +8317,12 @@ article.bw-viz .bw-viz-legend.bw-legend-big .c{background:var(--bwv-c)}
 article.bw-viz:has(.bw-legend-big) .bw-viz-read{padding:12px 14px}
 article.bw-viz:has(.bw-legend-big) .bw-viz-read .dir{font-size:12px}
 article.bw-viz:has(.bw-legend-big) .bw-viz-read .what{font-size:14px}
+article.bw-viz:has(svg.mr-line) .bw-viz-legend{gap:16px;font:700 13px var(--mono);color:var(--text);margin-bottom:10px}
+article.bw-viz:has(svg.mr-line) .bw-viz-legend i{width:22px;height:4px}
+article.bw-viz:has(svg.mr-line) .bw-viz-legend i.mr-sw{height:12px;border-radius:3px}
+article.bw-viz:has(svg.mr-line) svg text.axis{font-size:12px;font-weight:700;fill:var(--text)}
+article.bw-viz svg.mr-bars text.axis[text-anchor="middle"]{font-size:10px}
+article.bw-viz:has(svg.mr-line) .bw-viz-read .what{font-size:14px}
 /* body.theme-light svg text{fill:#153b67!important} (above, page-wide) was painting the
    inside-bar % labels navy-on-navy in light mode; force them white in both themes. */
 body.theme-light .bw-viz text.bw-pct.in{fill:#fff!important}
@@ -10644,7 +10650,7 @@ body.theme-light .bw-viz text.bw-pct.in{fill:#fff!important}
 </style>
 
 <script src="market-regime-data.js?v=1790400001" defer></script>
-<script src="dashboard.js?v=1790300301" defer></script>
+<script src="dashboard.js?v=1790300401" defer></script>
 <script src="paths-panels.js?v=1789148292" defer></script>
 <script src="playbook-panels.js?v=1790254731" defer></script>
 <script src="monitors-panels.js?v=1789148292" defer></script>
