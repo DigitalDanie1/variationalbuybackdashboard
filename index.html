@@ -8636,7 +8636,7 @@ body.theme-light .valuation-report #valScatter .val-var-label{
       <span>Latest ET net treasury inflow</span>
       <strong id="dailyBriefRevenue">—</strong>
       <em class="daily-brief-delta" id="dailyBriefRevenueDelta">Waiting for completed close</em>
-      <small id="dailyBriefBurn">Minimum buyback-burn floor —</small>
+      <small id="dailyBriefBurn">Intended buyback allocation —</small>
     </div>
     <div class="daily-brief-metric olp-side">
       <span>Daily OLP-side $ · implied</span>
@@ -8704,8 +8704,8 @@ body.theme-light .valuation-report #valScatter .val-var-label{
         </div>
       </div>
       <div class="daily-news-source">
-        <span>Revenue share + burn floor</span>
-        <p>Daily gross spreads equal net treasury inflow divided by the report-observed treasury share. OLP-side dollars are the remainder before market-making costs, rewards, and OLP PnL. The burn figure applies the stated 30% minimum to treasury inflow.</p>
+        <span>Revenue share + buy-&amp;-burn</span>
+        <p>Daily gross spreads equal net treasury inflow divided by the report-observed treasury share. OLP-side dollars are the remainder before market-making costs, rewards, and OLP PnL. The burn figure applies 100% of treasury inflow (intended, not yet executed).</p>
         <small id="dailySourceReportAsOf">Latest official report window</small>
         <div class="daily-news-source-links">
           <a href="https://docs.variational.io/omni/the-omni-liquidity-provider-olp" target="_blank" rel="noopener noreferrer">Variational Docs ↗</a>
@@ -9139,7 +9139,7 @@ body.theme-light .valuation-report #valScatter .val-var-label{
       <div class="activity-arrow">→</div>
       <div class="activity-result treasury"><span id="fmRevLabel">1D NET TREASURY INFLOW</span><strong id="fmDailyRev">—</strong><small id="fmDailyRevFormula">selected wallet balance change</small></div>
     </div>
-    <div class="activity-outcome"><b id="fmDailyBurn">—</b><span id="fmBurnLabel">theoretical minimum buyback allocation</span><small id="fmDailyBurnFormula">inflow × 30% Docs floor · not executed burn</small></div>
+    <div class="activity-outcome"><b id="fmDailyBurn">—</b><span id="fmBurnLabel">intended buyback allocation (not yet executed)</span><small id="fmDailyBurnFormula">inflow × 100% (intended, not yet executed burn)</small></div>
     <div class="activity-valuation" id="fmValLine"></div>
   </div>
   <div class="eff-ratios">
@@ -9277,16 +9277,16 @@ body.theme-light .valuation-report #valScatter .val-var-label{
     <div class="spread-arrow">→</div>
     <div class="spread-slice burn">
       <div class="k">Buyback-burn firepower</div>
-      <div class="v" id="bbSpreadBurn">$0.06</div>
-      <div class="d">30% of treasury revenue earmarked for $VAR</div>
+      <div class="v" id="bbSpreadBurn">$0.20</div>
+      <div class="d">100% of treasury revenue committed to $VAR (intended, not yet executed)</div>
     </div>
   </div>
   <div class="eff-ratios unit-core">
     <div class="er"><div class="er-v" id="oneSpreadVol">—</div><div class="er-l">Trading volume needed to create <b>$1 of trader spread payment</b><span class="er-note" id="oneSpreadVolNote">selected volume ÷ implied spread payments</span></div></div>
     <div class="er"><div class="er-v" id="oneSpreadOi">—</div><div class="er-l">Open interest needed to create <b>$1/day of trader spread payment</b><span class="er-note">OI ÷ implied daily spread payments</span></div></div>
-    <div class="er"><div class="er-v" id="bbDayBurn">—</div><div class="er-l">Current <b>buyback-burn firepower loaded per day</b><span class="er-note">daily treasury revenue × 30% burn floor</span></div></div>
+    <div class="er"><div class="er-v" id="bbDayBurn">—</div><div class="er-l">Current <b>buyback-burn firepower loaded per day</b><span class="er-note">daily treasury revenue × 100% (intended, not yet executed)</span></div></div>
   </div>
-  <div class="eff-note" id="bbEvidenceNote">Across the latest three official updates, a customer’s <b>$1.00 gross spread</b> sent <b id="bbTreasuryCutNote">$0.20</b> to treasury. At the current <b id="bbShare">30%</b> burn floor, that implies at least <b id="bbSpreadBurnNote">$0.06</b> of buyback-burn firepower. The near 50:50 split applies only to net profit after costs and rewards, not to gross spreads.</div>
+  <div class="eff-note" id="bbEvidenceNote">Across the latest three official updates, a customer’s <b>$1.00 gross spread</b> sent <b id="bbTreasuryCutNote">$0.20</b> to treasury. At <b id="bbShare">100%</b> of treasury committed to buy &amp; burn (intended, not yet executed), that implies <b id="bbSpreadBurnNote">$0.20</b> of buyback-burn firepower. The near 50:50 split applies only to net profit after costs and rewards, not to gross spreads.</div>
 </div>
 
 <div class="card math tsec tg-hide" data-tg="implied" style="margin-top:16px">
@@ -9297,7 +9297,7 @@ body.theme-light .valuation-report #valScatter .val-var-label{
     <span class="lg meas"><var>V</var> = 30D perp volume <b id="mqV">—</b></span>
     <span class="lg meas"><var>Q</var> = open interest <b id="mqQ">—</b></span>
     <span class="lg con"><var>s</var> = observed treasury share of spreads <b>0.20</b></span>
-    <span class="lg con"><var>b</var> = burn floor <b>0.30</b></span>
+    <span class="lg con"><var>b</var> = burn share <b>1.00</b> (intended, not yet executed)</span>
     <span class="lg tag2">subscript ₃₀ = trailing-30-day amount</span>
   </div>
   <div class="eqlist">
@@ -9314,7 +9314,7 @@ body.theme-light .valuation-report #valScatter .val-var-label{
     <span>Per <b>$1</b> customer spread:</span>
     <span class="ue"><var>1−s</var> = <b>$0.80</b> operating pool</span><span class="ue-plus">+</span>
     <span class="ue"><var>s</var> = <b>$0.20</b> treasury</span><span class="ue-plus">→</span>
-    <span class="ue burn"><var>s·b</var> = <b>$0.06</b> burn floor</span>
+    <span class="ue burn"><var>s·b</var> = <b>$0.20</b> committed to burn (intended)</span>
   </div>
 </div>
 
@@ -9425,7 +9425,7 @@ body.theme-light .valuation-report #valScatter .val-var-label{
     <div class="mrow"><span class="ms">Fees / revenue</span><span class="mf">Treasury balance on-chain (Arbitrum USDC <a href="https://arbiscan.io/address/0x5e91b40467fb8902c46a7b6cb90482363188d645" target="_blank" rel="noopener"><code>0x5e91…d645 ↗</code></a>), sampled daily via archive RPC. The latest three official reports show treasury = exactly 20% of gross spreads, so current spread estimates use revenue ÷ 0.20. The docs page currently says 10% and subject to change; that conflict is disclosed rather than averaged away.</span></div>
     <div class="mrow"><span class="ms">Perp volume &amp; OI</span><span class="mf">Historical daily values come directly from DeFiLlama's public <code>/v2/chart/derivatives/protocol/variational</code> and <code>/v2/chart/open-interest/protocol/variational</code> series. Live rolling-24h volume and OI come from Variational's official <code>/metadata/stats</code> endpoint, which is also the source used by DeFiLlama's adapter.</span></div>
     <div class="mrow"><span class="ms">Volume → $1 spread</span><span class="mf"><code>volume_30d ÷ spreads_30d</code> where <code>spreads_30d = revenue_30d ÷ 0.20</code> using the latest observed share. Take-rate (bps) = <code>spreads ÷ volume × 10000</code>.</span></div>
-    <div class="mrow"><span class="ms">Volume → $1 burned</span><span class="mf"><code>volume_30d ÷ (revenue_30d × 0.30)</code> — burn is ≥30% of revenue.</span></div>
+    <div class="mrow"><span class="ms">Volume → $1 burned</span><span class="mf"><code>volume_30d ÷ (revenue_30d × 1.00)</code> — 100% of revenue is committed to burn (intended, not yet executed).</span></div>
     <div class="mrow"><span class="ms">OI → $1/day</span><span class="mf"><code>OI ÷ (revenue_30d ÷ 30)</code>. Annual yield on OI = <code>daily_rev × 365 ÷ OI</code>.</span></div>
     <div class="mrow"><span class="ms">Distance to HL</span><span class="mf"><code>(HL_metric ÷ VAR_metric − 1) × 100%</code>. Comparison tab uses Perpetual Pulse OI and volume snapshots.</span></div>
     <div class="mrow"><span class="ms">Fee per trader</span><span class="mf"><code>cumulative_fees ÷ unique_traders</code> (traders from Dune).</span></div>

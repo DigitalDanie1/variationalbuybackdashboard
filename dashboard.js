@@ -60,7 +60,7 @@ const MKT = {
   oi:1.178e9,
   spreadShare:0.20,  // Replaced below with the observed share from the latest 3 official reports
   docsSpreadShare:0.10,
-  burnShare:0.30,    // ≥30% of revenue → $VAR buy-&-burn
+  burnShare:1.00,    // 100% of treasury revenue → $VAR buy-&-burn (official, Sep 2026)
   hlOi:10.286e9,     // Hyperliquid OI (DeFiLlama, live-ish)
   hlVol30:255e9      // Hyperliquid ~30d perp volume (est.; DeFiLlama gates volume)
 };
@@ -995,8 +995,8 @@ function renderMoneyMap(T){
    </defs>
    ${rib(x1+bw,yA0,yA0+hOLP,x2,yO0,yO1,'url(#pmRibOlp)',`Non-treasury pool · ${fmtUSD(REMAINDER)} (${remainderPct}%) before costs, rewards, and OLP PnL`)}
    ${rib(x1+bw,yA0+hOLP+gap,yA1,x2,yT0,yT1,'url(#pmRibT)',`Current treasury balance · ${fmtUSD(T)} (${treasuryPct}% of modeled historical spreads)`)}
-   ${rib(x2+bw,yT0,tSplit,x3,yB0,yB1,'url(#pmRibB)',`$VAR buy & burn firepower · ≥ ${fmtUSD(BURN)} (≥30% of treasury)`)}
-   ${rib(x2+bw,tSplit,yT1,x3,yD0,yD1,'url(#pmRibD)',`Dry powder retained · ≤ ${fmtUSD(DRY)}`)}
+   ${rib(x2+bw,yT0,tSplit,x3,yB0,yB1,'url(#pmRibB)',`$VAR buy & burn firepower · ${fmtUSD(BURN)} (100% of treasury, intended — not yet executed)`)}
+   ${rib(x2+bw,tSplit,yT1,x3,yD0,yD1,'url(#pmRibD)',`Dry powder retained · ${fmtUSD(DRY)}`)}
    <rect x="${x1}" y="${yA0}" width="${bw}" height="${yA1-yA0}" rx="3" fill="#3f74c9"/>
    <rect x="${x2}" y="${yO0}" width="${bw}" height="${hOLP}" rx="3" fill="#2f5590"/>
    <rect x="${x2}" y="${yT0}" width="${bw}" height="${hT}" rx="3" fill="#22e6a0"/>
@@ -1008,8 +1008,8 @@ function renderMoneyMap(T){
    <text x="${x2}" y="36" fill="#eaf1ff" font-size="15" font-weight="900">Operating pool ${c(REMAINDER)} · ${remainderPct}%</text>
    <text x="${x2}" y="${Math.min(H-10,yT1+22)}" fill="#22e6a0" font-size="15" font-weight="900">Treasury balance ${c(T)} · current observed share ${currentPct}%</text>
    <text x="${x3}" y="20" fill="#7d8aa5" font-size="9.5" font-weight="800" letter-spacing="1.5" text-anchor="end">USE OF TREASURY</text>
-   <text x="${x3}" y="${Math.max(56,yB0-8)}" fill="#c7bcff" font-size="13" font-weight="900" text-anchor="end">Burn ≥ ${c(BURN)}</text>
-   <text x="${x3}" y="${Math.min(H-10,yD1+16)}" fill="#7fe8c4" font-size="13" font-weight="900" text-anchor="end">Dry powder ≤ ${c(DRY)}</text>`;
+   <text x="${x3}" y="${Math.max(56,yB0-8)}" fill="#c7bcff" font-size="13" font-weight="900" text-anchor="end">Burn ${c(BURN)}</text>
+   <text x="${x3}" y="${Math.min(H-10,yD1+16)}" fill="#7fe8c4" font-size="13" font-weight="900" text-anchor="end">Dry powder ${c(DRY)}</text>`;
 }
 function feeRevenueHistory(){
   const out=[];
@@ -2413,7 +2413,7 @@ function renderEfficiency(){
   $('#fmOiLabel') && ($('#fmOiLabel').textContent='OPEN INTEREST · LIVE SNAPSHOT');
   $('#fmFeesLabel') && ($('#fmFeesLabel').textContent=periodLabel+' IMPLIED GROSS SPREADS');
   $('#fmRevLabel') && ($('#fmRevLabel').textContent=periodLabel+' NET TREASURY INFLOW');
-  $('#fmBurnLabel') && ($('#fmBurnLabel').textContent='theoretical minimum '+periodLabel+' buyback allocation');
+  $('#fmBurnLabel') && ($('#fmBurnLabel').textContent='intended '+periodLabel+' buyback allocation (not yet executed)');
   $('#efVol') && ($('#efVol').textContent=fmtBig(e.vol));
   $('#efVolLabel') && ($('#efVolLabel').textContent='Perp volume · '+e.label);
   $('#efVolSub') && ($('#efVolSub').textContent=e.key==='all'?'$168B all-time':e.key==='month'?'MTD proxy volume':'selected window');
@@ -2438,7 +2438,7 @@ function renderEfficiency(){
   $('#fmDailyRevFormula') && ($('#fmDailyRevFormula').textContent=periodLabel+' net wallet balance change');
   $('#fmDailyFeesFormula') && ($('#fmDailyFeesFormula').textContent='daily inflow ÷ period-specific report share · current '+(MKT.spreadShare*100).toFixed(0)+'%; Docs 10%');
   $('#fmDailyVolFormula') && ($('#fmDailyVolFormula').textContent=e.volSource);
-  $('#fmDailyBurnFormula') && ($('#fmDailyBurnFormula').textContent=periodLabel+' inflow × 30% Docs floor · not executed burn');
+  $('#fmDailyBurnFormula') && ($('#fmDailyBurnFormula').textContent=periodLabel+' inflow × 100% (intended, not yet executed burn)');
   $('#raTreasuryDay') && ($('#raTreasuryDay').textContent=fmtBig(e.dailyRev));
   $('#raSpreadDay') && ($('#raSpreadDay').textContent=fmtBig(e.dailySpread));
   $('#raVolumeDay') && ($('#raVolumeDay').textContent=fmtBig(e.dailySpread*e.volPerFee));
@@ -2491,7 +2491,7 @@ function renderEfficiency(){
   $('#bbTreasuryCutNote') && ($('#bbTreasuryCutNote').textContent=fmtUSD(treasuryPerSpread,2));
   $('#bbSpreadBurnNote') && ($('#bbSpreadBurnNote').textContent=fmtUSD(burnPerSpread,2));
   const ev=REVENUE_EVIDENCE, perDollar=n=>fmtUSD(ev.grossSpreads?n/ev.grossSpreads:0,2);
-  $('#bbEvidenceNote') && ($('#bbEvidenceNote').innerHTML=`Across the latest ${ev.reports.length} official updates, each <b>$1.00 gross spread</b> produced <b>${perDollar(ev.treasury)}</b> treasury revenue, <b>${perDollar(ev.marketMakingCosts)}</b> market-making costs, <b>${perDollar(ev.rewards)}</b> rewards, and <b>${perDollar(ev.olpPnl)}</b> OLP PnL. Treasury and OLP PnL split <b>${(ev.treasuryNetShare*100).toFixed(1)}% / ${(ev.olpNetShare*100).toFixed(1)}%</b> only at the net-profit stage. At the ${(MKT.burnShare*100).toFixed(0)}% burn floor, buyback-burn firepower is at least <b>${fmtUSD(burnPerSpread,2)} per $1 gross spread</b>.`);
+  $('#bbEvidenceNote') && ($('#bbEvidenceNote').innerHTML=`Across the latest ${ev.reports.length} official updates, each <b>$1.00 gross spread</b> produced <b>${perDollar(ev.treasury)}</b> treasury revenue, <b>${perDollar(ev.marketMakingCosts)}</b> market-making costs, <b>${perDollar(ev.rewards)}</b> rewards, and <b>${perDollar(ev.olpPnl)}</b> OLP PnL. Treasury and OLP PnL split <b>${(ev.treasuryNetShare*100).toFixed(1)}% / ${(ev.olpNetShare*100).toFixed(1)}%</b> only at the net-profit stage. At ${(MKT.burnShare*100).toFixed(0)}% of treasury committed to buy & burn (intended, not yet executed), buyback-burn firepower is <b>${fmtUSD(burnPerSpread,2)} per $1 gross spread</b>.`);
 
   renderFeePerTrader();
 }
@@ -2874,7 +2874,7 @@ function renderDailyBrief(){
   revenueDelta.className='daily-brief-delta';
   if(vsPrevious!=null&&Math.abs(vsPrevious)>.05)revenueDelta.classList.add(vsPrevious>0?'up':'down');
   revenueDelta.textContent=`${money0(previous.e)} → ${money0(latest.e)} · ${signedPct(vsPrevious)} DoD`;
-  $('#dailyBriefBurn').textContent=`Theoretical ${fmtUSD(Math.max(0,latest.e*MKT.burnShare))} minimum buyback allocation`;
+  $('#dailyBriefBurn').textContent=`${fmtUSD(Math.max(0,latest.e*MKT.burnShare))} intended buyback allocation (not yet executed)`;
   $('#dailyBriefOlpSide').textContent=fmtUSD(dailyOlpSide);
   $('#dailyBriefOlpShare').textContent=`${((1-reportShare)*100).toFixed(0)}% non-treasury side of implied spreads`;
   $('#dailyBriefVolume').textContent=marketBig(volume);
@@ -2939,9 +2939,9 @@ function renderDailyBrief(){
 	  set('#varPulseAsOf',c.dateLabel);
 	  set('#varPulseVerdict',verdict[0]);
 	  set('#varPulseTakeaway',verdict[1]);
-	  set('#varPulseData',`Treasury balance ${marketBig(c.cur)} · 7D inflow pace ${moneyWhole(c.pace)}/day · theoretical 30% floor ${moneyWhole(c.burnDay)}`);
+	  set('#varPulseData',`Treasury balance ${marketBig(c.cur)} · 7D inflow pace ${moneyWhole(c.pace)}/day · intended buy-&-burn ${moneyWhole(c.burnDay)} (100%, not yet executed)`);
 	  set('#varPulseScoreLine',`${engine}/10`);
-	  set('#varPulseScoreCopy',`Volume ${volumeScore} · OI ${oiScore} · treasury inflow ${revenueScore} · theoretical buyback floor ${burnScore}, each out of 10. This is a momentum read, not audited revenue or a valuation.`);
+	  set('#varPulseScoreCopy',`Volume ${volumeScore} · OI ${oiScore} · treasury inflow ${revenueScore} · intended buyback allocation ${burnScore}, each out of 10. This is a momentum read, not audited revenue or a valuation.`);
 	  [['#scoreVol',volumeScore],['#scoreOi',oiScore],['#scoreRev',revenueScore],['#scoreBurn',burnScore]].forEach(([id,v])=>{
 	    const el=$(id);
 	    if(el)el.style.setProperty('--w',`${v*10}%`);
@@ -2949,7 +2949,7 @@ function renderDailyBrief(){
 	  const milestoneLabel=marketBig(c.milestone);
 	  set('#varMilestoneAmount',marketBig(c.toMilestone));
 	  set('#varMilestoneCopy',c.daysToMilestone?`${marketBig(c.toMilestone)} until the treasury reaches ${milestoneLabel}. At the current 7D pace, that is about ${c.daysToMilestone} day${c.daysToMilestone===1?'':'s'}.`:`Next treasury milestone: ${milestoneLabel}. Waiting for a clean pace estimate.`);
-	  set('#varMilestoneSub',`At least ${marketBig(c.burnTotal)} of treasury is buyback-burn firepower at the ${Math.round(MKT.burnShare*100)}% floor.`);
+	  set('#varMilestoneSub',`${marketBig(c.burnTotal)} of treasury is buyback-burn firepower — ${Math.round(MKT.burnShare*100)}% of treasury, intended and not yet executed.`);
 	  const vari=PEERS.list.find(p=>p.me)||{oi:c.oi,vol:c.volume};
 	  const lighter=PEERS.list.find(p=>p.n==='Lighter')||{};
 	  const extended=PEERS.list.find(p=>p.n==='Extended')||{};
@@ -3015,7 +3015,7 @@ const NEWS_ANGLES=[
      `This is revenue, not incentives — the token hasn't even launched.`]},
   {id:'burn',ok:c=>c.burnDay>0,card:c=>({big:money0(c.burnDay),label:'of $VAR burn fuel loaded yesterday'}),
    text:c=>[`Yesterday Variational loaded ${money0(c.burnDay)} of buyback-and-burn fuel for $VAR.`,'',
-     `At least 30% of every treasury dollar is earmarked for it — ${marketBig(c.burnTotal)} and counting.`,'',
+     `100% of every treasury dollar is earmarked for it (intended, not yet executed) — ${marketBig(c.burnTotal)} and counting.`,'',
      `None of it has been spent yet.`]},
   {id:'scale',ok:()=>true,card:c=>({big:marketBig(c.oi),label:'open interest, pre-token'}),
    text:c=>[`${marketBig(c.oi)} open interest.`,`${marketBig(c.volume)} traded in 24h.`,'',
@@ -3131,7 +3131,7 @@ function renderChanges(){
 function dailyRate(days){const n=SERIES.length;if(n-1<days)days=n-1;return (SERIES[n-1].v-SERIES[n-1-days].v)/days;}
 function allTimeRate(){const n=SERIES.length;const dd=Math.max(1,(new Date(SERIES[n-1].d)-new Date(SERIES[0].d))/864e5);return SERIES[n-1].v/dd;}
 const rateOf={ '7d':()=>dailyRate(7), '30d':()=>dailyRate(30), '60d':()=>dailyRate(60), 'all':()=>allTimeRate() };
-const FC={ rate:0, target:'2026-09-30', burn:30 };
+const FC={ rate:0, target:'2026-09-30', burn:100 };
 const CHART={curveZoom:'all'};
 function daysTo(dstr){return Math.max(0,Math.round((new Date(dstr+'T00:00:00Z')-new Date(SERIES[SERIES.length-1].d+'T00:00:00Z'))/864e5));}
 function clamp(n,min,max){return Math.max(min,Math.min(max,n));}
@@ -3295,9 +3295,9 @@ function renderForecast(){
   $('#projAdd').textContent=`+${fmtUSD(projBase-last.v)} added in ${nDays} days`;
   $('#projRange').textContent=`range ${fmtUSD(projLo)} – ${fmtUSD(projHi)} (soft→hot pace)`;
   const bn=last.v*FC.burn/100, bp=projBase*FC.burn/100;
-  $('#burnNow').textContent='≥ '+fmtUSD(bn);
-  $('#burnProj').textContent='≥ '+fmtUSD(bp);
-  $('#burnNote').innerHTML=`≥${FC.burn}% of protocol revenue is committed to purchase &amp; burn $VAR. Treasury revenue ≈ USDC captured here. Zero outflows so far → this is dry powder building up, not yet burned on-chain.`;
+  $('#burnNow').textContent=fmtUSD(bn);
+  $('#burnProj').textContent=fmtUSD(bp);
+  $('#burnNote').innerHTML=`${FC.burn}% of protocol revenue is committed to purchase &amp; burn $VAR (intended, not yet executed). Treasury revenue ≈ USDC captured here. Zero outflows so far → this is dry powder building up, not yet burned on-chain.`;
 }
 
 /* ---------- interval bar chart ---------- */
@@ -3895,7 +3895,7 @@ function selectCell(dateStr){
     if(complete){
       const a=calImpliedActivity(amt,dateStr);
       label=`<b>${dateStr}</b> (${wd}) · completed daily total<br>
-        <b>${calMiniMoney(a.volume)}</b> modeled volume · <b>${calMiniMoney(a.oi)}</b> modeled OI context · <b>${calMiniMoney(a.burn)}</b> theoretical 30% buyback floor`;
+        <b>${calMiniMoney(a.volume)}</b> modeled volume · <b>${calMiniMoney(a.oi)}</b> modeled OI context · <b>${calMiniMoney(a.burn)}</b> intended buy-&amp;-burn (100%, not yet executed)`;
       status='COMPLETE';statusClass='estimated';
     }else if(isToday){
       label=`<b>${dateStr}</b> (${wd}) · earned so far<br>Final daily total locks at <b>00:00 ET</b>.`;
@@ -3957,7 +3957,7 @@ function renderMacroPanel(events,dateStr){
 function calShareText(){
   if(!CAL.sel)return '';
   const url=shareUrl();
-  return {t:`Variational's buyback treasury stacked ${CAL.sel.amt} USDC ${CAL.sel.scope} 📈\n\nThe latest three official reports show 20% of gross spreads reaching treasury, implying a 6% minimum buyback-burn floor. Live tracker 👇`,url};
+  return {t:`Variational's buyback treasury stacked ${CAL.sel.amt} USDC ${CAL.sel.scope} 📈\n\nThe latest three official reports show 20% of gross spreads reaching treasury; 100% of that treasury is committed to buy & burn (intended, not yet executed). Live tracker 👇`,url};
 }
 $('#calSeg').addEventListener('click',e=>{
   const b=e.target.closest('button');if(!b)return;
@@ -4509,7 +4509,7 @@ $('#tweet').addEventListener('click',()=>{
   const text=
 `Variational's buyback treasury has quietly stacked ${fmtUSD(total)} USDC in ${days} days 👀
 
-The latest three official reports show 20% of gross spreads reaching treasury, implying a 6% minimum buyback-burn floor. I built a live tracker for it 👇`;
+The latest three official reports show 20% of gross spreads reaching treasury; 100% of that treasury is committed to buy & burn (intended, not yet executed). I built a live tracker for it 👇`;
   const intent='https://twitter.com/intent/tweet?text='+encodeURIComponent(text)+'&url='+encodeURIComponent(url)+'&via=0xdefidaniel';
   window.open(intent,'_blank','noopener,width=600,height=520');
 });
