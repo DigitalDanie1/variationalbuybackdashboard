@@ -2101,6 +2101,86 @@ const BW_METRIC_DEFS=[
   {g:'Special notes',k:'referralBackfillExcluded',l:'Older referral payment not counted (about)',t:'usd'}
 ];
 const BW_CORE_KEYS=['totalVolume','oi','tvl','dau','wau','netProfit2w','olpPnlLife','treasuryHoldings'];
+/* ---------- Revenue vs market regime card (chart 19) ----------
+   Built from mrRows (one entry per official report with spreads2w, joined to the
+   BTC / S&P 500 window return computed in renderBiweeklyResearch). Kept as a standalone
+   function so the large markup literal doesn't bloat that closure further. */
+function renderMarketRegimeCard(mrRows,pearson,esc,nfmt,finite){
+  const money=v=>finite(v)?'$'+(v/1e6).toFixed(2)+'M':'—';
+  const pctSigned=v=>finite(v)?(v>=0?'+':'')+(v*100).toFixed(1)+'%':'—';
+  const classify=v=>finite(v)?(Math.abs(v)<0.3?'weak':Math.abs(v)<0.6?'moderate':'strong'):'unknown';
+  const spreadsArr=mrRows.map(r=>r.spreads2w),btcArr=mrRows.map(r=>r.btcRet),spxArr=mrRows.map(r=>r.spxRet),volArr=mrRows.map(r=>r.btcVol);
+  const rBtc=pearson(spreadsArr,btcArr),rSpx=pearson(spreadsArr,spxArr),rVol=pearson(spreadsArr,volArr);
+  const chgSpreads=mrRows.slice(1).map((r,i)=>r.spreads2w/mrRows[i].spreads2w-1),chgBtc=mrRows.slice(1).map(r=>r.btcRet);
+  const rChg=pearson(chgSpreads,chgBtc);
+
+  /* (a) BTC / S&P indexed to 100 at the first window start, shaded by BTC direction */
+  const w=620,hTop=200,P={l:48,r:18,t:14,b:24};
+  const baseDate='2026-02-20',endDate=mrRows.at(-1).asOf;
+  const btcByDate={}; MARKET_BTC.forEach(([d,c])=>{btcByDate[d]=c;});
+  const dates=MARKET_BTC.map(x=>x[0]).filter(d=>d>=baseDate&&d<=endDate);
+  const spxOnOrBefore=d=>{let r=null;for(const [dt,c] of MARKET_SPX){if(dt<=d)r=c;else break;}return r;};
+  const btcBase=btcByDate[baseDate],spxBase=spxOnOrBefore(baseDate);
+  const nIdx=Math.max(1,dates.length-1);
+  const xi=i=>P.l+(w-P.l-P.r)*(i/nIdx);
+  const dateIdx=d=>{const i=dates.indexOf(d);return i>=0?i:null;};
+  const btcIdxArr=dates.map(d=>btcByDate[d]/btcBase*100),spxIdxArr=dates.map(d=>spxOnOrBefore(d)/spxBase*100);
+  const lo=Math.min(...btcIdxArr,...spxIdxArr),hi=Math.max(...btcIdxArr,...spxIdxArr),span=(hi-lo)||1;
+  const y=v=>P.t+(hTop-P.t-P.b)*(1-(v-lo)/span);
+  const bands=mrRows.map(r=>{const i0=dateIdx(r.start),i1=dateIdx(r.asOf);if(i0==null||i1==null)return '';const x0=xi(i0),x1=xi(i1);
+    return `<rect class="${r.btcRet>=0?'mr-band-up':'mr-band-dn'}" x="${x0.toFixed(1)}" y="${P.t}" width="${Math.max(1,x1-x0).toFixed(1)}" height="${(hTop-P.t-P.b).toFixed(1)}"/>`;}).join('');
+  const gridRows=[0,.5,1].map(t=>{const v=lo+span*t;return `<line class="grid" x1="${P.l}" y1="${y(v).toFixed(1)}" x2="${w-P.r}" y2="${y(v).toFixed(1)}"/><text class="axis" x="${P.l-7}" y="${(y(v)+3).toFixed(1)}" text-anchor="end">${v.toFixed(0)}</text>`;}).join('');
+  const pathOf=arr=>arr.map((v,i)=>(i?'L':'M')+xi(i).toFixed(1)+' '+y(v).toFixed(1)).join(' ');
+  const lineSvg=`<svg viewBox="0 0 ${w} ${hTop}" role="img" class="mr-line">${bands}${gridRows}<path class="series-a" d="${pathOf(btcIdxArr)}"/><path class="series-b" d="${pathOf(spxIdxArr)}"/><text class="axis" x="${P.l}" y="${hTop-6}">${baseDate.slice(5)}</text><text class="axis" x="${w-P.r}" y="${hTop-6}" text-anchor="end">${endDate.slice(5)}</text></svg>`;
+
+  /* (b) gross spreads per report (bars) with net profit overlaid as a dot, same x domain as (a) */
+  const hBars=190,bP={l:48,r:18,t:16,b:26};
+  const maxSpread=Math.max(...mrRows.map(r=>r.spreads2w));
+  const by=v=>bP.t+(hBars-bP.t-bP.b)*(1-v/maxSpread);
+  const barW=13;
+  const barGrid=[0,.5,1].map(t=>{const v=maxSpread*t;return `<line class="grid" x1="${bP.l}" y1="${by(v).toFixed(1)}" x2="${w-bP.r}" y2="${by(v).toFixed(1)}"/><text class="axis" x="${bP.l-7}" y="${(by(v)+3).toFixed(1)}" text-anchor="end">${esc(nfmt(v))}</text>`;}).join('');
+  const barsInner=mrRows.map(r=>{const i=dateIdx(r.asOf);if(i==null)return '';const cx=xi(i),yy=by(r.spreads2w),hh=(hBars-bP.b)-yy,dotY=by(r.netProfit2w);
+    return `<rect class="dot-a" x="${(cx-barW/2).toFixed(1)}" y="${yy.toFixed(1)}" width="${barW}" height="${Math.max(1,hh).toFixed(1)}" rx="2" opacity=".88"><title>${r.asOf} · spreads ${nfmt(r.spreads2w)}</title></rect>`+
+      `<circle class="dot-c" cx="${cx.toFixed(1)}" cy="${dotY.toFixed(1)}" r="4.4"><title>${r.asOf} · net profit ${nfmt(r.netProfit2w)}</title></circle>`+
+      `<text class="axis" x="${cx.toFixed(1)}" y="${(hBars-8).toFixed(1)}" text-anchor="middle" font-size="8.5">${r.asOf.slice(5)}</text>`;}).join('');
+  const barsSvg=`<div class="bw-viz-legend"><span><i class="a"></i>Gross spreads (bar)</span><span><i class="c"></i>Net profit (dot)</span></div><svg viewBox="0 0 ${w} ${hBars}" role="img" class="mr-bars">${barGrid}${barsInner}</svg>`;
+
+  /* (c) stat tiles */
+  const up=mrRows.filter(r=>r.btcRet>0),down=mrRows.filter(r=>r.btcRet<=0);
+  const spxUp=mrRows.filter(r=>r.spxRet>0),spxDown=mrRows.filter(r=>r.spxRet<=0);
+  const avg=(arr,k)=>arr.length?arr.reduce((s,r)=>s+r[k],0)/arr.length:null;
+  const tile=(label,valueHtml,sub)=>`<div class="tile"><span>${label}</span>${valueHtml}${sub?`<small>${sub}</small>`:''}</div>`;
+  const tiles=[
+    tile('BTC-up windows',`<b class="up">${money(avg(up,'spreads2w'))}</b>`,`n=${up.length} avg spreads &middot; net ${money(avg(up,'netProfit2w'))}`),
+    tile('BTC-down windows',`<b class="dn">${money(avg(down,'spreads2w'))}</b>`,`n=${down.length} avg spreads &middot; net ${money(avg(down,'netProfit2w'))}`),
+    tile('S&amp;P-up windows',`<b class="up">${money(avg(spxUp,'spreads2w'))}</b>`,`n=${spxUp.length} avg spreads &middot; net ${money(avg(spxUp,'netProfit2w'))}`),
+    tile('S&amp;P-down windows',`<b class="dn">${money(avg(spxDown,'spreads2w'))}</b>`,`n=${spxDown.length} avg spreads &middot; net ${money(avg(spxDown,'netProfit2w'))}`),
+    tile('r &middot; spreads vs BTC return',`<b>${finite(rBtc)?rBtc.toFixed(2):'—'}</b>`,classify(rBtc)),
+    tile('r &middot; spreads vs S&amp;P return',`<b>${finite(rSpx)?rSpx.toFixed(2):'—'}</b>`,classify(rSpx)),
+    tile('r &middot; spreads vs BTC 14d vol',`<b>${finite(rVol)?rVol.toFixed(2):'—'}</b>`,classify(rVol)),
+    tile('r &middot; trend-free change vs BTC ret',`<b>${finite(rChg)?rChg.toFixed(2):'—'}</b>`,classify(rChg)+' &middot; removes the revenue growth trend')
+  ].join('');
+
+  /* (d) auto verdict, built from thresholds so it re-reads correctly if the numbers change.
+     Written as one flowing sentence (like the other dynamic READ/note strings in this file)
+     rather than fragmented spans, so i18n.js's numeric-pattern matching can generalise the
+     translation the same way it already does for e.g. "MM cost has ranged 43%-78%...". */
+  const entries=[['BTC return',rBtc],['S&P 500 return',rSpx]].filter(x=>finite(x[1])).sort((a,b)=>Math.abs(b[1])-Math.abs(a[1]));
+  const top=entries[0]||['BTC return',0],topCls=classify(top[1]);
+  const maxRow=mrRows.reduce((a,b)=>b.spreads2w>a.spreads2w?b:a);
+  const worstBtcRow=mrRows.reduce((a,b)=>b.btcRet<a.btcRet?b:a);
+  const sameWindow=maxRow.asOf===worstBtcRow.asOf;
+  const landing=sameWindow
+    ?`landed in BTC’s worst two-week window in this sample (${pctSigned(worstBtcRow.btcRet)} on ${worstBtcRow.asOf})`
+    :`landed while BTC returned ${pctSigned(maxRow.btcRet)} (the worst window was ${worstBtcRow.asOf}, BTC ${pctSigned(worstBtcRow.btcRet)})`;
+  const verdict=`<p class="bw-mr-verdict">The relationship between revenue and market direction is <b>${topCls}</b> `+
+    `(|r| under 0.3 counts as weak, 0.3–0.6 as moderate, above 0.6 as strong): spreads correlate at <b>${finite(rBtc)?rBtc.toFixed(2):'—'}</b> with BTC's two-week return `+
+    `and at <b>${finite(rSpx)?rSpx.toFixed(2):'—'}</b> with the S&amp;P 500's. The single largest revenue report on record, <b>${maxRow.asOf} (${money(maxRow.spreads2w)})</b>, ${landing}. `+
+    `BTC realized volatility correlates at <b>${finite(rVol)?rVol.toFixed(2):'—'}</b> with spreads — consistent with volatility and platform growth explaining more of the swing in revenue `+
+    `than plain market direction. With only <b>n=${mrRows.length}</b> two-week windows, treat every correlation here as directional, not conclusive.</p>`;
+
+  return `<div class="bw-viz-legend"><span><i class="a"></i>BTC (indexed 100)</span><span><i class="b"></i>S&amp;P 500 (indexed 100)</span><span><i class="mr-sw up"></i>BTC rose that window</span><span><i class="mr-sw dn"></i>BTC fell that window</span></div>${lineSvg}${barsSvg}<div class="bw-mr-tiles">${tiles}</div>${verdict}`;
+}
 function renderBiweeklyResearch(){
   const host=$('#bwResearchGrid'); if(!host)return;
   const H=BIWEEKLY_HISTORY, finite=v=>Number.isFinite(v), nfmt=(v,unit='')=>{
@@ -2159,8 +2239,36 @@ function renderBiweeklyResearch(){
   const volMarkets=H.filter(r=>finite(r.markets)&&finite(r.totalVolume)).map(r=>({x:r.markets,y:r.totalVolume,d:r.asOf}));
   const dau=series('dau'),wau=series('wau'),life=series('olpPnlLife');
   const volat=[['Net Profit','netProfit2w'],['OI','oi'],['DAU','dau'],['WAU','wau'],['Treasury','treasuryHoldings'],['Volume','totalVolume'],['TVL','tvl'],['OLP PnL','olpPnlLife'],['Markets','markets']].map(([l,k],i)=>({l,v:sd(changeSeries(k)),f:sd(changeSeries(k)).toFixed(1)+' pp',cls:i===0?'dot-d':'dot-a'})).sort((a,b)=>b.v-a.v);
+  /* ---------- market regime overlay (BTC / S&P 500) ----------
+     market-regime-data.js (loaded before this file) defines MARKET_BTC (daily Binance
+     BTCUSDT close), MARKET_SPX (Yahoo ^GSPC daily close, trading days only) and
+     MARKET_REGIME_ASOF. Each report's window is the 14 days ending on its asOf date. */
+  const mrHas=typeof MARKET_BTC!=='undefined'&&typeof MARKET_SPX!=='undefined';
+  const mrBtcByDate={}; if(mrHas)MARKET_BTC.forEach(([d,c])=>{mrBtcByDate[d]=c;});
+  const mrBtcDates=mrHas?MARKET_BTC.map(x=>x[0]):[];
+  const mrSpxOnOrBefore=d=>{let r=null;for(const [dt,c] of MARKET_SPX){if(dt<=d)r=c;else break;}return r;};
+  const mrAddDays=(d,n)=>{const dt=new Date(d+'T00:00:00Z');dt.setUTCDate(dt.getUTCDate()+n);return dt.toISOString().slice(0,10);};
+  const pearson=(xs,ys)=>{const n=xs.length;if(n<3)return null;const mx=xs.reduce((s,v)=>s+v,0)/n,my=ys.reduce((s,v)=>s+v,0)/n;let top=0,aa=0,bb=0;xs.forEach((x,i)=>{const dx=x-mx,dy=ys[i]-my;top+=dx*dy;aa+=dx*dx;bb+=dy*dy;});return aa&&bb?top/Math.sqrt(aa*bb):null;};
+  const mrRows=mrHas?H.filter(r=>finite(r.spreads2w)).map(r=>{
+    const end=r.asOf,start=mrAddDays(end,-14);
+    const btcEnd=mrBtcByDate[end],btcStart=mrBtcByDate[start];
+    const spxEnd=mrSpxOnOrBefore(end),spxStart=mrSpxOnOrBefore(start);
+    const i0=mrBtcDates.indexOf(start),i1=mrBtcDates.indexOf(end);
+    let btcVol=null;
+    if(i0>=0&&i1>i0){
+      const closes=mrBtcDates.slice(i0,i1+1).map(d=>mrBtcByDate[d]);
+      const lr=closes.slice(1).map((c,i)=>Math.log(c/closes[i]));
+      const m=lr.reduce((s,v)=>s+v,0)/lr.length,va=lr.reduce((s,v)=>s+(v-m)**2,0)/lr.length;
+      btcVol=Math.sqrt(va)*Math.sqrt(365);
+    }
+    const btcRet=finite(btcEnd)&&finite(btcStart)?btcEnd/btcStart-1:null;
+    const spxRet=finite(spxEnd)&&finite(spxStart)?spxEnd/spxStart-1:null;
+    return {asOf:r.asOf,start,spreads2w:r.spreads2w,netProfit2w:r.netProfit2w,mmCosts2w:r.mmCosts2w,btcRet,spxRet,btcVol};
+  }).filter(x=>finite(x.btcRet)&&finite(x.spxRet)):[];
+  const mrByDate={}; mrRows.forEach(r=>{mrByDate[r.asOf]=r;});
   const lastSix=H.filter(r=>finite(r.spreads2w)&&finite(r.mmCosts2w)&&finite(r.netProfit2w)).slice(-6);
-  const grouped=`<svg viewBox="0 0 620 260" role="img" class="bw-grouped">${lastSix.map((r,i)=>{const mx=Math.max(...lastSix.flatMap(x=>[x.spreads2w,x.mmCosts2w,x.netProfit2w])),base=218,scale=178/mx,W=27,G=3,x=36+i*98,pc=v=>Math.round(v/r.spreads2w*100)+'%',lb=(cx,v,t,c)=>c==='a'?`<text class="value bw-pct a" x="${cx}" y="${base-v*scale-6}" text-anchor="middle" font-size="13">${t}</text>`:`<text class="bw-pct in" x="${cx}" y="${base-v*scale+17}" text-anchor="middle" font-size="13.5">${t}</text>`;return `<rect class="dot-a" x="${x}" y="${base-r.spreads2w*scale}" width="${W}" height="${r.spreads2w*scale}" rx="2" opacity=".9"/><rect class="dot-d" x="${x+W+G}" y="${base-r.mmCosts2w*scale}" width="${W}" height="${r.mmCosts2w*scale}" rx="2" opacity=".9"/><rect class="dot-c" x="${x+2*(W+G)}" y="${base-r.netProfit2w*scale}" width="${W}" height="${r.netProfit2w*scale}" rx="2" opacity=".9"/>${lb(x+W/2,r.spreads2w,esc(nfmt(r.spreads2w)),'a')}${lb(x+W+G+W/2,r.mmCosts2w,pc(r.mmCosts2w),'d')}${lb(x+2*(W+G)+W/2,r.netProfit2w,pc(r.netProfit2w),'c')}<text class="axis bw-date" x="${x+W*1.5+G}" y="242" text-anchor="middle" font-size="13">${r.asOf.slice(5)}</text>`}).join('')}<line class="grid" x1="30" y1="218" x2="612" y2="218"/></svg>`;
+  const pctSigned=v=>finite(v)?(v>=0?'+':'')+(v*100).toFixed(1)+'%':'—';
+  const grouped=`<svg viewBox="0 0 620 300" role="img" class="bw-grouped">${lastSix.map((r,i)=>{const mx=Math.max(...lastSix.flatMap(x=>[x.spreads2w,x.mmCosts2w,x.netProfit2w])),base=218,scale=178/mx,W=27,G=3,x=36+i*98,pc=v=>Math.round(v/r.spreads2w*100)+'%',lb=(cx,v,t,c)=>c==='a'?`<text class="value bw-pct a" x="${cx}" y="${base-v*scale-6}" text-anchor="middle" font-size="13">${t}</text>`:`<text class="bw-pct in" x="${cx}" y="${base-v*scale+17}" text-anchor="middle" font-size="13.5">${t}</text>`;const mr=mrByDate[r.asOf],bandCls=mr&&mr.btcRet<0?'mr-band-dn':'mr-band-up',bandX=x-6,bandW=90;return `${mr?`<rect class="${bandCls}" x="${bandX}" y="6" width="${bandW}" height="228"/>`:''}<rect class="dot-a" x="${x}" y="${base-r.spreads2w*scale}" width="${W}" height="${r.spreads2w*scale}" rx="2" opacity=".9"/><rect class="dot-d" x="${x+W+G}" y="${base-r.mmCosts2w*scale}" width="${W}" height="${r.mmCosts2w*scale}" rx="2" opacity=".9"/><rect class="dot-c" x="${x+2*(W+G)}" y="${base-r.netProfit2w*scale}" width="${W}" height="${r.netProfit2w*scale}" rx="2" opacity=".9"/>${lb(x+W/2,r.spreads2w,esc(nfmt(r.spreads2w)),'a')}${lb(x+W+G+W/2,r.mmCosts2w,pc(r.mmCosts2w),'d')}${lb(x+2*(W+G)+W/2,r.netProfit2w,pc(r.netProfit2w),'c')}<text class="axis bw-date" x="${x+W*1.5+G}" y="242" text-anchor="middle" font-size="13">${r.asOf.slice(5)}</text>${mr?`<text class="mr-reg ${mr.btcRet>=0?'up':'dn'}" x="${x+W*1.5+G}" y="262" text-anchor="middle" font-size="12.5">BTC ${pctSigned(mr.btcRet)}</text><text class="mr-reg ${mr.spxRet>=0?'up':'dn'}" x="${x+W*1.5+G}" y="280" text-anchor="middle" font-size="12.5">S&amp;P ${pctSigned(mr.spxRet)}</text>`:''}`}).join('')}<line class="grid" x1="30" y1="218" x2="612" y2="218"/></svg>`;
   const may=H.map((r,i)=>({i,d:r.asOf,markets:r.markets,dau:r.dau,profit:r.netProfit2w}));
   const minP=pnl.reduce((a,b)=>a.v<b.v?a:b),maxP=pnl.reduce((a,b)=>a.v>b.v?a:b),latestP=pnl.at(-1);
   const correlations=[['Volume × markets',corr('totalVolume','markets')],['Volume × OI',corr('totalVolume','oi')],['Volume × DAU',corr('totalVolume','dau')],['DAU × WAU',corr('dau','wau')]].map(([l,v],i)=>({l,v,f:v.toFixed(2),cls:i===3?'dot-c':i===0?'dot-d':'dot-b'}));
@@ -2178,7 +2286,8 @@ function renderBiweeklyResearch(){
     frame(9,'Implied leverage over time','Open interest divided by TVL. TVL excludes some hedging accounts.',line([{pts:leverage}],{min:0}),true,`Range: <b>${Math.min(...leverage.map(x=>x.v)).toFixed(2)}x-${Math.max(...leverage.map(x=>x.v)).toFixed(2)}x</b>. It cycled rather than rising without interruption.`)+
     frame(10,'How to read implied leverage','Trading exposure per $1 of reported deposited capital.',`<div class="bw-formula"><div class="oi"><b>Open interest</b><span>trading exposure</span></div><b>÷</b><div class="tvl"><b>TVL</b><span>reported deposited capital</span></div></div>${line([{pts:leverage}],{min:0,h:165})}`,false,'The riskier pattern would be a persistent climb. The observed series falls, ranges, and later recovers.')+
     frame(11,'Volatility of report-over-report changes','Standard deviation of percentage changes, measured in percentage points.',bars(volat,{max:Math.max(...volat.map(x=>x.v))*1.12}),false,'Net profit is the most volatile disclosed metric by a wide margin.')+
-    frame(12,'Gross spreads, market-making cost, and net profit','Latest six reports with complete, directly comparable P&L fields. Red and green labels are % of that report’s gross spreads.',`<div class="bw-viz-legend bw-legend-big"><span><i class="a"></i>Gross spreads</span><span><i class="d"></i>MM cost</span><span><i class="c"></i>Net profit</span></div>${grouped}`,true,'These are contribution-margin components. They do not include every corporate operating expense.')+
+    frame(12,'Gross spreads, market-making cost, and net profit','Latest six reports with complete, directly comparable P&L fields. Red and green labels are % of that report’s gross spreads. BTC / S&P = price change over the same two weeks.',`<div class="bw-viz-legend bw-legend-big"><span><i class="a"></i>Gross spreads</span><span><i class="d"></i>MM cost</span><span><i class="c"></i>Net profit</span></div>${grouped}`,true,'These are contribution-margin components. They do not include every corporate operating expense.')+
+    (mrHas&&mrRows.length?frame(19,'Revenue vs market regime','Every report with P&L data, against BTC and the S&P 500 over the same two weeks.',renderMarketRegimeCard(mrRows,pearson,esc,nfmt,finite),true,`Market data: Binance BTCUSDT daily close, Yahoo ^GSPC daily close · snapshot ${esc(MARKET_REGIME_ASOF)}. Correlation ≠ causation.`):'')+
     frame(13,'Recent turnover close-up','The latest five completed volume-to-OI observations.',line([{pts:recentTurn}],{min:0,h:190}),false,`Latest: <b>${nextLabel}x</b>. ${turnRebounded?'The fifth checkpoint rebounded, breaking the prior four-report decline.':'Another sequential decline would strengthen the case for a structural efficiency trend.'}`)+
     frame(14,'The May 2026 joint slowdown','Listed markets, DAU, and net profit are normalized within each series so timing can be compared.',`<div class="bw-viz-legend"><span><i class="a"></i>Markets</span><span><i class="b"></i>DAU</span><span><i class="c"></i>Net profit</span></div>${line(['markets','dau','profit'].map((k,ki)=>{const pts=may.filter(x=>finite(x[k])),lo=Math.min(...pts.map(x=>x[k])),hi=Math.max(...pts.map(x=>x[k]));return {cls:'abc'[ki],pts:pts.map(x=>({i:x.i,d:x.d,v:(x[k]-lo)/(hi-lo||1)*100}))}}),{min:0,max:100})}`,true,'The synchronized dip suggests a broader protocol activity slowdown, not an isolated profitability event.')+
     frame(15,'Net profit: peak, trough, and latest','Annotated landmarks from the directly comparable P&L era.',line([{pts:pnl}],{min:0}),false,`Peak <b>${maxP.d}: ${nfmt(maxP.v)}</b>. Trough <b>${minP.d}: ${nfmt(minP.v)}</b>. Latest <b>${latestP.d}: ${nfmt(latestP.v)}</b>.`)+

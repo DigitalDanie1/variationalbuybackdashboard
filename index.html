@@ -8317,6 +8317,9 @@ article.bw-viz .bw-viz-legend.bw-legend-big .c{background:var(--bwv-c)}
 article.bw-viz:has(.bw-legend-big) .bw-viz-read{padding:12px 14px}
 article.bw-viz:has(.bw-legend-big) .bw-viz-read .dir{font-size:12px}
 article.bw-viz:has(.bw-legend-big) .bw-viz-read .what{font-size:14px}
+/* body.theme-light svg text{fill:#153b67!important} (above, page-wide) was painting the
+   inside-bar % labels navy-on-navy in light mode; force them white in both themes. */
+body.theme-light .bw-viz text.bw-pct.in{fill:#fff!important}
 </style>
 <style id="pts-fit-fix">
 [data-tg="points"] .fdv-head{flex-wrap:wrap}
@@ -10135,6 +10138,24 @@ article.bw-viz:has(.bw-legend-big) .bw-viz-read .what{font-size:14px}
   .bw-formula{display:grid;grid-template-columns:1fr auto 1fr;gap:12px;align-items:center;margin:10px 0 14px}
   .bw-formula>div{padding:14px;border:1px solid var(--line);text-align:center}.bw-formula b{display:block;font-size:15px}.bw-formula span{color:var(--muted);font-size:10px}
   .bw-formula .oi{border-color:color-mix(in srgb,var(--cyan) 42%,var(--line))}.bw-formula .tvl{border-color:color-mix(in srgb,var(--grn) 42%,var(--line))}
+  .bw-grouped .mr-band-up{fill:var(--bwv-c);opacity:.09}
+  .bw-grouped .mr-band-dn{fill:var(--bwv-d);opacity:.09}
+  .bw-grouped text.mr-reg{font-family:var(--mono);font-weight:800}
+  .bw-grouped text.mr-reg.up{fill:var(--bwv-c)}
+  .bw-grouped text.mr-reg.dn{fill:var(--bwv-d)}
+  .mr-line .mr-band-up{fill:var(--bwv-c);opacity:.08}
+  .mr-line .mr-band-dn{fill:var(--bwv-d);opacity:.08}
+  .bw-viz-legend .mr-sw{width:10px;height:10px;border-radius:2px;margin-right:6px}
+  .bw-viz-legend .mr-sw.up{background:var(--bwv-c);opacity:.55}
+  .bw-viz-legend .mr-sw.dn{background:var(--bwv-d);opacity:.55}
+  .bw-mr-tiles{display:flex;flex-wrap:wrap;gap:10px;margin:14px 0}
+  .bw-mr-tiles .tile{flex:1 1 150px;min-width:150px;padding:12px 13px;border:1px solid var(--line);background:color-mix(in srgb,var(--panel) 92%,transparent)}
+  .bw-mr-tiles .tile span{display:block;font:800 9.5px var(--mono);letter-spacing:.6px;text-transform:uppercase;color:var(--dim);margin-bottom:6px}
+  .bw-mr-tiles .tile b{display:block;font:900 17px var(--mono);color:var(--ink);letter-spacing:-.3px}
+  .bw-mr-tiles .tile b.up{color:var(--grn)}.bw-mr-tiles .tile b.dn{color:#f08aa0}
+  .bw-mr-tiles .tile small{display:block;margin-top:4px;font:11px/1.4 var(--sans);color:var(--sub)}
+  .bw-mr-verdict{margin-top:14px;padding:14px 16px;border-left:3px solid var(--bwv-a);background:color-mix(in srgb,var(--bwv-a) 6%,transparent);font:13.5px/1.65 var(--sans);color:var(--sub)}
+  .bw-mr-verdict b{color:var(--ink);font-family:var(--mono);font-weight:900}
   @media(max-width:900px){
     .bw-command{grid-template-columns:1fr}
     .bw-command-money{padding-left:0!important;border-left:0;border-top:1px solid var(--line)}
@@ -10622,6 +10643,7 @@ article.bw-viz:has(.bw-legend-big) .bw-viz-read .what{font-size:14px}
   }
 </style>
 
+<script src="market-regime-data.js?v=1790400001" defer></script>
 <script src="dashboard.js?v=1790300301" defer></script>
 <script src="paths-panels.js?v=1789148292" defer></script>
 <script src="playbook-panels.js?v=1790254731" defer></script>
