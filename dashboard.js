@@ -1472,9 +1472,11 @@ async function refreshValuationMcaps(){
     const stamp=latest?new Date(latest):new Date();
     VAL_MCAP_ASOF='Live CoinGecko · '+stamp.toLocaleString('en-US',{month:'short',day:'2-digit',hour:'2-digit',minute:'2-digit',timeZoneName:'short'});
     renderValuation();
+    refreshPointsFdvUI();
   }catch(err){
     console.warn('Valuation market-cap sync fell back to snapshot:',err);
     renderValuation();
+    refreshPointsFdvUI();
   }
 }
 /* ---------- live perp-DEX board via CoinGecko (free, CORS-open) ----------
@@ -2597,21 +2599,141 @@ function renderFeePerTrader(){
   $('#revPerTrader').textContent='$'+fmtK(e.cur/n);
   $('#volPerTrader').textContent='$'+fmtK(MKT.vol.d30/n);
 }
+/* ---------- Points / FDV calculator: pool schedule, FDV log-scale, matrix ---------- */
+const PTS_POOL_MIN=9000000, PTS_POOL_MAX=11050000, PTS_POOL_STEP=50000;
+const PTS_POOL_BASE_DATE='2026-09-30', PTS_POOL_BASE=9100000, PTS_POOL_WEEKLY=150000;
+const PTS_TGE_MARK1='2026-10-30', PTS_TGE_MARK2='2026-11-30', PTS_TGE_LATEST='2026-12-31';
+const PTS_FDV_FLOOR=100e6;
+function ptsPoolAt(dateStr){
+  const baseTs=resetLocalTs(PTS_POOL_BASE_DATE,23,59,59)*1000;
+  const ts=resetLocalTs(dateStr,23,59,59)*1000;
+  const daysSince=Math.max(0,(ts-baseTs)/864e5);
+  const weeks=Math.floor(daysSince/7);
+  const v=PTS_POOL_BASE+weeks*PTS_POOL_WEEKLY;
+  return Math.min(PTS_POOL_MAX,Math.max(PTS_POOL_MIN,v));
+}
+function ptsPoolToday(){
+  const baseTs=resetLocalTs(PTS_POOL_BASE_DATE,23,59,59)*1000;
+  const daysSince=Math.max(0,(Date.now()-baseTs)/864e5);
+  const weeks=Math.floor(daysSince/7);
+  return Math.min(PTS_POOL_MAX,Math.max(PTS_POOL_MIN,PTS_POOL_BASE+weeks*PTS_POOL_WEEKLY));
+}
+function hypeFdv(){
+  const c=VAL_COMPS.find(c=>c.n==='Hyperliquid');
+  return c&&c.fdv>0?c.fdv:85.8e9;
+}
+function ptsFdvBounds(){ return {min:PTS_FDV_FLOOR,max:Math.max(hypeFdv(),90e9)}; }
+function ptsPosToFdv(pos){
+  const {min,max}=ptsFdvBounds();
+  const lo=Math.log(min),hi=Math.log(max);
+  const t=Math.min(1000,Math.max(0,pos))/1000;
+  return Math.exp(lo+t*(hi-lo));
+}
+function ptsFdvToPos(fdv){
+  const {min,max}=ptsFdvBounds();
+  const v=Math.min(max,Math.max(min,fdv));
+  const lo=Math.log(min),hi=Math.log(max);
+  return (Math.log(v)-lo)/(hi-lo)*1000;
+}
+function fmtFdvShort(v){
+  const b=v/1e9;
+  let s=b>=100?b.toFixed(0):b.toFixed(1);
+  if(s.endsWith('.0'))s=s.slice(0,-2);
+  return '$'+s+'B';
+}
+function fmtCompact(v){
+  const a=Math.abs(v);
+  if(a>=1e9)return '$'+(v/1e9).toFixed(2)+'B';
+  if(a>=1e6)return '$'+(v/1e6).toFixed(2)+'M';
+  if(a>=1e3)return '$'+(v/1e3).toFixed(1)+'K';
+  return '$'+v.toFixed(0);
+}
+function ptsSigPct(n,figs=4){
+  if(!Number.isFinite(n)||n===0)return '0%';
+  return Number(n).toPrecision(figs)+'%';
+}
+function syncPoolFromSlider(){
+  $('#ptsPool').value=$('#ptsPoolSlider').value;
+  renderPointsCalc();
+}
+function syncPoolFromNumber(){
+  let v=Math.round((+$('#ptsPool').value||PTS_POOL_BASE)/PTS_POOL_STEP)*PTS_POOL_STEP;
+  v=Math.min(PTS_POOL_MAX,Math.max(PTS_POOL_MIN,v));
+  $('#ptsPool').value=v;
+  $('#ptsPoolSlider').value=v;
+  renderPointsCalc();
+}
+function refreshPointsFdvUI(){
+  if(!$('#ptsMine'))return;
+  renderFdvPresets();
+  renderPointsCalc();
+}
+function renderFdvPresets(){
+  const box=$('#fdvPresets'); if(!box)return;
+  const hype=hypeFdv();
+  const find=n=>{const c=VAL_COMPS.find(c=>c.n===n);return c&&c.fdv>0?c.fdv:0;};
+  const presets=[
+    {label:'$1B',fdv:1e9},
+    {label:'$5B',fdv:5e9},
+    {label:'$10B',fdv:10e9},
+    {label:'edgeX · '+fmtFdvShort(find('edgeX')),fdv:find('edgeX')},
+    {label:'Lighter · '+fmtFdvShort(find('Lighter')),fdv:find('Lighter')},
+    {label:'Aster · '+fmtFdvShort(find('Aster')),fdv:find('Aster')},
+    {label:'½ Hyperliquid · '+fmtFdvShort(hype/2),fdv:hype/2},
+    {label:'Hyperliquid · '+fmtFdvShort(hype),fdv:hype}
+  ].filter(p=>p.fdv>0);
+  box.innerHTML=presets.map(p=>`<button type="button" class="preset" data-fdv="${p.fdv}">${escapeHTML(p.label)}</button>`).join('');
+}
+const PTS_MATRIX_FDVS=[1e9,2.5e9,5e9,10e9,25e9,50e9,'hype'];
+const PTS_MATRIX_POOLS=[
+  {label:'Oct 30',sub:'9.70M',v:9700000},
+  {label:'Nov 30',sub:'10.30M',v:10300000},
+  {label:'Dec 31',sub:'11.05M',v:11050000}
+];
+function renderPointsMatrix(){
+  const box=$('#ptsMatrix'); if(!box)return;
+  const mine=Math.max(0,parseFloat($('#ptsMine').value)||0);
+  const curFdv=ptsPosToFdv(+$('#ptsFdv').value);
+  const curPool=Math.max(1,parseFloat($('#ptsPool').value)||1);
+  const rows=PTS_MATRIX_FDVS.map(f=>f==='hype'?hypeFdv():f);
+  const vals=[];
+  rows.forEach(f=>PTS_MATRIX_POOLS.forEach(p=>vals.push(mine/p.v*f*0.32)));
+  const minV=Math.min(...vals), maxV=Math.max(...vals)||1;
+  let selRowIdx=0,selRowDist=Infinity;
+  rows.forEach((f,i)=>{const d=Math.abs(Math.log(f)-Math.log(curFdv||1));if(d<selRowDist){selRowDist=d;selRowIdx=i;}});
+  let selColIdx=0,selColDist=Infinity;
+  PTS_MATRIX_POOLS.forEach((p,i)=>{const d=Math.abs(p.v-curPool);if(d<selColDist){selColDist=d;selColIdx=i;}});
+  let html='<span class="pmx-corner">FDV \\ Pool</span>';
+  PTS_MATRIX_POOLS.forEach((p,i)=>{html+=`<span class="pmx-colhead${i===selColIdx?' sel':''}">${p.label}<b>${p.sub}</b></span>`;});
+  rows.forEach((f,ri)=>{
+    const rowLabel=PTS_MATRIX_FDVS[ri]==='hype'?'HYPE':fmtFdvShort(f);
+    html+=`<span class="pmx-rowhead${ri===selRowIdx?' sel':''}">${rowLabel}</span>`;
+    PTS_MATRIX_POOLS.forEach((p,ci)=>{
+      const val=mine/p.v*f*0.32;
+      const t=(val-minV)/(maxV-minV||1);
+      const bg=`rgba(34,230,160,${(0.05+0.28*t).toFixed(3)})`;
+      const isSel=ri===selRowIdx&&ci===selColIdx;
+      html+=`<button type="button" class="pmx-cell${isSel?' sel':''}" style="background:${bg}" data-fdv="${f}" data-pool="${p.v}">${fmtCompact(val)}</button>`;
+    });
+  });
+  box.innerHTML=html;
+}
 function renderPointsCalc(){
   if(!$('#ptsMine'))return;
   const mine=Math.max(0,parseFloat($('#ptsMine').value)||0);
   const pool=Math.max(1,parseFloat($('#ptsPool').value)||1);
-  const fdv=parseFloat($('#ptsFdv').value)||0;
-  const hype=67.7e9, share=mine/pool;
+  const fdv=ptsPosToFdv(+$('#ptsFdv').value);
+  const hype=hypeFdv(), share=mine/pool;
   renderPointsDeadline();
-  const pctHype=fdv/hype*100;
-  $('#ptsFdvLabel').textContent=pctHype.toFixed(0)+'% of HYPE FDV ($67.7B)';
+  renderFdvPresets();
+  const pctHype=hype>0?fdv/hype*100:0;
+  $('#ptsFdvLabel').textContent=pctHype.toFixed(0)+'% of HYPE FDV ('+fmtFdvShort(hype)+')';
   $('#ptsFdvBig').textContent='$'+(fdv/1e9).toFixed(fdv>=1e9?1:3)+'B';
-  [20,25,30].forEach(p=>{
+  [32,41,50].forEach(p=>{
     const el=$('#ptsTgeMcap'+p);
-    // Abbreviated to match the FDV headline above it. The full-precision form
-    // ("$10,000,000,000") cannot fit these three narrow cards and used to break mid-number.
-    if(el)el.textContent=fmtBig(fdv*p/100)+' MCAP'+(p===25?' · base':'');
+    if(!el)return;
+    const suffix=p===32?' · airdrop only (floor)':p===41?' · + half ecosystem':' · + full ecosystem';
+    el.textContent=fmtBig(fdv*p/100)+' MCAP'+suffix;
   });
   // scenario band — grounds expectations vs a live comp (HYPE)
   let band,bcol;
@@ -2621,30 +2743,40 @@ function renderPointsCalc(){
   else{band='Moonshot';bcol='var(--red)';}
   const bandEl=$('#ptsBand');
   bandEl.textContent='● '+band;bandEl.style.color=bcol;
-  // per-point value (base 25% case) — the shareable nugget
-  const pv25=mine>0?fdv*0.25*share/mine:0;
-  $('#ptsPerPt').innerHTML='≈ <b>'+fmtUSD(pv25,2)+'</b> / point <span style="color:var(--dim)">at 25% airdrop</span>';
-  [20,25,30].forEach(p=>{
-    const out=fdv*(p/100)*share, pv=mine>0?out/mine:0;
-    $('#pts'+p).textContent=fmtUSD(out);
-    $('#ptv'+p).textContent='1pt '+fmtUSD(pv,4);
+  // results: (a) share of pool, (b) my airdrop value at 32%, (c) value per point
+  $('#ptsShareOfPool').textContent=ptsSigPct(share*100,4);
+  const airdropVal=fdv*0.32*share;
+  $('#ptsAirdropValue').textContent=fmtUSD(airdropVal);
+  const perPt=pool>0?fdv*0.32/pool:0;
+  $('#ptsPerPointVal').textContent=fmtUSD(perPt,2);
+  // highlight matching FDV preset (within 1%)
+  document.querySelectorAll('#fdvPresets .preset').forEach(b=>{
+    const pf=+b.dataset.fdv;
+    b.classList.toggle('on',pf>0&&Math.abs(fdv-pf)/pf<0.01);
   });
-  // highlight matching FDV preset
-  document.querySelectorAll('#fdvPresets .preset').forEach(b=>b.classList.toggle('on',+b.dataset.fdv===fdv));
+  // pool milestone chips
+  const todayVal=ptsPoolToday();
+  const todayChip=$('#ptsPoolToday');
+  if(todayChip){todayChip.dataset.pool=todayVal;todayChip.textContent='Today · '+(todayVal/1e6).toFixed(2)+'M';}
+  document.querySelectorAll('#ptsPoolChips .chip').forEach(b=>b.classList.toggle('on',+b.dataset.pool===pool));
+  renderPointsMatrix();
 }
 function ptsShareText(){
   const mine=Math.max(0,parseFloat($('#ptsMine').value)||0);
   const pool=Math.max(1,parseFloat($('#ptsPool').value)||1);
-  const fdv=parseFloat($('#ptsFdv').value)||0;
-  const share=mine/pool, val=fdv*0.25*share, pv=mine>0?val/mine:0;
+  const fdv=ptsPosToFdv(+$('#ptsFdv').value);
+  const share=mine/pool, val=fdv*0.32*share, pv=pool>0?fdv*0.32/pool:0;
   const fdvStr='$'+(fdv/1e9).toFixed(fdv>=1e9?1:3)+'B';
-  const url=location.href.startsWith('http')?location.href.split('#')[0]+'#points':'https://variationalbuybackdashboard.vercel.app/#points';
-  return {t:`If Variational's FDV hits ${fdvStr} and airdrops 25% of supply, my ${mine.toLocaleString('en-US')} points ≈ ${fmtUSD(val)} (${fmtUSD(pv,2)}/pt) 🪂\n\nLive points→FDV calculator on the buyback tracker 👇`,url};
+  const poolStr=(pool/1e6).toFixed(2)+'M';
+  const url=location.href.startsWith('http')?location.href.split('#')[0]+'#points':'https://www.variational.money/#points';
+  return {t:`If Variational hits ${fdvStr} FDV (32% genesis airdrop, ${poolStr} pts pool, TGE Q4 2026), my ${mine.toLocaleString('en-US')} points ≈ ${fmtUSD(val)} (${fmtUSD(pv,2)}/pt) 🪂\n\nLive points→FDV calculator on the buyback tracker 👇`,url};
 }
 function renderPointsDeadline(){
   if(!$('#ptsRemainPct'))return;
   const start=resetLocalTs(SERIES[0].d,0,0,0)*1000;
-  const end=resetLocalTs('2026-09-30',23,59,59)*1000;
+  const mark1=resetLocalTs(PTS_TGE_MARK1,23,59,59)*1000;
+  const mark2=resetLocalTs(PTS_TGE_MARK2,23,59,59)*1000;
+  const end=resetLocalTs(PTS_TGE_LATEST,23,59,59)*1000;
   const now=Date.now();
   const total=Math.max(1,end-start);
   const left=Math.max(0,end-now);
@@ -2652,11 +2784,29 @@ function renderPointsDeadline(){
   const remain=left/total;
   const days=Math.floor(left/864e5);
   const hours=Math.floor((left%864e5)/36e5);
-  $('#ptsRemainPct').textContent=(remain*100).toFixed(2)+'% left';
+  $('#ptsRemainPct').textContent=now>=end?'TGE window reached':(remain*100).toFixed(2)+'% left';
   $('#ptsDonePct').textContent=(done*100).toFixed(2)+'%';
-  $('#ptsDaysLeft').textContent=left>0?`${days}D ${hours}H left`:'deadline passed';
-  $('#ptsDeadlineText').textContent='Ends Sep 30, 2026 · 11:59PM ET';
+  $('#ptsDaysLeft').textContent=now>=end?'TGE window reached':`${days}D ${hours}H left`;
+  $('#ptsDeadlineText').textContent='TGE window: Q4 2026 (latest Dec 31, 2026 · 11:59PM ET)';
   $('#ptsProgress').style.setProperty('--p',(done*100).toFixed(2)+'%');
+  const pos1=Math.min(100,Math.max(0,(mark1-start)/total*100));
+  const pos2=Math.min(100,Math.max(0,(mark2-start)/total*100));
+  $('#ptsTgeMark1')&&($('#ptsTgeMark1').style.left=pos1.toFixed(2)+'%');
+  $('#ptsTgeMark2')&&($('#ptsTgeMark2').style.left=pos2.toFixed(2)+'%');
+  const sub=$('#ptsTgeSub');
+  if(sub){
+    if(now<mark1){
+      const d=Math.floor((mark1-now)/864e5),h=Math.floor(((mark1-now)%864e5)/36e5);
+      sub.textContent=`${d}D ${h}H to possible TGE mark · Oct 30, 2026`;
+    }else if(now<mark2){
+      const d=Math.floor((mark2-now)/864e5),h=Math.floor(((mark2-now)%864e5)/36e5);
+      sub.textContent=`${d}D ${h}H to possible TGE mark · Nov 30, 2026`;
+    }else if(now<end){
+      sub.textContent='Past both possible TGE marks — TGE could land any day through Dec 31, 2026';
+    }else{
+      sub.textContent='TGE window reached — awaiting official TGE date';
+    }
+  }
 }
 function renderDailyBrief(){
   const root=$('#dailyBrief');if(!root||SERIES.length<3)return;
@@ -3838,11 +3988,30 @@ $('#effCalNext')?.addEventListener('click',()=>{
   if(next<=SERIES[SERIES.length-1].d.slice(0,7))EFF_CAL_MONTH=next;
   renderEfficiency();
 });
-['#ptsMine','#ptsPool','#ptsFdv'].forEach(s=>$(s)?.addEventListener('input',renderPointsCalc));
+['#ptsMine','#ptsFdv'].forEach(s=>$(s)?.addEventListener('input',renderPointsCalc));
+$('#ptsPoolSlider')?.addEventListener('input',syncPoolFromSlider);
+$('#ptsPool')?.addEventListener('input',syncPoolFromNumber);
+$('#ptsPoolChips')?.addEventListener('click',e=>{
+  const b=e.target.closest('.chip');if(!b)return;
+  const v=+b.dataset.pool;if(!v)return;
+  $('#ptsPool').value=v;$('#ptsPoolSlider').value=v;renderPointsCalc();
+});
 $('#fdvPresets')?.addEventListener('click',e=>{
   const b=e.target.closest('.preset');if(!b)return;
-  $('#ptsFdv').value=b.dataset.fdv;renderPointsCalc();
+  $('#ptsFdv').value=ptsFdvToPos(+b.dataset.fdv);renderPointsCalc();
 });
+$('#ptsMatrix')?.addEventListener('click',e=>{
+  const b=e.target.closest('.pmx-cell');if(!b)return;
+  $('#ptsFdv').value=ptsFdvToPos(+b.dataset.fdv);
+  $('#ptsPool').value=+b.dataset.pool;$('#ptsPoolSlider').value=+b.dataset.pool;
+  renderPointsCalc();
+});
+(function initPointsPool(){
+  const num=$('#ptsPool'),sl=$('#ptsPoolSlider');
+  if(!num||!sl)return;
+  const p=ptsPoolToday();
+  num.value=p;sl.value=p;
+})();
 $('#ptsShareBtn')?.addEventListener('click',()=>{
   const s=ptsShareText();
   window.open('https://twitter.com/intent/tweet?text='+encodeURIComponent(s.t)+'&url='+encodeURIComponent(s.url)+'&via=0xdefidaniel','_blank','noopener,width=600,height=520');

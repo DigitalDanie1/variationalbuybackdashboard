@@ -1741,16 +1741,45 @@
   .hist-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:-4px;margin-bottom:10px}
   .hist-row button{cursor:pointer;border:1px solid var(--line);background:var(--panel);color:var(--sub);border-radius:999px;padding:5px 9px;font:800 10px var(--mono)}
   .hist-row button.on,.hist-row button:hover{color:#04120c;background:linear-gradient(92deg,var(--grn),var(--cyan));border-color:transparent}
-  @media(max-width:780px){.points-grid{grid-template-columns:1fr}.points-controls{min-height:300px}.fdv-control{grid-template-columns:1fr}.pts-outs{grid-template-columns:1fr;width:100%;margin-top:12px}.pts-card{width:100%;min-width:0}.pts-results{display:block;text-align:left}.pts-fdv{text-align:left}.pts-input-mascot{top:88px;width:210px;height:195px}.pts-dead-top{align-items:flex-start;flex-direction:column}.pts-dead-v{text-align:left}.pts-band{text-align:left}}
+  @media(max-width:780px){.points-grid{grid-template-columns:1fr}.points-controls{min-height:0}.fdv-control{grid-template-columns:1fr}.pts-outs{grid-template-columns:1fr;width:100%;margin-top:12px}.pts-card{width:100%;min-width:0}.pts-results{display:block;text-align:left}.pts-fdv{text-align:left}.pts-input-mascot{display:none}.pts-dead-top{align-items:flex-start;flex-direction:column}.pts-dead-v{text-align:left}.pts-band{text-align:left}.fdv-head{flex-wrap:wrap;align-items:flex-start}.fdv-action{white-space:normal;text-align:center}}
   .fdv-presets{display:flex;flex-wrap:wrap;gap:7px;margin-top:9px}
   .fdv-presets .preset{padding:6px 10px}
   .pts-band{margin-top:9px;text-align:left;font:800 11px var(--mono);letter-spacing:1.3px;text-transform:uppercase;color:var(--sub)}
   .pts-perpt{margin-top:5px;text-align:left;font:700 13px var(--mono);color:var(--sub)}
   .pts-perpt b{color:var(--grn);font-weight:800}
+  .pts-row-solo{grid-template-columns:1fr}
+  .pts-pool{margin-top:2px}
+  .pts-pool-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px}
+  .pts-pool-label{font:700 11px var(--mono);letter-spacing:.8px;color:var(--sub);text-transform:uppercase}
+  .pts-pool-num{width:130px;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:8px 9px;color:var(--ink);font:800 15px var(--mono);text-align:right}
+  .pool-slider::-webkit-slider-runnable-track{background:linear-gradient(90deg,var(--grn),var(--cyan))}
+  .pool-slider::-moz-range-track{background:linear-gradient(90deg,var(--grn),var(--cyan))}
+  .pts-pool-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px}
+  .pts-pool-chips .chip{cursor:pointer;border:1px solid var(--line);background:var(--panel);color:var(--sub);border-radius:999px;padding:5px 9px;font:800 9.5px var(--mono);white-space:nowrap}
+  .pts-pool-chips .chip:hover,.pts-pool-chips .chip.on{color:#04120c;background:linear-gradient(92deg,var(--grn),var(--cyan));border-color:transparent}
+  .pts-pool-note{display:block;margin-top:7px;font:700 9.5px var(--mono);color:var(--dim)}
+  .pts-tge-mark{position:absolute;top:-2px;bottom:-2px;width:2px;background:rgba(255,181,71,.85);box-shadow:0 0 6px rgba(255,181,71,.6)}
+  .pts-progress{position:relative}
+  .pts-tge-sub{margin-top:8px;font:700 10.5px var(--mono);color:var(--amber)}
+  .pts-facts{display:flex;flex-wrap:wrap;gap:7px;margin-top:16px}
+  .pts-facts span{font:700 9.5px var(--mono);color:var(--sub);border:1px solid var(--line);border-radius:999px;padding:6px 10px;background:var(--panel);white-space:nowrap}
+  .pts-matrix{margin-top:14px;border:1px solid var(--line);border-radius:12px;padding:12px;background:var(--panel)}
+  .pts-matrix-title{font:800 10px var(--mono);letter-spacing:.8px;text-transform:uppercase;color:var(--sub);margin-bottom:9px}
+  .pts-matrix-title small{display:block;margin-top:3px;font:700 9px var(--mono);letter-spacing:.3px;text-transform:none;color:var(--dim)}
+  .pts-matrix-grid{display:grid;grid-template-columns:minmax(58px,.9fr) repeat(3,minmax(0,1fr));gap:4px}
+  .pmx-corner{font:800 8.5px var(--mono);color:var(--sub);display:flex;align-items:center}
+  .pmx-colhead{font:800 9px var(--mono);color:var(--sub);text-align:center;padding:4px 2px;border-radius:6px}
+  .pmx-colhead b{display:block;font-size:10.5px;color:var(--ink);margin-top:2px}
+  .pmx-colhead.sel{background:rgba(85,184,255,.14);color:var(--cyan)}
+  .pmx-rowhead{font:800 9.5px var(--mono);color:var(--sub);display:flex;align-items:center;padding:0 2px;border-radius:6px}
+  .pmx-rowhead.sel{background:rgba(85,184,255,.14);color:var(--cyan)}
+  .pmx-cell{cursor:pointer;border:1px solid var(--line);border-radius:6px;padding:7px 2px;font:800 9.5px var(--mono);color:var(--ink);text-align:center;min-width:0}
+  .pmx-cell.sel{border-color:var(--grn);box-shadow:0 0 0 1px var(--grn) inset}
+  @media(max-width:520px){.pts-matrix-grid{grid-template-columns:minmax(46px,.8fr) repeat(3,minmax(0,1fr));gap:3px}.pmx-cell,.pmx-rowhead,.pmx-colhead{font-size:8.6px;padding:6px 1px}.pts-facts span{font-size:8.8px;padding:5px 8px}}
   .cal>h2{display:flex;align-items:center;justify-content:flex-start;gap:10px;min-width:0}
   .cal>h2>span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .pts-card.base{border-color:rgba(34,230,160,.5);background:radial-gradient(300px 120px at 50% 0,rgba(34,230,160,.1),transparent 70%),var(--panel);position:relative}
-  .pts-card.base::after{content:"BASE CASE";position:absolute;top:-8px;left:50%;transform:translateX(-50%);
+  .pts-card.base::after{content:"32% AIRDROP";position:absolute;top:-8px;left:50%;transform:translateX(-50%);
     font:800 8px var(--mono);letter-spacing:1px;color:#04120c;background:linear-gradient(92deg,var(--grn),var(--cyan));padding:2px 7px;border-radius:999px}
   .pts-share-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px;padding-top:15px;border-top:1px solid var(--line)}
   .historical-combo{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(340px,.85fr);column-gap:18px;align-items:start}
@@ -6681,6 +6710,12 @@ body{background:var(--bg)!important;min-height:100vh}
   align-items:start!important;
 }
 .fdv-value,.fdv-tools{min-width:0!important}
+@media(max-width:780px){
+  .fdv-control{grid-template-columns:1fr!important}
+  .points-grid{grid-template-columns:1fr!important}
+  .pts-outs{grid-template-columns:1fr!important}
+  .pts-tge-scenarios{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+}
 
 /* slider: neutral track, green handle — no third accent colour */
 .pts-slider::-webkit-slider-runnable-track{background:rgba(255,255,255,.13)!important;border:1px solid var(--line)!important;box-shadow:none!important}
@@ -9296,23 +9331,38 @@ body.theme-light .valuation-report #valScatter .val-var-label{
 
 <div class="card tsec tg-hide" data-tg="points" style="margin-top:16px">
   <h2>Points / FDV Calculator <span class="tag">airdrop scenario</span></h2>
-  <div class="cap">Sep 31 does not exist, so this uses the actual campaign deadline: <b>Sep 30, 2026 at 11:59PM ET</b>. Your points ÷ total pool = share; share × FDV × airdrop allocation = estimated value.</div>
+  <div class="cap">Program extended. TGE is set for <b>Q4 2026</b> (no exact date yet — possible marks Oct 30 and Nov 30, latest bound Dec 31). Genesis airdrop confirmed at <b>32% of supply, 100% unlocked at TGE</b>. Points ÷ total pool = share; share × FDV × 32% = estimated value.</div>
   <div class="pts-deadline">
     <div class="pts-dead-top">
       <div>
-        <div class="pts-dead-k">Time left to deadline</div>
-        <div class="pts-dead-s" id="ptsDeadlineText">Ends Sep 30, 2026 · 11:59PM ET</div>
+        <div class="pts-dead-k">Time left in TGE window</div>
+        <div class="pts-dead-s" id="ptsDeadlineText">TGE window: Q4 2026 (latest Dec 31, 2026 · 11:59PM ET)</div>
       </div>
       <div class="pts-dead-v" id="ptsRemainPct">—</div>
     </div>
-    <div class="pts-progress" aria-label="Campaign time progress"><i id="ptsProgress"></i></div>
+    <div class="pts-progress" aria-label="Campaign time progress"><i id="ptsProgress"></i><i class="pts-tge-mark" id="ptsTgeMark1" title="Possible TGE · Oct 30, 2026"></i><i class="pts-tge-mark" id="ptsTgeMark2" title="Possible TGE · Nov 30, 2026"></i></div>
     <div class="pts-dead-foot"><span><b id="ptsDonePct">—</b> elapsed</span><span id="ptsDaysLeft">—</span></div>
+    <div class="pts-tge-sub" id="ptsTgeSub">—</div>
   </div>
   <div class="points-grid">
     <div class="points-controls">
-      <div class="pts-row">
+      <div class="pts-row pts-row-solo">
         <label class="pts-in">My points <input type="number" id="ptsMine" value="12000" min="0"></label>
-        <label class="pts-in">Total pool <input type="number" id="ptsPool" value="9167500" min="1"></label>
+      </div>
+      <div class="pts-pool">
+        <div class="pts-pool-head">
+          <span class="pts-in pts-pool-label">Total pool</span>
+          <input type="number" id="ptsPool" class="pts-pool-num" value="9100000" min="9000000" max="11050000" step="50000">
+        </div>
+        <input class="pts-slider pool-slider" type="range" id="ptsPoolSlider" min="9000000" max="11050000" step="50000" value="9100000" aria-label="Total pool slider">
+        <div class="pts-pool-chips" id="ptsPoolChips">
+          <button type="button" class="chip" data-pool="9100000">Sep 30 · 9.10M</button>
+          <button type="button" class="chip" data-pool="9700000">Oct 30 · 9.70M</button>
+          <button type="button" class="chip" data-pool="10300000">Nov 30 · 10.30M</button>
+          <button type="button" class="chip" data-pool="11050000">Dec 31 (Q4 end) · 11.05M</button>
+          <button type="button" class="chip" id="ptsPoolToday" data-pool="9100000">Today · 9.10M</button>
+        </div>
+        <small class="pts-pool-note">Assumes +150,000 pts/week until TGE</small>
       </div>
       <div class="pts-input-mascot"><img src="pepe-miami.jpg" alt="Pepe mascot"></div>
     </div>
@@ -9324,11 +9374,11 @@ body.theme-light .valuation-report #valScatter .val-var-label{
           <div class="pts-tge-assumption">
             <span>TGE circulating supply assumption</span>
             <div class="pts-tge-scenarios">
-              <div class="pts-tge-scenario"><b>20%</b><small id="ptsTgeMcap20">— MCAP</small></div>
-              <div class="pts-tge-scenario base"><b>25%</b><small id="ptsTgeMcap25">— MCAP · base</small></div>
-              <div class="pts-tge-scenario"><b>30%</b><small id="ptsTgeMcap30">— MCAP</small></div>
+              <div class="pts-tge-scenario base"><b>32%</b><small id="ptsTgeMcap32">— MCAP · airdrop only (floor)</small></div>
+              <div class="pts-tge-scenario"><b>41%</b><small id="ptsTgeMcap41">— MCAP · + half ecosystem</small></div>
+              <div class="pts-tge-scenario"><b>50%</b><small id="ptsTgeMcap50">— MCAP · + full ecosystem</small></div>
             </div>
-            <small>Each MCAP = selected FDV × tokens circulating at TGE.</small>
+            <small>Airdrop is 100% unlocked at TGE, so float is at least 32%; team/investors (50%) are locked 12 months.</small>
           </div>
         </div>
         <div class="fdv-tools">
@@ -9338,26 +9388,30 @@ body.theme-light .valuation-report #valScatter .val-var-label{
             </div>
             <div class="fdv-action">EDIT · DRAG TO CHANGE</div>
           </div>
-          <input class="pts-slider" type="range" id="ptsFdv" min="1000000" max="67700000000" step="1000000" value="50000000000" aria-label="Edit FDV scenario">
-          <div class="fdv-presets" id="fdvPresets">
-            <button type="button" class="preset" data-fdv="1000000000">$1B</button>
-            <button type="button" class="preset" data-fdv="5000000000">$5B</button>
-            <button type="button" class="preset" data-fdv="10000000000">$10B</button>
-            <button type="button" class="preset" data-fdv="33850000000">½ HYPE · $33.9B</button>
-            <button type="button" class="preset" data-fdv="67700000000">HYPE · $67.7B</button>
-          </div>
+          <input class="pts-slider" type="range" id="ptsFdv" min="0" max="1000" step="1" value="600" aria-label="Edit FDV scenario">
+          <div class="fdv-presets" id="fdvPresets"></div>
         </div>
       </div>
       <div class="pts-band" id="ptsBand">—</div>
-      <div class="pts-perpt" id="ptsPerPt">—</div>
       <div class="pts-outs">
-        <div class="pts-card"><b id="pts20">—</b><span id="ptv20">—</span><small>20% airdrop</small></div>
-        <div class="pts-card base"><b id="pts25">—</b><span id="ptv25">—</span><small>25% airdrop</small></div>
-        <div class="pts-card"><b id="pts30">—</b><span id="ptv30">—</span><small>30% airdrop</small></div>
+        <div class="pts-card"><b id="ptsShareOfPool">—</b><span>share of pool</span><small>my pts ÷ total pool</small></div>
+        <div class="pts-card base"><b id="ptsAirdropValue">—</b><span>my airdrop value</span><small>32% airdrop</small></div>
+        <div class="pts-card"><b id="ptsPerPointVal">—</b><span>value per point</span><small>at this FDV</small></div>
+      </div>
+      <div class="pts-matrix" id="ptsMatrixWrap" aria-label="FDV by pool value matrix">
+        <div class="pts-matrix-title">My airdrop value across FDV × pool <small>tap a cell to load it</small></div>
+        <div class="pts-matrix-grid" id="ptsMatrix"></div>
       </div>
     </div>
   </div>
-  
+  <div class="pts-facts" id="ptsFacts">
+    <span>32% Genesis (100% unlocked)</span>
+    <span>18% Ecosystem</span>
+    <span>50% Team &amp; Investors (12m lock, ≥3y unlock)</span>
+    <span>100% of treasury revenue → buy &amp; burn</span>
+    <span>Unclaimed airdrop burned</span>
+    <span>Need ≥1 point to be eligible</span>
+  </div>
   <div class="pts-share-row">
     <button class="share-btn" id="ptsShareBtn" type="button">𝕏 Share my scenario</button>
     <button class="share-btn ghost" id="ptsCopyBtn" type="button">⧉ Copy</button>
@@ -10548,11 +10602,11 @@ body.theme-light .valuation-report #valScatter .val-var-label{
   }
 </style>
 
-<script src="dashboard.js?v=1790254731" defer></script>
+<script src="dashboard.js?v=1790565181" defer></script>
 <script src="paths-panels.js?v=1789148292" defer></script>
 <script src="playbook-panels.js?v=1790254731" defer></script>
 <script src="monitors-panels.js?v=1789148292" defer></script>
-<script src="i18n-dict.js?v=1790254731" defer></script>
+<script src="i18n-dict.js?v=1790565181" defer></script>
 <script src="i18n.js?v=1789148292" defer></script>
 <script src="app-inline.js?v=20260809-theme-toggle" defer></script>
 <script src="comparison-lab-panels.js?v=1789148292" defer></script>
