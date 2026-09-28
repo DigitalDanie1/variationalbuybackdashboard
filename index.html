@@ -8306,8 +8306,17 @@ body.theme-light .valuation-report #valScatter .val-var-label{
 </style>
 <style id="bw-pct-fix">
 .bw-viz text.bw-pct{font-weight:800;font-family:var(--mono)}
-.bw-viz text.bw-pct.a{opacity:.85}
-.bw-viz text.bw-pct.in{fill:#fff;letter-spacing:-.2px}
+.bw-viz text.bw-pct.a{fill:var(--text)}
+.bw-viz text.bw-pct.in{fill:#fff;letter-spacing:-.4px}
+article.bw-viz svg.bw-grouped text.bw-date{font-size:13px;font-weight:700;fill:var(--text)}
+article.bw-viz .bw-viz-legend.bw-legend-big{gap:18px;font:700 14px var(--mono);color:var(--text);margin-bottom:12px}
+article.bw-viz .bw-viz-legend.bw-legend-big i{width:22px;height:12px;border-radius:3px;margin-right:7px}
+article.bw-viz .bw-viz-legend.bw-legend-big .a{background:var(--bwv-a)}
+article.bw-viz .bw-viz-legend.bw-legend-big .d{background:var(--bwv-d)}
+article.bw-viz .bw-viz-legend.bw-legend-big .c{background:var(--bwv-c)}
+article.bw-viz:has(.bw-legend-big) .bw-viz-read{padding:12px 14px}
+article.bw-viz:has(.bw-legend-big) .bw-viz-read .dir{font-size:12px}
+article.bw-viz:has(.bw-legend-big) .bw-viz-read .what{font-size:14px}
 </style>
 <style id="pts-fit-fix">
 [data-tg="points"] .fdv-head{flex-wrap:wrap}
@@ -10613,7 +10622,7 @@ body.theme-light .valuation-report #valScatter .val-var-label{
   }
 </style>
 
-<script src="dashboard.js?v=1790300201" defer></script>
+<script src="dashboard.js?v=1790300301" defer></script>
 <script src="paths-panels.js?v=1789148292" defer></script>
 <script src="playbook-panels.js?v=1790254731" defer></script>
 <script src="monitors-panels.js?v=1789148292" defer></script>
