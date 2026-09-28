@@ -8308,6 +8308,9 @@ body.theme-light .valuation-report #valScatter .val-var-label{
 [data-tg="points"] .fdv-head{flex-wrap:wrap}
 [data-tg="points"] .fdv-action{white-space:nowrap;max-width:100%}
 [data-tg="points"] .pts-tge-scenario small{overflow-wrap:anywhere;word-break:break-word}
+.pts-tge-scenarios.pts-tge-fixed{grid-template-columns:1fr!important}
+.pts-tge-fixed .pts-tge-scenario{display:flex;align-items:baseline;gap:10px}
+.pts-tge-fixed .pts-tge-scenario small{margin-top:0;font-size:12px!important}
 </style>
 </head>
 <body>
@@ -9377,13 +9380,11 @@ body.theme-light .valuation-report #valScatter .val-var-label{
           <div class="fdv-title">FDV scenario</div>
           <div class="pts-fdv" id="ptsFdvBig">—</div>
           <div class="pts-tge-assumption">
-            <span>TGE circulating supply assumption</span>
-            <div class="pts-tge-scenarios">
-              <div class="pts-tge-scenario base"><b>32%</b><small id="ptsTgeMcap32">— MCAP · airdrop only (floor)</small></div>
-              <div class="pts-tge-scenario"><b>41%</b><small id="ptsTgeMcap41">— MCAP · + half ecosystem</small></div>
-              <div class="pts-tge-scenario"><b>50%</b><small id="ptsTgeMcap50">— MCAP · + full ecosystem</small></div>
+            <span>TGE circulating supply · fixed</span>
+            <div class="pts-tge-scenarios pts-tge-fixed">
+              <div class="pts-tge-scenario base"><b>32%</b><small id="ptsTgeMcap32">— MCAP at TGE</small></div>
             </div>
-            <small>Airdrop is 100% unlocked at TGE, so float is at least 32%; team/investors (50%) are locked 12 months.</small>
+            <small>Circulating at TGE = the 32% genesis airdrop (100% unlocked). MCAP = FDV × 32%.</small>
           </div>
         </div>
         <div class="fdv-tools">
@@ -10607,11 +10608,11 @@ body.theme-light .valuation-report #valScatter .val-var-label{
   }
 </style>
 
-<script src="dashboard.js?v=1790565181" defer></script>
+<script src="dashboard.js?v=1790300001" defer></script>
 <script src="paths-panels.js?v=1789148292" defer></script>
 <script src="playbook-panels.js?v=1790254731" defer></script>
 <script src="monitors-panels.js?v=1789148292" defer></script>
-<script src="i18n-dict.js?v=1790565181" defer></script>
+<script src="i18n-dict.js?v=1790300001" defer></script>
 <script src="i18n.js?v=1789148292" defer></script>
 <script src="app-inline.js?v=20260809-theme-toggle" defer></script>
 <script src="comparison-lab-panels.js?v=1789148292" defer></script>

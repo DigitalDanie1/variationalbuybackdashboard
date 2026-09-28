@@ -2729,12 +2729,8 @@ function renderPointsCalc(){
   const pctHype=hype>0?fdv/hype*100:0;
   $('#ptsFdvLabel').textContent=pctHype.toFixed(0)+'% of HYPE FDV ('+fmtFdvShort(hype)+')';
   $('#ptsFdvBig').textContent='$'+(fdv/1e9).toFixed(fdv>=1e9?1:3)+'B';
-  [32,41,50].forEach(p=>{
-    const el=$('#ptsTgeMcap'+p);
-    if(!el)return;
-    const suffix=p===32?' · airdrop only (floor)':p===41?' · + half ecosystem':' · + full ecosystem';
-    el.textContent=fmtBig(fdv*p/100)+' MCAP'+suffix;
-  });
+  const tgeEl=$('#ptsTgeMcap32');
+  if(tgeEl)tgeEl.textContent=fmtBig(fdv*0.32)+' MCAP at TGE';
   // scenario band — grounds expectations vs a live comp (HYPE)
   let band,bcol;
   if(pctHype<10){band='Conservative';bcol='var(--sub)';}
