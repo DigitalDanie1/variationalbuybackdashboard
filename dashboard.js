@@ -652,6 +652,35 @@ const BIWEEKLY_HISTORY=[
   olpPnl2w:1014976,          // OLP PnL
   olpPnlLife:18433850,       // lifetime OLP PnL
   treasuryHoldings:7361084   // current protocol treasury holdings (USDC)
+},
+{
+  asOf:'2026-09-19', src:'https://x.com/search?q=from%3Avariational_io%20biweekly%20update!&src=typed_query',
+  release:'v0.34.0',
+  product:[
+    'Added in-app announcement page',
+    'Improved margin usage display',
+    'Improved notification display',
+    'Other miscellaneous UI improvements'
+  ],
+  totalVolume:339.75e9,      // Total Volume Traded
+  oi:1.83e9,                 // Current Dual-Sided OI
+  tvl:236.12e6,              // TVL (excludes OLP hedging accounts)
+  markets:552,               // Total markets currently listed
+  rewardsClaimed:8275215,    // Total rewards claimed (lifetime)
+  lossesRefunded:4559196,    // Total losses refunded (Sunset)
+  referralClaimed:3716019,   // Total referral rewards claimed (lifetime)
+  dau:null,                  // not published in this report
+  wau:null,                  // not published in this report
+  spreads2w:4570970,         // 2w spreads paid (gross revenue)
+  mmCosts2w:2091443,         // derived: spreads minus net revenue
+  netRevenue2w:2479527,      // 2w net revenue
+  rewards2w:211814,          // 2w rewards (all referral rewards in this report)
+  referralRewards2w:211814,  // 2w referral rewards
+  netProfit2w:2267713,       // 2w net profit
+  treasury2w:914194,         // protocol treasury
+  olpPnl2w:1353519,          // OLP PnL
+  olpPnlLife:19787369,       // lifetime OLP PnL
+  treasuryHoldings:8274637   // current protocol treasury holdings (USDC)
 }
 ];
 const BIWEEKLY=BIWEEKLY_HISTORY[BIWEEKLY_HISTORY.length-1];
