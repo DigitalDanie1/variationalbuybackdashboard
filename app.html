@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <!-- Security hardening. connect-src lists ONLY the read-only data APIs this page calls;
      any injected external script src or exfiltration to another host is blocked. -->
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'none'; object-src 'none'; form-action 'none'; frame-src 'none'; script-src 'self'; script-src-attr 'none'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src 'self' https://api.coingecko.com https://api.llama.fi https://omni-client-api.prod.ap-northeast-1.variational.io https://arb1.arbitrum.io https://arbitrum-one-rpc.publicnode.com https://arbitrum.gateway.tenderly.co; upgrade-insecure-requests">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'none'; object-src 'none'; form-action 'none'; frame-src 'none'; script-src 'self' https://cdn.vercel-insights.com; script-src-attr 'none'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src 'self' https://api.coingecko.com https://api.llama.fi https://omni-client-api.prod.ap-northeast-1.variational.io https://arb1.arbitrum.io https://arbitrum-one-rpc.publicnode.com https://arbitrum.gateway.tenderly.co https://vitals.vercel-insights.com; upgrade-insecure-requests">
 <meta name="referrer" content="no-referrer">
 <meta name="robots" content="index,follow">
 <title>Variational Money - The first onchain dashboard for Variational</title>
@@ -17,6 +17,8 @@
 <link rel="manifest" href="/site.webmanifest?v=20260731">
 <link rel="image_src" href="https://www.variational.money/variational-money-card-20260731.png">
 <link rel="stylesheet" href="fonts.css">
+<!-- Vercel Web Analytics -->
+<script defer src="https://cdn.vercel-insights.com/v1/script.js"></script>
 
 <!-- ============================================================
      TWITTER / LINK PREVIEW  —  canonical public URL below.
