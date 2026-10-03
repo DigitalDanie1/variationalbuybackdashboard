@@ -681,6 +681,30 @@ const BIWEEKLY_HISTORY=[
   olpPnl2w:1353519,          // OLP PnL
   olpPnlLife:19787369,       // lifetime OLP PnL
   treasuryHoldings:8274637   // current protocol treasury holdings (USDC)
+},
+{
+  asOf:'2026-10-03', src:'https://x.com/search?q=from%3Avariational_io%20biweekly%20update!&src=typed_query',
+  release:'v0.36.1',
+  product:[],                // no itemised product list in this report
+  totalVolume:378.54e9,      // Total Volume Traded
+  oi:2.13e9,                 // Current Dual-Sided OI
+  tvl:298.28e6,              // TVL (excludes OLP hedging accounts)
+  markets:560,               // Total markets currently listed
+  rewardsClaimed:8564196,    // Total rewards claimed (lifetime)
+  lossesRefunded:4559196,    // Total losses refunded (Sunset) — unchanged, programme closed
+  referralClaimed:4005000,   // Total referral rewards claimed (lifetime)
+  dau:null,                  // not published in this report
+  wau:null,                  // not published in this report
+  spreads2w:7372480,         // 2w spreads paid (gross revenue)
+  mmCosts2w:3988691,         // derived: spreads minus net revenue
+  netRevenue2w:3383789,      // 2w net revenue
+  rewards2w:337984,          // 2w rewards (all referral rewards in this report)
+  referralRewards2w:337984,  // 2w referral rewards
+  netProfit2w:3045805,       // 2w net profit
+  treasury2w:1474496,        // protocol treasury (20.00% of spreads, on policy)
+  olpPnl2w:1571309,          // OLP PnL
+  olpPnlLife:21358678,       // lifetime OLP PnL
+  treasuryHoldings:9758014   // current protocol treasury holdings (USDC)
 }
 ];
 const BIWEEKLY=BIWEEKLY_HISTORY[BIWEEKLY_HISTORY.length-1];
@@ -734,7 +758,7 @@ const impliedSpreadsAllTime=()=>impliedSpreadsBetween(addDays(SERIES[0].d,-1),cu
 
 /* perp-DEX peer ranking by open interest (Perpetual Pulse snapshot) */
 const PEERS = {
-  asOf:'loading live data', snapAsOf:'2026-07-08 board', live:false, total:16.408469162e9, count:15, varRank:3, varShare:7.4, vsHl:8.9,
+  asOf:'2026-07-08 board', snapAsOf:'2026-07-08 board', live:false, total:16.408469162e9, count:15, varRank:3, varShare:7.4, vsHl:8.9,
   list:[
     {n:'Hyperliquid',oi:10684309662,vol:7126971862,tvl:5711017306,pairs:353,maker:'0.01%',taker:'0.045%',lev:'40x',url:'https://app.hyperliquid.xyz/'},
     {n:'Aster',oi:1880005706,vol:1230816436,tvl:1363035561,pairs:514,maker:'0.01%',taker:'0.035%',lev:'100x',url:'https://www.asterdex.com/'},
@@ -918,7 +942,7 @@ function renderImpliedSpreadTotal(treasuryTotal){
   $('#pmFeesTotal') && ($('#pmFeesTotal').textContent=compact(totalFees));
   $('#pmSpreadTotal') && ($('#pmSpreadTotal').textContent=compact(totalFees));
   $('#pmTreasuryFormula') && ($('#pmTreasuryFormula').innerHTML=`Formula: <b>USDC balanceOf(${walletLink(ADDR.treasury,'0x5e91...d645')}) = ${fmtUSD(treasuryTotal)}</b>`);
-  $('#pmDailyFormula') && ($('#pmDailyFormula').innerHTML=days?`Formula: <b>(${fmtUSD(treasuryTotal)} - ${fmtUSD(start30)}) / ${days}D = ${fmtUSD(avg30)}/day</b>`:'Formula: <b>waiting for historical treasury series</b>');
+  $('#pmDailyFormula') && ($('#pmDailyFormula').innerHTML=days?`Formula: <b>(${fmtUSD(treasuryTotal)} - ${fmtUSD(start30)}) / ${days}D = ${fmtUSD(avg30)}/day</b>`:'Formula: <b>daily average needs two or more days of treasury history</b>');
   $('#pmFeesFormula') && ($('#pmFeesFormula').innerHTML=`Formula: <b>daily net treasury inflow ÷ report-observed share = ${compact(totalFees)} implied gross spreads</b>`);
   renderCompletedTreasuryGrowth();
   renderPmDailyMonitor();
@@ -1679,7 +1703,7 @@ function renderMarketActivity(){
     const valid=value!==null&&value!==undefined&&Number.isFinite(Number(value));
     const a=$(main),b=$(exact);if(a)a.textContent=valid?marketBig(Number(value)):'—';
     if(b){
-      b.textContent=valid?marketExact(Number(value),dp):'waiting for source';
+      b.textContent=valid?marketExact(Number(value),dp):'not published';
       b.title=valid?b.textContent:'';
     }
   };
@@ -1697,10 +1721,10 @@ function renderMarketActivity(){
       ?errors.join(' · ')+' · showing last exact observation'
       :MARKET_ACTIVITY.liveAt
         ?'Live synced '+MARKET_ACTIVITY.liveAt.toLocaleTimeString('en-US',{timeZone:'UTC',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false})+' UTC'+(dailyThrough?' · daily through '+dailyThrough:'')
-        :'Syncing exact data…';
+        :'Official report figures · exact daily series not loaded';
   }
   if(!vols.length||!ois.length){
-    svg.innerHTML='<text x="50%" y="50%" fill="#7d8aa5" text-anchor="middle" font-family="monospace" font-size="12">Loading exact DeFiLlama daily series…</text>';
+    svg.innerHTML='<text x="50%" y="50%" fill="#7d8aa5" text-anchor="middle" font-family="monospace" font-size="12">Daily series unavailable — the figures above are the official report</text>';
     return;
   }
   const vm=new Map(vols.map(x=>[x.d,x.v])),om=new Map(ois.map(x=>[x.d,x.v]));
@@ -2597,7 +2621,7 @@ function renderEfficiency(){
   const tvlOk=tvlV>0;
   const tvlTag=DUNE_TVL_SNAP.v>0?' (Dune '+DUNE_TVL_SNAP.asOf+')':(BIWEEKLY.tvl>0?' (official '+BIWEEKLY.asOf+')':(OLP_TVL_LIVE?' (live on-chain)':' (on-chain '+OLP_TVL_ASOF+')'));
   $('#erTvl') && ($('#erTvl').textContent=tvlOk?fmtBig(tvlV):'—');
-  $('#efTvl') && ($('#efTvl').textContent=tvlOk?fmtBig(tvlV)+tvlTag:'loading');
+  $('#efTvl') && ($('#efTvl').textContent=tvlOk?fmtBig(tvlV)+tvlTag:'—');
   $('#efCapEff') && ($('#efCapEff').textContent=tvlOk?(MKT.oi/tvlV).toFixed(0)+'×':'—');
   $('#efVolSupport') && ($('#efVolSupport').textContent=tvlOk?'$'+fmtK((e.vol/e.days)/tvlV):'—');
   $('#efFeeVsTvl') && ($('#efFeeVsTvl').textContent=tvlOk?(e.spread/tvlV*100).toFixed(0)+'%':'—');
@@ -3874,7 +3898,7 @@ function renderCalendarLiveSync(dateStr){
   wrap.classList.toggle('is-final',!live&&final);
   wrap.classList.toggle('is-pending',!live&&!final);
   text.textContent=live
-    ? `Live syncing · ${resetTimeShort()} ET`
+    ? `Accruing now · ${resetTimeShort()} ET`
     : (final?'Finalized at 00:00 ET':'Waiting for ET close');
 }
 function calImpliedActivity(earn,date=currentTreasuryDate()){
@@ -4323,7 +4347,7 @@ function renderMemeLab(){
   const tweet=`${headline}\n${footer}\n\nhttps://variationalbuybackdashboard.vercel.app/`;
   const copy=$('#memeTweetCopy');
   if(copy)copy.innerHTML='<b>Tweet copy</b><br>'+tweet.replaceAll('\n','<br>');
-  if($('#memeAutoState'))$('#memeAutoState').textContent=MEME_READY?`VAR Pepe ${MEME_INDEX+1} / ${MEME_LIBRARY.length}`:'Loading Pepe library';
+  if($('#memeAutoState'))$('#memeAutoState').textContent=MEME_READY?`VAR Pepe ${MEME_INDEX+1} / ${MEME_LIBRARY.length}`:'';
 }
 function initMemeLab(){
   if(!$('#varMemeCanvas'))return;
@@ -4549,9 +4573,14 @@ async function balanceAtEtDayEnd(dateStr){
   const closeTs=resetMidnightTs(addDays(dateStr,1));
   return balAt(await exactBlockAtTimestamp(closeTs));
 }
-async function refresh({deep=false}={}){
-  const btn=$('#refresh'),note=$('#note');btn.classList.add('busy');btn.textContent='↻ syncing…';
-  $('#stamp').className='';
+/* `silent` is the default for every automatic call. The page already has every number on
+   it before this runs — the figures come from the baked series and the official reports —
+   so a sync is a refinement, not a load, and announcing it made a complete page look like
+   an incomplete one on every single visit. Only a click on Refresh live shows progress,
+   because only then has someone asked for it and is waiting on the answer. */
+async function refresh({deep=false,silent=true}={}){
+  const btn=$('#refresh'),note=$('#note');
+  if(!silent){btn.classList.add('busy');btn.textContent='↻ syncing…';$('#stamp').className='';}
   try{
     const todayET=resetDateKey();
 
@@ -4612,7 +4641,7 @@ async function refresh({deep=false}={}){
     note.classList.remove('show');
     $('#stamp').textContent='snapshot · '+SERIES[SERIES.length-1].d+' ET';
     $('#stamp').className='warn';
-  }finally{btn.classList.remove('busy');btn.textContent='↻ Refresh live';}
+  }finally{if(!silent){btn.classList.remove('busy');btn.textContent='↻ Refresh live';}}
 }
 let quickSyncBusy=false, lastWindowSync=0;
 async function quickSyncLive(){
@@ -4639,7 +4668,8 @@ async function quickSyncLive(){
   }finally{quickSyncBusy=false;}
 }
 $('#refresh').addEventListener('click',()=>{
-  refresh({deep:true});
+  /* user-initiated: this one does show progress */
+  refresh({deep:true,silent:false});
   refreshMarketActivity();
 });
 
