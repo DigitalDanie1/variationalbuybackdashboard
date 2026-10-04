@@ -81,6 +81,42 @@
     { v: LISTED[1].v, alt: null,        label: 'LIT listed',       cls: 'lit'  }
   ];
 
+  /* ---------- what the two comparables are actually priced at ----------
+     The ladder above is a set of FDVs with no derivation: the playbook names five
+     boundaries and the tab takes them as given. This is the one place a number can be
+     built from the business instead, because both comparables now have enough trading
+     history to carry a real multiple.
+
+     Source is the P/E series on LIT and HYPE, last point 2026-09-09. The revenue bases are
+     NOT the same one — LIT is every fee the exchange takes (lighter exchangeMetrics: maker,
+     taker, transfer, withdraw, liquidation), HYPE is the holder-accruing line only
+     (hyperliquid dailyRevenue, which is what the buyback spends). FDV supply is max_supply
+     on both. That mismatch is why the two sit at similar multiples on very different
+     businesses, and it is why applying either one to VAR needs the basis named first. */
+  var PE = {
+    asOf: '2026-09-09',
+    lit:  { pe: 29.27, feePe: 117.07, mcap: 1.269953e9, fdv: 5.079813e9, px: 5.08,
+            basis: 'all fees — maker, taker, transfer, withdraw, liquidation' },
+    hype: { pe: 31.23, feePe: 140.38, mcap: 19.289122e9, fdv: 86.713840e9, px: 86.71,
+            basis: 'holder revenue only — the line the buyback spends' },
+    mult: 30,        /* the round number both circulating P/Es sit on */
+    float: 0.25,     /* day-one circulating share — the Points tab's own base case */
+    pool: 9167500    /* total points, same figure the Points tab divides by */
+  };
+  /* The two VAR revenue lines, and why there are two rather than one. The 14-day report
+     gives both: net revenue is the protocol's own P&L after market-making cost, treasury
+     inflow is the 20% of spread that actually accrues to the token. HYPE's multiple is
+     built on its holder line, so treasury inflow is the like-for-like one; LIT's is built
+     on all fees, so net revenue is the closer read there. Both are carried because picking
+     one silently would be picking the answer. */
+  var VAR_REV = [
+    { k: 'net',  label: 'Net revenue',     v: 2278641, of: 'the protocol P&L, after market-making cost',
+      like: 'LIT basis', note: '44.8% of the $5.08M spread in the same report' },
+    { k: 'tre',  label: 'Treasury inflow', v: 1016164, of: 'the share that accrues to the token',
+      like: 'HYPE basis', note: '20% of the same spread — the payout policy, not weak monetisation' }
+  ];
+  var REV_ASOF = '2026-09-05';
+
   var FDV_CHIPS = [
     { v: 0.94e9, label: '$0.94B' }, { v: 1.5e9, label: '$1.5B' }, { v: 2.81e9, label: '$2.81B' },
     { v: 3.0e9,  label: '$3.0B'  }, { v: 4.12e9, label: '$4.12B' }, { v: 5.0e9, label: '$5.0B' },
@@ -207,13 +243,68 @@
     var avgEntry = tokens > 0 ? cost / tokens : 0;
     var liqPx = tokens > 0 && lev > 1 ? (cost - M) / (tokens * (1 - MM)) : 0;
     var alive = liqDay < 0;
+
+    /* ---------- how long the money spends under water ----------
+       The panel could say what the entry ended at and what hole it sat in, and still never
+       say how long it sat there. "Low leverage to survive the initial volatility" is a
+       statement about duration, and duration was the one axis with no number on it: a
+       −60% dip for nine days and the same dip for seven months are the same figure here
+       and a completely different thing to hold.
+
+       Everything below is measured from the day the last clip lands, because before that
+       the position is still being built and being under water on a half-built position is
+       not the thing being asked about. Days are daily closes, so a stretch that dips under
+       intraday and closes above is not counted.
+
+         firstUp     first close back at or above what went in
+         heldUp      the close after which it never went under again — the honest one,
+                     because a single green day inside a long hole is not a recovery
+         underDays   total closes under water
+         worstRun    the longest unbroken stretch of them
+         troughDay   the day of the deepest point */
+    var startDay = Math.min(days > 0 ? days - 1 : 0, eq.length - 1);
+    var endDay = liqDay < 0 ? eq.length - 1 : liqDay;
+    var underDays = 0, run = 0, runStart = -1, worstRun = 0, worstRunStart = -1;
+    var firstUp = -1, heldUp = -1, troughDay = startDay, j;
+    for (j = startDay; j <= endDay; j++) {
+      if (eq[j] < 1) {
+        underDays++; run++;
+        if (run === 1) runStart = j;
+        /* the span is drawn on the chart, so where it starts matters as much as how long
+           it ran — a 40-day hole in month two is a different thing from one in month eight */
+        if (run > worstRun) { worstRun = run; worstRunStart = runStart; }
+        heldUp = -1;
+      } else {
+        run = 0;
+        if (firstUp < 0) firstUp = j;
+        if (heldUp < 0) heldUp = j;
+      }
+      if (eq[j] < eq[troughDay]) troughDay = j;
+    }
+
+    /* The price and the money are two different percentages and at leverage they are never
+       the same one. Both are kept so the panel can print them side by side instead of
+       showing one and letting it be read as the other. The series is a multiple of the
+       listing price, so 1.0 is the listing price and (v − 1) is the move off it. */
+    var pxMin = px[startDay], pxMinDay = startDay;
+    for (j = startDay; j <= endDay; j++) if (px[j] < pxMin) { pxMin = px[j]; pxMinDay = j; }
+
     return {
       eq: eq, liqDay: liqDay, alive: alive, tokens: tokens, cost: cost, fees: fees,
       avgEntry: avgEntry, liqPx: liqPx,
       liqFromEntry: avgEntry > 0 ? (liqPx / avgEntry - 1) * 100 : 0,
       peak: Math.max.apply(null, eq.slice(0, liqDay < 0 ? eq.length : liqDay + 1)),
       trough: alive ? Math.min.apply(null, eq.slice(days || 1)) : 0,
-      finalEq: alive ? eq[eq.length - 1] : 0
+      finalEq: alive ? eq[eq.length - 1] : 0,
+      /* time */
+      startDay: startDay, endDay: endDay, firstUp: firstUp, heldUp: heldUp,
+      underDays: underDays, worstRun: worstRun, worstRunStart: worstRunStart,
+      troughDay: troughDay,
+      /* price, as a multiple of the listing price */
+      pxEnd: px[endDay], pxMin: pxMin, pxMinDay: pxMinDay,
+      entryVsList: avgEntry > 0 ? (avgEntry - 1) * 100 : 0,
+      pxEndVsEntry: avgEntry > 0 ? (px[endDay] / avgEntry - 1) * 100 : 0,
+      pxMinVsEntry: avgEntry > 0 ? (pxMin / avgEntry - 1) * 100 : 0
     };
   }
 
@@ -309,6 +400,97 @@
       avoid: pick(none, function (r) { return -r.firstDeath; }),
       counts: { both: both.length, one: one.length, none: none.length, all: all.length }
     };
+  }
+
+  /* ---------- the comparables, priced ----------
+     Builds the block rather than hard-coding its figures, so the arithmetic is visible and
+     a revised report changes every number in it by changing VAR_REV. Each row ends in an
+     FDV chip that sets the ladder above, which is the point of the section: the two bases
+     do not land in the same band, and that disagreement is the finding. */
+  function peRows() {
+    return VAR_REV.map(function (r) {
+      var ann = r.v * 365 / 14;
+      var mcap = ann * PE.mult;
+      var fdv = mcap / PE.float;
+      var perPt = mcap / PE.pool;
+      var band = bandFor(fdv);
+      return {
+        r: r, ann: ann, mcap: mcap, fdv: fdv, perPt: perPt, band: band,
+        fdvMult: fdv / ann
+      };
+    });
+  }
+
+  function peBlock() {
+    var rows = peRows();
+    var head =
+      '<div class="bw-head"><b>What the Comparables Are Priced At</b><span><i>the same multiple both listings trade on, put on VAR&rsquo;s own revenue</i></span></div>' +
+      /* No inline <b> inside this sentence. i18n matches whole text nodes, so a bolded
+         figure mid-paragraph cuts it into five fragments and four of them are too short to
+         translate — the same trap the funding note downstream already carries a comment
+         about. Emphasis is carried by the class on the paragraph instead. */
+      '<p class="pb-lead">Both $LIT and $HYPE trade around 30&times; earnings on circulating supply and 120&ndash;140&times; on fully diluted supply. Those are the only two comparables this tab uses anywhere, and the only two perp DEXs with enough post-listing history to carry a multiple at all. Putting the circulating multiple on VAR&rsquo;s own 14-day report is the one valuation on this page derived from the business rather than from a band boundary.</p>';
+
+    var comp =
+      '<div class="pb-pecomp">' + ['lit', 'hype'].map(function (k) {
+        var c = PE[k];
+        return '<div class="pb-pec ' + k + '"><span class="pb-hname">' +
+          (k === 'lit' ? 'LIT · Lighter' : 'HYPE · Hyperliquid') + '</span>' +
+          '<div class="pb-pecg">' +
+          '<div><span>P/E on circulating</span><strong>' + c.pe.toFixed(1) + '&times;</strong></div>' +
+          '<div><span>P/E on FDV</span><strong>' + c.feePe.toFixed(0) + '&times;</strong></div>' +
+          '</div>' +
+          '<small>' + usdB(c.mcap) + ' market cap · ' + usdB(c.fdv) + ' FDV · $' + c.px.toFixed(2) + '</small>' +
+          '<small class="pb-pebasis">Revenue basis: ' + esc(c.basis) + '</small>' +
+          '</div>';
+      }).join('') + '</div>' +
+      '<div class="pb-note"><b>The two are not on the same revenue basis</b>, which is the first thing to settle before either multiple is borrowed. LIT&rsquo;s is every fee the exchange takes; HYPE&rsquo;s is only the part that reaches holders. So VAR gets measured twice below — once on each &mdash; rather than once on whichever produces the friendlier number. As of ' + PE.asOf + '.</div>';
+
+    /* Six columns, not eight. The first cut of this table gave the 14-day figure and the
+       annualised figure a column each, which pushed the whole row past the panel and left
+       the label column collapsing to one word per line. They are one number in two units,
+       so they are one column, and the table is laid out fixed so the label column keeps
+       its width instead of being squeezed by whatever the figures need. */
+    var table =
+      '<div class="pb-tablewrap"><table class="pb-table pb-petable">' +
+      '<colgroup><col class="c1"><col class="c2"><col class="c3"><col class="c4"><col class="c5"><col class="c6"></colgroup>' +
+      '<thead><tr>' +
+      '<th>VAR revenue line</th><th>Annualised revenue</th>' +
+      '<th>At 30&times; · market cap</th><th>Implied FDV at 25% float</th>' +
+      '<th>Per point</th><th>Lands in</th>' +
+      '</tr></thead><tbody>' +
+      rows.map(function (x) {
+        return '<tr data-fdv="' + Math.round(x.fdv) + '" class="pb-perow">' +
+          '<td><b>' + x.r.label + '</b><small>' + esc(x.r.of) + '</small>' +
+            '<small class="pb-pelike">' + esc(x.r.like) + '</small></td>' +
+          '<td class="pb-n"><b>' + usd(x.ann) + '</b><small>' + usd(x.r.v) +
+            ' over 14 days, &times; 365 ÷ 14</small><small>' + esc(x.r.note) + '</small></td>' +
+          '<td class="pb-n"><b>' + usdB(x.mcap) + '</b><small>&times; ' + PE.mult + '</small></td>' +
+          '<td class="pb-n"><b>' + usdB(x.fdv) + '</b><small>÷ 25% · ' + x.fdvMult.toFixed(0) + '&times; FDV</small></td>' +
+          '<td class="pb-n"><b>$' + x.perPt.toFixed(0) + '</b><small>÷ ' +
+            PE.pool.toLocaleString('en-US') + ' pts</small></td>' +
+          '<td><span class="pb-peband">' + esc(x.band.label) + '</span>' +
+            '<small>click to set the ladder</small></td>' +
+          '</tr>';
+      }).join('') + '</tbody></table></div>';
+
+    var a = rows[0], b = rows[1];
+    var split = a.band.k !== b.band.k;
+    var verd =
+      '<div class="pb-verd ' + (split ? 'warn' : 'ok') + '"><b>' +
+      (split ? 'The two bases land in different bands' : 'Both bases land in the same band') + '</b><p>' +
+      'On net revenue the multiple gives ' + usdB(a.fdv) + ' — ' + a.band.label.toLowerCase() +
+      '. On treasury inflow, the line that actually accrues to the token and the one HYPE&rsquo;s own multiple is built on, it gives ' + usdB(b.fdv) + ' — ' + b.band.label.toLowerCase() + '. ' +
+      (split
+        ? 'Same company, same report, same multiple, two different instructions — so this is a range to bid against, not a target. The gap between them is the payout policy: 20% of the spread reaches the treasury and the rest pays the OLP, so the token earns less than the protocol does by design, and a P/E built on the protocol line is lending VAR earnings its holders do not receive.'
+        : 'Both readings agree on the instruction, which is the unusual case.') +
+      '</p></div>';
+
+    var caveat =
+      '<div class="pb-note pb-pecav"><b>Trailing revenue, not a launch price.</b> Every figure in this block is the last 14 days annualised — one report, taken twice, with no growth and no decay in it. A token that has not listed has no float, no unlock schedule and no market, and the 25% is the Points tab&rsquo;s base case rather than anything announced. The per-point column also assumes the entire circulating supply goes to points, which is the most generous reading available and is why it should be treated as a ceiling on that column and not a forecast. ' +
+      'The 30&times; is a round number chosen because both comparables happen to sit on it today; they were at 25.5&times; and 27.9&times; a day earlier, and LIT ran under 15&times; for most of August. Nothing here is advice. Revenue as of ' + REV_ASOF + ', comparables as of ' + PE.asOf + '.</div>';
+
+    return head + comp + table + verd + caveat;
   }
 
   /* ---------- svg helpers ---------- */
@@ -468,7 +650,47 @@
     }
     var bn = function (v) { return '$' + (v / 1e9 >= 10 ? (v / 1e9).toFixed(0) : (v / 1e9).toFixed(1)) + 'B'; };
 
+    /* ---------- label placement ----------
+       Melting the card figures onto the chart put four more captions into a space that was
+       already carrying six, and which of them collide depends on the band: the avg-entry
+       line moves with the schedule, the trough moves with the path, and a pair that clears
+       at 45 days lands on top of each other at 14. Rather than special-casing the pairs
+       that happened to clash, every caption registers the box it occupies and the movable
+       ones take the first candidate position that is still free.
+
+       Widths are estimated from the character count — getBBox is not available while the
+       string is being built — at the mono advance for each size. The estimate only has to
+       be good enough to keep two captions apart, and it errs wide. */
+    var boxes = [];
+    var ADV = { 9.5: 5.75, 10: 6.05, 11: 6.65 };
+    function boxFor(str, x, y, size, anchor) {
+      var w = str.length * (ADV[size] || 6), h = size + 3;
+      var bx = anchor === 'end' ? x - w : anchor === 'middle' ? x - w / 2 : x;
+      return { x: bx, y: y - size, w: w, h: h };
+    }
+    function free(b) {
+      for (var i = 0; i < boxes.length; i++) {
+        var o = boxes[i];
+        if (b.x < o.x + o.w && o.x < b.x + b.w && b.y < o.y + o.h && o.y < b.y + b.h) return false;
+      }
+      return true;
+    }
+    /* Register a caption that has nowhere else to go. */
+    function claim(str, x, y, size, anchor) { boxes.push(boxFor(str, x, y, size, anchor)); }
+    /* Place a movable caption at the first free candidate; if every candidate is taken the
+       label is dropped rather than printed through something else — an unreadable overlap
+       is worse than one missing annotation, and the figure it carries is never the only
+       copy on the page. */
+    function place(str, cls, size, cands) {
+      for (var i = 0; i < cands.length; i++) {
+        var c = cands[i], b = boxFor(str, c[0], c[1], size, c[2]);
+        if (free(b)) { boxes.push(b); return tx(c[0], c[1], str, cls, c[2]); }
+      }
+      return '';
+    }
+
     ['hype', 'lit'].forEach(function (k, idx) {
+      boxes = [];   /* the two panels are far apart; collisions are only ever within one */
       var sim = sims[k], x0 = PAD + idx * (panelW + GAP);
       var fdv0 = (LI[k] && LI[k].fdv) || (k === 'hype' ? 3.05e9 : 4.00e9);
       var end = sim.alive ? n - 1 : Math.min(sim.liqDay, n - 1);
@@ -499,12 +721,44 @@
       if (sim.avgEntry > 0) {
         var ya = yF(sim.avgEntry * fdv0);
         s += ln(x0, ya, x0 + panelW, ya, 'pb-entry');
-        s += tx(x0 + panelW, ya - 5, 'avg entry ' + bn(sim.avgEntry * fdv0), 'pb-entry-t', 'end');
+        /* The price you pay, and how far off the listing price that is, on the line itself.
+           This used to be a row in a card stack above the chart, which meant reading the
+           figure in one place and seeing where it sat in another. */
+        var eLab = 'avg entry ' + bn(sim.avgEntry * fdv0) + ' · ' + pct(sim.entryVsList, 0) + ' vs listing';
+        s += tx(x0 + panelW, ya - 5, eLab, 'pb-entry-t', 'end');
+        claim(eLab, x0 + panelW, ya - 5, 10, 'end');
       }
-      if (p.lev > 1 && sim.liqPx > 0) {
-        var yl = yF(sim.liqPx * fdv0);
-        s += ln(x0, yl, x0 + panelW, yl, 'pb-liqline');
-        s += tx(x0 + panelW, yl + 12, 'liquidation ' + bn(sim.liqPx * fdv0), 'pb-liqline-t', 'end');
+      var yLiq = (p.lev > 1 && sim.liqPx > 0) ? yF(sim.liqPx * fdv0) : null;
+      if (yLiq !== null) {
+        var lLab = 'liquidation ' + bn(sim.liqPx * fdv0);
+        s += ln(x0, yLiq, x0 + panelW, yLiq, 'pb-liqline');
+        s += tx(x0 + panelW, yLiq + 12, lLab, 'pb-liqline-t', 'end');
+        claim(lLab, x0 + panelW, yLiq + 12, 10, 'end');
+      }
+      /* The worst the price got, marked where it happened rather than stated as a date the
+         reader has to find on the axis. Measured from the average entry, not the listing
+         price — the entry is what the position is actually judged against. */
+      if (sim.avgEntry > 0 && sim.pxMinVsEntry < -0.5 && sim.pxMinDay > sim.startDay) {
+        var wx = x(sim.pxMinDay), wy = yF(sim.pxMin * fdv0);
+        s += '<circle cx="' + wx.toFixed(1) + '" cy="' + wy.toFixed(1) + '" r="3.4" class="pb-worst ' + k + '"/>';
+        var wStr = 'worst ' + pct(sim.pxMinVsEntry, 0) + ' D+' + sim.pxMinDay;
+        var rightish = wx > x0 + panelW - 92;
+        s += place(wStr, 'pb-worst-t', 9.5, [
+          [wx + (rightish ? -7 : 7), wy + 13, rightish ? 'end' : 'start'],
+          [wx + (rightish ? -7 : 7), wy - 8,  rightish ? 'end' : 'start'],
+          [wx + (rightish ? 7 : -7), wy + 13, rightish ? 'start' : 'end'],
+          [wx, wy + 24, 'middle']
+        ]);
+      }
+      /* Where the price line ends, in the only unit that matters to someone holding it. */
+      if (sim.avgEntry > 0) {
+        var exY = yF(P[k][end] * fdv0);
+        var exStr = pct(sim.pxEndVsEntry, 0) + ' from entry';
+        s += place(exStr, 'pb-pxend ' + k, 10, [
+          [x0 + panelW, Math.max(exY - 7, pT + 10), 'end'],
+          [x0 + panelW, Math.max(exY + 16, pT + 10), 'end'],
+          [x0 + panelW, pT + 11, 'end']
+        ]);
       }
       s += tx(x0 + 6, pT + 13, p.days > 0 ? 'TWAP ' + p.days + 'd' : '', 'pb-twapwin-t');
 
@@ -520,14 +774,20 @@
       s += '<rect x="' + x0 + '" y="' + yM(1).toFixed(1) + '" width="' + panelW.toFixed(1) +
         '" height="' + (mB - yM(1)).toFixed(1) + '" class="pb-zone down"/>';
       var stM = top > 8 ? 2 : top > 4 ? 1 : top > 2 ? 0.5 : 0.25;
+      /* The break-even line is drawn whatever the step is, so a tick that lands within a
+         line-height of it prints through it. The gridline still goes in; only its number
+         is dropped, and the one it would have collided with is the more important of the
+         two anyway. */
       for (g = 0; g <= top + 1e-9; g += stM) {
         if (Math.abs(g - 1) < 1e-9) continue;
         s += ln(x0, yM(g), x0 + panelW, yM(g), 'pb-grid');
-        s += tx(x0 - 7, yM(g) + 3.5, lab(g), 'pb-ax', 'end');
+        if (Math.abs(yM(g) - yM(1)) >= 13) s += tx(x0 - 7, yM(g) + 3.5, lab(g), 'pb-ax', 'end');
       }
       s += ln(x0, yM(1), x0 + panelW, yM(1), 'pb-grid one');
       s += tx(x0 - 7, yM(1) + 3.5, lab(1), 'pb-ax one', 'end');
-      s += tx(x0 + 6, yM(1) - 5, money ? 'what went in' : 'break even', 'pb-eqbase', 'start');
+      var baseStr = money ? 'what went in' : 'break even';
+      s += tx(x0 + 6, yM(1) - 5, baseStr, 'pb-eqbase', 'start');
+      claim(baseStr, x0 + 6, yM(1) - 5, 10, 'start');
       if (p.days > 0) s += '<rect x="' + x0 + '" y="' + mT + '" width="' +
         (x(Math.min(p.days, n - 1)) - x0).toFixed(1) + '" height="' + (mB - mT) + '" class="pb-twapwin"/>';
 
@@ -536,15 +796,79 @@
       if (!sim.alive) ep.push([x(end), yM(0)]);
       s += poly(ep, 'pb-eqline ' + k);
 
+      /* The ending claims its space before the annotations are placed: it is the one
+         readout on this row that cannot move, so everything else yields to it. */
       if (!sim.alive) {
+        var wipeStr = 'wiped out D+' + end;
+        var wipeEnd = x(end) + 74 > x0 + panelW;
         s += '<g class="pb-liq ' + k + '"><circle cx="' + x(end).toFixed(1) + '" cy="' + yM(0) +
           '" r="5"/><path d="M' + (x(end) - 3.4) + ',' + (yM(0) - 3.4) + ' l6.8,6.8 M' +
           (x(end) + 3.4) + ',' + (yM(0) - 3.4) + ' l-6.8,6.8"/></g>';
-        s += tx(Math.min(x(end) + 9, x0 + panelW), yM(0) - 10, 'wiped out D+' + end,
-          'pb-eqlab ' + k, x(end) + 74 > x0 + panelW ? 'end' : 'start');
+        s += tx(Math.min(x(end) + 9, x0 + panelW), yM(0) - 10, wipeStr, 'pb-eqlab ' + k,
+          wipeEnd ? 'end' : 'start');
+        claim(wipeStr, Math.min(x(end) + 9, x0 + panelW), yM(0) - 10, 11, wipeEnd ? 'end' : 'start');
       } else {
         s += tx(x0 + panelW, yM(sim.eq[end]) - 18, lab(sim.eq[end]), 'pb-eqlab ' + k, 'end');
         s += tx(x0 + panelW, yM(sim.eq[end]) - 4, pnl(sim.eq[end]), 'pb-eqsub ' + k, 'end');
+        claim(lab(sim.eq[end]), x0 + panelW, yM(sim.eq[end]) - 18, 11, 'end');
+        claim(pnl(sim.eq[end]), x0 + panelW, yM(sim.eq[end]) - 4, 10, 'end');
+      }
+
+      /* The deepest point, where it happened. Placed before the bracket caption below:
+         this one is pinned to a dot on the line and can only shuffle around it, while the
+         caption can slide anywhere along its span — so the pinned one picks first.  On a liquidated path the wipe-out marker
+         below already carries the ending, so this would just crowd it. */
+      if (sim.alive && sim.underDays > 0) {
+        var tx_ = x(sim.troughDay), ty = yM(sim.eq[sim.troughDay]);
+        s += '<circle cx="' + tx_.toFixed(1) + '" cy="' + ty.toFixed(1) + '" r="3.4" class="pb-trough ' + k + '"/>';
+        var tRight = tx_ > x0 + panelW - 76;
+        var tStr = pnl(sim.eq[sim.troughDay]) + ' D+' + sim.troughDay;
+        s += place(tStr, 'pb-trough-t', 9.5, [
+          [tx_ + (tRight ? -7 : 7), ty + 13, tRight ? 'end' : 'start'],
+          [tx_ + (tRight ? -7 : 7), ty - 8,  tRight ? 'end' : 'start'],
+          [tx_ + (tRight ? 7 : -7), ty - 8,  tRight ? 'start' : 'end'],
+          [tx_ + (tRight ? 7 : -7), ty + 13, tRight ? 'start' : 'end'],
+          [tx_, ty + 24, 'middle'],
+          [tx_, ty - 19, 'middle']
+        ]);
+      }
+      /* ---- the time served, drawn on the axis it happened on ----
+         The pink zone already says "under water" but says nothing about for how long or
+         when, and those were the two figures the card stack above the chart existed to
+         carry. A bracket spanning the longest unbroken run puts the duration where the
+         duration is, so its length is the picture and the number is the caption. */
+      if (sim.worstRun > 1 && sim.worstRunStart >= 0) {
+        var ux1 = x(sim.worstRunStart), ux2 = x(sim.worstRunStart + sim.worstRun - 1);
+        var uy = yM(1) + 9;
+        s += '<g class="pb-under">' +
+          ln(ux1, uy, ux2, uy, 'pb-under-l') +
+          ln(ux1, uy - 3.5, ux1, uy + 3.5, 'pb-under-l') +
+          ln(ux2, uy - 3.5, ux2, uy + 3.5, 'pb-under-l') + '</g>';
+        /* Centred on the span, then pulled inside the panel: a short run near either edge
+           would otherwise hang its caption off the chart. */
+        var uMid = Math.min(Math.max((ux1 + ux2) / 2, x0 + 34), x0 + panelW - 34);
+        var uStr = sim.worstRun + ' days under';
+        s += place(uStr, 'pb-under-t', 9.5, [
+          [uMid, uy + 13, 'middle'],
+          [uMid, uy + 25, 'middle'],
+          [ux1 + 3, uy + 13, 'start'],
+          [ux2 - 3, uy + 13, 'end'],
+          [ux1 + 3, uy + 25, 'start'],
+          [ux2 - 3, uy + 25, 'end'],
+          [uMid, uy - 14, 'middle']
+        ]);
+      }
+      /* The day it got back above and stayed there — a tick on the water line, because
+         that is the day the waiting actually ended. */
+      if (sim.alive && sim.heldUp > sim.startDay && sim.underDays > 0) {
+        var hx = x(sim.heldUp), hRight = hx > x0 + panelW - 110;
+        var hStr = 'above for good D+' + sim.heldUp;
+        s += ln(hx, yM(1) - 6, hx, yM(1) + 6, 'pb-recov');
+        s += place(hStr, 'pb-recov-t', 9.5, [
+          [hx + (hRight ? -3 : 3), yM(1) - 10, hRight ? 'end' : 'start'],
+          [hx + (hRight ? 3 : -3), yM(1) - 10, hRight ? 'start' : 'end'],
+          [hx + (hRight ? -3 : 3), yM(1) - 22, hRight ? 'end' : 'start']
+        ]);
       }
 
       [0, 60, 120, 180, 240].forEach(function (d) {
@@ -618,20 +942,112 @@
         '<em>' + esc(lands) + '</em></button>';
     }).join('');
 
+    /* ---------- the table the playbook is written in, run on history ----------
+       Every other panel below runs the entry the reader has picked. These rows run the plan
+       as written: each band takes its own size, schedule and leverage through both listings
+       day by day, on the same intended size, so the five instructions can be read next to
+       what they would have done. Nothing has to be clicked to read it.
+
+       Size and duration are back in this table after being cut from it. They were removed
+       as a third copy of 60% / 30d, and that was right while the row said nothing; now the
+       row carries a result those two figures produced, and a result whose inputs are off
+       screen cannot be checked.
+
+       One row is a like-for-like test and four are not, which is said in the lead rather
+       than left to be reconstructed: the band an FDV lands in is what picks the instruction,
+       and both comparables listed inside one band. */
+    var landed = {};
+    LISTED.forEach(function (L) {
+      var lk = bandFor(L.v).k;
+      (landed[lk] = landed[lk] || []).push(L);
+    });
+    var histSims = {}, histBoth = [];
+    if (P) BANDS.forEach(function (x2) {
+      if (x2.days <= 0 || x2.lev <= 0) return;
+      histSims[x2.k] = {
+        hype: simulate(P.hype, x2.days, x2.lev, true),
+        lit:  simulate(P.lit,  x2.days, x2.lev, true)
+      };
+      if (histSims[x2.k].hype.alive && histSims[x2.k].lit.alive) histBoth.push(x2);
+    });
+
     var bandRows = BANDS.map(function (x2) {
       var lo = x2.min === 0 ? 'Below' : usdB(x2.min);
       var hi = x2.max === Infinity ? '' : ' – ' + usdB(x2.max);
       var rng = x2.min === 0 ? 'Below ' + usdB(x2.max) : (x2.max === Infinity ? 'Above ' + usdB(x2.min) : lo + hi);
       var on = x2 === b;
-      return '<tr class="pb-row' + (on ? ' on' : '') + '" data-band="' + x2.k + '">' +
-        '<td class="pb-rng"><b>' + esc(rng) + '</b><small>' + esc(x2.label) + '</small></td>' +
-        /* Size and duration are the staircase above; reprinting them here made three
-           copies of 60% / 30d on one page. Leverage is the one figure the ladder cannot
-           carry, so that column stays. */
+      var margin = state.size * x2.size / 100;
+      var s2 = histSims[x2.k];
+      var here = landed[x2.k];
+      /* The two dots are the accents the price charts use for the same two listings, so the
+         mark reads as "this is where they actually were" rather than as decoration. */
+      var mark = !here ? '' : '<em class="pb-btland">' +
+        here.map(function (L) { return '<i class="' + L.cls + '"></i>'; }).join('') +
+        '<span>' + (here.length > 1 ? 'both listed here'
+          : here[0].cls === 'hype' ? 'HYPE listed here' : 'LIT listed here') + '</span></em>';
+      /* Same wording as the leverage table below, deliberately: one shape for "this is what
+         the money did" across the page, and one dictionary entry behind it. */
+      var cell = function (k) {
+        if (!P) return '<td class="pb-n out"><b>—</b></td>';
+        if (!s2) return '<td class="pb-n out"><b>—</b><small>price ended ' +
+          pnl(P[k][P[k].length - 1]) + '</small></td>';
+        var sm = s2[k];
+        return sm.alive
+          ? '<td class="pb-n"><b>' + usd(sm.finalEq * margin) + '</b><small>' + pnl(sm.finalEq) +
+            ' · dipped to ' + usd(sm.trough * margin) + '</small></td>'
+          : '<td class="pb-n dead"><b>liquidated</b><small>D+' + sm.liqDay + ' · lost ' +
+            usd(margin) + '</small></td>';
+      };
+      var alive2 = s2 ? (s2.hype.alive ? 1 : 0) + (s2.lit.alive ? 1 : 0) : -1;
+      var verd = alive2 < 0
+        ? '<em class="pb-st wait">stayed out</em>'
+        : '<em class="pb-st ' + (alive2 === 2 ? 'on' : alive2 === 1 ? 'half' : 'wait') + '">' +
+          (alive2 === 2 ? 'survived both' : alive2 === 1 ? 'one only' : 'neither') + '</em>';
+      return '<tr class="pb-row' + (on ? ' on' : '') + (here ? ' landed' : '') +
+        '" data-band="' + x2.k + '">' +
+        '<td class="pb-rng"><b>' + esc(rng) + '</b><small>' + esc(x2.label) + '</small>' + mark + '</td>' +
         '<td class="pb-quote">“' + esc(x2.quote) + '”</td>' +
-        '<td class="pb-n">' + (x2.lev ? x2.lev + '×' + DEG : '—') + '</td>' +
+        '<td class="pb-set">' + (x2.lev
+          ? '<b>' + x2.lev + '×' + DEG + '</b><small>' + x2.size + '% of size over ' + x2.days + ' days</small>'
+          : '<b>—</b><small>no position</small>') + '</td>' +
+        cell('hype') + cell('lit') +
+        '<td class="pb-n">' + verd + '</td>' +
         '</tr>';
     }).join('');
+
+    /* The finding the table is worth reading for, stated before it rather than left to be
+       spotted: both comparables listed inside the same band, and on this data that band is
+       the only one of the five that came out of both paths alive. Every figure in it is
+       computed, and the claim itself is guarded — if the series or the bands change so that
+       it stops being true, the neutral reading is rendered instead of a stale headline. */
+    var histLead = '';
+    if (P) {
+      var lkeys = Object.keys(landed);
+      var oneB = lkeys.length === 1 ? BANDS.filter(function (x2) { return x2.k === lkeys[0]; })[0] : null;
+      if (oneB && histBoth.length === 1 && histBoth[0] === oneB && histSims[oneB.k]) {
+        var m1 = state.size * oneB.size / 100, sl1 = histSims[oneB.k].lit;
+        var ceil1 = Math.min(maxSurvivable(P.hype, oneB.days), maxSurvivable(P.lit, oneB.days));
+        var deaths = BANDS.filter(function (x2) { return histSims[x2.k] && !histSims[x2.k].lit.alive; })
+          .map(function (x2) { return 'day ' + histSims[x2.k].lit.liqDay; }).join(', ');
+        histLead =
+          '<h4>Both comparables listed inside one band, and it is the only row of the five that survived both</h4>' +
+          '<p>HYPE listed at $' + (LISTED[0].v / 1e9).toFixed(2) + 'B and Lighter at $' +
+          (LISTED[1].v / 1e9).toFixed(2) + 'B, so the ladder hands both the same instruction — ' +
+          oneB.label.toLowerCase() + ': ' + oneB.size + '% of the intended size, over ' + oneB.days +
+          ' days, at ' + oneB.lev + '×.</p>' +
+          '<p>It survived the LIT path by nothing at all: ' + ceil1 + '× is the most a ' + oneB.days +
+          '-day entry could carry there, and ' + usdExact(m1) + ' of margin was down to ' +
+          usdExact(sl1.trough * m1) + ' before it ended at ' + usdExact(sl1.finalEq * m1) +
+          '. Every band that takes more size or more leverage was liquidated on that same path — ' +
+          deaths + '.</p>';
+      } else {
+        histLead = '<h4>What each band’s own words would have done</h4>' +
+          '<p>Each row takes its band’s size, schedule and leverage through both listings day by day. Where a listing actually landed in the band, the row is marked.</p>';
+      }
+      histLead = '<div class="pb-btlead"><span class="pb-eyebrow">The same table, run on history</span>' +
+        histLead +
+        '<p class="pb-btcav">Only the marked row is a like-for-like test. The band an FDV lands in is what picks the instruction, so the other four hold the price path fixed and swap the instruction — what those words would have done to this money, not what would have happened had VAR listed there. Deploy share scales the dollars and nothing else, so the shape of every row holds at whatever size you bring.</p></div>';
+    }
 
     var chart = P && p.days > 0 && p.lev > 0 ? equityChart(P, p, budget) : null;
     /* Two opposite outcomes on one chart — rich on HYPE, wiped out on LIT — is a coin flip,
@@ -780,6 +1196,28 @@
         }).join('') + '</div></div>';
     }
 
+    /* ---------- the same four facts, melted into the chart ----------
+       These were a stack of cards above the survivability chart: average entry, the price
+       from that entry, the money from what went in, the day it came back and the longest
+       stretch under water. Every one of them is a fact about a point in time or a level on
+       an axis, and the chart already draws both axes — so a card stack meant reading a
+       figure in one place and finding where it sat in another.
+
+       They now live on the chart itself (see equityChart): the average entry line carries
+       its own distance from the listing price, the worst close and the deepest equity point
+       are marked where they happened, the longest unbroken run under water is a bracket
+       whose length is the duration, and the day the money got back above for good is a tick
+       on the water line. Only the note survives as prose, because it is the one part that
+       is not a coordinate: which percentage is which. */
+    var holdNote = '';
+    if (chart && budget > 0) {
+      holdNote =
+        '<div class="pb-note pb-holdnote"><b>Two different percentages on this chart.</b> ' +
+        'The top row is the token, measured from your own average entry rather than from the listing price — nobody in this plan pays the listing price, they pay the average of ' +
+        p.days + ' daily clips. The bottom row is the account: the same move carried at ' + p.lev +
+        '× with funding taken off it. At ' + p.lev + '× the second is the larger number in both directions, which is the whole reason the bracket under the water line matters — the price is what you wait on, the money is what you have to watch while you wait. Days are daily closes; an intraday wick is not counted.</div>';
+    }
+
     var monitors = [
       { k: 'wallets', status: 'after TGE', statusCls: 'wait',
         head: 'Top 100 airdropped wallets',
@@ -865,11 +1303,15 @@
       '<div class="pb-marks">' + markChips + '</div>' +
       '<div class="pb-note pb-marks-note">A range is one estimate priced off both of Lighter’s TGE anchors — the listing candle at $4.00B and CoinGecko’s first point eight days later. One number, two readings; not two estimates.</div>' +
 
-      '<div class="pb-tablewrap"><table class="pb-table"><thead><tr>' +
-      '<th>Listing FDV</th><th>The playbook, in its own words</th><th>Leverage</th>' +
+      histLead +
+      '<div class="pb-tablewrap"><table class="pb-table pb-bt"><thead><tr>' +
+      '<th>Listing FDV</th><th>The playbook, in its own words</th><th>The entry it implies</th>' +
+      '<th>HYPE path</th><th>LIT path</th><th>Verdict</th>' +
       '</tr></thead><tbody>' + bandRows + '</tbody></table></div>' +
       '<div class="pb-note">Figures marked ' + DEG +
       ' are not in the playbook: it gives the five FDV boundaries, &ldquo;1 month&rdquo;, &ldquo;over a month or more&rdquo;, &ldquo;the first week&rdquo; and &ldquo;low leverage&rdquo;, nothing else. Sizes, days and leverage are read from those words and are adjustable below.</div>' +
+
+      peBlock() +
 
       '<div class="bw-head"><b>The Entry</b><span><i>what &ldquo;TWAP in on low leverage&rdquo; costs, commits, and survives</i></span></div>' +
       '<div class="pb-chips"><span>Intended size</span>' + sizeChips +
@@ -931,8 +1373,10 @@
         '<span class="mk liq"><i></i>your liquidation price</span>' +
         '<span class="up"><i></i>money above what went in</span>' +
         '<span class="down"><i></i>below it</span>' +
+        '<span class="mk under"><i></i>longest stretch under water</span>' +
         '<span class="win"><i></i>the TWAP window</span></div>' +
         chart.svg +
+        holdNote +
         levTable +
         actCards +
         ''
@@ -947,7 +1391,7 @@
       '<p>Total supply, day-one float, the unlock schedule and the listing date are all unannounced, and every one of them moves the FDV this whole ladder is indexed on. So does whether a VAR perp exists and is liquid at listing, whether public OLP is live, and whether VAR is accepted as collateral — steps 2, 3 and 4 of the playbook each assume one of those. The two anchors for Lighter’s own TGE differ by 47% and this site currently carries both. Nothing here is a price target, and none of it is advice. As of ' + ASOF + '.</p></div>';
 
     /* ---------- events ---------- */
-    host.querySelectorAll('.pb-chips button,.pb-marks button,.pb-act,tr[data-lev]').forEach(function (el) {
+    host.querySelectorAll('.pb-chips button,.pb-marks button,.pb-act,tr[data-lev],tr.pb-perow').forEach(function (el) {
       el.addEventListener('click', function () {
         var d = el.dataset;
         if (d.fdv) { state.fdv = Number(d.fdv); state.lev = state.days = state.sizePct = null; }
@@ -1170,6 +1614,71 @@
     'body.theme-light .pb-verd.ok>b{color:#0e7a52}body.theme-light .pb-verd.warn>b{color:#9a6300}',
     'body.theme-light .pb-verd.dead>b{color:#c22a4c}',
     '@media(max-width:820px){.pb-group{grid-template-columns:1fr}}',
+
+    /* ---- annotations melted onto the survivability chart ----
+       Everything here labels a point the chart already plots, so the type is small and the
+       colour is borrowed from the series it belongs to. Nothing is filled: a marker that
+       competes with the line it sits on defeats the reason for putting it there. */
+    '.pb-eq .pb-worst,.pb-eq .pb-trough{fill:none;stroke-width:1.6}',
+    '.pb-eq .pb-worst.hype,.pb-eq .pb-trough.hype{stroke:#4fd6c3}',
+    '.pb-eq .pb-worst.lit,.pb-eq .pb-trough.lit{stroke:#b98cff}',
+    '.pb-eq .pb-worst-t,.pb-eq .pb-trough-t{fill:var(--muted);font:700 9.5px var(--mono);letter-spacing:.2px}',
+    '.pb-eq .pb-pxend{font:800 10px var(--mono);letter-spacing:.2px}',
+    '.pb-eq .pb-pxend.hype{fill:#4fd6c3}.pb-eq .pb-pxend.lit{fill:#b98cff}',
+    /* The bracket is the duration: its length is the answer and the caption only names it. */
+    '.pb-eq .pb-under-l{stroke:#f7b955;stroke-width:1.4}',
+    '.pb-eq .pb-under-t{fill:#f7b955;font:800 9.5px var(--mono);letter-spacing:.3px}',
+    '.pb-eq .pb-recov{stroke:#4fd39a;stroke-width:1.6;stroke-dasharray:3 2}',
+    '.pb-eq .pb-recov-t{fill:#4fd39a;font:700 9.5px var(--mono);letter-spacing:.2px}',
+    'body.theme-light .pb-eq .pb-under-l{stroke:#9a6300}',
+    'body.theme-light .pb-eq .pb-under-t{fill:#9a6300}',
+    'body.theme-light .pb-eq .pb-recov{stroke:#0e7a52}',
+    'body.theme-light .pb-eq .pb-recov-t{fill:#0e7a52}',
+    'body.theme-light .pb-eq .pb-worst-t,body.theme-light .pb-eq .pb-trough-t{fill:var(--muted)}',
+    '.pb-legend .mk.under i{background:#f7b955}',
+    'body.theme-light .pb-legend .mk.under i{background:#9a6300}',
+    '.pb-holdnote{margin-top:10px}',
+
+    /* ---- the comparables, priced ---- */
+    /* .pb-hname outlived the hold cards it was written for: the two comparable cards still
+       use it for their venue name. */
+    '.pb-hname{display:block;margin:0 0 10px;color:var(--muted)!important;font:800 9px var(--mono);',
+    'letter-spacing:.9px;text-transform:uppercase}',
+    '.pb-pecomp{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px;margin:0 0 12px}',
+    '.pb-pec{padding:13px 16px;border:1px solid var(--line);border-left:3px solid var(--muted);',
+    'background:rgba(255,255,255,.015);background:color-mix(in srgb,var(--panel) 74%,transparent);min-width:0}',
+    '.pb-pec.lit{border-left-color:#b98cff}.pb-pec.hype{border-left-color:#4fd6c3}',
+    '.pb-pecg{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:0 0 9px}',
+    '.pb-pecg>div>span{display:block;color:var(--muted)!important;font:800 9px var(--mono);',
+    'letter-spacing:.8px;text-transform:uppercase}',
+    '.pb-pecg>div>strong{display:block;margin-top:5px;color:var(--text);font:800 25px/1 var(--mono);',
+    'letter-spacing:-.9px;font-variant-numeric:tabular-nums}',
+    '.pb-pec>small{display:block;color:var(--muted)!important;font-size:10.5px;line-height:1.5}',
+    '.pb-pebasis{margin-top:3px;color:var(--dim)!important}',
+    /* The dashboard sets table{min-width:680px} globally and auto layout then hands the
+       widest column whatever it asks for, which collapsed the label column to one word per
+       line and pushed the last two columns off the panel. Fixed layout with declared widths
+       is the fix; min-width:0 keeps the global rule from reintroducing the scroll. */
+    '.pb-petable{min-width:0;table-layout:fixed;width:100%}',
+    /* Widths are set from what each sub-line needs on one line, not from the headers:
+       "÷ 9,167,500 pts" and "÷ 25% · 120× FDV" are the two that decide columns 4 and 5,
+       and starving them turned a one-line qualifier into a three-line stack. */
+    '.pb-petable col.c1{width:20%}.pb-petable col.c2{width:21%}.pb-petable col.c3{width:12%}',
+    '.pb-petable col.c4{width:18%}.pb-petable col.c5{width:15%}.pb-petable col.c6{width:14%}',
+    '.pb-petable th,.pb-petable td{vertical-align:top;word-break:normal;overflow-wrap:anywhere}',
+    '.pb-petable td>b{font:800 17px/1.15 var(--mono);letter-spacing:-.5px;font-variant-numeric:tabular-nums}',
+    /* .pb-n sets white-space:nowrap so a figure never breaks mid-number. The sub-lines are
+       prose and inherit it, which under fixed layout made them run straight out of the cell
+       and across the next two columns. The figure keeps nowrap; the prose under it wraps. */
+    '.pb-petable td>small{display:block;margin-top:3px;white-space:normal;color:var(--dim)!important;',
+    'font-size:10px;line-height:1.4}',
+    '@media(max-width:900px){.pb-petable{table-layout:auto;min-width:620px}}',
+    '.pb-pelike{color:var(--muted)!important;font-weight:700}',
+    '.pb-perow{cursor:pointer}',
+    '.pb-perow:hover{background:color-mix(in srgb,var(--accent) 7%,transparent)}',
+    '.pb-peband{display:inline-block;padding:2px 7px;border:1px solid var(--line);',
+    'color:var(--text);font:800 10px var(--mono);letter-spacing:.3px;white-space:nowrap}',
+    '.pb-pecav{margin-top:2px}',
     '.pb-readout{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin:2px 0 14px}',
     '.pb-ro{padding:13px 15px;border:1px solid var(--line);background:var(--panel);min-width:0}',
     '.pb-ro>span{display:block;color:var(--muted)!important;font:800 9px var(--mono);letter-spacing:.8px;text-transform:uppercase}',
@@ -1289,6 +1798,40 @@
     '.pb-levtable td.pb-rng>b{font:800 15px var(--mono)}',
     '.pb-levtable td.pb-rng>small{display:block;margin-top:2px;color:var(--v2-accent,#4c9af8)!important;',
     'font:700 9px var(--mono);letter-spacing:.6px;text-transform:uppercase}',
+
+    /* the band table once it carries its own history: five outcome columns beside the
+       quote, so the quote gives up width and the numbers get their own block layout */
+    '.pb-btlead{margin:0 0 14px;padding:16px 18px;border:1px solid var(--line);',
+    'border-left:3px solid var(--v2-accent,#4c9af8);background:rgba(255,255,255,.02);',
+    'background:color-mix(in srgb,var(--panel) 88%,transparent)}',
+    '.pb-btlead h4{margin:9px 0 9px;color:var(--text);font:800 19px/1.32 var(--sans);letter-spacing:-.015em}',
+    '.pb-btlead p{margin:0 0 8px;color:var(--muted)!important;font-size:12.5px;line-height:1.7}',
+    '.pb-btlead p:last-child{margin:0}',
+    '.pb-btlead p.pb-btcav{margin-top:10px;padding-top:10px;border-top:1px solid var(--line);',
+    'color:var(--dim)!important;font-size:11px;line-height:1.65}',
+    '.pb-bt td{padding:13px 9px}',
+    '.pb-bt td.pb-quote{min-width:168px;font-size:11.5px;line-height:1.5}',
+    '.pb-bt td.pb-rng{min-width:148px}',
+    /* the implied-entry column reads as an instruction, so it is set left like the quote
+       beside it — the header has to follow or the column looks unaligned */
+    '.pb-bt th:nth-child(3){text-align:left}',
+    '.pb-bt td.pb-set{text-align:left!important;min-width:124px}',
+    '.pb-bt td.pb-set>b{display:block;color:var(--text);font:800 14px var(--mono);letter-spacing:-.3px}',
+    '.pb-bt td.pb-set>small,.pb-bt td.pb-n>small{display:block;margin-top:3px;margin-left:0;',
+    'color:var(--muted)!important;font:600 10px var(--mono);letter-spacing:-.1px}',
+    '.pb-bt td.pb-n>b{display:block;color:var(--text);font:800 14px var(--mono);letter-spacing:-.4px}',
+    '.pb-bt td.pb-n.dead>b{color:#ff6b8b}',
+    'body.theme-light .pb-bt td.pb-n.dead>b{color:#c22a4c}',
+    '.pb-bt td.pb-n.out>b{color:var(--dim)!important}',
+    /* the row where the two real listings landed. :not(.on) so the selected-band highlight
+       still wins on the row that is both — otherwise the more specific rule hides it. */
+    '.pb-bt tr.landed:not(.on) td{background:rgba(76,154,248,.045)}',
+    'body.theme-light .pb-bt tr.landed:not(.on) td{background:rgba(76,154,248,.06)}',
+    '.pb-btland{display:flex;align-items:center;gap:5px;margin-top:7px;font-style:normal}',
+    '.pb-btland i{width:7px;height:7px;border-radius:50%;flex:0 0 auto}',
+    '.pb-btland i.hype{background:#4fd6c3}.pb-btland i.lit{background:#b98cff}',
+    '.pb-btland span{color:var(--v2-accent,#4c9af8)!important;font:800 8px var(--mono);',
+    'letter-spacing:.4px;text-transform:uppercase;line-height:1.3}',
 
     '.pb-sigs{margin:0 0 22px;border-top:1px solid var(--line)}',
     '.pb-sig{display:grid;grid-template-columns:26px minmax(0,1fr) auto;column-gap:12px;row-gap:5px;',
