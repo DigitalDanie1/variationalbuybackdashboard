@@ -1355,20 +1355,25 @@ function renderKing(){
    A/B reproduce the Perpetual Pulse "Circulating MarketCap vs OI" model (R^2~0.74, log-log). */
 const VAL_FIT={A:10.0339,B:0.8753,r2:0.74};
 const VAL_FLOAT=0.25; // assumed circulating float at TGE, for FDV
-let VAL_MCAP_ASOF='CoinGecko snapshot · 2026-08-01 18:35 SGT';
+let VAL_MCAP_ASOF='CoinGecko snapshot · 2026-10-04 22:36 SGT';
+/* Baked fallback for when the live CoinGecko call is rate-limited or CORS-blocked, which
+   happens often enough that this snapshot is what most readers actually see. It had been
+   sitting on 2026-08-01 while HYPE went from $52.1B to $86.0B and Lighter from $2.0B to
+   $3.5B, so the FDV preset chips were quoting two-month-old comparables as if they were
+   today's. Refreshed from the live board; oi values are left as last observed. */
 const VAL_COMPS=[
-  {n:'Hyperliquid',cg:'hyperliquid',oi:10650289066,mc:11599713040,fdv:52137671327,big:1},
-  {n:'Aster',cg:'aster-2',oi:1873558499,mc:1605324651,fdv:4667103076,big:1},
-  {n:'Lighter',cg:'lighter',oi:841224409,mc:509610389,fdv:2038441555,big:1},
-  {n:'Jupiter',cg:'jupiter-exchange-solana',oi:231885286,mc:636595444,fdv:1315717088,big:1},
-  {n:'edgeX',cg:'edgex',oi:297961154,mc:124286369,fdv:355103912},
-  {n:'dYdX',cg:'dydx-chain',oi:39069154,mc:95435590,fdv:107776514},
-  {n:'GMX',cg:'gmx',oi:45194812,mc:62567571,fdv:62567571},
-  {n:'ApeX Protocol',cg:'apex-token-2',oi:113429724,mc:32226080,fdv:220516983},
-  {n:'Avantis',cg:'avantis',oi:12551268,mc:27915130,fdv:83387800},
-  {n:'Orderly',cg:'orderly-network',oi:35976834,mc:11242088,fdv:28215849},
-  {n:'Gains Network',cg:'gains-network',oi:3337198,mc:11758338,fdv:11758338},
-  {n:'Drift',cg:'drift-protocol',oi:123964778,mc:9022464,fdv:12178493}
+  {n:'Hyperliquid',cg:'hyperliquid',oi:17059298032,mc:20028524831,fdv:86013756843,big:1},
+  {n:'Aster',cg:'aster-2',oi:2577523349,mc:1923676784,fdv:5532763922,big:1},
+  {n:'Lighter',cg:'lighter',oi:1191618484,mc:886982806,fdv:3547931224,big:1},
+  {n:'Jupiter',cg:'jupiter-exchange-solana',oi:231885286,mc:1095988006,fdv:2265522873,big:1},
+  {n:'edgeX',cg:'edgex',oi:460453045,mc:165106698,fdv:471733424},
+  {n:'dYdX',cg:'dydx-chain',oi:39069154,mc:125275641,fdv:141895548},
+  {n:'GMX',cg:'gmx',oi:49634401,mc:87177536,fdv:87177536},
+  {n:'ApeX Protocol',cg:'apex-token-2',oi:154933749,mc:35979277,fdv:115982009},
+  {n:'Avantis',cg:'avantis',oi:12551268,mc:44950104,fdv:126681378},
+  {n:'Orderly',cg:'orderly-network',oi:35976834,mc:15944812,fdv:38897482},
+  {n:'Gains Network',cg:'gains-network',oi:3337198,mc:9959809,fdv:9959809},
+  {n:'Drift',cg:'drift-protocol',oi:123964778,mc:14274783,fdv:19933113}
 ];
 const valPred=oi=>VAL_FIT.A*Math.pow(oi,VAL_FIT.B);
 function fmtBig(v){return v>=1e9?'$'+(v/1e9).toFixed(2)+'B':v>=1e6?'$'+(v/1e6).toFixed(0)+'M':'$'+fmtK(v);}
@@ -2125,6 +2130,29 @@ const BW_METRIC_DEFS=[
   {g:'Special notes',k:'referralBackfillExcluded',l:'Older referral payment not counted (about)',t:'usd'}
 ];
 const BW_CORE_KEYS=['totalVolume','oi','tvl','dau','wau','netProfit2w','olpPnlLife','treasuryHoldings'];
+/* ---------- chart 19 headline ----------
+   The card used to be titled "Revenue vs market regime" — a neutral noun phrase that named
+   the axes and stated nothing, while every other heading on this page is a sentence with a
+   finding in it. The split it draws does carry a finding, so the finding becomes the title
+   and is recomputed from the data, which means it flips on its own if the relationship does.
+   The S&P split is used for the headline because it is the balanced one: BTC-down windows
+   are a handful of observations and cannot carry a claim on their own. */
+function marketRegimeRead(mrRows){
+  const avg=(a,k)=>a.length?a.reduce((s,r)=>s+r[k],0)/a.length:null;
+  const up=mrRows.filter(r=>r.spxRet>0), down=mrRows.filter(r=>r.spxRet<=0);
+  const bUp=mrRows.filter(r=>r.btcRet>0), bDown=mrRows.filter(r=>r.btcRet<=0);
+  const su=avg(up,'spreads2w'), sd=avg(down,'spreads2w');
+  const nu=avg(up,'netProfit2w'), nd=avg(down,'netProfit2w');
+  const gap=(Number.isFinite(su)&&Number.isFinite(sd)&&su)?(sd/su-1):null;
+  const thin=Math.min(up.length,down.length)<5||Math.min(bUp.length,bDown.length)<5;
+  let title;
+  if(gap===null) title='Revenue against market direction';
+  else if(gap>=0.08) title='The buyback does not need a rising market';
+  else if(gap<=-0.08) title='The buyback leans on a rising market';
+  else title='Market direction does not move the buyback';
+  return {up,down,bUp,bDown,su,sd,nu,nd,gap,thin,title};
+}
+
 /* ---------- Revenue vs market regime card (chart 19) ----------
    Built from mrRows (one entry per official report with spreads2w, joined to the
    BTC / S&P 500 window return computed in renderBiweeklyResearch). Kept as a standalone
@@ -2139,7 +2167,7 @@ function renderMarketRegimeCard(mrRows,pearson,esc,nfmt,finite){
   const rChg=pearson(chgSpreads,chgBtc);
 
   /* (a) BTC / S&P indexed to 100 at the first window start, shaded by BTC direction */
-  const w=620,hTop=200,P={l:48,r:18,t:14,b:24};
+  const w=620,hTop=210,P={l:48,r:18,t:14,b:24};
   const baseDate='2026-02-20',endDate=mrRows.at(-1).asOf;
   const btcByDate={}; MARKET_BTC.forEach(([d,c])=>{btcByDate[d]=c;});
   const dates=MARKET_BTC.map(x=>x[0]).filter(d=>d>=baseDate&&d<=endDate);
@@ -2158,7 +2186,7 @@ function renderMarketRegimeCard(mrRows,pearson,esc,nfmt,finite){
   const lineSvg=`<svg viewBox="0 0 ${w} ${hTop}" role="img" class="mr-line">${bands}${gridRows}<path class="series-a" d="${pathOf(btcIdxArr)}"/><path class="series-b" d="${pathOf(spxIdxArr)}"/><text class="axis" x="${P.l}" y="${hTop-6}">${baseDate.slice(5)}</text><text class="axis" x="${w-P.r}" y="${hTop-6}" text-anchor="end">${endDate.slice(5)}</text></svg>`;
 
   /* (b) gross spreads per report (bars) with net profit overlaid as a dot, same x domain as (a) */
-  const hBars=190,bP={l:48,r:18,t:16,b:26};
+  const hBars=210,bP={l:48,r:18,t:16,b:26};
   const maxSpread=Math.max(...mrRows.map(r=>r.spreads2w));
   const by=v=>bP.t+(hBars-bP.t-bP.b)*(1-v/maxSpread);
   const barW=13;
@@ -2174,16 +2202,41 @@ function renderMarketRegimeCard(mrRows,pearson,esc,nfmt,finite){
   const spxUp=mrRows.filter(r=>r.spxRet>0),spxDown=mrRows.filter(r=>r.spxRet<=0);
   const avg=(arr,k)=>arr.length?arr.reduce((s,r)=>s+r[k],0)/arr.length:null;
   const tile=(label,valueHtml,sub)=>`<div class="tile"><span>${label}</span>${valueHtml}${sub?`<small>${sub}</small>`:''}</div>`;
-  const tiles=[
-    tile('BTC-up windows',`<b class="up">${money(avg(up,'spreads2w'))}</b>`,`n=${up.length} avg spreads &middot; net ${money(avg(up,'netProfit2w'))}`),
-    tile('BTC-down windows',`<b class="dn">${money(avg(down,'spreads2w'))}</b>`,`n=${down.length} avg spreads &middot; net ${money(avg(down,'netProfit2w'))}`),
-    tile('S&amp;P-up windows',`<b class="up">${money(avg(spxUp,'spreads2w'))}</b>`,`n=${spxUp.length} avg spreads &middot; net ${money(avg(spxUp,'netProfit2w'))}`),
-    tile('S&amp;P-down windows',`<b class="dn">${money(avg(spxDown,'spreads2w'))}</b>`,`n=${spxDown.length} avg spreads &middot; net ${money(avg(spxDown,'netProfit2w'))}`),
-    tile('r &middot; spreads vs BTC return',`<b>${finite(rBtc)?rBtc.toFixed(2):'—'}</b>`,classify(rBtc)),
-    tile('r &middot; spreads vs S&amp;P return',`<b>${finite(rSpx)?rSpx.toFixed(2):'—'}</b>`,classify(rSpx)),
-    tile('r &middot; spreads vs BTC 14d vol',`<b>${finite(rVol)?rVol.toFixed(2):'—'}</b>`,classify(rVol)),
-    tile('r &middot; trend-free change vs BTC ret',`<b>${finite(rChg)?rChg.toFixed(2):'—'}</b>`,classify(rChg)+' &middot; removes the revenue growth trend')
-  ].join('');
+  /* The four averages were four equal tiles, which is the one layout that hides a
+     comparison: the reader had to pick two of them out and divide. They are now two
+     explicit pairs — market up beside market down — with the gap stated once, and the
+     correlation coefficients drop to a second row where an analyst can still find them. */
+  const read=marketRegimeRead(mrRows);
+  const pairGap=(a,b)=>finite(a)&&finite(b)&&a?`${b>=a?'+':''}${((b/a-1)*100).toFixed(0)}%`:'—';
+  const thinNote=n=>n<5?` &middot; <b class="mr-thin">only ${n} windows</b>`:'';
+  const pair=(label,upArr,dnArr,note)=>
+    `<div class="mr-pair"><span class="mr-pair-h">${label}</span><div class="mr-pair-g">`+
+    `<div><span>Market rose</span><b>${money(avg(upArr,'spreads2w'))}</b>`+
+      `<small>n=${upArr.length} &middot; net ${money(avg(upArr,'netProfit2w'))}${thinNote(upArr.length)}</small></div>`+
+    `<div><span>Market fell</span><b>${money(avg(dnArr,'spreads2w'))}</b>`+
+      `<small>n=${dnArr.length} &middot; net ${money(avg(dnArr,'netProfit2w'))}${thinNote(dnArr.length)}</small></div>`+
+    `<div class="mr-pair-d"><span>Difference</span>`+
+      `<b class="${(avg(dnArr,'spreads2w')>=avg(upArr,'spreads2w'))?'up':'dn'}">`+
+      `${pairGap(avg(upArr,'spreads2w'),avg(dnArr,'spreads2w'))}</b>`+
+      `<small>spreads in falling windows${note?' &middot; '+note:''}</small></div>`+
+    `</div>`+
+    /* Spreads are the input nobody holds. What a token holder actually receives is the
+       treasury share of them, and the treasury is spent entirely on buying VAR back — so
+       the same two averages are restated in that unit, which is the one that matters. */
+    `<div class="mr-pair-b"><span>Buyback fuel</span>`+
+      `<em>market rose</em><b>${money(avg(upArr,'spreads2w')*MKT.spreadShare)}</b>`+
+      `<em>market fell</em><b>${money(avg(dnArr,'spreads2w')*MKT.spreadShare)}</b>`+
+      `<small>treasury inflow per fortnight &middot; ${(MKT.spreadShare*100).toFixed(0)}% of spreads, all of it spent on buybacks</small>`+
+    `</div></div>`;
+  const tiles=
+    pair('S&amp;P 500 windows',spxUp,spxDown,'the balanced split')+
+    pair('BTC windows',up,down,'read with care')+
+    `<details class="mr-stats"><summary>Correlation coefficients</summary><div class="bw-mr-tiles">`+
+    [tile('r &middot; spreads vs BTC return',`<b>${finite(rBtc)?rBtc.toFixed(2):'—'}</b>`,classify(rBtc)),
+     tile('r &middot; spreads vs S&amp;P return',`<b>${finite(rSpx)?rSpx.toFixed(2):'—'}</b>`,classify(rSpx)),
+     tile('r &middot; spreads vs BTC 14d vol',`<b>${finite(rVol)?rVol.toFixed(2):'—'}</b>`,classify(rVol)),
+     tile('r &middot; trend-free change vs BTC ret',`<b>${finite(rChg)?rChg.toFixed(2):'—'}</b>`,classify(rChg)+' &middot; removes the revenue growth trend')
+    ].join('')+`</div></details>`;
 
   /* (d) auto verdict, built from thresholds so it re-reads correctly if the numbers change.
      Written as one flowing sentence (like the other dynamic READ/note strings in this file)
@@ -2197,13 +2250,31 @@ function renderMarketRegimeCard(mrRows,pearson,esc,nfmt,finite){
   const landing=sameWindow
     ?`landed in BTC’s worst two-week window in this sample (${pctSigned(worstBtcRow.btcRet)} on ${worstBtcRow.asOf})`
     :`landed while BTC returned ${pctSigned(maxRow.btcRet)} (the worst window was ${worstBtcRow.asOf}, BTC ${pctSigned(worstBtcRow.btcRet)})`;
-  const verdict=`<p class="bw-mr-verdict">The relationship between revenue and market direction is <b>${topCls}</b> `+
-    `(|r| under 0.3 counts as weak, 0.3–0.6 as moderate, above 0.6 as strong): spreads correlate at <b>${finite(rBtc)?rBtc.toFixed(2):'—'}</b> with BTC's two-week return `+
-    `and at <b>${finite(rSpx)?rSpx.toFixed(2):'—'}</b> with the S&amp;P 500's. The single largest revenue report on record, <b>${maxRow.asOf} (${money(maxRow.spreads2w)})</b>, ${landing}. `+
-    `BTC realized volatility correlates at <b>${finite(rVol)?rVol.toFixed(2):'—'}</b> with spreads — consistent with volatility and platform growth explaining more of the swing in revenue `+
-    `than plain market direction. With only <b>n=${mrRows.length}</b> two-week windows, treat every correlation here as directional, not conclusive.</p>`;
+  /* Plain finding first, method second. The old paragraph opened by defining what counts as
+     a weak correlation, which is the last thing a reader needs and the first thing they hit. */
+  const gapPct=finite(read.gap)?`${read.gap>=0?'+':''}${(read.gap*100).toFixed(0)}%`:'—';
+  const lead=finite(read.gap)
+    ? (read.gap>=0.08
+        ? `Across ${mrRows.length} two-week windows, the exchange took <b>${gapPct}</b> more in spreads when the S&amp;P 500 fell than when it rose (${money(read.sd)} against ${money(read.su)}, net ${money(read.nd)} against ${money(read.nu)}). Revenue here is paid by trading activity, not by the market going up \u2014 and since ${(MKT.spreadShare*100).toFixed(0)}% of every spread dollar reaches the treasury and the treasury is spent on buying VAR back, the buyback kept running through the falling windows at <b>${money(read.sd*MKT.spreadShare)}</b> a fortnight against <b>${money(read.su*MKT.spreadShare)}</b> in the rising ones.`
+        : read.gap<=-0.08
+        ? `Across ${mrRows.length} two-week windows, spreads ran <b>${gapPct}</b> in falling markets against rising ones (${money(read.sd)} against ${money(read.su)}) — revenue has leaned on a rising market in this sample.`
+        : `Across ${mrRows.length} two-week windows, spreads were within ${gapPct} between rising and falling markets (${money(read.sd)} against ${money(read.su)}). Market direction has not moved revenue either way.`)
+    : 'Not enough windows with both P&amp;L and market data to compare.';
+  const verdict=`<p class="bw-mr-verdict">${lead} `+
+    `The single largest revenue report on record, <b>${maxRow.asOf} (${money(maxRow.spreads2w)})</b>, ${landing}.</p>`+
+    `<p class="bw-mr-verdict mr-method">How this was measured: spreads correlate at <b>${finite(rBtc)?rBtc.toFixed(2):'—'}</b> with BTC\u2019s two-week return, `+
+    `<b>${finite(rSpx)?rSpx.toFixed(2):'—'}</b> with the S&amp;P 500\u2019s, and <b>${finite(rVol)?rVol.toFixed(2):'—'}</b> with BTC realized volatility `+
+    `(|r| under 0.3 is weak, 0.3\u20130.6 moderate, above 0.6 strong) \u2014 consistent with volatility and platform growth explaining more of the swing than direction does. `+
+    `${read.thin?`One side of these splits has fewer than five windows, so the smaller split is directional only. `:''}`+
+    `With <b>n=${mrRows.length}</b> windows in total, treat every figure here as directional, not conclusive.</p>`;
 
-  return `<div class="bw-viz-legend"><span><i class="a"></i>BTC (indexed 100)</span><span><i class="b"></i>S&amp;P 500 (indexed 100)</span><span><i class="mr-sw up"></i>BTC rose that window</span><span><i class="mr-sw dn"></i>BTC fell that window</span></div>${lineSvg}${barsSvg}<div class="bw-mr-tiles">${tiles}</div>${verdict}`;
+    /* Order: finding, then the comparison it rests on, then the revenue series, and the two
+     indexed index lines last — they set context but answer nothing on their own, and at the
+     top they were the first thing between the reader and the point. */
+  return verdict+`<div class="mr-pairs">${tiles}</div>`+barsSvg+
+    `<details class="mr-context"><summary>BTC and S&amp;P 500 over the same windows</summary>`+
+    `<div class="bw-viz-legend"><span><i class="a"></i>BTC (indexed 100)</span><span><i class="b"></i>S&amp;P 500 (indexed 100)</span>`+
+    `<span><i class="mr-sw up"></i>BTC rose that window</span><span><i class="mr-sw dn"></i>BTC fell that window</span></div>${lineSvg}</details>`;
 }
 function renderBiweeklyResearch(){
   const host=$('#bwResearchGrid'); if(!host)return;
@@ -2248,7 +2319,7 @@ function renderBiweeklyResearch(){
   };
   const frame=(num,title,sub,body,wide=false,note='')=>{const rd=READ[num];return `<article class="bw-viz${wide?' wide':''}"><div class="bw-viz-kicker"><span>${String(num).padStart(2,'0')}</span><span>official reports · n=${H.length}</span></div><h3>${title}</h3><p class="bw-viz-sub">${sub}</p>${rd?`<div class="bw-viz-read"><span class="dir ${rd.dir}"><i>${DIRW[rd.dir][0]}</i>${DIRW[rd.dir][1]}</span><span class="what">${rd.text}</span></div>`:''}${body}${note?`<div class="bw-viz-note">${note}</div>`:''}</article>`;};
   const colourKey=`<div class="bw-key"><b>Colour code</b><span><i></i><em>Scale</em> \u2014 volume, open interest, markets</span><span><i class="b"></i><em>Paired series</em> \u2014 the second line in a comparison</span><span><i class="c"></i><em>Profit</em> \u2014 money kept</span><span><i class="d"></i><em>Cost</em> \u2014 money spent running the market</span></div>`;
-  const line=(sets,{w=620,h=245,min=null,max=null,labels=true,area=false}={})=>{
+  const line=(sets,{w=620,h=210,min=null,max=null,labels=true,area=false}={})=>{
     const all=sets.flatMap(s=>s.pts.map(p=>p.v)).filter(finite), lo=min??Math.min(...all),hi=max??Math.max(...all),span=hi-lo||1,P={l:48,r:18,t:15,b:32};
     const indices=sets.flatMap(s=>s.pts.map((p,i)=>finite(p.i)?p.i:i)),xMin=Math.min(...indices),xMax=Math.max(...indices),x=i=>P.l+(w-P.l-P.r)*((i-xMin)/(xMax-xMin||1)),y=v=>P.t+(h-P.t-P.b)*(1-(v-lo)/span);
     const grids=[0,.25,.5,.75,1].map(t=>`<line class="grid" x1="${P.l}" y1="${y(lo+span*t)}" x2="${w-P.r}" y2="${y(lo+span*t)}"/><text class="axis" x="${P.l-7}" y="${y(lo+span*t)+3}" text-anchor="end">${esc(nfmt(lo+span*t))}</text>`).join('');
@@ -2256,8 +2327,8 @@ function renderBiweeklyResearch(){
     const first=sets[0].pts[0]?.d?.slice(2,7)||'',last=sets[0].pts.at(-1)?.d?.slice(2,7)||'';
     return `<svg viewBox="0 0 ${w} ${h}" role="img">${grids}${paths}${labels?`<text class="axis" x="${P.l}" y="${h-8}">${first}</text><text class="axis" x="${w-P.r}" y="${h-8}" text-anchor="end">${last}</text>`:''}</svg>`;
   };
-  const bars=(items,{w=620,h=245,max=null,zero=true}={})=>{const P={l:120,r:55,t:12,b:18},vals=items.map(x=>x.v),hi=max??Math.max(...vals,0),lo=zero?Math.min(0,...vals):Math.min(...vals),span=hi-lo||1,row=(h-P.t-P.b)/items.length,x=v=>P.l+(w-P.l-P.r)*(v-lo)/span,x0=x(0);return `<svg viewBox="0 0 ${w} ${h}" role="img"><line class="grid" x1="${x0}" y1="${P.t}" x2="${x0}" y2="${h-P.b}"/>${items.map((it,i)=>{const yy=P.t+i*row+row*.18,bh=row*.64,xx=Math.min(x0,x(it.v)),ww=Math.abs(x(it.v)-x0),cls=it.cls||'dot-a';return `<text class="axis" x="${P.l-8}" y="${yy+bh*.7}" text-anchor="end">${esc(it.l)}</text><rect class="${cls}" x="${xx}" y="${yy}" width="${Math.max(2,ww)}" height="${bh}" opacity=".86"/><text class="value" x="${Math.max(x0,x(it.v))+6}" y="${yy+bh*.7}">${esc(it.f||nfmt(it.v))}</text>`}).join('')}</svg>`};
-  const scatter=(pts,{xk='x',yk='y',w=620,h=245}={})=>{const P={l:48,r:18,t:15,b:32},xs=pts.map(p=>p[xk]),ys=pts.map(p=>p[yk]),xmin=Math.min(...xs),xmax=Math.max(...xs),ymin=Math.min(...ys),ymax=Math.max(...ys),x=v=>P.l+(w-P.l-P.r)*(v-xmin)/(xmax-xmin||1),y=v=>P.t+(h-P.t-P.b)*(1-(v-ymin)/(ymax-ymin||1));return `<svg viewBox="0 0 ${w} ${h}" role="img"><line class="grid" x1="${P.l}" y1="${h-P.b}" x2="${w-P.r}" y2="${h-P.b}"/><line class="grid" x1="${P.l}" y1="${P.t}" x2="${P.l}" y2="${h-P.b}"/>${pts.map(p=>`<circle class="dot-a" cx="${x(p[xk])}" cy="${y(p[yk])}" r="4" opacity=".82"><title>${p.d} · ${p[xk].toFixed(0)} markets · ${nfmt(p[yk])}</title></circle>`).join('')}<text class="axis" x="${P.l}" y="${h-8}">${xmin.toFixed(0)}</text><text class="axis" x="${w-P.r}" y="${h-8}" text-anchor="end">${xmax.toFixed(0)} markets</text><text class="axis" x="${P.l-6}" y="${P.t+3}" text-anchor="end">${nfmt(ymax)}</text></svg>`};
+  const bars=(items,{w=620,h=210,max=null,zero=true}={})=>{const P={l:120,r:55,t:12,b:18},vals=items.map(x=>x.v),hi=max??Math.max(...vals,0),lo=zero?Math.min(0,...vals):Math.min(...vals),span=hi-lo||1,row=(h-P.t-P.b)/items.length,x=v=>P.l+(w-P.l-P.r)*(v-lo)/span,x0=x(0);return `<svg viewBox="0 0 ${w} ${h}" role="img"><line class="grid" x1="${x0}" y1="${P.t}" x2="${x0}" y2="${h-P.b}"/>${items.map((it,i)=>{const yy=P.t+i*row+row*.18,bh=row*.64,xx=Math.min(x0,x(it.v)),ww=Math.abs(x(it.v)-x0),cls=it.cls||'dot-a';return `<text class="axis" x="${P.l-8}" y="${yy+bh*.7}" text-anchor="end">${esc(it.l)}</text><rect class="${cls}" x="${xx}" y="${yy}" width="${Math.max(2,ww)}" height="${bh}" opacity=".86"/><text class="value" x="${Math.max(x0,x(it.v))+6}" y="${yy+bh*.7}">${esc(it.f||nfmt(it.v))}</text>`}).join('')}</svg>`};
+  const scatter=(pts,{xk='x',yk='y',w=620,h=210}={})=>{const P={l:48,r:18,t:15,b:32},xs=pts.map(p=>p[xk]),ys=pts.map(p=>p[yk]),xmin=Math.min(...xs),xmax=Math.max(...xs),ymin=Math.min(...ys),ymax=Math.max(...ys),x=v=>P.l+(w-P.l-P.r)*(v-xmin)/(xmax-xmin||1),y=v=>P.t+(h-P.t-P.b)*(1-(v-ymin)/(ymax-ymin||1));return `<svg viewBox="0 0 ${w} ${h}" role="img"><line class="grid" x1="${P.l}" y1="${h-P.b}" x2="${w-P.r}" y2="${h-P.b}"/><line class="grid" x1="${P.l}" y1="${P.t}" x2="${P.l}" y2="${h-P.b}"/>${pts.map(p=>`<circle class="dot-a" cx="${x(p[xk])}" cy="${y(p[yk])}" r="4" opacity=".82"><title>${p.d} · ${p[xk].toFixed(0)} markets · ${nfmt(p[yk])}</title></circle>`).join('')}<text class="axis" x="${P.l}" y="${h-8}">${xmin.toFixed(0)}</text><text class="axis" x="${w-P.r}" y="${h-8}" text-anchor="end">${xmax.toFixed(0)} markets</text><text class="axis" x="${P.l-6}" y="${P.t+3}" text-anchor="end">${nfmt(ymax)}</text></svg>`};
   const growth=['tvl','wau','olpPnlLife','dau','oi','totalVolume'].map((k,i)=>{const s=series(k);return {l:{tvl:'TVL',wau:'WAU',olpPnlLife:'OLP PnL',dau:'DAU',oi:'Open interest',totalVolume:'Volume'}[k],v:pct(s[0]?.v,s.at(-1)?.v),f:nfmt(pct(s[0]?.v,s.at(-1)?.v),'%'),cls:k==='tvl'?'dot-d':'dot-a'}}).filter(x=>finite(x.v));
   const volOi=series('totalVolume').map((p,i)=>({...p,v:p.v/1e9})), oi=series('oi').map(p=>({...p,v:p.v/1e6}));
   const volMarkets=H.filter(r=>finite(r.markets)&&finite(r.totalVolume)).map(r=>({x:r.markets,y:r.totalVolume,d:r.asOf}));
@@ -2292,7 +2363,26 @@ function renderBiweeklyResearch(){
   const mrByDate={}; mrRows.forEach(r=>{mrByDate[r.asOf]=r;});
   const lastSix=H.filter(r=>finite(r.spreads2w)&&finite(r.mmCosts2w)&&finite(r.netProfit2w)).slice(-6);
   const pctSigned=v=>finite(v)?(v>=0?'+':'')+(v*100).toFixed(1)+'%':'—';
-  const grouped=`<svg viewBox="0 0 620 300" role="img" class="bw-grouped">${lastSix.map((r,i)=>{const mx=Math.max(...lastSix.flatMap(x=>[x.spreads2w,x.mmCosts2w,x.netProfit2w])),base=218,scale=178/mx,W=27,G=3,x=36+i*98,pc=v=>Math.round(v/r.spreads2w*100)+'%',lb=(cx,v,t,c)=>c==='a'?`<text class="value bw-pct a" x="${cx}" y="${base-v*scale-6}" text-anchor="middle" font-size="13">${t}</text>`:`<text class="bw-pct in" x="${cx}" y="${base-v*scale+17}" text-anchor="middle" font-size="13.5">${t}</text>`;const mr=mrByDate[r.asOf],bandCls=mr&&mr.btcRet<0?'mr-band-dn':'mr-band-up',bandX=x-6,bandW=90;return `${mr?`<rect class="${bandCls}" x="${bandX}" y="6" width="${bandW}" height="228"/>`:''}<rect class="dot-a" x="${x}" y="${base-r.spreads2w*scale}" width="${W}" height="${r.spreads2w*scale}" rx="2" opacity=".9"/><rect class="dot-d" x="${x+W+G}" y="${base-r.mmCosts2w*scale}" width="${W}" height="${r.mmCosts2w*scale}" rx="2" opacity=".9"/><rect class="dot-c" x="${x+2*(W+G)}" y="${base-r.netProfit2w*scale}" width="${W}" height="${r.netProfit2w*scale}" rx="2" opacity=".9"/>${lb(x+W/2,r.spreads2w,esc(nfmt(r.spreads2w)),'a')}${lb(x+W+G+W/2,r.mmCosts2w,pc(r.mmCosts2w),'d')}${lb(x+2*(W+G)+W/2,r.netProfit2w,pc(r.netProfit2w),'c')}<text class="axis bw-date" x="${x+W*1.5+G}" y="242" text-anchor="middle" font-size="13">${r.asOf.slice(5)}</text>${mr?`<text class="mr-reg ${mr.btcRet>=0?'up':'dn'}" x="${x+W*1.5+G}" y="262" text-anchor="middle" font-size="12.5">BTC ${pctSigned(mr.btcRet)}</text><text class="mr-reg ${mr.spxRet>=0?'up':'dn'}" x="${x+W*1.5+G}" y="280" text-anchor="middle" font-size="12.5">S&amp;P ${pctSigned(mr.spxRet)}</text>`:''}`}).join('')}<line class="grid" x1="30" y1="218" x2="612" y2="218"/></svg>`;
+  /* Geometry recomputed for the shared 620x210 box. The two regime rows this chart used to
+     print under every date (BTC %, S&P %) are gone: chart 19 now answers market direction
+     properly, with the split, the sample sizes and the treasury translation, so repeating a
+     thin version of it here was duplicating the weaker copy. The direction shading stays and
+     is named in the legend, so nothing the bands carried is lost. */
+  const grouped=`<svg viewBox="0 0 620 210" role="img" class="bw-grouped">${lastSix.map((r,i)=>{
+    const mx=Math.max(...lastSix.flatMap(x=>[x.spreads2w,x.mmCosts2w,x.netProfit2w])),
+      base=170,scale=138/mx,W=27,G=3,x=36+i*98,
+      pc=v=>Math.round(v/r.spreads2w*100)+'%',
+      lb=(cx,v,t,c)=>c==='a'
+        ?`<text class="value bw-pct a" x="${cx}" y="${base-v*scale-6}" text-anchor="middle" font-size="12">${t}</text>`
+        :`<text class="bw-pct in" x="${cx}" y="${base-v*scale+15}" text-anchor="middle" font-size="12.5">${t}</text>`;
+    const mr=mrByDate[r.asOf],bandCls=mr&&mr.btcRet<0?'mr-band-dn':'mr-band-up',bandX=x-6,bandW=90;
+    return `${mr?`<rect class="${bandCls}" x="${bandX}" y="5" width="${bandW}" height="178"/>`:''}`+
+      `<rect class="dot-a" x="${x}" y="${base-r.spreads2w*scale}" width="${W}" height="${r.spreads2w*scale}" rx="2" opacity=".9"/>`+
+      `<rect class="dot-d" x="${x+W+G}" y="${base-r.mmCosts2w*scale}" width="${W}" height="${r.mmCosts2w*scale}" rx="2" opacity=".9"/>`+
+      `<rect class="dot-c" x="${x+2*(W+G)}" y="${base-r.netProfit2w*scale}" width="${W}" height="${r.netProfit2w*scale}" rx="2" opacity=".9"/>`+
+      `${lb(x+W/2,r.spreads2w,esc(nfmt(r.spreads2w)),'a')}${lb(x+W+G+W/2,r.mmCosts2w,pc(r.mmCosts2w),'d')}${lb(x+2*(W+G)+W/2,r.netProfit2w,pc(r.netProfit2w),'c')}`+
+      `<text class="axis bw-date" x="${x+W*1.5+G}" y="196" text-anchor="middle" font-size="12.5">${r.asOf.slice(5)}</text>`;
+  }).join('')}<line class="grid" x1="30" y1="170" x2="612" y2="170"/></svg>`;
   const may=H.map((r,i)=>({i,d:r.asOf,markets:r.markets,dau:r.dau,profit:r.netProfit2w}));
   const minP=pnl.reduce((a,b)=>a.v<b.v?a:b),maxP=pnl.reduce((a,b)=>a.v>b.v?a:b),latestP=pnl.at(-1);
   const correlations=[['Volume × markets',corr('totalVolume','markets')],['Volume × OI',corr('totalVolume','oi')],['Volume × DAU',corr('totalVolume','dau')],['DAU × WAU',corr('dau','wau')]].map(([l,v],i)=>({l,v,f:v.toFixed(2),cls:i===3?'dot-c':i===0?'dot-d':'dot-b'}));
@@ -2308,16 +2398,16 @@ function renderBiweeklyResearch(){
     frame(7,'Daily and weekly active users','DAU and WAU move together across the complete reporting history.',`<div class="bw-viz-legend"><span><i class="a"></i>DAU</span><span><i class="b"></i>WAU</span></div>${line([{pts:dau},{pts:wau}],{min:0})}`,false,`Pearson r = <b>${corr('dau','wau').toFixed(2)}</b>. The strong relationship is consistent with repeat usage, though correlation alone does not prove retention.`)+
     frame(8,'Lifetime OLP PnL','Cumulative liquidity-provider PnL disclosed in official reports.',line([{pts:life}],{min:0,area:true}),false,`${nfmt(pct(life[0].v,life.at(-1).v),'%')} since the first report, with only ${life.slice(1).filter((p,i)=>p.v<life[i].v).length} declining periods.`)+
     frame(9,'Implied leverage over time','Open interest divided by TVL. TVL excludes some hedging accounts.',line([{pts:leverage}],{min:0}),true,`Range: <b>${Math.min(...leverage.map(x=>x.v)).toFixed(2)}x-${Math.max(...leverage.map(x=>x.v)).toFixed(2)}x</b>. It cycled rather than rising without interruption.`)+
-    frame(10,'How to read implied leverage','Trading exposure per $1 of reported deposited capital.',`<div class="bw-formula"><div class="oi"><b>Open interest</b><span>trading exposure</span></div><b>÷</b><div class="tvl"><b>TVL</b><span>reported deposited capital</span></div></div>${line([{pts:leverage}],{min:0,h:165})}`,false,'The riskier pattern would be a persistent climb. The observed series falls, ranges, and later recovers.')+
+    frame(10,'How to read implied leverage','Trading exposure per $1 of reported deposited capital.',`<div class="bw-formula"><div class="oi"><b>Open interest</b><span>trading exposure</span></div><b>÷</b><div class="tvl"><b>TVL</b><span>reported deposited capital</span></div></div>${line([{pts:leverage}],{min:0})}`,false,'The riskier pattern would be a persistent climb. The observed series falls, ranges, and later recovers.')+
     frame(11,'Volatility of report-over-report changes','Standard deviation of percentage changes, measured in percentage points.',bars(volat,{max:Math.max(...volat.map(x=>x.v))*1.12}),false,'Net profit is the most volatile disclosed metric by a wide margin.')+
-    frame(12,'Gross spreads, market-making cost, and net profit','Latest six reports with complete, directly comparable P&L fields. Red and green labels are % of that report’s gross spreads. BTC / S&P = price change over the same two weeks.',`<div class="bw-viz-legend bw-legend-big"><span><i class="a"></i>Gross spreads</span><span><i class="d"></i>MM cost</span><span><i class="c"></i>Net profit</span></div>${grouped}`,true,'These are contribution-margin components. They do not include every corporate operating expense.')+
-    (mrHas&&mrRows.length?frame(19,'Revenue vs market regime','Every report with P&L data, against BTC and the S&P 500 over the same two weeks.',renderMarketRegimeCard(mrRows,pearson,esc,nfmt,finite),true,`Market data: Binance BTCUSDT daily close, Yahoo ^GSPC daily close · snapshot ${esc(MARKET_REGIME_ASOF)}. Correlation ≠ causation.`):'')+
-    frame(13,'Recent turnover close-up','The latest five completed volume-to-OI observations.',line([{pts:recentTurn}],{min:0,h:190}),false,`Latest: <b>${nextLabel}x</b>. ${turnRebounded?'The fifth checkpoint rebounded, breaking the prior four-report decline.':'Another sequential decline would strengthen the case for a structural efficiency trend.'}`)+
+    frame(12,'Gross spreads, market-making cost, and net profit','Latest six reports with complete, directly comparable P&L fields. Red and green labels are % of that report’s gross spreads. Shading marks whether BTC rose or fell over the same two weeks.',`<div class="bw-viz-legend bw-legend-big"><span><i class="a"></i>Gross spreads</span><span><i class="d"></i>MM cost</span><span><i class="c"></i>Net profit</span><span><i class="mr-sw up"></i>BTC rose that window</span><span><i class="mr-sw dn"></i>BTC fell</span></div>${grouped}`,true,'These are contribution-margin components. They do not include every corporate operating expense.')+
+    (mrHas&&mrRows.length?frame(19,marketRegimeRead(mrRows).title,'Every report with P&L data, against BTC and the S&P 500 over the same two weeks.',renderMarketRegimeCard(mrRows,pearson,esc,nfmt,finite),true,`Market data: Binance BTCUSDT daily close, Yahoo ^GSPC daily close · snapshot ${esc(MARKET_REGIME_ASOF)}. Correlation ≠ causation.`):'')+
+    frame(13,'Recent turnover close-up','The latest five completed volume-to-OI observations.',line([{pts:recentTurn}],{min:0}),false,`Latest: <b>${nextLabel}x</b>. ${turnRebounded?'The fifth checkpoint rebounded, breaking the prior four-report decline.':'Another sequential decline would strengthen the case for a structural efficiency trend.'}`)+
     frame(14,'The May 2026 joint slowdown','Listed markets, DAU, and net profit are normalized within each series so timing can be compared.',`<div class="bw-viz-legend"><span><i class="a"></i>Markets</span><span><i class="b"></i>DAU</span><span><i class="c"></i>Net profit</span></div>${line(['markets','dau','profit'].map((k,ki)=>{const pts=may.filter(x=>finite(x[k])),lo=Math.min(...pts.map(x=>x[k])),hi=Math.max(...pts.map(x=>x[k]));return {cls:'abc'[ki],pts:pts.map(x=>({i:x.i,d:x.d,v:(x[k]-lo)/(hi-lo||1)*100}))}}),{min:0,max:100})}`,true,'The synchronized dip suggests a broader protocol activity slowdown, not an isolated profitability event.')+
     frame(15,'Net profit: peak, trough, and latest','Annotated landmarks from the directly comparable P&L era.',line([{pts:pnl}],{min:0}),false,`Peak <b>${maxP.d}: ${nfmt(maxP.v)}</b>. Trough <b>${minP.d}: ${nfmt(minP.v)}</b>. Latest <b>${latestP.d}: ${nfmt(latestP.v)}</b>.`)+
     frame(16,'What moves together','Pearson correlation across matched official-report observations.',bars(correlations,{max:1}),false,'Volume and listed markets have the weakest relationship. DAU and WAU have the strongest.')+
     frame(17,'What to watch: MM cost share','Current disclosed range and the two interpretation paths.',`<div class="bw-watch"><div class="source">MM cost has ranged ${Math.min(...costs.map(x=>x.c)).toFixed(0)}%-${Math.max(...costs.map(x=>x.c)).toFixed(0)}% of gross spreads</div><div class="good"><b>Narrows</b><span>Net profit volatility likely resolves</span></div><div class="arrow">→</div><div class="risk"><b>Stays erratic</b><span>Profit keeps swinging regardless of volume</span></div></div>`,false,'This is the highest-priority cost-quality monitor.')+
-    frame(18,'What to watch: volume-to-OI turnover',turnRebounded?'The fifth checkpoint rebounded after four consecutive declines.':'A fifth straight decline would require a deeper operational explanation.',`${line([{pts:recentTurn}],{min:0,h:165})}<div class="bw-watch"><div class="source">Latest checkpoint: ${nextLabel}x ${turnRebounded?'and the decline streak broke':'with the decline still active'}</div><div class="good"><b>${turnRebounded?'Rebounded':'Stabilizes'}</b><span>${turnRebounded?'Current evidence favors a cyclical slowdown':'Recent decline may be cyclical'}</span></div><div class="arrow">→</div><div class="risk"><b>Watch next</b><span>A renewed decline would reopen the efficiency question</span></div></div>`,false,'Volume is calculated from the change in cumulative volume between reports; OI is the ending snapshot for each window.');
+    frame(18,'What to watch: volume-to-OI turnover',turnRebounded?'The fifth checkpoint rebounded after four consecutive declines.':'A fifth straight decline would require a deeper operational explanation.',`${line([{pts:recentTurn}],{min:0})}<div class="bw-watch"><div class="source">Latest checkpoint: ${nextLabel}x ${turnRebounded?'and the decline streak broke':'with the decline still active'}</div><div class="good"><b>${turnRebounded?'Rebounded':'Stabilizes'}</b><span>${turnRebounded?'Current evidence favors a cyclical slowdown':'Recent decline may be cyclical'}</span></div><div class="arrow">→</div><div class="risk"><b>Watch next</b><span>A renewed decline would reopen the efficiency question</span></div></div>`,false,'Volume is calculated from the change in cumulative volume between reports; OI is the ending snapshot for each window.');
 }
 /* ---------- what changed since the previous official report ----------
    Readers could see every number but not what the move meant, so this block states it.
@@ -2416,11 +2506,32 @@ function renderBiweekly(){
   };
   const datedSpark=(pts,d)=>{
     if(pts.length<2)return '<span class="muted">Only one official report</span>';
-    const W=720,H=86,PX=12,top=25,bottom=9,vals=pts.map(x=>x.v),lo=Math.min(...vals),hi=Math.max(...vals),span=hi-lo||1;
+    const W=720,H=86,PX=12,top=18,bottom=20,vals=pts.map(x=>x.v),lo=Math.min(...vals),hi=Math.max(...vals),span=hi-lo||1;
     const xy=vals.map((v,i)=>[PX+(W-PX*2)*(i/(vals.length-1)),H-bottom-(H-top-bottom)*((v-lo)/span)]);
     const path=xy.map((p,i)=>(i?'L':'M')+p[0].toFixed(1)+' '+p[1].toFixed(1)).join(' ');
     const dots=xy.map((p,i)=>`<circle cx="${p[0]}" cy="${p[1]}" r="${i===xy.length-1?4:2.5}" fill="${i===xy.length-1?'var(--grn)':'var(--cyan)'}"><title>${pts[i].r.asOf} · ${fmtMetric(d,pts[i].v)}</title></circle>`).join('');
-    const labels=xy.map((p,i)=>{const y=Math.max(10,p[1]-7-(i%2)*7);return `<text class="bw-point-value" x="${p[0]}" y="${y}" text-anchor="start" transform="rotate(-32 ${p[0]} ${y})">${fmtMetric(d,pts[i].v)}</text>`}).join('');
+    /* Every one of the 24 points used to carry its own value, tilted 32 degrees and nudged
+       up on alternate points to dodge its neighbour. At this width that is a label every
+       30px: they overlapped into a diagonal smear that hid the line they were describing,
+       and the series itself — the only thing a sparkline is for — read as a thin blue
+       thread underneath. Each point already states its date and value on hover, which the
+       section header tells the reader, so the labels now mark only the four points that
+       carry the shape: where it started, where it ended, and its high and low. */
+    const iMin=vals.indexOf(lo), iMax=vals.indexOf(hi), iLast=xy.length-1;
+    const keep=[...new Set([0,iMin,iMax,iLast])].filter(i=>i>=0).sort((a,b)=>a-b);
+    const labels=keep.map(i=>{
+      const p=xy[i];
+      /* a label at either end would hang off the box, so the anchor follows the position */
+      const anchor=i===0?'start':i===iLast?'end':'middle';
+      const dx=i===0?-2:i===iLast?2:0;
+      /* high sits above the point, low sits below, so neither collides with the line */
+      const below=(i===iMin&&iMin!==0&&iMin!==iLast);
+      /* H-6, not H-2: the clamp has to leave room for the glyph descent or the low
+         label sits two pixels outside the box on every series that has one. */
+      const y=below?Math.min(H-6,p[1]+14):Math.max(11,p[1]-9);
+      const tag=i===iMax&&iMax!==iLast?' hi':i===iMin&&iMin!==iLast?' lo':'';
+      return `<text class="bw-point-value${tag}" x="${(p[0]+dx).toFixed(1)}" y="${y.toFixed(1)}" text-anchor="${anchor}">${fmtMetric(d,pts[i].v)}</text>`;
+    }).join('');
     const mid=pts[Math.floor((pts.length-1)/2)];
     return `<div class="bw-metric-trend"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${d.l} by official report date"><path d="${path}" fill="none" stroke="var(--cyan)" stroke-width="2.5" vector-effect="non-scaling-stroke"/>${dots}${labels}</svg><div class="bw-metric-dates"><span>${pts[0].r.asOf}</span><span>${mid.r.asOf}</span><span>${pts[pts.length-1].r.asOf}</span></div></div>`;
   };
