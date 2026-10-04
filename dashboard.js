@@ -60,9 +60,11 @@ const MKT = {
   oi:1.178e9,
   spreadShare:0.20,  // Replaced below with the observed share from the latest 3 official reports
   docsSpreadShare:0.10,
-  burnShare:1.00,    // 100% of treasury revenue → $VAR buy-&-burn (official, Sep 2026)
-  hlOi:10.286e9,     // Hyperliquid OI (DeFiLlama, live-ish)
-  hlVol30:255e9      // Hyperliquid ~30d perp volume (est.; DeFiLlama gates volume)
+  burnShare:1.00     // 100% of treasury revenue → $VAR buy-&-burn (official, Sep 2026)
+  /* Hyperliquid's own size is read live from the peer board (PEERS / VAL_COMPS), so the
+     two constants that used to sit here were never referenced by anything and had drifted
+     badly — 10.286e9 against an actual $17.09B. A stale number nothing reads is a trap for
+     whoever reaches for it next, so they are gone rather than refreshed. */
 };
 /* ---------- official biweekly metrics ----------
    Source: Variational's biweekly metrics post on X (x.com/variational_io).
@@ -758,22 +760,22 @@ const impliedSpreadsAllTime=()=>impliedSpreadsBetween(addDays(SERIES[0].d,-1),cu
 
 /* perp-DEX peer ranking by open interest (Perpetual Pulse snapshot) */
 const PEERS = {
-  asOf:'2026-07-08 board', snapAsOf:'2026-07-08 board', live:false, total:16.408469162e9, count:15, varRank:3, varShare:7.4, vsHl:8.9,
+  asOf:'2026-10-04 board', snapAsOf:'2026-10-04 board', live:false, total:25008293016e0, count:15, varRank:3, varShare:8.6, vsHl:12.6,
   list:[
-    {n:'Hyperliquid',oi:10684309662,vol:7126971862,tvl:5711017306,pairs:353,maker:'0.01%',taker:'0.045%',lev:'40x',url:'https://app.hyperliquid.xyz/'},
-    {n:'Aster',oi:1880005706,vol:1230816436,tvl:1363035561,pairs:514,maker:'0.01%',taker:'0.035%',lev:'100x',url:'https://www.asterdex.com/'},
-    {n:'Variational',oi:1206870736,vol:800298819,tvl:null,pairs:506,maker:'0%',taker:'0%',lev:'50x',me:true,url:'https://omni.variational.io/'},
-    {n:'Lighter',oi:838501998,vol:1125433816,tvl:519756720,pairs:191,maker:'0%',taker:'0%',lev:'50x',url:'https://app.lighter.xyz/'},
-    {n:'GRVT',oi:352183672,vol:1429270972,tvl:39227830,pairs:168,maker:'-0.0001%',taker:'0.055%',lev:'50x',url:'https://grvt.io/'},
-    {n:'Ostium',oi:267613768,vol:99175845,tvl:61452624,pairs:44,maker:'0.03%',taker:'0.1%',lev:'200x',url:'https://app.ostium.com/'},
+    {n:'Hyperliquid',oi:17090136731,vol:2348502332,tvl:5711017306,pairs:353,maker:'0.01%',taker:'0.045%',lev:'40x',url:'https://app.hyperliquid.xyz/'},
+    {n:'Aster',oi:2584185384,vol:685831528,tvl:1363035561,pairs:514,maker:'0.01%',taker:'0.035%',lev:'100x',url:'https://www.asterdex.com/'},
+    {n:'Variational',oi:2153375689,vol:920445002,tvl:null,pairs:506,maker:'0%',taker:'0%',lev:'50x',me:true,url:'https://omni.variational.io/'},
+    {n:'Lighter',oi:1192848158,vol:533349250,tvl:519756720,pairs:191,maker:'0%',taker:'0%',lev:'50x',url:'https://app.lighter.xyz/'},
+    {n:'GRVT',oi:478186664,vol:466245137,tvl:39227830,pairs:168,maker:'-0.0001%',taker:'0.055%',lev:'50x',url:'https://grvt.io/'},
+    {n:'Ostium',oi:5820599,vol:720962,tvl:61452624,pairs:44,maker:'0.03%',taker:'0.1%',lev:'200x',url:'https://app.ostium.com/'},
     {n:'Jupiter',oi:231885286,vol:258477468,tvl:3438598110,pairs:3,maker:'0.06%',taker:'0.06%',lev:'100x',url:'https://jup.ag/'},
-    {n:'edgeX',oi:214889911,vol:105579834,tvl:95335629,pairs:31,maker:'0.012%',taker:'0.038%',lev:'100x',url:'https://pro.edgex.exchange/'},
-    {n:'Extended',oi:204911013,vol:259124156,tvl:137001630,pairs:103,maker:'0%',taker:'0.025%',lev:'50x',url:'https://app.extended.exchange/'},
+    {n:'edgeX',oi:461153179,vol:295915411,tvl:95335629,pairs:31,maker:'0.012%',taker:'0.038%',lev:'100x',url:'https://pro.edgex.exchange/'},
+    {n:'Extended',oi:197330409,vol:184519461,tvl:137001630,pairs:103,maker:'0%',taker:'0.025%',lev:'50x',url:'https://app.extended.exchange/'},
     {n:'Drift',oi:123964778,vol:75541710,tvl:218924986,pairs:0,maker:'-0.02%',taker:'0.035%',lev:'50x',url:'https://app.drift.trade/'},
-    {n:'ApeX Protocol',oi:113634503,vol:341478529,tvl:34259653,pairs:343,maker:'0%',taker:'0.025%',lev:'50x',url:'https://omni.apex.exchange/'},
-    {n:'Pacifica',oi:89999223,vol:961617175,tvl:27315143,pairs:70,maker:'0.015%',taker:'0.04%',lev:'50x',url:'https://app.pacifica.fi/'},
-    {n:'Backpack',oi:87726672,vol:167821143,tvl:null,pairs:74,maker:'0.02%',taker:'0.05%',lev:'50x',url:'https://backpack.exchange/'},
-    {n:'Vest Exchange',oi:62337833,vol:35979665,tvl:705662,pairs:548,maker:'0.01%',taker:'0.01%',lev:'50x',url:'https://trade.vest.exchange/'},
+    {n:'ApeX Protocol',oi:155270569,vol:430354858,tvl:34259653,pairs:343,maker:'0%',taker:'0.025%',lev:'50x',url:'https://omni.apex.exchange/'},
+    {n:'Pacifica',oi:139343698,vol:284303223,tvl:27315143,pairs:70,maker:'0.015%',taker:'0.04%',lev:'50x',url:'https://app.pacifica.fi/'},
+    {n:'Backpack',oi:107325286,vol:45817377,tvl:null,pairs:74,maker:'0.02%',taker:'0.05%',lev:'50x',url:'https://backpack.exchange/'},
+    {n:'Vest Exchange',oi:37832185,vol:324220,tvl:705662,pairs:548,maker:'0.01%',taker:'0.01%',lev:'50x',url:'https://trade.vest.exchange/'},
     {n:'GMX',oi:49634401,vol:42765304,tvl:252749585,pairs:6,maker:'0.04%',taker:'0.06%',lev:'100x',url:'https://app.gmx.io/'}
   ]
 };
