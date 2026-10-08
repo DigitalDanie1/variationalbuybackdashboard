@@ -3009,7 +3009,7 @@ function ppFmt(n){
   for(let i=0;i<u.length;i++){
     const [d,l]=u[i];
     if(n>=d*0.9995||(n>=d&&i===0)){
-      const x=n/d,t=(x<10?x.toFixed(2):x<100?x.toFixed(1):x.toFixed(0)).replace(/\.?0+$/,'');
+      const x=n/d,t=(x<10?x.toFixed(2):x<100?x.toFixed(1):x.toFixed(0)).replace(/(\.\d*?)0+$/,'$1').replace(/\.$/,''); // strip decimal zeros only: 100K must stay 100K
       return '$'+t+l;
     }
   }
@@ -3025,7 +3025,7 @@ function ppRain(tier){
   const money=tier===3?6:tier===4?10:8, stars=tier===5?4:0;
   const n=Math.min(money,PP_CAP-stars);
   for(let i=0;i<n;i++){
-    const e=document.createElement('span');e.className='pp-p';e.textContent='\u{1F4B5}';
+    const e=document.createElement('span');e.className='pp-p coin';e.textContent='$';
     e.style.cssText='--x:'+(4+Math.random()*90).toFixed(1)+'%;--s:'+(10+Math.random()*4).toFixed(0)+'px;--d:'+(3+Math.random()*2.5).toFixed(2)+'s;--dl:-'+(Math.random()*5).toFixed(2)+'s;--sw:'+((Math.random()*30-15)|0)+'px;--r:'+((Math.random()*160-80)|0)+'deg';
     box.appendChild(e);
   }
@@ -3068,8 +3068,31 @@ function ppFire(from,to){
     stage.classList.remove('wob');void stage.offsetWidth;stage.classList.add('wob');setTimeout(()=>stage.classList.remove('wob'),700);
   }
 }
+/* The photo is portrait (858x1280) and the frog is tiny inside it. Instead of zooming a fixed
+   crop, size the image so the car and the frog fill the view, and hand the frog/car positions to
+   CSS in px so every prop sits on the right spot at any card width. Coordinates are natural px. */
+var PP_ANCH={head:[453,1121],top:[453,1104],neck:[453,1146],hand:[488,1172],tl1:[52,1110],tl2:[236,1112],plate:[125,1148],sky:[453,1040]};
+function ppLayout(){
+  const view=document.querySelector('#ppStage .pp-view'),img=view&&view.querySelector('img');
+  if(!view||!img)return;
+  const W=view.clientWidth,H=view.clientHeight;if(!W||!H)return;
+  const s=Math.max(W/560,H/1280),iw=858*s,ih=1280*s;
+  let left=W/2-290*s;left=Math.min(0,Math.max(W-iw,left));
+  let top=H-1245*s;top=Math.min(0,Math.max(H-ih,top));
+  // older mascot rules size this img with !important, so the layout has to win the same way
+  const set=(k,v)=>img.style.setProperty(k,v.toFixed(1)+'px','important');
+  set('width',iw);set('height',ih);set('left',left);set('top',top);
+  img.style.setProperty('object-fit','fill','important');img.style.setProperty('max-height','none','important');img.style.setProperty('min-height','0','important');img.style.setProperty('margin','0','important');
+  view.style.setProperty('--s',s.toFixed(4));
+  for(const k in PP_ANCH){
+    view.style.setProperty('--'+k+'x',(left+PP_ANCH[k][0]*s).toFixed(1)+'px');
+    view.style.setProperty('--'+k+'y',(top+PP_ANCH[k][1]*s).toFixed(1)+'px');
+  }
+  if(!PP.ro&&'ResizeObserver' in window){PP.ro=true;new ResizeObserver(()=>ppLayout()).observe(view);}
+}
 function ppUpdate(v){
   const stage=document.getElementById('ppStage');if(!stage)return;
+  ppLayout();
   v=isFinite(v)&&v>0?v:0;
   const t=ppTierOf(v),T=PP_TIERS[t],N=PP_TIERS[t+1];
   let pct=1;
