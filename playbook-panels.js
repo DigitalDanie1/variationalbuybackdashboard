@@ -1060,30 +1060,81 @@
       var rows = LEV_CHIPS.slice();
       if (safeLev && rows.indexOf(safeLev) < 0 && safeLev > 1) rows.push(safeLev);
       rows.sort(function (a, c) { return a - c; });
-      levTable = rows.map(function (lv) {
-        var s3 = { hype: simulate(P.hype, p.days, lv, true), lit: simulate(P.lit, p.days, lv, true) };
-        var both = s3.hype.alive && s3.lit.alive;
-        var cell = function (k) {
-          var sm = s3[k];
-          return sm.alive
-            ? '<td class="pb-n"><b>' + usd(sm.finalEq * budget) + '</b><small>' +
-              pnl(sm.finalEq) + ' · dipped to ' + usd(sm.trough * budget) + '</small></td>'
-            : '<td class="pb-n dead"><b>liquidated</b><small>D+' + sm.liqDay + ' · lost ' +
-              usd(budget) + '</small></td>';
-        };
+      var sims = rows.map(function (lv) {
+        return { lv: lv, hype: simulate(P.hype, p.days, lv, true), lit: simulate(P.lit, p.days, lv, true) };
+      });
+      /* Signed dollars and a signed percent of principal, kept in their own elements so the
+         static words around them can be translated. */
+      var sUsd = function (v) { return (v < -0.5 ? '−' : '+') + usd(Math.abs(v)); };
+      var sPct = function (r) { return (r < 0 ? '−' : '+') + Math.abs(r * 100).toFixed(0) + '%'; };
+      /* Bars: left end is −100% (everything lost), linear; right side is log-scaled to the
+         best result in that column so +1933% does not flatten every other row. */
+      var capOf = function (k) {
+        var m = 0;
+        sims.forEach(function (r) { if (r[k].alive) m = Math.max(m, r[k].finalEq - 1); });
+        return m > 0.05 ? m : 1;
+      };
+      var cap = { hype: capOf('hype'), lit: capOf('lit') };
+      var bar = function (k, sm) {
+        var r = sm.alive ? sm.finalEq - 1 : -1, w, st;
+        if (r < 0) { w = Math.min(1, -r) * 50; st = 'left:' + (50 - w).toFixed(1) + '%;width:' + w.toFixed(1) + '%'; }
+        else { w = Math.min(1, Math.log(1 + r) / Math.log(1 + cap[k])) * 50; st = 'left:50%;width:' + w.toFixed(1) + '%'; }
+        return '<span class="pb-bar"><i class="' + (r < 0 ? 'dn' : 'up') + '" style="' + st + '"></i></span>';
+      };
+      var cell = function (k, sm) {
+        if (!sm.alive) {
+          return '<td class="pb-n pb-path dead"><b>liquidated</b><span class="pb-pl dn">' +
+            sUsd(-budget) + ' (−100%)</span>' + bar(k, sm) +
+            '<small><span>D+' + sm.liqDay + '</span> <span>· lost</span> <span>' + usd(budget) +
+            '</span> <span>(−100% of principal)</span></small></td>';
+        }
+        var r = sm.finalEq - 1, w = sm.trough - 1;
+        return '<td class="pb-n pb-path"><b>' + usd(sm.finalEq * budget) + '</b>' +
+          '<span class="pb-pl ' + (r < 0 ? 'dn' : 'up') + '">' + sUsd(r * budget) + ' (' + sPct(r) + ')</span>' +
+          bar(k, sm) +
+          '<small><span>worst</span> <span>' + sUsd(w * budget) + ' (' + sPct(w) + ')</span> <span>on</span> <span>D+' +
+          sm.troughDay + '</span></small></td>';
+      };
+      var bestSim = null;
+      levTable = sims.map(function (s3) {
+        var lv = s3.lv, both = s3.hype.alive && s3.lit.alive;
+        if (safeLev && Math.abs(lv - safeLev) < .01) bestSim = s3;
+        var liqCell = (lv <= 1 || !s3.hype.liqPx)
+          ? '<td class="pb-n"><b class="pb-spot">no liquidation (spot)</b></td>'
+          : '<td class="pb-n"><b>' + pct(s3.hype.liqFromEntry, 0) + '</b><small>from avg entry</small></td>';
         return '<tr class="pb-row' + (Math.abs(lv - p.lev) < .01 ? ' on' : '') +
           '" data-lev="' + lv + '"><td class="pb-rng"><b>' + lv + '×</b>' +
           (safeLev && Math.abs(lv - safeLev) < .01 ? '<small>most that survived both</small>' : '') +
-          '</td>' + cell('hype') + cell('lit') +
+          '</td><td class="pb-n"><b>' + usd(budget * lv) + '</b><small><span>margin</span> <span>' +
+          usd(budget) + '</span></small></td>' + liqCell + cell('hype', s3.hype) + cell('lit', s3.lit) +
           '<td class="pb-n"><em class="pb-st ' + (both ? 'on' : 'wait') + '">' +
           (both ? 'survived both' : (s3.hype.alive || s3.lit.alive) ? 'one only' : 'neither') +
           '</em></td></tr>';
       }).join('');
+      var summary;
+      if (bestSim && safeLev > 1) {
+        summary = '<span>With</span> <b>' + usdExact(budget) + '</b> <span>principal over</span> <b>' + p.days +
+          '</b> <span>days:</span> <span>the most leverage that survived both paths is</span> <b>' + safeLev +
+          '×</b><span>,</span> <span>a position of</span> <b>' + usd(budget * safeLev) + '</b><span>.</span> ' +
+          '<span>HYPE would end at</span> <b>' + usd(bestSim.hype.finalEq * budget) + '</b> <em>(' +
+          sUsd((bestSim.hype.finalEq - 1) * budget) + ')</em><span>,</span> <span>LIT at</span> <b>' +
+          usd(bestSim.lit.finalEq * budget) + '</b> <em>(' + sUsd((bestSim.lit.finalEq - 1) * budget) + ')</em><span>.</span>';
+      } else {
+        summary = '<span>With</span> <b>' + usdExact(budget) + '</b> <span>principal over</span> <b>' + p.days +
+          '</b> <span>days:</span> <span>nothing above 1× (spot) survived both paths.</span>';
+      }
+      var capNote = '<div class="pb-note pb-barnote"><span>Bars show profit or loss as a % of principal. Left end = −100% (all of it lost); the right side is log-scaled so a huge win does not flatten the other rows. Full bar =</span> <b>HYPE +' +
+        (cap.hype * 100).toFixed(0) + '%</b><span>,</span> <b>LIT +' + (cap.lit * 100).toFixed(0) + '%</b><span>.</span></div>';
       levTable = '<div class="bw-head"><b>What Each Leverage Would Have Done</b><span><i>same ' +
         usdExact(budget) + ' over ' + p.days + ' days · click a row to take it</i></span></div>' +
+        '<div class="pb-pctl"><label class="pb-inp"><span>My total capital $</span><input type="number" step="10000" min="0" value="' +
+        Math.round(state.size) + '" data-size-input></label>' +
+        '<span class="pb-ro"><span>Deploy</span> <b>' + p.size + '%</b></span>' +
+        '<span class="pb-ro2"><span>→ principal in (margin):</span> <b>' + usdExact(budget) + '</b> <span>· days:</span> <b>' + p.days + '</b></span></div>' +
+        '<p class="pb-levsum">' + summary + '</p>' +
         '<div class="pb-tablewrap"><table class="pb-table pb-levtable"><thead><tr>' +
-        '<th>Leverage</th><th>HYPE path</th><th>LIT path</th><th>Verdict</th>' +
-        '</tr></thead><tbody>' + levTable + '</tbody></table></div>';
+        '<th>Leverage</th><th>Position</th><th>Liquidates at</th><th>HYPE path</th><th>LIT path</th><th>Verdict</th>' +
+        '</tr></thead><tbody>' + levTable + '</tbody></table></div>' + capNote;
     }
 
     /* The four postures, rendered from the grid search. Each card states the rule it won
@@ -1409,10 +1460,11 @@
       var v = Number(fi.value);
       if (isFinite(v) && v > 0) { state.fdv = v * 1e9; state.lev = state.days = state.sizePct = null; save(); render(); }
     });
-    var si = host.querySelector('[data-size-input]');
-    if (si) si.addEventListener('change', function () {
-      var v = Number(si.value);
-      if (isFinite(v) && v > 0) { state.size = v; save(); render(); }
+    host.querySelectorAll('[data-size-input]').forEach(function (si) {
+      si.addEventListener('change', function () {
+        var v = Number(si.value);
+        if (isFinite(v) && v > 0) { state.size = v; save(); render(); }
+      });
     });
     /* The staircase hit areas carry the same data-band contract as the table rows. */
     host.querySelectorAll('[data-band]').forEach(function (tr) {
@@ -1473,7 +1525,7 @@
     'font-weight:800;letter-spacing:.3px}',
     '.pb-chips button.pb-best:hover{background:var(--v2-accent,#4c9af8);color:var(--v2-bg)}',
     '.pb-key{display:inline-flex;align-items:center;gap:5px;color:var(--dim)!important;',
-    'font:700 9px var(--mono);letter-spacing:.6px;text-transform:uppercase}',
+    'font:700 11px var(--mono);letter-spacing:.4px;text-transform:uppercase}',
     '.pb-key>i{width:12px;height:2px;border-radius:1px;flex:0 0 auto}',
     '.pb-key>i.surv-ok{background:#4fd39a}.pb-key>i.surv-warn{background:#f7b955}',
     '.pb-key>i.surv-dead{background:#ff6b8b}',
@@ -1789,15 +1841,35 @@
     '.pb-act>em{display:block;margin:0 0 9px;color:var(--muted)!important;font:700 10px var(--mono);',
     'font-style:normal;letter-spacing:-.1px}',
     '.pb-act>p{margin:0;color:var(--dim)!important;font-size:11px;line-height:1.55}',
+    '.pb-levtable{min-width:900px!important}',
     '.pb-levtable td.pb-n{text-align:right}',
-    '.pb-levtable td.pb-n>b{display:block;color:var(--text);font:800 14px var(--mono);letter-spacing:-.4px}',
-    '.pb-levtable td.pb-n>small{display:block;margin-top:2px;color:var(--muted)!important;',
-    'font:600 10px var(--mono);letter-spacing:-.1px}',
+    '.pb-levtable td.pb-n>b{display:block;color:var(--text);font:800 15px var(--mono);letter-spacing:-.4px}',
+    '.pb-levtable td.pb-n>b.pb-spot{font-size:13px;color:var(--muted);white-space:normal}',
+    '.pb-levtable td.pb-n>small{display:block;margin-top:4px;color:var(--muted)!important;',
+    'font:600 12px/1.45 var(--mono);letter-spacing:-.1px;white-space:normal}',
+    '.pb-levtable td.pb-path{min-width:210px}',
     '.pb-levtable td.pb-n.dead>b{color:#ff6b8b}',
     'body.theme-light .pb-levtable td.pb-n.dead>b{color:#c22a4c}',
+    '.pb-pl{display:block;margin-top:3px;font:800 13px var(--mono)}',
+    '.pb-levtable .pb-pl.up{color:#4fd39a!important}.pb-levtable .pb-pl.dn{color:#ff6b8b!important}',
+    'body.theme-light .pb-levtable .pb-pl.up{color:#0e7a52!important}body.theme-light .pb-levtable .pb-pl.dn{color:#c22a4c!important}',
+    '.pb-bar{display:block;position:relative;height:6px;margin:7px 0 2px;border-radius:3px;background:rgba(127,127,127,.18)}',
+    '.pb-bar::after{content:"";position:absolute;left:50%;top:-2px;bottom:-2px;width:1px;background:var(--muted);opacity:.6}',
+    '.pb-bar>i{position:absolute;top:0;bottom:0;border-radius:3px}',
+    '.pb-bar>i.up{background:#4fd39a}.pb-bar>i.dn{background:#ff6b8b}',
+    'body.theme-light .pb-bar>i.up{background:#17a06f}body.theme-light .pb-bar>i.dn{background:#d8355a}',
+    '.pb-pctl{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px;margin:0 0 12px}',
+    '.pb-pctl .pb-inp{display:flex;align-items:center;gap:8px;color:var(--text);font:700 14px var(--mono)}',
+    '.pb-pctl .pb-inp input{width:150px;max-width:100%;font:800 15px var(--mono)}',
+    '.pb-ro{padding:5px 10px;border:1px solid var(--line);border-radius:999px;color:var(--muted);font:700 13px var(--mono)}',
+    '.pb-ro b{color:var(--text)}',
+    '.pb-ro2{color:var(--muted);font:600 14px var(--mono)}.pb-ro2 b{color:var(--text);font-weight:800}',
+    '.pb-levsum{margin:0 0 14px;color:var(--muted)!important;font-size:15px;line-height:1.7}',
+    '.pb-levsum b{color:var(--text);font-weight:800}.pb-levsum em{font-style:normal;color:var(--text);font-weight:700}',
+    '.pb-barnote{margin:0 0 26px;font-size:12px}',
     '.pb-levtable td.pb-rng>b{font:800 15px var(--mono)}',
     '.pb-levtable td.pb-rng>small{display:block;margin-top:2px;color:var(--v2-accent,#4c9af8)!important;',
-    'font:700 9px var(--mono);letter-spacing:.6px;text-transform:uppercase}',
+    'font:700 11px var(--mono);letter-spacing:.4px;text-transform:uppercase}',
 
     /* the band table once it carries its own history: five outcome columns beside the
        quote, so the quote gives up width and the numbers get their own block layout */

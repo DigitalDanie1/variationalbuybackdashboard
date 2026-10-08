@@ -1357,25 +1357,25 @@ function renderKing(){
    A/B reproduce the Perpetual Pulse "Circulating MarketCap vs OI" model (R^2~0.74, log-log). */
 const VAL_FIT={A:10.0339,B:0.8753,r2:0.74};
 const VAL_FLOAT=0.25; // assumed circulating float at TGE, for FDV
-let VAL_MCAP_ASOF='CoinGecko snapshot · 2026-10-04 22:36 SGT';
+let VAL_MCAP_ASOF='CoinGecko snapshot · 2026-10-08 14:40 SGT';
 /* Baked fallback for when the live CoinGecko call is rate-limited or CORS-blocked, which
    happens often enough that this snapshot is what most readers actually see. It had been
    sitting on 2026-08-01 while HYPE went from $52.1B to $86.0B and Lighter from $2.0B to
    $3.5B, so the FDV preset chips were quoting two-month-old comparables as if they were
    today's. Refreshed from the live board; oi values are left as last observed. */
 const VAL_COMPS=[
-  {n:'Hyperliquid',cg:'hyperliquid',oi:17059298032,mc:20028524831,fdv:86013756843,big:1},
-  {n:'Aster',cg:'aster-2',oi:2577523349,mc:1923676784,fdv:5532763922,big:1},
-  {n:'Lighter',cg:'lighter',oi:1191618484,mc:886982806,fdv:3547931224,big:1},
-  {n:'Jupiter',cg:'jupiter-exchange-solana',oi:231885286,mc:1095988006,fdv:2265522873,big:1},
-  {n:'edgeX',cg:'edgex',oi:460453045,mc:165106698,fdv:471733424},
-  {n:'dYdX',cg:'dydx-chain',oi:39069154,mc:125275641,fdv:141895548},
-  {n:'GMX',cg:'gmx',oi:49634401,mc:87177536,fdv:87177536},
-  {n:'ApeX Protocol',cg:'apex-token-2',oi:154933749,mc:35979277,fdv:115982009},
-  {n:'Avantis',cg:'avantis',oi:12551268,mc:44950104,fdv:126681378},
-  {n:'Orderly',cg:'orderly-network',oi:35976834,mc:15944812,fdv:38897482},
-  {n:'Gains Network',cg:'gains-network',oi:3337198,mc:9959809,fdv:9959809},
-  {n:'Drift',cg:'drift-protocol',oi:123964778,mc:14274783,fdv:19933113}
+  {n:'Hyperliquid',cg:'hyperliquid',oi:17059298032,mc:19368547114,fdv:83179441119,big:1},
+  {n:'Aster',cg:'aster-2',oi:2577523349,mc:1935286166,fdv:5557559733,big:1},
+  {n:'Lighter',cg:'lighter',oi:1191618484,mc:889116163,fdv:3556464650,big:1},
+  {n:'Jupiter',cg:'jupiter-exchange-solana',oi:231885286,mc:1246444115,fdv:2576531506,big:1},
+  {n:'edgeX',cg:'edgex',oi:460453045,mc:141079174,fdv:403083354},
+  {n:'dYdX',cg:'dydx-chain',oi:39069154,mc:112960315,fdv:127946388},
+  {n:'GMX',cg:'gmx',oi:49634401,mc:86402055,fdv:86402055},
+  {n:'ApeX Protocol',cg:'apex-token-2',oi:154933749,mc:36939207,fdv:119076419},
+  {n:'Avantis',cg:'avantis',oi:12551268,mc:45239909,fdv:127425753},
+  {n:'Orderly',cg:'orderly-network',oi:35976834,mc:14812269,fdv:35996280},
+  {n:'Gains Network',cg:'gains-network',oi:3337198,mc:9133060,fdv:9133060},
+  {n:'Drift',cg:'drift-protocol',oi:123964778,mc:14238451,fdv:19608568}
 ];
 const valPred=oi=>VAL_FIT.A*Math.pow(oi,VAL_FIT.B);
 function fmtBig(v){return v>=1e9?'$'+(v/1e9).toFixed(2)+'B':v>=1e6?'$'+(v/1e6).toFixed(0)+'M':'$'+fmtK(v);}
@@ -2993,6 +2993,114 @@ function renderPointsMatrix(){
   });
   box.innerHTML=html;
 }
+/* ---------- Pepe wealth ladder: mascot tier follows the airdrop value ---------- */
+var PP=window.__PP||(window.__PP={last:-1,fxAt:0,io:false,vis:true});
+var PP_TIERS=[
+  {min:0,name:'Ramen Pepe',cap:'Instant noodles and copium. Farm harder.'},
+  {min:1e3,name:'Coffee Money',cap:'Covers the coffee run. Wen lambo?'},
+  {min:1e4,name:'Rent Paid',cap:'Landlord off your back. Shades on.'},
+  {min:1e5,name:'Miami Mode',cap:'Gold chain on, beach house in the group chat.'},
+  {min:1e6,name:'Lambo Pepe',cap:'The valet knows your name. Number go up.'},
+  {min:1e7,name:'Moon Pepe',cap:'Generational wealth. Touch grass? Touch the moon.'}
+];
+var PP_CAP=30; // hard ceiling on live particles (rain + stars + confetti)
+function ppFmt(n){
+  const u=[[1e9,'B'],[1e6,'M'],[1e3,'K']];
+  for(let i=0;i<u.length;i++){
+    const [d,l]=u[i];
+    if(n>=d*0.9995||(n>=d&&i===0)){
+      const x=n/d,t=(x<10?x.toFixed(2):x<100?x.toFixed(1):x.toFixed(0)).replace(/\.?0+$/,'');
+      return '$'+t+l;
+    }
+  }
+  return '$'+Math.round(n);
+}
+function ppTierOf(v){let t=0;for(let i=1;i<PP_TIERS.length;i++)if(v>=PP_TIERS[i].min)t=i;return t;}
+function ppSet(el,txt){if(el&&el._pp!==txt){el._pp=txt;el.textContent=txt;}}
+function ppReduced(){return window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;}
+function ppRain(tier){
+  const box=document.querySelector('#ppStage .pp-rain');if(!box)return;
+  box.textContent='';
+  if(ppReduced()||tier<3)return;
+  const money=tier===3?6:tier===4?10:8, stars=tier===5?4:0;
+  const n=Math.min(money,PP_CAP-stars);
+  for(let i=0;i<n;i++){
+    const e=document.createElement('span');e.className='pp-p';e.textContent='\u{1F4B5}';
+    e.style.cssText='--x:'+(4+Math.random()*90).toFixed(1)+'%;--s:'+(10+Math.random()*4).toFixed(0)+'px;--d:'+(3+Math.random()*2.5).toFixed(2)+'s;--dl:-'+(Math.random()*5).toFixed(2)+'s;--sw:'+((Math.random()*30-15)|0)+'px;--r:'+((Math.random()*160-80)|0)+'deg';
+    box.appendChild(e);
+  }
+  for(let i=0;i<stars;i++){
+    const e=document.createElement('span');e.className='pp-p star';e.textContent='✦';
+    e.style.cssText='--x:'+(6+Math.random()*88).toFixed(1)+'%;--y:'+(Math.random()*55).toFixed(0)+'%;--s:'+(8+Math.random()*6).toFixed(0)+'px;--d:'+(1.6+Math.random()*1.6).toFixed(2)+'s;--dl:-'+(Math.random()*3).toFixed(2)+'s';
+    box.appendChild(e);
+  }
+}
+function ppConfetti(count){
+  const box=document.querySelector('#ppStage .pp-burst');if(!box||ppReduced())return;
+  const cols=['#ffd24a','#ff5d8f','#55b8ff','#6fe0a0','#c79bff','#fff'];
+  const live=document.querySelectorAll('#ppStage .pp-p').length;
+  const n=Math.max(0,Math.min(count,PP_CAP-live));
+  box.textContent='';
+  for(let i=0;i<n;i++){
+    const e=document.createElement('i');e.className='pp-c';
+    const a=Math.random()*Math.PI*2,r=40+Math.random()*80;
+    e.style.cssText='--c:'+cols[i%cols.length]+';--dx:'+(Math.cos(a)*r*1.3).toFixed(0)+'px;--dy:'+(Math.sin(a)*r*0.8-30).toFixed(0)+'px;--r:'+((Math.random()*720-360)|0)+'deg';
+    box.appendChild(e);
+  }
+  setTimeout(()=>{box.textContent='';},1500);
+}
+function ppPop(txt,down){
+  const el=document.querySelector('#ppStage .pp-pop');if(!el)return;
+  el.textContent=txt;el.classList.toggle('down',!!down);
+  el.classList.remove('go');void el.offsetWidth;el.classList.add('go');
+}
+function ppFire(from,to){
+  const stage=document.getElementById('ppStage');if(!stage)return;
+  const sec=document.querySelector('[data-tg="points"]');
+  if(!sec||sec.classList.contains('tg-hide'))return; // only play while the Points tab is showing
+  const now=Date.now();if(now-PP.fxAt<600)return;PP.fxAt=now;
+  if(to>from){
+    ppPop('LEVEL UP!');
+    if(to>=3)ppConfetti(to>=5?16:to>=4?14:8);
+    if(to>=5&&sec&&!ppReduced()){sec.classList.remove('pp-shake');void sec.offsetWidth;sec.classList.add('pp-shake');setTimeout(()=>sec.classList.remove('pp-shake'),550);}
+  }else{
+    ppPop('\u{1F4C9}',true);
+    stage.classList.remove('wob');void stage.offsetWidth;stage.classList.add('wob');setTimeout(()=>stage.classList.remove('wob'),700);
+  }
+}
+function ppUpdate(v){
+  const stage=document.getElementById('ppStage');if(!stage)return;
+  v=isFinite(v)&&v>0?v:0;
+  const t=ppTierOf(v),T=PP_TIERS[t],N=PP_TIERS[t+1];
+  let pct=1;
+  if(N)pct=t===0?v/N.min:Math.log(v/T.min)/Math.log(N.min/T.min);
+  pct=Math.max(0,Math.min(1,pct||0));
+  const q=(sel)=>stage.querySelector(sel);
+  ppSet(q('.pp-name'),T.name);
+  ppSet(q('.pp-val'),ppFmt(v));
+  ppSet(q('.pp-nl'),N?'next:':'MAX LEVEL');
+  ppSet(q('.pp-nname'),N?N.name:'');
+  ppSet(q('.pp-at'),N?'at':'');
+  ppSet(q('.pp-nthr'),N?ppFmt(N.min):'');
+  ppSet(q('.pp-pct'),'('+(N?Math.min(99,Math.floor(pct*100)):100)+'%)');
+  q('.pp-bar i').style.width=(pct*100).toFixed(1)+'%';
+  ppSet(document.querySelector('#ppMascot .pp-cap'),T.cap);
+  if(t!==PP.last){
+    const from=PP.last;
+    stage.dataset.tier=t;
+    stage.querySelectorAll('.pp-prop').forEach(e=>{
+      const mn=+(e.dataset.min||0),mx=+(e.dataset.max||99),on=t>=mn&&t<=mx,was=e.classList.contains('on');
+      if(on&&!was)e.classList.add('on');else if(!on)e.classList.remove('on');
+    });
+    ppRain(t);
+    PP.last=t;
+    if(from>=0)ppFire(from,t); // first paint sets the tier silently
+  }
+  if(!PP.io&&'IntersectionObserver' in window){
+    PP.io=true;
+    new IntersectionObserver(es=>es.forEach(e=>stage.classList.toggle('pp-off',!e.isIntersecting))).observe(stage);
+  }
+}
 function renderPointsCalc(){
   if(!$('#ptsMine'))return;
   const mine=Math.max(0,parseFloat($('#ptsMine').value)||0);
@@ -3018,6 +3126,7 @@ function renderPointsCalc(){
   $('#ptsShareOfPool').textContent=ptsSigPct(share*100,4);
   const airdropVal=fdv*0.32*share;
   $('#ptsAirdropValue').textContent=fmtUSD(airdropVal);
+  ppUpdate(airdropVal);
   const perPt=pool>0?fdv*0.32/pool:0;
   $('#ptsPerPointVal').textContent=fmtUSD(perPt,2);
   // highlight matching FDV preset (within 1%)
