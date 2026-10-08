@@ -2993,6 +2993,137 @@ function renderPointsMatrix(){
   });
   box.innerHTML=html;
 }
+/* ---------- Pepe wealth ladder: mascot tier follows the airdrop value ---------- */
+var PP=window.__PP||(window.__PP={last:-1,fxAt:0,io:false,vis:true});
+var PP_TIERS=[
+  {min:0,name:'Ramen Pepe',cap:'Instant noodles and copium. Farm harder.'},
+  {min:1e3,name:'Coffee Money',cap:'Covers the coffee run. Wen lambo?'},
+  {min:1e4,name:'Rent Paid',cap:'Landlord off your back. Shades on.'},
+  {min:1e5,name:'Miami Mode',cap:'Gold chain on, beach house in the group chat.'},
+  {min:1e6,name:'Lambo Pepe',cap:'The valet knows your name. Number go up.'},
+  {min:1e7,name:'Moon Pepe',cap:'Generational wealth. Touch grass? Touch the moon.'}
+];
+var PP_CAP=30; // hard ceiling on live particles (rain + stars + confetti)
+function ppFmt(n){
+  const u=[[1e9,'B'],[1e6,'M'],[1e3,'K']];
+  for(let i=0;i<u.length;i++){
+    const [d,l]=u[i];
+    if(n>=d*0.9995||(n>=d&&i===0)){
+      const x=n/d,t=(x<10?x.toFixed(2):x<100?x.toFixed(1):x.toFixed(0)).replace(/(\.\d*?)0+$/,'$1').replace(/\.$/,''); // strip decimal zeros only: 100K must stay 100K
+      return '$'+t+l;
+    }
+  }
+  return '$'+Math.round(n);
+}
+function ppTierOf(v){let t=0;for(let i=1;i<PP_TIERS.length;i++)if(v>=PP_TIERS[i].min)t=i;return t;}
+function ppSet(el,txt){if(el&&el._pp!==txt){el._pp=txt;el.textContent=txt;}}
+function ppReduced(){return window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;}
+function ppRain(tier){
+  const box=document.querySelector('#ppStage .pp-rain');if(!box)return;
+  box.textContent='';
+  if(ppReduced()||tier<3)return;
+  const money=tier===3?6:tier===4?10:8, stars=tier===5?4:0;
+  const n=Math.min(money,PP_CAP-stars);
+  for(let i=0;i<n;i++){
+    const e=document.createElement('span');e.className='pp-p coin';e.textContent='$';
+    e.style.cssText='--x:'+(4+Math.random()*90).toFixed(1)+'%;--s:'+(10+Math.random()*4).toFixed(0)+'px;--d:'+(3+Math.random()*2.5).toFixed(2)+'s;--dl:-'+(Math.random()*5).toFixed(2)+'s;--sw:'+((Math.random()*30-15)|0)+'px;--r:'+((Math.random()*160-80)|0)+'deg';
+    box.appendChild(e);
+  }
+  for(let i=0;i<stars;i++){
+    const e=document.createElement('span');e.className='pp-p star';e.textContent='✦';
+    e.style.cssText='--x:'+(6+Math.random()*88).toFixed(1)+'%;--y:'+(Math.random()*55).toFixed(0)+'%;--s:'+(8+Math.random()*6).toFixed(0)+'px;--d:'+(1.6+Math.random()*1.6).toFixed(2)+'s;--dl:-'+(Math.random()*3).toFixed(2)+'s';
+    box.appendChild(e);
+  }
+}
+function ppConfetti(count){
+  const box=document.querySelector('#ppStage .pp-burst');if(!box||ppReduced())return;
+  const cols=['#ffd24a','#ff5d8f','#55b8ff','#6fe0a0','#c79bff','#fff'];
+  const live=document.querySelectorAll('#ppStage .pp-p').length;
+  const n=Math.max(0,Math.min(count,PP_CAP-live));
+  box.textContent='';
+  for(let i=0;i<n;i++){
+    const e=document.createElement('i');e.className='pp-c';
+    const a=Math.random()*Math.PI*2,r=40+Math.random()*80;
+    e.style.cssText='--c:'+cols[i%cols.length]+';--dx:'+(Math.cos(a)*r*1.3).toFixed(0)+'px;--dy:'+(Math.sin(a)*r*0.8-30).toFixed(0)+'px;--r:'+((Math.random()*720-360)|0)+'deg';
+    box.appendChild(e);
+  }
+  setTimeout(()=>{box.textContent='';},1500);
+}
+function ppPop(txt,down){
+  const el=document.querySelector('#ppStage .pp-pop');if(!el)return;
+  el.textContent=txt;el.classList.toggle('down',!!down);
+  el.classList.remove('go');void el.offsetWidth;el.classList.add('go');
+}
+function ppFire(from,to){
+  const stage=document.getElementById('ppStage');if(!stage)return;
+  const sec=document.querySelector('[data-tg="points"]');
+  if(!sec||sec.classList.contains('tg-hide'))return; // only play while the Points tab is showing
+  const now=Date.now();if(now-PP.fxAt<600)return;PP.fxAt=now;
+  if(to>from){
+    ppPop('LEVEL UP!');
+    if(to>=3)ppConfetti(to>=5?16:to>=4?14:8);
+    if(to>=5&&sec&&!ppReduced()){sec.classList.remove('pp-shake');void sec.offsetWidth;sec.classList.add('pp-shake');setTimeout(()=>sec.classList.remove('pp-shake'),550);}
+  }else{
+    ppPop('LEVEL DOWN',true);
+    stage.classList.remove('wob');void stage.offsetWidth;stage.classList.add('wob');setTimeout(()=>stage.classList.remove('wob'),700);
+  }
+}
+/* The photo is portrait (858x1280) and the frog is tiny inside it. Instead of zooming a fixed
+   crop, size the image so the car and the frog fill the view, and hand the frog/car positions to
+   CSS in px so every prop sits on the right spot at any card width. Coordinates are natural px. */
+var PP_ANCH={head:[453,1121],top:[453,1104],neck:[453,1146],hand:[488,1172],tl1:[52,1110],tl2:[236,1112],plate:[125,1148],sky:[453,1040]};
+function ppLayout(){
+  const view=document.querySelector('#ppStage .pp-view'),img=view&&view.querySelector('img');
+  if(!view||!img)return;
+  const W=view.clientWidth,H=view.clientHeight;if(!W||!H)return;
+  const s=Math.max(W/560,H/1280),iw=858*s,ih=1280*s;
+  let left=W/2-290*s;left=Math.min(0,Math.max(W-iw,left));
+  let top=H-1245*s;top=Math.min(0,Math.max(H-ih,top));
+  // older mascot rules size this img with !important, so the layout has to win the same way
+  const set=(k,v)=>img.style.setProperty(k,v.toFixed(1)+'px','important');
+  set('width',iw);set('height',ih);set('left',left);set('top',top);
+  img.style.setProperty('object-fit','fill','important');img.style.setProperty('max-height','none','important');img.style.setProperty('min-height','0','important');img.style.setProperty('margin','0','important');
+  view.style.setProperty('--s',s.toFixed(4));
+  for(const k in PP_ANCH){
+    view.style.setProperty('--'+k+'x',(left+PP_ANCH[k][0]*s).toFixed(1)+'px');
+    view.style.setProperty('--'+k+'y',(top+PP_ANCH[k][1]*s).toFixed(1)+'px');
+  }
+  if(!PP.ro&&'ResizeObserver' in window){PP.ro=true;new ResizeObserver(()=>ppLayout()).observe(view);}
+}
+function ppUpdate(v){
+  const stage=document.getElementById('ppStage');if(!stage)return;
+  ppLayout();
+  v=isFinite(v)&&v>0?v:0;
+  const t=ppTierOf(v),T=PP_TIERS[t],N=PP_TIERS[t+1];
+  let pct=1;
+  if(N)pct=t===0?v/N.min:Math.log(v/T.min)/Math.log(N.min/T.min);
+  pct=Math.max(0,Math.min(1,pct||0));
+  const q=(sel)=>stage.querySelector(sel);
+  ppSet(q('.pp-name'),T.name);
+  ppSet(q('.pp-val'),ppFmt(v));
+  ppSet(q('.pp-nl'),N?'next:':'MAX LEVEL');
+  ppSet(q('.pp-nname'),N?N.name:'');
+  ppSet(q('.pp-at'),N?'at':'');
+  ppSet(q('.pp-nthr'),N?ppFmt(N.min):'');
+  ppSet(q('.pp-pct'),'('+(N?Math.min(99,Math.floor(pct*100)):100)+'%)');
+  q('.pp-bar i').style.width=(pct*100).toFixed(1)+'%';
+  ppSet(document.querySelector('#ppMascot .pp-cap'),T.cap);
+  if(t!==PP.last){
+    const from=PP.last;
+    stage.dataset.tier=t;
+    stage.querySelectorAll('.pp-prop').forEach(e=>{
+      const mn=+(e.dataset.min||0),mx=+(e.dataset.max||99),on=t>=mn&&t<=mx,was=e.classList.contains('on');
+      if(on&&!was)e.classList.add('on');else if(!on)e.classList.remove('on');
+    });
+    ppRain(t);
+    PP.last=t;
+    if(from>=0)ppFire(from,t); // first paint sets the tier silently
+  }
+  if(!PP.io&&'IntersectionObserver' in window){
+    PP.io=true;
+    new IntersectionObserver(es=>es.forEach(e=>stage.classList.toggle('pp-off',!e.isIntersecting))).observe(stage);
+  }
+}
 function renderPointsCalc(){
   if(!$('#ptsMine'))return;
   const mine=Math.max(0,parseFloat($('#ptsMine').value)||0);
@@ -3018,6 +3149,7 @@ function renderPointsCalc(){
   $('#ptsShareOfPool').textContent=ptsSigPct(share*100,4);
   const airdropVal=fdv*0.32*share;
   $('#ptsAirdropValue').textContent=fmtUSD(airdropVal);
+  ppUpdate(airdropVal);
   const perPt=pool>0?fdv*0.32/pool:0;
   $('#ptsPerPointVal').textContent=fmtUSD(perPt,2);
   // highlight matching FDV preset (within 1%)

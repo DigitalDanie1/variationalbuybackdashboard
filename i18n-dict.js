@@ -18,8 +18,22 @@
 window.__VDICT = {
   ko: {
     /* ---- Points · Pepe wealth ladder ---- */
+    "Ramen Pepe": "라면 페페",
+    "Coffee Money": "커피값 페페",
+    "Rent Paid": "월세 해결",
+    "Miami Mode": "마이애미 모드",
+    "Lambo Pepe": "람보 페페",
+    "Moon Pepe": "달나라 페페",
+    "Instant noodles and copium. Farm harder.": "컵라면과 희망회로. 더 열심히 파밍하자.",
+    "Covers the coffee run. Wen lambo?": "커피 한 잔은 해결. 람보는 언제?",
+    "Landlord off your back. Shades on.": "집주인 걱정 끝. 선글라스 착용.",
+    "Gold chain on, beach house in the group chat.": "금목걸이 착용, 단톡방엔 비치하우스 얘기.",
+    "The valet knows your name. Number go up.": "발레파킹 기사가 이름을 압니다. 숫자는 오른다.",
+    "Generational wealth. Touch grass? Touch the moon.": "대대손손 부자. 잔디? 아니, 달을 만지자.",
     "next:": "다음:",
     "at": "기준",
+    "MAX LEVEL": "최고 레벨",
+    "LEVEL UP!": "레벨 업!",
     "Annualised revenue": "연환산 매출",
     "$2.48M over 14 days, × 365 ÷ 14": "14일간 $2.48M, × 365 ÷ 14",
     /* ---- Tab 13 · comparables priced, and the time under water ---- */
@@ -2508,8 +2522,22 @@ window.__VDICT = {
   },
   zh: {
     /* ---- Points · Pepe wealth ladder ---- */
+    "Ramen Pepe": "泡面佩佩",
+    "Coffee Money": "咖啡钱佩佩",
+    "Rent Paid": "房租搞定",
+    "Miami Mode": "迈阿密模式",
+    "Lambo Pepe": "兰博佩佩",
+    "Moon Pepe": "登月佩佩",
+    "Instant noodles and copium. Farm harder.": "泡面加自我安慰。再努力刷点吧。",
+    "Covers the coffee run. Wen lambo?": "咖啡钱够了。兰博基尼什么时候来？",
+    "Landlord off your back. Shades on.": "房东不再催了。墨镜戴上。",
+    "Gold chain on, beach house in the group chat.": "金链子戴上，群里聊起了海滨别墅。",
+    "The valet knows your name. Number go up.": "代客泊车的小哥都认识你了。数字继续涨。",
+    "Generational wealth. Touch grass? Touch the moon.": "几代人的财富。去摸草地？不，去摸月亮。",
     "next:": "下一级：",
     "at": "需要",
+    "MAX LEVEL": "满级",
+    "LEVEL UP!": "升级！",
     "Annualised revenue": "年化收入",
     "$2.48M over 14 days, × 365 ÷ 14": "14 天 $2.48M，× 365 ÷ 14",
     /* ---- Tab 13 · comparables priced, and the time under water ---- */
