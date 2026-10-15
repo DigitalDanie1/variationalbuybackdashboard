@@ -9833,6 +9833,20 @@ body.theme-light .bw-viz text.bw-pct.in{fill:#fff!important}
       <div><span class="cmp-eyebrow">D · FUNDRAISE HISTORY</span><h3>Three rounds, ≈ $61.8M disclosed</h3></div>
       <p>Valuation was not disclosed for any round. Names are tagged by how well they are sourced: primary press carries the round, secondary outlets add some participants.</p>
     </div>
+    <div class="tk-backers" aria-labelledby="tkBackersTitle">
+      <h4 id="tkBackersTitle">Variational investors</h4>
+      <p class="tk-note">Investor logos from Variational’s official website. Round labels follow the funding announcements below.</p>
+      <div class="tk-investor-grid">
+        <div class="tk-investor"><div class="tk-investor-logo"><img src="assets/investors/dragonfly.svg" alt="Dragonfly logo" width="180" height="64" loading="lazy"></div><strong>Dragonfly</strong><span>Seed · Series A lead</span></div>
+        <div class="tk-investor"><div class="tk-investor-logo"><img src="assets/investors/bain.svg" alt="Bain Capital Crypto logo" width="180" height="64" loading="lazy"></div><strong>Bain Capital Crypto</strong><span>Seed co-lead · Series A</span></div>
+        <div class="tk-investor"><div class="tk-investor-logo"><img src="assets/investors/peak.svg" alt="Peak XV Partners logo" width="180" height="64" loading="lazy"></div><strong>Peak XV Partners</strong><span>Seed co-lead</span></div>
+        <div class="tk-investor"><div class="tk-investor-logo"><img src="assets/investors/coinbase.svg" alt="Coinbase Ventures logo" width="180" height="64" loading="lazy"></div><strong>Coinbase Ventures</strong><span>Seed · Series A</span></div>
+        <div class="tk-investor"><div class="tk-investor-logo"><img src="assets/investors/mirana.svg" alt="Mirana Ventures logo" width="180" height="64" loading="lazy"></div><strong>Mirana Ventures</strong><span>Strategic</span></div>
+        <div class="tk-investor"><div class="tk-investor-logo"><img src="assets/investors/caladan.svg" alt="Caladan logo" width="180" height="64" loading="lazy"></div><strong>Caladan</strong><span>Strategic</span></div>
+      </div>
+      <p class="tk-note">Additional announced investors: <b>North Island Ventures</b> · <b>Hack VC</b> (Seed); <b>Zoku Ventures</b> (Strategic).</p>
+      <p class="tk-note">Sources: <a href="https://www.variational.io/" target="_blank" rel="noopener noreferrer">Official investor roster</a> · <a href="https://www.linkedin.com/posts/variational_today-were-excited-to-share-that-variational-activity-7254863632050577408-rSPT" target="_blank" rel="noopener noreferrer">Seed announcement</a> · <a href="https://www.theblock.co/press-releases/357076/variational-announces-1-5-million-strategic-round-and-launches-referral-program" target="_blank" rel="noopener noreferrer">Strategic announcement</a></p>
+    </div>
     <ol class="tk-tl">
       <li>
         <i></i><span class="tk-tl-d">Closed Dec 2021 · announced 2024-10-23</span>
@@ -10337,6 +10351,16 @@ body.theme-light .bw-viz text.bw-pct.in{fill:#fff!important}
 
 
 <style id="tokenomics-room">
+  [data-tg="tokenomics"] .tk-backers{margin-top:24px}
+  [data-tg="tokenomics"] .tk-backers h4{color:var(--ink);font:750 17px var(--sans)}
+  [data-tg="tokenomics"] .tk-investor-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:16px}
+  [data-tg="tokenomics"] .tk-investor{min-width:0;border:1px solid var(--line);padding:20px 16px;background:var(--panel)}
+  [data-tg="tokenomics"] .tk-investor-logo{display:flex;align-items:center;justify-content:center;height:88px;background:#10151c;border-radius:6px;margin-bottom:16px;padding:12px}
+  [data-tg="tokenomics"] .tk-investor-logo img{width:auto;max-width:100%;height:auto;max-height:64px;object-fit:contain;filter:brightness(0) invert(1)}
+  [data-tg="tokenomics"] .tk-investor strong{display:block;color:var(--ink);font:750 13px var(--sans)}
+  [data-tg="tokenomics"] .tk-investor>span{display:block;margin-top:7px;color:var(--sub);font:11px var(--sans)}
+  @media(max-width:650px){[data-tg="tokenomics"] .tk-investor-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
   /* Tokenomics / Fundraise. Every selector is prefixed .tk- and scoped under [data-tg="tokenomics"]
      so it cannot reach another workspace. It reuses the Pre-TGE tab's .pt-block / .pt-src shells and
      the shell's own tokens only: the airdrop takes the accent, Team + Investors a muted mix of it,
