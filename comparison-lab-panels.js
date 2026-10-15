@@ -17,6 +17,15 @@
    publishes no fee series for it, so the value is net treasury-wallet
    inflow divided by the allocation ratio observed in the official
    biweekly reports (20%). It is labelled as modeled everywhere it shows.
+
+   ONE SNAPSHOT. Every "current" figure on the Comparison tab — open interest,
+   24H volume, 30D fee pool, 30D treasury, take rate, turnover, share — is read
+   from the VENUES store through window.CmpSnap, which re-derives the 30D figures
+   from daily series over ONE shared 30-day window (WINDOW.end) each time it is
+   asked. The dashboard's own cards (verdict, KPIs, head-to-head table) read the
+   same object, and any data arrival re-renders both halves. Money figures carry
+   one of three tags: MODELED (fee pool = treasury inflow / 20%), WALLET INFLOW
+   (treasury net balance change) or REPORTED (peers, DeFiLlama).
    ------------------------------------------------------------------ */
 'use strict';
 
@@ -43,7 +52,7 @@ const VENUES = [
   /* n            slug (DeFiLlama)              cg (CoinGecko name)  logo                                oi            vol24         vol30           fees30 */
   {n:'Hyperliquid',   slug:'hyperliquid',                cg:'Hyperliquid',   logo:'logo-hyperliquid.png',                oi:17090136731, vol24:2348502332, vol30:200018813276, fees30:53048393, rev30: 39741303, hold30: 39741303, sup30: 13527563, ceiling:true},
   {n:'Aster',         slug:'aster',                      cg:'Aster',         logo:'logo-aster.png',                      oi: 2584185384, vol24: 685831528, vol30: 47829594323, fees30: 4883477, rev30: null, hold30: 4051865, sup30: null},
-  {n:'Variational',   slug:'variational',                cg:'Variational Omni', logo:'variational-symbol-transparent.png', oi: 2153375689, vol24: 920445002, vol30: 26731975907, fees30: VAR_TREASURY_30D/VAR_SPREAD_SHARE, rev30: VAR_TREASURY_30D, hold30: null, sup30: null, me:true, modeled:true},
+  {n:'Variational',   slug:'variational',                cg:'Variational Omni', logo:'variational-symbol-transparent.png', oi: 2153375689, vol24: 920445002, vol30: null, fees30: VAR_TREASURY_30D/VAR_SPREAD_SHARE, rev30: VAR_TREASURY_30D, hold30: null, sup30: null, me:true, modeled:true},
   {n:'Lighter',       slug:'lighter',                    cg:'Lighter',       logo:'lighter-logo.png',                    oi:  1192848158, vol24: 533349250, vol30: 37087407828, fees30: 3272031, rev30: 2325722, hold30: 2033208, sup30: 1216773},
   {n:'edgeX',         slug:'edgex',                      cg:'edgeX',         logo:'logo-edgex.png',                      oi:  461153179, vol24: 295915411, vol30: 30165985089, fees30: 2358699, rev30: 1903181, hold30: 620120, sup30: 793691},
   {n:'GRVT',          slug:'grvt',                       cg:'GRVT',          logo:'logo-grvt.png',                       oi:  478186664, vol24:  466245137, vol30: 17832316970, fees30: null, rev30: null, hold30: null, sup30: null},
@@ -95,10 +104,124 @@ const oiShare  = v => { const t=VENUES.reduce((s,x)=>s+(x.oi||0),0); return t? v
 const capture  = v => (v.rev30>0 && v.fees30>0) ? v.rev30/v.fees30*100 : null; /* kept of what traders pay */
 const byName   = n => VENUES.find(v => v.n===n);
 
+/* ---------- ONE SNAPSHOT ----------
+   30D figures are never read from a venue's own "total30d" once daily series exist: fees,
+   revenue and volume are summed over the SAME 30 calendar days for every venue, and
+   Variational's treasury inflow is the wallet-balance change over those same days. */
+const WIN_DAYS=30;
+const TREAS={through:null,stale:false,lag:null,basis:'report',value:null};
+const WINDOW={end:null,peerEnd:null};
+const dayDiff=(a,b)=>Math.round((Date.parse(a+'T00:00:00Z')-Date.parse(b+'T00:00:00Z'))/864e5);
+const lastKey=m=>{ let k=null; for(const d in (m||{})) if(k===null||d>k) k=d; return k; };
+const sumWin=(m,end,days)=>{
+  if(!m||!end) return null;
+  let t=0,n=0;
+  for(let i=0;i<days;i++){ const x=m[addDaysIso(end,-i)]; if(x!=null){ t+=x; n++; } }
+  return n>=Math.ceil(days*0.8)?t:null;
+};
+function recomputeSnapshot(){
+  const va=byName('Variational');
+  /* 1. where the data ends */
+  const ends=[];
+  VENUES.forEach(v=>{ if(v.modeled||!v.slug) return; const D=DAILY[v.n]||{};
+    const a=lastKey(D.fee), b=lastKey(D.vol); if(a&&b) ends.push(a<b?a:b); });
+  ends.sort();
+  WINDOW.peerEnd=ends.length?ends[Math.floor(ends.length/2)]:null;
+  let through=null;
+  if(typeof SERIES!=='undefined'&&Array.isArray(SERIES)&&SERIES.length>31&&typeof cumAt==='function')
+    through=SERIES[SERIES.length-1].d;
+  TREAS.through=through;
+  const today=(typeof resetDateKey==='function')?resetDateKey():new Date().toISOString().slice(0,10);
+  TREAS.lag=through?dayDiff(today,through):null;
+  /* a closed ET day behind today is normal; more than three means the series is genuinely behind */
+  TREAS.stale=!through||TREAS.lag>3;
+  /* 2. one window end for everyone: the earlier of the two series, so no venue is read a day
+        further than another */
+  let E=through;
+  if(WINDOW.peerEnd&&through&&WINDOW.peerEnd<through) E=WINDOW.peerEnd;
+  WINDOW.end=E;
+  /* 3. peers: sum the daily series over that window */
+  VENUES.forEach(v=>{
+    if(v.modeled) return;
+    const D=DAILY[v.n]||{}; v.win=null;
+    if(!E||!v.slug||!D.fee||!D.vol) return;
+    const f=sumWin(D.fee,E,WIN_DAYS), vo=sumWin(D.vol,E,WIN_DAYS);
+    if(f==null||vo==null) return;
+    v.fees30=f; v.vol30=vo; v.win=E;
+    const r=sumWin(D.rev,E,WIN_DAYS);  if(r!=null) v.rev30=r;
+    const h=sumWin(D.hold,E,WIN_DAYS); if(h!=null) v.hold30=h;
+    const sp=sumWin(D.sup,E,WIN_DAYS); if(sp!=null) v.sup30=sp;
+  });
+  /* 4. Variational: wallet inflow over the same days, fee pool modeled from it */
+  if(va&&E){
+    let t30=null, basis='report';
+    if(SERIES[0].d<=addDaysIso(E,-WIN_DAYS)){
+      const w=cumAt(E)-cumAt(addDaysIso(E,-WIN_DAYS));
+      if(w>0){ t30=w; basis='wallet'; }
+    }
+    if(t30==null) t30=VAR_TREASURY_30D;
+    TREAS.basis=basis; TREAS.value=t30;
+    va.rev30=t30; va.fees30=t30/VAR_SPREAD_SHARE;
+    const vv=sumWin((DAILY.Variational||{}).vol,E,WIN_DAYS);
+    va.vol30=vv; va.win=vv!=null?E:null;
+  }
+}
+/* tags: one vocabulary for money, used by every panel */
+const TAG={
+  modeled:'MODELED', wallet:'WALLET INFLOW', reported:'REPORTED', policy:'POLICY'
+};
+const tagHtml=(k,title)=>`<i class="rm-flag" title="${esc(title||'')}">${TAG[k]}</i>`;
+const TAG_NOTE={
+  modeled:`modeled: treasury inflow ÷ ${(VAR_SPREAD_SHARE*100).toFixed(0)}% allocation`,
+  wallet:'net change in the Arbitrum treasury wallet, not audited revenue',
+  reported:'as published by DeFiLlama',
+  policy:'stated policy, not a measurement'
+};
+/* ---- comparative wording, generated from the numbers that are drawn ---- */
+const near=(a,b)=>Math.abs(a-b)<=Math.max(Math.abs(a),Math.abs(b))*0.005;
+const andList=a=>a.length<2?a.join(''):a.slice(0,-1).join(', ')+' and '+a[a.length-1];
+/* where `me` stands against each other value: higher is ahead unless `lowerIsBetter` */
+function stand(me,others,lowerIsBetter,fmt){
+  const st={ahead:[],behind:[],level:[],n:0};
+  others.forEach(o=>{
+    if(o.v==null||me==null) return; st.n++;
+    if(near(me,o.v)||(fmt&&fmt(me)===fmt(o.v))) st.level.push(o.n);
+    else if(lowerIsBetter?me<o.v:me>o.v) st.ahead.push(o.n);
+    else st.behind.push(o.n);
+  });
+  return st;
+}
+const standClass=st=>!st.n?'none':st.ahead.length===st.n?'win':st.behind.length===st.n?'lose':'mixed';
+function standPhrase(st,metric){
+  if(!st.n) return null;
+  const c=standClass(st), both=st.n>1;
+  if(c==='win')  return `leads ${both?'both peers':st.ahead[0]} on ${metric}`;
+  if(c==='lose') return `trails ${both?'both peers':st.behind[0]} on ${metric}`;
+  const bits=[];
+  if(st.ahead.length)  bits.push('leads '+andList(st.ahead));
+  if(st.level.length)  bits.push('is level with '+andList(st.level));
+  if(st.behind.length) bits.push('trails '+andList(st.behind));
+  return `${bits.join(' but ')} on ${metric}`;
+}
+function verdictText(){
+  const va=byName('Variational'), li=byName('Lighter'), ex=byName('Extended');
+  const pair=k=>[{n:'Lighter',v:li?li[k]:null},{n:'Extended',v:ex?ex[k]:null}];
+  const so=stand(va.oi,pair('oi')), sf=stand(va.fees30,pair('fees30'));
+  const po=standPhrase(so,'OI'), pf=standPhrase(sf,'modeled 30D fee pool');
+  if(!po||!pf) return {head:'Compare activity first. Read what each protocol keeps on its own basis.',sub:''};
+  const co=standClass(so), cf=standClass(sf);
+  const head=(co===cf&&(co==='win'||co==='lose'))
+    ? `Variational ${co==='win'?'leads both peers':'trails both peers'} on OI and modeled 30D fee pool. Monetization is not directly comparable.`
+    : `Variational ${po}; ${pf}. Monetization is not directly comparable.`;
+  return {head,so,sf};
+}
+
 /* ---- valuation comps: the same power-law model the dashboard runs, so both
        halves of the merged chart speak about the same peers ---- */
 const CL_VAL_FIT={A:10.0339,B:0.8753,r2:0.74};
-const CL_VAL_FLOAT=0.25;
+/* official tokenomics: the Genesis airdrop (32% of supply) is 100% unlocked at TGE, so the
+   circulating float at TGE is 32%. 20% and 25% stay as lower-float sensitivities. */
+const CL_VAL_FLOAT=0.32;
 const CL_VAL_COMPS=[
   {n:'Hyperliquid',cg:'hyperliquid',oi:10650289066,mc:11599713040},
   {n:'Aster',cg:'aster-2',oi:1873558499,mc:1605324651},
@@ -290,17 +413,24 @@ function renderField(){
     const va=byName('Variational'), hl=byName('Hyperliquid'), li=byName('Lighter');
     const byOi=[...rows].sort((a,b)=>b.oi-a.oi);
     const rank=byOi.findIndex(v=>v.me)+1;
-    const fast=[...rows].filter(v=>t(v)!==null).sort((a,b)=>t(b)-t(a)).slice(0,2);
+    const fast=[...rows].filter(v=>t(v)!==null&&t(v)>3).sort((a,b)=>t(b)-t(a)).slice(0,2);
+    const tv=t(va);
+    /* which peer is actually nearer is decided by the distances, not asserted */
+    const refs=[hl,li].filter(x=>x&&t(x)!==null).sort((a,b)=>Math.abs(t(a)-tv)-Math.abs(t(b)-tv));
+    const nearTxt=refs.length>1
+      ? ` — nearer ${esc(refs[0].n)}'s ${t(refs[0]).toFixed(2)}× than ${esc(refs[1].n)}'s ${t(refs[1]).toFixed(2)}×`
+      : '';
     const ringTxt=(va.fees30>0)
-      ? ` Reading its circle: <b>${usd(va.fees30)}</b> of trader fees over 30 days, of which
-          <b>${usd(va.rev30||0)}</b> is booked — the ring between the two is what goes back to liquidity.`
+      ? ` Reading its circle: <b>${usd(va.fees30)}</b> ${tagHtml('modeled',TAG_NOTE.modeled)} of trader fees over 30 days
+          (to ${WINDOW.end||'the snapshot date'}), of which <b>${usd(va.rev30||0)}</b> ${tagHtml('wallet',TAG_NOTE.wallet)}
+          is booked — the ring between the two is what goes back to liquidity.`
       : '';
     read.innerHTML=`Variational holds the <b>#${rank}</b> book on the board at <b>${usd(va.oi)}</b> and trades
-      <b>${t(va).toFixed(2)}×</b> of it per day — nearer Hyperliquid's ${t(hl).toFixed(2)}× than Lighter's
-      ${t(li).toFixed(2)}×. Position on the vertical axis is capital trusted to the venue; distance to the right of a
-      diagonal is churn against that capital. The venues furthest right of the 3× line
+      <b>${tv.toFixed(2)}×</b> of it per day (24H volume ÷ open interest)${nearTxt}. Position on the vertical axis is capital trusted to the venue; distance to the right of a
+      diagonal is churn against that capital.${fast.length
+        ? ` The venues furthest right of the 3× line
       (${fast.map(v=>esc(v.n)+' '+t(v).toFixed(1)+'×').join(', ')}) move far more volume than their books hold,
-      which is the shape incentive programs produce.${ringTxt}`;
+      which is the shape incentive programs produce.` : ''}${ringTxt}`;
   }
 }
 
@@ -380,8 +510,8 @@ function renderValuationField(){
   const read=$('#fieldRead');
   if(read&&mine){
     read.innerHTML=`At <b>${usd(mine.oi)}</b> of open interest the model puts Variational at
-      <b>${usd(mine.mc)}</b> of circulating market cap — <b>${usd(mine.mc/CL_VAL_FLOAT)}</b> FDV at a
-      ${(CL_VAL_FLOAT*100).toFixed(0)}% float, and ${hl?`<b>${(hl.mc/mine.mc).toFixed(1)}×</b> below Hyperliquid`:''}.
+      <b>${usd(mine.mc)}</b> of circulating market cap — <b>${usd(mine.mc/CL_VAL_FLOAT)}</b> FDV at the
+      ${(CL_VAL_FLOAT*100).toFixed(0)}% official TGE float (Genesis airdrop, fully unlocked), and ${hl?`<b>${(hl.mc/mine.mc).toFixed(1)}×</b> below Hyperliquid`:''}.
       It is the one dashed marker here: there is no traded price to plot, so it sits exactly on the line by
       construction. For everyone else the drop line is the gap to the model — above it the market pays a
       premium for the book, below it a discount.`;
@@ -426,7 +556,7 @@ function tipHtml(v){
     +row('Open interest', usd(v.oi))
     +row('24H volume', usd(v.vol24))
     +row('24H turnover', v.oi? (v.vol24/v.oi).toFixed(2)+'×':'—')
-    +row('30D volume', v.vol30?usd(v.vol30):'not published', !v.vol30)
+    +row('30D volume', v.vol30?usd(v.vol30):(v.modeled?'loading':'not published'), !v.vol30)
     +row('30D fee pool', v.fees30?usd(v.fees30)+(v.modeled?' *':''):'not published', !v.fees30)
     +row('30D revenue', v.rev30?usd(v.rev30)+(v.modeled?' †':''):'not published', !v.rev30)
     +row('Kept of fees', cp!==null?cp.toFixed(0)+'%'+(v.modeled?' †':''):'—', cp===null)
@@ -434,8 +564,9 @@ function tipHtml(v){
     +row('30D turnover', to!==null?mult(to):'—', to===null)
     +`</dl>`
     +(v.modeled?`<div style="margin-top:7px;font-size:10.5px;color:var(--faint);line-height:1.4">`
-      +`* modeled: treasury inflow ÷ ${(VAR_SPREAD_SHARE*100).toFixed(0)}% allocation<br>`
-      +`† on-chain treasury inflow; the ${(VAR_SPREAD_SHARE*100).toFixed(0)}% is the reported policy, not a measured split</div>`:'')
+      +`* MODELED: treasury inflow ÷ ${(VAR_SPREAD_SHARE*100).toFixed(0)}% allocation<br>`
+      +`† WALLET INFLOW: on-chain treasury change; the ${(VAR_SPREAD_SHARE*100).toFixed(0)}% is the reported policy, not a measured split</div>`
+      :`<div style="margin-top:7px;font-size:10.5px;color:var(--faint);line-height:1.4">REPORTED: DeFiLlama${v.win?' · 30D to '+v.win:' · snapshot '+SNAP_AS_OF}</div>`)
     +(cp!==null&&cp>100?`<div style="margin-top:7px;font-size:10.5px;color:var(--faint);line-height:1.4">`
       +`adapter reports more revenue than fees — definitions differ on this venue</div>`:'');
 }
@@ -455,14 +586,14 @@ const RATIOS=[
   {
     key:'take',
     label:'Trader take rate',
-    sub:'30D fee pool ÷ 30D volume — the venue\'s price per dollar traded.',
+    sub:()=>`30D fee pool ÷ 30D volume — the venue's price per dollar traded. Basis: DeFiLlama daily fees and daily volume summed over the same 30 days${WINDOW.end?' (to '+WINDOW.end+')':''} for every venue; Variational's fee pool is modeled.`,
     dir:'up', dirNote:'more revenue per unit of flow · traders pay it, so it is a price too',
     get:takeRate, fmt:v=>bps(v), unit:'bps'
   },
   {
     key:'capture',
     label:'Revenue capture',
-    sub:'30D revenue ÷ 30D fee pool — the share of what traders pay that the protocol books.',
+    sub:()=>`30D revenue ÷ 30D fee pool — the share of what traders pay that the protocol books. Variational: wallet inflow ÷ modeled pool, so 20% by construction.`,
     dir:'up', dirNote:'more of the pool stays with the protocol · Variational\'s 20% is a payout policy, not a shortfall',
     get:capture, fmt:v=>v.toFixed(0)+'%', unit:'of fee pool'
   },
@@ -476,16 +607,16 @@ const RATIOS=[
   {
     key:'turn',
     label:'Book turnover',
-    sub:'30D volume ÷ current open interest — how many times the venue trades through its own book.',
+    sub:()=>`30D volume ÷ current open interest — how many times the venue trades through its own book. Same DeFiLlama 30D volume basis as the take rate, for every venue.`,
     dir:'mixed', dirNote:'high can be incentive churn, low can be a deep book held by real size',
     get:turnover, fmt:v=>mult(v), unit:'× / 30D'
   },
   {
     key:'share',
     label:'Open interest share',
-    sub:'Share of the open interest tracked on this board.',
+    sub:()=>`Share of the open interest tracked on this board (${VENUES.length} venues), same open interest as everywhere else on this tab.`,
     dir:'up', dirNote:'more of the market\'s capital sits here',
-    get:oiShare, fmt:v=>pct(v), unit:'% of field'
+    get:oiShare, fmt:v=>v.toFixed(2)+'%', unit:'% of field'
   }
 ];
 
@@ -524,15 +655,24 @@ function ladder(r){
 
   const me=have.find(d=>d.v.me);
   const D=DIRS[dir];
+  let verdict='';
+  if(me){
+    if(dir==='mixed'){
+      verdict=` · Variational sits ${have.indexOf(me)+1} of ${have.length} by size, not by merit`;
+    }else{
+      /* the sentence is derived from the same numbers the cells print: ties are decided on
+         the displayed value, direction on the metric's own better-direction */
+      const st=stand(me.x,have.filter(d=>d!==me).map(d=>({n:d.v.n,v:d.x})),dir==='down',r.fmt);
+      const bits=[];
+      if(st.ahead.length)  bits.push(`<b>ahead of</b> ${andList(st.ahead)}`);
+      if(st.level.length)  bits.push(`<b>level with</b> ${andList(st.level)}`);
+      if(st.behind.length) bits.push(`<b>behind</b> ${andList(st.behind)}`);
+      verdict=bits.length?` · Variational is ${bits.join(', ')} here`:'';
+    }
+  }else verdict=' · Variational does not publish this';
   html+=`<div class="read">`
     +((r.key==='share'&&OI_MIXED)?`<span class="basis-chip">mixed basis</span> ${esc(OI_MIXED_NOTE)}<br>`:'')
-    +`<span class="dir ${dir}">${D.mark} ${D.text}</span>`
-    +(me
-      ? (dir==='mixed'
-          ? ` · Variational sits ${have.indexOf(me)+1} of ${have.length} by size, not by merit`
-          : ` · Variational is <b>${have.indexOf(me)===0?'ahead of':'behind'}</b> `
-            +`${have.filter(d=>d!==me).map(d=>d.v.n).join(' and ')} here`)
-      : ' · Variational does not publish this')
+    +`<span class="dir ${dir}">${D.mark} ${D.text}</span>`+verdict
     +`<br><span class="dir-note">${r.dirNote||''}</span></div>`;
   return html;
 }
@@ -560,7 +700,7 @@ function renderRatios(){
     };
     const D=DIRS[r.dir||'up'];
     return `<tr>
-      <td class="metric"><b>${r.label}</b><span>${r.sub}</span>
+      <td class="metric"><b>${r.label}</b><span>${typeof r.sub==='function'?r.sub():r.sub}</span>
         <span class="dir-badge ${r.dir||'up'}">${D.mark} ${D.text}</span></td>
       ${cell(va,true)}${cell(li)}${cell(ex)}
       <td class="strip">${ladder(r)}</td>
@@ -570,18 +710,19 @@ function renderRatios(){
   /* callout: the take-rate reading, stated so it cannot be misread as revenue */
   const tv=takeRate(va), tl=takeRate(li), th=takeRate(hl), te=takeRate(ex);
   const treasuryBps=tv!==null?tv*VAR_SPREAD_SHARE:null;
+  const stT=stand(tv,[{n:'Hyperliquid',v:th},{n:'Lighter',v:tl},{n:'Extended',v:te}],false,v=>bps(v));
   orNull('#ratioCallout').innerHTML=`<b>Read the take rate before reading revenue</b>
-    <p>Traders pay Variational about <b>${bps(tv)} bps</b> per dollar traded — ${tl?mult(tv/tl):'—'} Lighter's
-    ${bps(tl)} bps, ${te?mult(tv/te):'—'} Extended's ${bps(te)} bps, and just ${th>tv?'under':'over'}
-    Hyperliquid's ${bps(th)} bps. Monetization per unit of flow is therefore in line with the ceiling, not below the field.
+    <p>Traders pay Variational about <b>${bps(tv)} bps</b> per dollar traded — Lighter ${bps(tl)} bps,
+    Extended ${bps(te)} bps, Hyperliquid ${bps(th)} bps. Variational ${standPhrase(stT,'price per dollar traded')||'—'}.
     What differs is allocation: only ${(VAR_SPREAD_SHARE*100).toFixed(0)}% of that pool reaches the treasury
     (<b>${bps(treasuryBps)} bps</b>), the remainder funds OLP returns and market-making cost. A low treasury number
     is a payout policy, not weak monetization.</p>`;
 
   const foot=document.createElement('div');
   foot.className='tbl-foot';
-  foot.innerHTML=`* fee pool modeled from treasury inflow \u00f7 ${(VAR_SPREAD_SHARE*100).toFixed(0)}% allocation`
-    +` &nbsp;·&nbsp; † the ${(VAR_SPREAD_SHARE*100).toFixed(0)}% is the reported policy ratio, so this cell restates it rather than measuring it`;
+  foot.innerHTML=`* MODELED: fee pool = WALLET INFLOW \u00f7 ${(VAR_SPREAD_SHARE*100).toFixed(0)}% allocation`
+    +` &nbsp;·&nbsp; † POLICY: the ${(VAR_SPREAD_SHARE*100).toFixed(0)}% is the reported ratio, so this cell restates it rather than measuring it`
+    +` &nbsp;·&nbsp; peers REPORTED by DeFiLlama · every 30D figure covers ${WINDOW.end?'the 30 days to '+WINDOW.end:'the '+SNAP_AS_OF+' snapshot'}`;
   const prev=document.querySelector('.tbl-foot'); if(prev) prev.remove();
   body.closest('table').after(foot);
 
@@ -646,8 +787,10 @@ const sum30=chart=>Array.isArray(chart)&&chart.length
 
 async function refreshLlama(){
   const jobs=VENUES.filter(v=>v.slug);
-  let ok=0;
-  /* four at a time: the free endpoints are fine with it and the page stays responsive */
+  const got=[];
+  /* four at a time: the free endpoints are fine with it and the page stays responsive.
+     Nothing is written to the board until every venue has answered — venues used to be
+     updated one by one, so any render in between showed a mixture of old and new. */
   for(let i=0;i<jobs.length;i+=4){
     await Promise.all(jobs.slice(i,i+4).map(async v=>{
       try{
@@ -666,28 +809,34 @@ async function refreshLlama(){
         const supP=v.modeled?Promise.resolve(null)
           :fetch('https://api.llama.fi/summary/fees/'+v.slug+'?dataType=dailySupplySideRevenue').then(r=>r.ok?r.json():null);
         const [vol,fee,rev,hold,sup]=await Promise.all([volP,feeP,revP,holdP,supP]);
-        /* keep the full daily series too: the metric browser charts these, and they
-           are already downloaded for the 30D totals below */
-        const D=DAILY[v.n]||(DAILY[v.n]={});
-        const keep=(key,raw)=>{ if(!raw) return; const m=chartToDaily(raw);
-          if(Object.keys(m).length&&!(v.modeled&&(key==='fee'||key==='rev'||key==='sup'))) D[key]=m; };
-        keep('vol',vol); keep('fee',fee); keep('rev',rev); keep('hold',hold); keep('sup',sup);
-        const v30=sum30(vol);
-        if(v30>0){ v.vol30=v30; ok++; }
-        const f30=fee&&Number(fee.total30d);
-        if(f30>0) v.fees30=f30;
-        const r30=rev&&Number(rev.total30d);
-        if(r30>0) v.rev30=r30;
-        const h30=hold&&Number(hold.total30d);
-        if(Number.isFinite(h30)&&h30>=0) v.hold30=h30;
-        const s30=sup&&Number(sup.total30d);
-        if(Number.isFinite(s30)&&s30>=0) v.sup30=s30;
+        got.push({v,vol,fee,rev,hold,sup});
       }catch(err){ /* one venue failing must not take the board down */ }
     }));
   }
+  let ok=0;
+  got.forEach(({v,vol,fee,rev,hold,sup})=>{
+    /* keep the full daily series: the metric browser charts these, and the 30D figures
+       are summed from them over one shared window (recomputeSnapshot) */
+    const D=DAILY[v.n]||(DAILY[v.n]={});
+    const keep=(key,raw)=>{ if(!raw) return; const m=chartToDaily(raw);
+      if(Object.keys(m).length&&!(v.modeled&&(key==='fee'||key==='rev'||key==='sup'))) D[key]=m; };
+    keep('vol',vol); keep('fee',fee); keep('rev',rev); keep('hold',hold); keep('sup',sup);
+    /* fallbacks for a venue whose daily chart did not arrive: DeFiLlama's own 30D totals */
+    const v30=sum30(vol);
+    if(v30>0){ if(!v.modeled) v.vol30=v30; ok++; }
+    const f30=fee&&Number(fee.total30d);
+    if(f30>0) v.fees30=f30;
+    const r30=rev&&Number(rev.total30d);
+    if(r30>0) v.rev30=r30;
+    const h30=hold&&Number(hold.total30d);
+    if(Number.isFinite(h30)&&h30>=0) v.hold30=h30;
+    const s30=sup&&Number(sup.total30d);
+    if(Number.isFinite(s30)&&s30>=0) v.sup30=s30;
+  });
   if(!ok) throw new Error('no defillama series');
   STATE.llamaLive=true;
-  renderMetricLab();
+  STATE.llamaAt=new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
+  ingest();
 }
 
 function stamp(){
@@ -697,7 +846,7 @@ function stamp(){
   setPill(STATE.cgLive&&STATE.llamaLive?'on':(STATE.cgLive||STATE.llamaLive?'on':'err'), parts.join(' · '));
   const foot=$('#foot');
   if(foot) foot.textContent='comparison-lab prototype · OI and 24H volume: CoinGecko derivatives · '
-    +'30D volume and fees: DeFiLlama · Variational fee pool modeled from Arbitrum treasury inflow';
+    +'30D volume and fees: DeFiLlama (one shared 30-day window) · Variational fee pool MODELED from Arbitrum treasury WALLET INFLOW';
 }
 
 /* ==================================================================
@@ -709,7 +858,7 @@ function stamp(){
    Everything else has a live feed that runs further, but VAR's fee and revenue
    do not — moving the anchor forward would leave VAR with empty bars and break
    the matched window the whole comparison rests on. */
-let ANCHOR='2026-08-21';   /* moved forward when a live treasury series is available */
+let ANCHOR='2026-08-21';   /* set to the last day of the treasury series on every ingest (see ingest) */
 /* cumulative USDC in the Arbitrum treasury wallet, read off the dashboard's own
    merged series (baked snapshot + on-chain extension) on 2026-08-22 */
 const VAR_TREASURY_CUM='04-14:1326350,04-15:1362961,04-16:1380611,04-17:1409159,04-18:1449068,04-19:1468909,04-20:1486887,04-21:1511186,04-22:1531565,04-23:1555439,04-24:1579550,04-25:1599008,04-26:1613082,04-27:1626685,04-28:1653130,04-29:1672191,04-30:1698306,05-01:1717541,05-02:1735805,05-03:1756472,05-04:1769897,05-05:1798088,05-06:1820802,05-07:1854525,05-08:1881322,05-09:1903199,05-10:1920509,05-11:1948092,05-12:1977333,05-13:2002406,05-14:2028173,05-15:2051672,05-16:2075427,05-17:2091557,05-18:2104807,05-19:2130136,05-20:2155001,05-21:2183496,05-22:2227026,05-23:2271753,05-24:2307879,05-25:2338082,05-26:2366326,05-27:2410526,05-28:2447361,05-29:2496203,05-30:2544271,05-31:2576707,06-01:2611872,06-02:2685646,06-03:2785986,06-04:2876625,06-05:2982896,06-06:3091894,06-07:3139507,06-08:3181402,06-09:3223359,06-10:3278138,06-11:3329583,06-12:3367594,06-13:3412833,06-14:3442548,06-15:3473511,06-16:3530870,06-17:3603532,06-18:3661007,06-19:3703679,06-20:3738786,06-21:3768101,06-22:3801659,06-23:3845259,06-24:3885404,06-25:3941838,06-26:4004947,06-27:4060646,06-28:4086202,06-29:4119188,06-30:4233393,07-01:4299277,07-02:4348312,07-03:4384717,07-04:4413015,07-05:4444847,07-06:4502445,07-07:4560623,07-08:4606783,07-09:4641408,07-10:4675860,07-11:4703317,07-12:4732840,07-13:4770939,07-14:4808014,07-15:4841980,07-16:4880931,07-17:4919884,07-18:4939632,07-19:4963299,07-20:5006713,07-21:5046023,07-22:5085306,07-23:5121980,07-24:5155657,07-25:5176586,07-26:5203734,07-27:5250359,07-28:5294467,07-29:5347342,07-30:5401647,07-31:5440858,08-01:5478834,08-02:5504681,08-03:5540453,08-04:5592089,08-05:5636657,08-06:5674634,08-07:5714678,08-08:5733730,08-09:5763261,08-10:5804706,08-11:5842528,08-12:5885596,08-13:5924447,08-14:5963262,08-15:5982390,08-16:6006116,08-17:6049250,08-18:6085189,08-19:6184934,08-20:6272250,08-21:6388349';
@@ -767,19 +916,19 @@ const METRICS=[
 
   {k:'fee', label:'Trader fee pool',  kind:'flow',  fmt:usd, group:'money',
    note:'What traders paid, before anything is paid back out. Variational is modeled: treasury inflow ÷ the 20% allocation ratio.',
-   src:'DeFiLlama fees · Variational modeled from Arbitrum treasury'},
+   src:'REPORTED: DeFiLlama fees · Variational MODELED from Arbitrum treasury'},
   {k:'rev', label:'Booked revenue',   kind:'flow',  fmt:usd, group:'money',
    note:'What each protocol books from that pool. An empty column means no published series — not a zero.',
-   src:'DeFiLlama revenue · Variational = net treasury inflow'},
+   src:'REPORTED: DeFiLlama revenue · Variational WALLET INFLOW (net treasury change)'},
   {k:'sup', label:'Paid to liquidity',kind:'flow',  fmt:usd, group:'money',
    note:'The other side of the pool: LP and vault suppliers, rebates, builder payouts. Variational is the 80% that funds OLP and market making.',
-   src:'DeFiLlama supply-side revenue · Variational from the 20/80 policy'},
+   src:'REPORTED: DeFiLlama supply-side revenue · Variational from the 20/80 policy'},
   {k:'hold',label:'To token holders', kind:'flow',  fmt:usd, group:'money',
    note:'What leaves the protocol for the token — buybacks and distributions. Variational has no token yet, so it has no series.',
    src:'DeFiLlama holders revenue'},
 
   {k:'take',label:'Take rate',        kind:'ratio', fmt:v=>bps(v)+' bps', unit:'bps', group:'rate',
-   note:'Fee pool ÷ volume. Price per dollar traded, with size divided out.',
+   note:'Fee pool ÷ volume for the same period, DeFiLlama volume for every venue. Price per dollar traded, with size divided out.',
    src:'derived: period fees ÷ period volume'},
   {k:'cap', label:'Revenue capture',  kind:'ratio', fmt:v=>v.toFixed(0)+'%', unit:'of fee pool', group:'rate',
    note:'Revenue ÷ fee pool. Variational sits flat at 20% by construction — the policy the pool was derived from.',
@@ -803,25 +952,25 @@ const CARD_TEXT={
            _:['derived','Venue OI ÷ every tracked venue reporting OI']},
   volShare:{VAR:['derived','Venue volume ÷ every tracked venue reporting volume'],
             _:['derived','Venue volume ÷ every tracked venue reporting volume']},
-  fee:{VAR:['modeled','Arbitrum wallet inflow ÷ official report ratio'],
-       LTR:['published','DeFiLlama Fees · <b>%LCAP%</b> booked as revenue'],
-       _:['published','DeFiLlama Fees']},
-  rev:{VAR:['on-chain','Net USDC into the treasury wallet · not audited revenue'],
-       LTR:['published','DeFiLlama Revenue · <b>%LHOLD%</b> of it goes to holders'],
+  fee:{VAR:['MODELED','Arbitrum wallet inflow ÷ 20% official report ratio'],
+       LTR:['reported','DeFiLlama Fees · <b>%LCAP%</b> booked as revenue'],
+       _:['reported','DeFiLlama Fees']},
+  rev:{VAR:['WALLET INFLOW','Net USDC into the treasury wallet · not audited revenue'],
+       LTR:['reported','DeFiLlama Revenue · <b>%LHOLD%</b> of it goes to holders'],
        EXT:['not published','No revenue series · left empty, not zeroed'],
-       _:['published','DeFiLlama Revenue']},
+       _:['reported','DeFiLlama Revenue']},
   sup:{VAR:['policy','The 80% that funds OLP returns and market making'],
-       _:['published','DeFiLlama supply-side revenue']},
+       _:['reported','DeFiLlama supply-side revenue']},
   hold:{VAR:['none','No token yet, so nothing is distributed'],
-        _:['published','DeFiLlama holders revenue · buybacks and distributions']},
-  take:{VAR:['modeled numerator','Modeled fee pool ÷ published volume'],
-        _:['published','Published fees ÷ published volume']},
+        _:['reported','DeFiLlama holders revenue · buybacks and distributions']},
+  take:{VAR:['MODELED numerator','Modeled fee pool ÷ DeFiLlama volume, same period'],
+        _:['reported','DeFiLlama fees ÷ DeFiLlama volume, same period']},
   cap:{VAR:['policy ratio','Flat 20% — the pool was derived from this ratio'],
-       _:['measured','Published revenue ÷ published fees']},
-  feeOnOi:{VAR:['modeled numerator','Modeled fee pool ÷ period-end open interest'],
-           _:['published','Published fees ÷ period-end open interest']},
-  turn:{VAR:['published','Published volume ÷ period-end open interest'],
-        _:['published','Published volume ÷ period-end open interest']}
+       _:['reported','DeFiLlama revenue ÷ DeFiLlama fees']},
+  feeOnOi:{VAR:['MODELED numerator','Modeled fee pool ÷ period-end open interest'],
+           _:['reported','DeFiLlama fees ÷ period-end open interest']},
+  turn:{VAR:['published','DeFiLlama volume ÷ period-end open interest'],
+        _:['published','DeFiLlama volume ÷ period-end open interest']}
 };
 
 let ML_SEL='fee', ML_RANGE='8W';
@@ -908,18 +1057,21 @@ function renderMetricList(){
   const host=$('#mlRows'); if(!host) return;
   const buckets=windowBuckets(ML_RANGE);
   const picked=mlPicked();
+  const per=buckets[0].days===1?'1-day':'7-day';
   const head=$('#mlHead');
-  if(head) head.innerHTML=`<th>Metric</th>`+picked.map(v=>{
+  if(head) head.innerHTML=`<th>Metric<span class="ml-per">${per} periods to ${ANCHOR}</span></th>`+picked.map(v=>{
     const ven=byName(v.n);
     return `<th class="num"><img src="${ven?ven.logo:''}" alt="" width="15" height="15">${v.short}</th>`;
   }).join('');
   let group='';
   host.innerHTML=METRICS.map(m=>{
+    const sers=picked.map(v=>{ const ser=mlSeries(v.n,m.k,ML_RANGE,buckets); return {v,ser,last:lastOf(ser)}; });
+    /* a row that has no series for anyone is hidden rather than printed as a column of dashes */
+    if(m.k==='oiShare'&&!sers.some(x=>x.last)) return '';
     let lead='';
     if(m.group!==group){ group=m.group;
       lead=`<tr class="ml-group"><td colspan="${picked.length+1}">${GROUPS[group]}</td></tr>`; }
-    const cells=picked.map(v=>{
-      const ser=mlSeries(v.n,m.k,ML_RANGE,buckets), last=lastOf(ser);
+    const cells=sers.map(({v,ser,last})=>{
       if(!last) return `<td class="num na"><b>—</b><span>no series</span></td>`;
       const prev=last.i>0?ser[last.i-1]:null;
       const dv=(prev!=null&&prev!==0)?(last.v-prev)/Math.abs(prev)*100:null;
@@ -928,8 +1080,8 @@ function renderMetricList(){
         +`<span class="${dv==null?'':dv>=0?'up':'down'}">${arrow||' '}</span></td>`;
     }).join('');
     return lead+`<tr class="ml-row${m.k===ML_SEL?' on':''}" data-metric="${m.k}" tabindex="0" role="button"
-      aria-pressed="${m.k===ML_SEL}"><td class="metric"><b>${m.label}</b><span>${m.kind==='stock'?'level'
-      :m.kind==='flow'?'per period':'ratio'}</span></td>${cells}</tr>`;
+      aria-pressed="${m.k===ML_SEL}"><td class="metric"><b>${m.label}</b><span>${m.kind==='stock'?'level at period end'
+      :m.kind==='flow'?per+' total':'ratio of '+per+' totals'}</span></td>${cells}</tr>`;
   }).join('');
   host.querySelectorAll('.ml-row').forEach(r=>{
     const pick=()=>{ ML_SEL=r.dataset.metric; renderMetricLab(); };
@@ -1023,8 +1175,9 @@ function drawMetric(){
     :ML_RANGE==='26W'?'26 complete 7-day periods'
     :ML_RANGE==='90D'?'13 complete 7-day periods':'8 complete 7-day periods';
   $('#mlTitle').textContent=m.label;
-  $('#mlWindow').textContent=`${span} · ${addDaysIso(buckets[0].end,-(buckets[0].days-1))} to ${ANCHOR}`
-    +` · anchored to the treasury series`;
+  const stale=TREAS.stale?` <em class="ml-stale">STALE · treasury series ends ${esc(TREAS.through||'—')}</em>`:'';
+  $('#mlWindow').innerHTML=`${span} · ${addDaysIso(buckets[0].end,-(buckets[0].days-1))} to ${ANCHOR}`
+    +` · ends on the last day of the treasury series${stale}`;
   const gaps=series.filter(s=>!s.d.some(x=>x!=null)).map(s=>s.n);
   let denom='';
   if(m.k==='oiShare'||m.k==='volShare'){
@@ -1032,12 +1185,21 @@ function drawMetric(){
     const n=VENUES.filter(v=>baseSeries(v.n,key,ML_RANGE,buckets).some(x=>x!=null)).length;
     denom=` · field = ${n} of ${VENUES.length} venues reporting`;
   }
+  const perLbl=buckets[0].days===1?'daily':'7-day';
+  /* DeFiLlama's end-of-day OI adapter does not read the same as Variational's official live OI
+     that the rest of the tab uses; say so next to every metric built on it */
+  let oiNote='';
+  if(['oi','oiShare','feeOnOi','turn'].includes(m.k)){
+    const dv=DAILY['Variational']&&DAILY['Variational'].oi, k=lastKey(dv), va0=byName('Variational');
+    if(k&&va0&&va0.oi>0) oiNote=` · note: DeFiLlama reads Variational OI at ${usd(dv[k])} on ${k}, against ${usd(va0.oi)} from its official live stats used elsewhere on this tab — compare venues within this row, not against the live figure`;
+  }
   orNull('#mlRead').innerHTML=`<p>${m.note}</p><span class="ml-src">${m.src}${denom}`
-    +`${gaps.length?` · no series for ${gaps.join(', ')}`:''}</span>`;
+    +`${gaps.length?` · no series for ${gaps.join(', ')}`:''}`
+    +` · these are ${perLbl} period figures to ${ANCHOR}, not the 30D snapshot used in the tables above${oiNote}</span>`;
 }
 
 function renderMetricLab(){
-  if(ML_SEL==='oiShare') ensureFieldOi();
+  if(ML_SEL==='oiShare'){ ensureFieldOi(); if(!FIELD_OI_READY) ML_SEL='volShare'; }
   renderVenuePicker(); renderRangeButtons(); renderMetricList(); drawMetric(); renderMetricCards();
 }
 
@@ -1113,7 +1275,7 @@ function renderSplit(){
   const others=rows.filter(v=>!v.me&&capture(v)!==null&&capture(v)<=100).map(capture);
   const med=median(others);
   orNull('#splitCallout').innerHTML=`<b>Same pool, different policy</b>
-    <p>Variational books <b>${capture(va).toFixed(0)}%</b> of its trader fee pool into the treasury;
+    <p>Variational books <b>${capture(va).toFixed(0)}%</b> of its ${tagHtml('modeled',TAG_NOTE.modeled)} trader fee pool into the treasury;
     Lighter books ${capture(li).toFixed(0)}%, Hyperliquid ${capture(hl).toFixed(0)}%, and the field median is
     ${med.toFixed(0)}%. The other ${(100-capture(va)).toFixed(0)}% is not lost — it funds OLP returns and
     market-making cost, which is what makes a ${usd(va.fees30)} pool at ${bps(takeRate(va))} bps possible
@@ -1148,7 +1310,7 @@ function flowCard(v){
   if(!(rev>0)){
     return `<figure class="flow-card ${cls}">
       <figcaption><img src="${v.logo}" alt="" width="18" height="18"><b>${esc(v.n)}</b>
-        <span>${usd(fees)} trader fees · 30D</span></figcaption>
+        <span>${usd(fees)} trader fees · 30D · REPORTED</span></figcaption>
       <svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(v.n)} fee flow, split not published">
         <rect class="node fees" x="${x0}" y="${top}" width="${nw}" height="${usable}" rx="3"/>
         <text class="nl" x="${x0}" y="${top-28}">Trader fees</text>
@@ -1183,7 +1345,7 @@ function flowCard(v){
 
   return `<figure class="flow-card ${cls}">
     <figcaption><img src="${v.logo}" alt="" width="18" height="18"><b>${esc(v.n)}</b>
-      <span>${usd(fees)} trader fees · 30D${v.modeled?' · modeled *':''}</span></figcaption>
+      <span>${usd(fees)} trader fees · 30D${v.modeled?' · MODELED *':' · REPORTED'}</span></figcaption>
     <svg viewBox="0 0 ${W} ${H}" role="img"
          aria-label="${esc(v.n)}: ${usd(fees)} of trader fees splits into ${usd(rev)} booked and ${usd(cost)} paid out">
       ${segs.map(d=>`<path class="rib ${d.k}" d="${ribbon(x0+nw,d.sy,x1,d.ny,d.h,d.h)}"/>`).join('')}
@@ -1213,12 +1375,16 @@ function renderFlow(){
   const host=$('#flowGrid'); if(!host) return;
   host.innerHTML=FLOW_SET.map(byName).filter(Boolean).filter(v=>v.fees30>0).map(flowCard).join('');
   const va=byName('Variational'), hl=byName('Hyperliquid'), li=byName('Lighter');
+  const hlAll=hl.hold30>=hl.rev30*0.995;
+  const hlTxt=hlAll
+    ? `Hyperliquid runs the whole ${usd(hl.rev30)} of its gross profit into buybacks`
+    : `Hyperliquid sends ${usd(hl.hold30)} of its ${usd(hl.rev30)} gross profit to holders`;
   orNull('#flowNote').innerHTML=`The shape follows DeFiLlama's income statement: gross protocol revenue (what traders
     pay) less cost of revenue (maker rebates, builder codes, LP and market-making share) leaves gross profit,
-    and what leaves that for the token is holders' revenue. Hyperliquid runs the whole
-    ${usd(hl.rev30)} of its gross profit into buybacks; Lighter books ${usd(li.rev30)} and sends
-    ${usd(li.hold30)} of it to holders. Variational's first split is the reported
-    ${(VAR_SPREAD_SHARE*100).toFixed(0)}/${(100-VAR_SPREAD_SHARE*100).toFixed(0)} policy applied to a modeled
+    and what leaves that for the token is holders' revenue. ${hlTxt}; Lighter books ${usd(li.rev30)} and sends
+    ${usd(li.hold30)} of it to holders (peers ${tagHtml('reported',TAG_NOTE.reported)}, 30 days to ${WINDOW.end||SNAP_AS_OF}).
+    Variational's first split is the reported
+    ${(VAR_SPREAD_SHARE*100).toFixed(0)}/${(100-VAR_SPREAD_SHARE*100).toFixed(0)} policy applied to a ${tagHtml('modeled',TAG_NOTE.modeled)}
     pool (*), and it publishes no onward distribution series, so the third column stays empty rather than
     being filled with the dashboard's own burn assumption.`;
 }
@@ -1230,11 +1396,19 @@ let OI_LABEL=null;
 function provenance(){
   const oi=OI_LABEL||(STATE.cgLive?'CoinGecko derivatives (live)':'CoinGecko snapshot '+SNAP_AS_OF);
   const vol=STATE.cgLive?'CoinGecko derivatives (live)':'CoinGecko snapshot '+SNAP_AS_OF;
-  const fees=STATE.llamaLive?'DeFiLlama (live)':'DeFiLlama snapshot '+SNAP_AS_OF;
-  return (OI_MIXED?`⚠ ${OI_MIXED_NOTE} — open-interest shares are withheld while that is true. `:'')
-    +`Open interest ${oi} · 24H volume ${vol} · peer fees, revenue and holder payouts ${fees}`
+  const win=WINDOW.end?` · 30D window to ${WINDOW.end}, the same days for every venue`:'';
+  const fees=STATE.llamaLive?'DeFiLlama (live)'+win:'DeFiLlama snapshot '+SNAP_AS_OF;
+  const asOf=(typeof PEERS!=='undefined'&&PEERS.asOf)?PEERS.asOf:(STATE.cgLive?'Live · '+STATE.stamp:'Snapshot '+SNAP_AS_OF);
+  /* peers and Variational are only on one window once the live feed is in */
+  const mism=(!STATE.llamaLive&&TREAS.through)
+    ? `⚠ window mismatch: peer fees, revenue and volume are the ${SNAP_AS_OF} snapshot while Variational's treasury runs to ${TREAS.through} — they line up once the live feed loads. `:'';
+  const tre=TREAS.through
+    ? `Variational treasury WALLET INFLOW through ${TREAS.through}${TREAS.stale?` — STALE: the treasury series is ${TREAS.lag} days behind, so every 30D figure here is the 30 days to ${WINDOW.end}`:''}`
+    : 'Variational treasury from the last official report';
+  return mism+(OI_MIXED?`⚠ ${OI_MIXED_NOTE} — open-interest shares are withheld while that is true. `:'')
+    +`As of ${asOf} · Open interest ${oi} · 24H volume ${vol} · peer fees, revenue and holder payouts (REPORTED) ${fees}`
     +(OI_STALE_NOTE?` · ${OI_STALE_NOTE}`:'')
-    +` · Variational fee pool modeled: Arbitrum treasury inflow ÷ the reported `
+    +` · ${tre} · Variational fee pool MODELED: treasury inflow ÷ the reported `
     +`${(VAR_SPREAD_SHARE*100).toFixed(0)}% allocation — an estimate, not booked revenue`;
 }
 function renderProvenance(){
@@ -1302,40 +1476,24 @@ function valComp(name){
   }catch(_){ return null; }
 }
 
-/* Variational on the same basis as everyone else.
-   The first cut put the treasury in the revenue column and the treasury again in the
-   holder column, which made the payout read 100% by construction and quietly compared
-   Variational's 20% slice against each peer's whole protocol revenue. The official report
-   publishes both lines for the same fortnight, so both are taken from it and scaled to the
-   30-day window the peers are measured over:
-     revenue  = net revenue   (after market-making cost, before the OLP split)
-     returned = treasury inflow (spent in full on buybacks, per published policy)
-   The payout that falls out of that is a real ratio, not a tautology. */
-function varReportPair(){
-  try{
-    const H=(typeof BIWEEKLY_HISTORY!=='undefined'&&BIWEEKLY_HISTORY)||null;
-    const r=H&&H.length?H[H.length-1]:null;
-    if(r&&r.netRevenue2w>0&&r.treasury2w>=0){
-      const k=30/14;
-      return {rev:r.netRevenue2w*k, hold:r.treasury2w*k, asOf:r.asOf};
-    }
-  }catch(_){}
-  return null;
-}
-
+/* Variational on the same basis as everyone else, and the same figure as everywhere else.
+   Official policy sends 100% of treasury revenue to $VAR buy & burn, so for Variational
+   "revenue" and "returned" are the one 30D treasury WALLET INFLOW the rest of this tab uses
+   (snapshot, same 30 days), and the share returned is 100% as POLICY — not a measurement.
+   The earlier cut scaled the biweekly net-revenue line instead ($7.25M vs $1.36M elsewhere),
+   which put two different Variational revenues on one page. */
 function revenueMetaRows(){
-  const vp=varReportPair();
   return VENUES.map(v=>{
     const c=valComp(v.n);
     let rev=num(v.rev30), hold=num(v.hold30);
-    if(v.me && vp){ rev=vp.rev; hold=vp.hold; }
+    if(v.me){ hold=rev; }   /* 100% of treasury → buy & burn (official policy) */
     const mc=c?num(c.mc):null, fdv=c?num(c.fdv):null;
     return {
       n:v.n, me:!!v.me, logo:v.logo, rev, hold, mc, fdv,
       payout: (rev&&hold!=null&&rev>0) ? hold/rev : null,
       yieldMc: (rev&&mc)   ? rev*WEEKS_PER_YEAR/mc  : null,
       yieldHold:(hold!=null&&mc)? hold*WEEKS_PER_YEAR/mc : null,
-      policy: !!v.me, asOf: v.me&&vp?vp.asOf:null
+      policy: !!v.me, asOf: null
     };
   }).filter(r=>r.rev>0);
 }
@@ -1399,10 +1557,13 @@ function renderRevenueMeta(){
     pts.sort((a,b)=>a[0]-b[0]);
     const p0=pts[0], p1=pts[pts.length-1];
     if(!clip(p0[0],p0[1])||!clip(p1[0],p1[1])) return '';
+    /* labels sit at the right-hand end of each diagonal, with their unit: outside the box when the
+       line leaves through the right edge, just inside and under the end when it leaves through the
+       top — never along the top margin, where the Variational caption lives */
     const onTop=p1[1]<=P.t+1;
     const lab=onTop
-      ? `<text class="rm-iso-t" x="${p1[0].toFixed(1)}" y="${(P.t-7).toFixed(1)}" text-anchor="middle">${isoFmt(ratio)}</text>`
-      : `<text class="rm-iso-t" x="${(W-P.r+7).toFixed(1)}" y="${(p1[1]+3.5).toFixed(1)}">${isoFmt(ratio)}</text>`;
+      ? `<text class="rm-iso-t" x="${(p1[0]-5).toFixed(1)}" y="${(P.t+13).toFixed(1)}" text-anchor="end">${isoFmt(ratio)}/yr</text>`
+      : `<text class="rm-iso-t" x="${(W-P.r+7).toFixed(1)}" y="${(p1[1]+3.5).toFixed(1)}">${isoFmt(ratio)}/yr</text>`;
     return `<line class="rm-iso" x1="${p0[0].toFixed(1)}" y1="${p0[1].toFixed(1)}" x2="${p1[0].toFixed(1)}" y2="${p1[1].toFixed(1)}"/>`+lab;
   }).join('');
 
@@ -1468,16 +1629,17 @@ function renderRevenueMeta(){
         ` data-mc="${usd(c.mc)}" data-rev="${usd(me.hold)}" data-pay="100%" data-y="${(c.p.yieldHold*100).toFixed(1)}%"`+
         ` transform="translate(${x.toFixed(1)},${y.toFixed(1)})">`+
         `<circle class="rm-me-mark" r="5"/><circle class="rm-hit" r="12"/>`+
-        `<text class="rm-me-t" x="-12" y="3.5" text-anchor="end">${usdShort(c.mc)} · ${c.p.n}</text></g>`;
+        `<text class="rm-me-t" x="-12" y="3.5" text-anchor="end">${usdShort(c.mc)} at ${c.p.n}'s yield</text></g>`;
     }).join('');
     meLayer=`<line class="rm-me-line" x1="${x.toFixed(1)}" y1="${P.t}" x2="${x.toFixed(1)}" y2="${H-P.b}"/>`+
-      `<text class="rm-me-cap" x="${x.toFixed(1)}" y="${(P.t-20).toFixed(1)}" text-anchor="middle">`+
-      `Variational · ${usd(me.hold)} returned, no market cap yet</text>`+marks;
+      `<text class="rm-me-cap" x="${Math.min(Math.max(x,P.l+200),W-P.r-200).toFixed(1)}" y="${(P.t-20).toFixed(1)}" text-anchor="middle">`+
+      `Variational · no token yet · ${usd(me.hold)} / 30D to buybacks</text>`+marks;
   }
 
   const svg=`<svg viewBox="0 0 ${W} ${H}" role="img" class="rm-svg" aria-label="30-day holder return against market capitalisation, log scale">`+
     grid+iso+dots+meLayer+
     `<text class="rm-axt" x="${W-P.r}" y="${H-8}" text-anchor="end">30D revenue · log →</text>`+
+    `<text class="rm-ax" x="${P.l}" y="${H-8}">diagonals = annual holder yield · 30D return × 365 ÷ 30 ÷ market cap</text>`+
     `<text class="rm-axt" x="${P.l}" y="${P.t-20}">Market cap ↑</text></svg>`+
     `<div class="rm-tip" hidden><b></b><div class="rm-tip-r"><span>Market cap</span><i data-mc></i></div>`+
     `<div class="rm-tip-r"><span>30D revenue</span><i data-rev></i></div>`+
@@ -1501,10 +1663,12 @@ function renderRevenueMeta(){
 
   host.innerHTML=
     `<div class="cl-head"><b>What a buyer pays per dollar returned</b> `+
-    `<span>30-day revenue against market cap, log–log. Diagonals are the annualised ratio between them.</span></div>`+
+    `<span>30-day revenue against market cap, log–log. Diagonals are the annual holder yield: 30D return × 365 ÷ 30 ÷ market cap.</span></div>`+
     `<p class="cl-lead">Across the listed venues the median holder yield is <b>${pc(med)}</b> of market cap a year. `+
-    `Variational returns <b>${usd(me?me.hold:null)}</b> over 30 days and has no market cap to divide it by — `+
-    `at the field's median that is a <b>${usd(impl)}</b> valuation, and the marks on its line show what matching each peer would take.</p>`+
+    `Variational has no token yet, so there is no market cap to plot. Its vertical line is its 30D buyback budget: <b>${usd(me?me.hold:null)}</b> `+
+    `of treasury ${tagHtml('wallet',TAG_NOTE.wallet)}, all of it committed to $VAR buy &amp; burn ${tagHtml('policy',TAG_NOTE.policy)}. `+
+    `Each mark on the line is the market cap Variational would have if the market priced that budget at the same yield as the named peer — `+
+    `at the field's median that is a <b>${usd(impl)}</b> valuation.</p>`+
     svg+
     `<div class="rm-key"><span><i class="discount"></i>Cheaper than the field — more returned per dollar of market cap</span>`+
     `<span><i class="premium"></i>Pricier than the field</span>`+
@@ -1513,11 +1677,12 @@ function renderRevenueMeta(){
     `<th>Venue</th><th>30D revenue</th><th>Returned to holders</th><th>Share returned</th><th>Market cap</th><th>Holder yield · annual</th><th>vs field</th>`+
     `</tr></thead><tbody>${tbody}</tbody></table></div>`+
     `<p class="cl-note"><b>Traditional markets are not in these figures.</b> Metals, energy and index `+
-    `exposure are a separate book with its own depth and its own counterparty, measured against `+
-    `Entropy's published TradFi section \u2014 <a href="#tradfi" data-open-tab="tradfi">see the TradFi tab</a>.</p>`+
+    `exposure are a separate book with its own depth and its own counterparty; Entropy publishes it as `+
+    `a separate TradFi section on <a href="https://arbdata.com/variational/tradfi" target="_blank" rel="noopener">arbdata.com ↗</a>.</p>`+
     `<p class="cl-note">Holder return is <code>dailyHoldersRevenue</code> from DeFiLlama for every listed venue. `+
-    `Variational has no distribution series — its figure is the treasury, which official policy spends entirely on buybacks, `+
-    `so it is a policy value and marked as one. Market caps are circulating, from the dashboard's CoinGecko board. `+
+    `Variational has no distribution series — its revenue and its returned figure are the same 30D treasury WALLET INFLOW used everywhere on this tab, `+
+    `and official policy spends all of it on $VAR buy &amp; burn, so its 100% share returned is a POLICY value, not a measurement. `+
+    `Peers are REPORTED by DeFiLlama over the same 30 days. Market caps are circulating, from the dashboard's CoinGecko board. `+
     `A yield here is revenue over price, not a payout anyone receives in cash.</p>`;
 
   /* hover card. A native <title> needs a one-second dwell and cannot be styled, which on a
@@ -1548,7 +1713,7 @@ function renderAll(){ renderProvenance(); renderFieldModes(); renderField(); ren
 
 /* ---------- mount into the dashboard ---------- */
 const CL_CSS = "\n.cmp-lab{\n  --accent:var(--v2-accent,#4c9af8); --accent-soft:var(--v2-accent-soft,#7db4fa);\n  --accent-deep:var(--v2-accent-deep,#2b7ae0);\n  --bg:var(--v2-bg,#0a0e14); --panel:var(--v2-panel,#0f1520); --panel2:var(--v2-panel2,#131b28);\n  --line:var(--v2-line,#212c3d); --text:var(--v2-text,#e9eef6); --muted:var(--v2-muted,#9aabc0);\n  --dim:var(--v2-dim,#8496ab); --faint:var(--v2-faint,#75879d); --on-accent:var(--v2-on-accent,#06101d);\n  --pos:var(--v2-pos,#4fd39a); --neg:var(--v2-neg,#ff8b8b);\n  --sans:\"Geist\",system-ui,-apple-system,sans-serif;\n  --mono:\"Geist Mono\",ui-monospace,SFMono-Regular,Menlo,monospace;\n  --t-label:11px; --t-label-track:1.1px; --t-num-s:20px;\n  --ceiling:#c7d3e4; --field:#54677f;\n  font-family:var(--sans); color:var(--text);\n}\nbody.theme-light .cmp-lab{ --ceiling:#41546c; --field:#8195ac; }\n.cmp-lab,.cmp-lab *{box-sizing:border-box}\n/* the dashboard sets a global `table{width:100%;min-width:680px;font:12px mono}`,\n   which pushes these panels' compact tables out of their grid columns */\n.cmp-lab table{min-width:0;width:100%;border-collapse:collapse;font:inherit}\n.cmp-lab th,.cmp-lab td{background:transparent}\n.cmp-lab p{margin:0}\n.cmp-lab .cl-panel{margin:26px 0}\n.rm-name{fill:var(--muted);font:700 11px var(--sans);paint-order:stroke;stroke:var(--panel);stroke-width:3.5px;stroke-linejoin:round}\n.rm-node.premium .rm-ring{stroke:var(--neg);stroke-width:2.2}\n.rm-node.discount .rm-ring{stroke:var(--pos);stroke-width:2.2}\n.rm-node.fair .rm-ring{stroke:var(--line)}\n.rm-key{display:flex;gap:16px;flex-wrap:wrap;align-items:center;margin:2px 0 0}\n.rm-key span{display:inline-flex;align-items:center;gap:6px;color:var(--dim);font:11.5px var(--sans)}\n.rm-key i{width:11px;height:11px;border-radius:50%;border:2.2px solid var(--line);display:block}\n.rm-key i.premium{border-color:var(--neg)}.rm-key i.discount{border-color:var(--pos)}\n.rm-tag{font-style:normal;font:700 9px var(--mono);letter-spacing:.5px;text-transform:uppercase;padding:1px 5px;border:1px solid}\n.rm-tag.premium{color:var(--neg);border-color:var(--neg)}\n.rm-tag.discount{color:var(--pos);border-color:var(--pos)}\n.rm-tag.fair{color:var(--dim);border-color:var(--line)}\n/* ---------- revenue meta ---------- */\n.cl-panel:has(.rm-svg){position:relative}\n.rm-svg{width:100%;height:auto;display:block;margin:16px 0 8px;overflow:visible}\n.rm-grid{stroke:var(--line);stroke-width:1}\n.rm-ax{fill:var(--dim);font:10.5px var(--mono)}\n.rm-axt{fill:var(--muted);font:800 10px var(--mono);letter-spacing:.9px;text-transform:uppercase}\n.rm-iso{stroke:var(--line);stroke-width:1;stroke-dasharray:3 4}\n.rm-iso-t{fill:var(--dim);font:700 10px var(--mono)}\n.rm-ring{fill:var(--panel);stroke:var(--line);stroke-width:1.5}\n.rm-node{cursor:pointer}\n.rm-node:hover .rm-ring{stroke:var(--accent);stroke-width:2.5}\n.rm-hit{fill:transparent}\n.rm-me-line{stroke:var(--accent);stroke-width:1.6;stroke-dasharray:4 3}\n.rm-me-cap{fill:var(--accent);font:800 11px var(--mono);letter-spacing:.3px}\n.rm-me-mark{fill:var(--accent);stroke:var(--panel);stroke-width:1.5}\n.rm-me-t{fill:var(--accent-soft);font:700 10px var(--mono)}\n.rm-tip{position:absolute;z-index:20;pointer-events:none;min-width:208px;background:var(--panel);border:1px solid var(--line);box-shadow:0 10px 28px rgba(0,0,0,.42);padding:11px 13px}\n.rm-tip b{display:block;margin-bottom:8px;font:800 12px var(--sans);color:var(--text)}\n.rm-tip-r{display:flex;justify-content:space-between;gap:18px;padding:3px 0}\n.rm-tip-r span{color:var(--dim);font:11.5px var(--sans)}\n.rm-tip-r i{font-style:normal;font:700 12px var(--mono);color:var(--text);font-variant-numeric:tabular-nums}\n.rm-table{width:100%;font:inherit}\n.rm-table th{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line);font:800 9.5px var(--mono);letter-spacing:1px;text-transform:uppercase;color:var(--dim)}\n.rm-table td{padding:10px;border-bottom:1px solid var(--line);font-size:12.5px;color:var(--text)}\n.rm-table .rm-n{text-align:right;font-family:var(--mono);font-variant-numeric:tabular-nums}\n.rm-table tr.rm-me td{background:color-mix(in srgb,var(--accent) 9%,transparent);font-weight:700}\n.rm-flag{font-style:normal;font:700 9px var(--mono);letter-spacing:.6px;text-transform:uppercase;color:var(--accent);border:1px solid var(--accent);padding:1px 5px;margin-left:6px}\n.rm-na{font-style:normal;color:var(--dim)}\n/* ---------- argument structure: verdict / claims / evidence ---------- */\n.cmp-lab.cl-sec{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;\n  margin:34px 0 4px;padding-bottom:10px;border-bottom:2px solid var(--line)}\n.cmp-lab.cl-sec:first-child{margin-top:6px}\n.cl-sec-n{font-family:var(--mono);font-size:11px;letter-spacing:1.2px;color:var(--accent);font-weight:700}\n.cmp-lab.cl-sec b{font-size:19px;letter-spacing:-.2px}\n.cmp-lab.cl-sec small{color:var(--faint);font-size:12.5px}\n.cmp-lab.cl-sub{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin:26px 0 2px}\n.cmp-lab.cl-sub span{font-family:var(--mono);font-size:10px;letter-spacing:1px;color:var(--on-accent);\n  background:var(--accent);border-radius:4px;padding:2px 7px;font-weight:700}\n.cmp-lab.cl-sub b{font-size:14px}\n.cmp-lab.cl-sub small{color:var(--faint);font-size:12px}\n\n.cmp-lab.cl-claims{display:grid;gap:8px;margin:14px 0 6px}\n.cl-claim{display:grid;grid-template-columns:34px minmax(0,1fr) auto;gap:14px;align-items:center;\n  padding:14px 16px;border:1px solid var(--line);border-radius:10px;background:var(--panel);\n  text-decoration:none;color:inherit}\n.cl-claim:hover{border-color:color-mix(in srgb,var(--accent) 50%,var(--line));background:var(--panel2)}\n.cl-claim-n{font-family:var(--mono);font-size:11px;color:var(--faint)}\n.cl-claim-body b{display:block;font-size:14.5px;font-weight:600;line-height:1.45}\n.cl-claim-body small{display:block;margin-top:3px;font-size:12px;color:var(--faint)}\n.cl-claim-fig{font-family:var(--mono);font-size:17px;font-weight:700;color:var(--accent);\n  white-space:nowrap;font-variant-numeric:tabular-nums}\n.cl-claim-src{margin-top:2px;padding:10px 16px;border:1px dashed var(--line);border-radius:10px;\n  font-family:var(--mono);font-size:10.5px;line-height:1.6;letter-spacing:.3px;color:var(--faint)}\n@media(max-width:700px){\n  .cl-claim{grid-template-columns:26px minmax(0,1fr)}\n  .cl-claim-fig{grid-column:2}\n}\n\n.cmp-lab *{box-sizing:border-box}\n.cmp-lab body{\n  background:var(--bg); color:var(--text);\n  font-family:var(--sans); font-size:15px; line-height:1.55;\n  -webkit-font-smoothing:antialiased;\n}\n.cmp-lab button{font-family:inherit}\n.cmp-lab a{color:var(--accent-soft)}\n.cmp-lab .wrap{max-width:1240px;margin:0 auto;padding:38px 28px 90px}\n.cmp-lab .kicker{font-family:var(--mono);font-size:var(--t-label);letter-spacing:var(--t-label-track);\n  text-transform:uppercase;color:var(--accent);font-weight:500;margin-bottom:10px}\n.cmp-lab .head-side{display:flex;flex-direction:column;align-items:flex-end;gap:10px}\n.cmp-lab .cl-panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;\n  padding:26px 26px 24px;margin-bottom:26px}\n.cmp-lab .cl-head{margin-bottom:20px}\n.cmp-lab .cl-head h2{margin:0;font-size:21px;letter-spacing:-.2px;font-weight:700}\n.cmp-lab .cl-head p{margin:7px 0 0;color:var(--muted);font-size:13.5px;max-width:88ch}\n.cmp-lab .field-wrap{position:relative}\n.cmp-lab #field{display:block;width:100%;height:auto;overflow:visible}\n.cmp-lab #field text{font-family:var(--mono);fill:var(--faint)}\n.cmp-lab #field .ax-t{font-size:11px;letter-spacing:.4px}\n.cmp-lab #field .ax-title{font-size:11px;letter-spacing:1.1px;text-transform:uppercase;fill:var(--dim)}\n.cmp-lab #field .iso-t{font-size:10px;letter-spacing:.6px;fill:var(--faint);\n  paint-order:stroke;stroke:var(--panel);stroke-width:5px;stroke-linejoin:round}\n.cmp-lab #field .grid{stroke:var(--line);stroke-width:1}\n.cmp-lab #field .axis{stroke:var(--line);stroke-width:1.5}\n.cmp-lab #field .iso{stroke:var(--line);stroke-dasharray:3 5;stroke-width:1}\n.cmp-lab #field .node circle.dot{fill:var(--field);fill-opacity:.24;stroke:var(--field);stroke-width:1.25}\n.cmp-lab #field .node.nofee circle.dot{fill:none;stroke-dasharray:2.5 3}\n.cmp-lab #field .node.ceil circle.dot{fill:var(--ceiling);fill-opacity:.16;stroke:var(--ceiling)}\n.cmp-lab #field .node.me circle.dot{fill:var(--accent);fill-opacity:.3;stroke:var(--accent);stroke-width:2}\n.cmp-lab #field .node .halo{fill:none;stroke:var(--accent);stroke-opacity:.35;stroke-width:1.5}\n.cmp-lab #field .node text.lbl{font-size:11.5px;fill:var(--muted);letter-spacing:.2px}\n.cmp-lab #field .node.me text.lbl{fill:var(--accent);font-weight:700}\n.cmp-lab #field .node.ceil text.lbl{fill:var(--ceiling)}\n.cmp-lab #field .bkey .k-box{fill:var(--panel2);stroke:var(--line);stroke-width:1}\n.cmp-lab #field .bkey .k-head{font-family:var(--mono);font-size:9.5px;letter-spacing:1px;text-transform:uppercase;\n  fill:var(--faint)}\n.cmp-lab #field .bkey .dot{fill:var(--field);fill-opacity:.24;stroke:var(--field);stroke-width:1.25}\n.cmp-lab #field .bkey .core{fill:var(--field);fill-opacity:.9;stroke:none}\n.cmp-lab #field .bkey .lead{stroke:var(--line);stroke-width:1}\n.cmp-lab #field .bkey .k-lbl{font-family:var(--mono);font-size:10px;letter-spacing:.4px;fill:var(--muted)}\n.cmp-lab #field .bkey .k-lbl.dim{fill:var(--faint);font-size:9.5px}\n.cmp-lab #field .node{cursor:pointer}\n.cmp-lab #field.dimmed .node{opacity:.22}\n.cmp-lab #field.dimmed .node.hot{opacity:1}\n.cmp-lab .cl-tip{position:absolute;pointer-events:none;opacity:0;transform:translate(-50%,-115%);\n  background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:11px 13px;\n  min-width:216px;box-shadow:0 18px 40px rgba(0,0,0,.45);transition:opacity .12s;z-index:5}\n.cmp-lab .cl-tip.on{opacity:1}\n.cmp-lab .cl-tip.below{transform:translate(-50%,14px)}\n.cmp-lab .cl-tip b{display:flex;align-items:center;gap:7px;font-size:13.5px;margin-bottom:7px}\n.cmp-lab .cl-tip img{width:16px;height:16px;border-radius:4px}\n.cmp-lab .cl-tip dl{margin:0;display:grid;grid-template-columns:auto auto;gap:3px 14px}\n.cmp-lab .cl-tip dt{font-family:var(--mono);font-size:10.5px;letter-spacing:.7px;text-transform:uppercase;color:var(--faint)}\n.cmp-lab .cl-tip dd{margin:0;font-family:var(--mono);font-size:12px;font-weight:700;text-align:right;font-variant-numeric:tabular-nums}\n.cmp-lab .cl-tip .na{color:var(--faint);font-weight:500}\n.cmp-lab .field-read{margin:14px 0 0;padding:13px 15px;background:var(--panel2);border:1px solid var(--line);\n  border-radius:10px;color:var(--muted);font-size:13px;line-height:1.6}\n.cmp-lab .field-read b{color:var(--text)}\n.cmp-lab .cl-legend{display:flex;flex-wrap:wrap;gap:8px 20px;align-items:center;margin-top:16px;\n  padding-top:15px;border-top:1px solid var(--line)}\n.cmp-lab .cl-legend span{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);\n  font-size:10.5px;letter-spacing:.6px;text-transform:uppercase;color:var(--faint)}\n.cmp-lab .cl-legend .k{width:11px;height:11px;border-radius:50%;flex:none}\n.cmp-lab .cl-legend .k.me{background:color-mix(in srgb,var(--accent) 30%,transparent);border:2px solid var(--accent)}\n.cmp-lab .cl-legend .k.pk{background:color-mix(in srgb,var(--ceiling) 16%,transparent);border:1.25px solid var(--ceiling)}\n.cmp-lab .cl-legend .k.pf{background:color-mix(in srgb,var(--field) 24%,transparent);border:1.25px solid var(--field)}\n.cmp-lab .cl-legend .k.nf{border:1.25px dashed var(--field)}\n.cmp-lab .cl-legend .k.prem{background:color-mix(in srgb,var(--pos) 45%,transparent);border:1.25px solid var(--pos)}\n.cmp-lab .cl-legend .k.disc{background:color-mix(in srgb,var(--neg) 35%,transparent);border:1.25px solid var(--neg)}\n.cmp-lab .ratio-tbl{width:100%;border-collapse:collapse;table-layout:fixed}\n.cmp-lab .ratio-tbl th{font-family:var(--mono);font-size:10.5px;letter-spacing:1px;text-transform:uppercase;\n  color:var(--faint);font-weight:500;text-align:left;padding:0 12px 11px;border-bottom:1px solid var(--line)}\n.cmp-lab .ratio-tbl th.num{text-align:right}\n.cmp-lab .ratio-tbl th img{width:17px;height:17px;border-radius:4px;vertical-align:-4px;margin-right:6px}\n.cmp-lab .ratio-tbl th:first-child{width:19%}\n.cmp-lab .ratio-tbl th.num{width:14%}\n.cmp-lab .ratio-tbl th:last-child{width:39%;text-align:left}\n.cmp-lab .ratio-tbl td{padding:16px 12px;border-bottom:1px solid var(--line);vertical-align:top}\n.cmp-lab .ratio-tbl tr:last-child td{border-bottom:0}\n.cmp-lab .ratio-tbl td.metric b{display:block;font-size:14px;font-weight:700;margin-bottom:3px}\n.cmp-lab .ratio-tbl td.metric span{font-size:11.5px;color:var(--faint);line-height:1.4;display:block}\n.cmp-lab .ratio-tbl td.num{text-align:right;font-family:var(--mono);font-variant-numeric:tabular-nums}\n.cmp-lab .ratio-tbl td.num b{font-size:var(--t-num-s);font-weight:700;letter-spacing:-.4px}\n.cmp-lab .ratio-tbl td.num span{display:block;font-size:10.5px;color:var(--faint);letter-spacing:.4px;margin-top:3px}\n.cmp-lab .ratio-tbl td.num.me b{color:var(--accent)}\n.cmp-lab .ratio-tbl td.num.na b{color:var(--faint);font-weight:500}\n.cmp-lab .split-list{display:flex;flex-direction:column;gap:2px}\n.cmp-lab .sp-row{display:grid;grid-template-columns:172px minmax(0,1fr) 132px;gap:16px;align-items:center;\n  padding:9px 10px;border-radius:8px}\n.cmp-lab .sp-row.me{background:color-mix(in srgb,var(--accent) 10%,transparent)}\n.cmp-lab .sp-row:hover{background:var(--panel2)}\n.cmp-lab .sp-row.me:hover{background:color-mix(in srgb,var(--accent) 14%,transparent)}\n.cmp-lab .sp-name{display:flex;align-items:center;gap:9px;min-width:0}\n.cmp-lab .sp-name img{width:18px;height:18px;border-radius:5px;flex:none}\n.cmp-lab .sp-name b{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}\n.cmp-lab .sp-row.me .sp-name b{color:var(--accent);font-weight:700}\n.cmp-lab .sp-row.ceil .sp-name b{color:var(--ceiling)}\n.cmp-lab .sp-bar{position:relative;height:26px;border-radius:6px;overflow:hidden;border:1px solid var(--line);\n  background:repeating-linear-gradient(115deg,transparent 0 5px,var(--line) 5px 7px)}\n.cmp-lab .sp-bar .kept{position:absolute;inset:0 auto 0 0;background:var(--field);border-right:1px solid var(--panel)}\n.cmp-lab .sp-row.me .sp-bar .kept{background:var(--accent)}\n.cmp-lab .sp-row.ceil .sp-bar .kept{background:var(--ceiling)}\n.cmp-lab .sp-bar .pctlbl{position:absolute;top:50%;transform:translateY(-50%);font-family:var(--mono);\n  font-size:10.5px;font-weight:700;letter-spacing:.4px}\n.cmp-lab .sp-bar .pctlbl.outside{color:var(--muted)}\n.cmp-lab .sp-bar .pctlbl.inside{color:var(--text)}\n.cmp-lab .sp-row.me .sp-bar .pctlbl.inside,.cmp-lab .sp-row.ceil .sp-bar .pctlbl.inside{color:var(--on-accent)}\n.cmp-lab .sp-bar .natxt{position:absolute;left:10px;top:50%;transform:translateY(-50%);font-family:var(--mono);\n  font-size:10.5px;letter-spacing:.5px;color:var(--faint);text-transform:uppercase}\n.cmp-lab .sp-val{text-align:right;font-family:var(--mono);font-variant-numeric:tabular-nums}\n.cmp-lab .sp-val b{display:block;font-size:14px;font-weight:700}\n.cmp-lab .sp-val span{font-size:10.5px;color:var(--faint)}\n.cmp-lab .sp-row.me .sp-val b{color:var(--accent)}\n.cmp-lab .cl-legend .k.kept{background:var(--field);border-radius:3px}\n.cmp-lab .cl-legend .k.out{border-radius:3px;border:1px solid var(--line);\n  background:repeating-linear-gradient(115deg,transparent 0 4px,var(--line) 4px 6px)}\n.cmp-lab .tbl-foot{margin-top:12px;font-family:var(--mono);font-size:10.5px;line-height:1.7;color:var(--faint);\n  letter-spacing:.3px}\n.cmp-lab #field .node circle.core{fill:var(--field);fill-opacity:.9;stroke:none;pointer-events:none}\n.cmp-lab #field .node.ceil circle.core{fill:var(--ceiling)}\n.cmp-lab #field .node.me circle.core{fill:var(--accent);fill-opacity:1}\n@media(max-width:900px){.cmp-lab .sp-row{grid-template-columns:132px minmax(0,1fr);gap:10px}\n.cmp-lab .sp-val{grid-column:2;text-align:left}}\n.cmp-lab .flow-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(410px,1fr));gap:14px}\n.cmp-lab .flow-card{margin:0;padding:14px 14px 8px;border:1px solid var(--line);border-radius:12px;background:var(--panel2)}\n.cmp-lab .flow-card.me{border-color:color-mix(in srgb,var(--accent) 55%,var(--line));\n  background:color-mix(in srgb,var(--accent) 8%,var(--panel2))}\n.cmp-lab .flow-card figcaption{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:2px}\n.cmp-lab .flow-card figcaption img{width:18px;height:18px;border-radius:5px}\n.cmp-lab .flow-card figcaption b{font-size:14px;font-weight:700}\n.cmp-lab .flow-card.me figcaption b{color:var(--accent)}\n.cmp-lab .flow-card.ceil figcaption b{color:var(--ceiling)}\n.cmp-lab .flow-card figcaption span{font-family:var(--mono);font-size:10.5px;letter-spacing:.4px;color:var(--faint)}\n.cmp-lab .flow-card svg{display:block;width:100%;height:auto;overflow:visible}\n.cmp-lab .flow-card svg text{font-family:var(--mono)}\n.cmp-lab .flow-card svg .nl{font-size:9.5px;letter-spacing:.9px;text-transform:uppercase;fill:var(--faint)}\n.cmp-lab .flow-card svg .nv{font-size:12px;font-weight:700;fill:var(--text);font-variant-numeric:tabular-nums}\n.cmp-lab .flow-card svg .nv.cost,.cmp-lab .flow-card svg .nl.cost{fill:var(--faint)}\n.cmp-lab .flow-card svg .na{font-size:9.5px;letter-spacing:.6px;fill:var(--faint)}\n.cmp-lab .flow-card svg .node{fill:var(--field)}\n.cmp-lab .flow-card svg .node.supply{fill:var(--field);fill-opacity:.45}\n.cmp-lab .flow-card svg .node.other{fill:var(--field);fill-opacity:.22}\n.cmp-lab .flow-card svg .node.hold{fill:var(--ceiling)}\n.cmp-lab .flow-card svg .rib{stroke:none}\n.cmp-lab .flow-card svg .rib.rev{fill:var(--field);fill-opacity:.34}\n.cmp-lab .flow-card svg .rib.supply{fill:var(--field);fill-opacity:.15}\n.cmp-lab .flow-card svg .rib.other{fill:var(--field);fill-opacity:.09}\n.cmp-lab .flow-card svg .rib.hold{fill:var(--ceiling);fill-opacity:.3}\n.cmp-lab .flow-card svg .rib.keep2{fill:var(--field);fill-opacity:.2}\n.cmp-lab .flow-card.me svg .node.rev,.cmp-lab .flow-card.me svg .rib.rev{fill:var(--accent)}\n.cmp-lab .flow-card.me svg .rib.rev{fill-opacity:.34}\n.cmp-lab .flow-card.ceil svg .node.rev,.cmp-lab .flow-card.ceil svg .rib.rev,.cmp-lab .flow-card.ceil svg .rib.hold{fill:var(--ceiling)}\n.cmp-lab .flow-card.ceil svg .rib.rev,.cmp-lab .flow-card.ceil svg .rib.hold{fill-opacity:.28}\n.cmp-lab .fc-chips{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:10px;padding-top:9px;\n  border-top:1px solid var(--line)}\n.cmp-lab .fc-chip{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:10px;\n  letter-spacing:.4px;text-transform:uppercase;color:var(--faint)}\n.cmp-lab .fc-chip b{color:var(--muted);font-weight:700;text-transform:none;font-size:11px}\n.cmp-lab .fc-chip i{width:9px;height:9px;border-radius:2px;background:var(--field);flex:none}\n.cmp-lab .fc-chip.supply i{opacity:.45}\n.cmp-lab .fc-chip.other i{opacity:.22}\n.cmp-lab .fc-chip.keep2 i{opacity:.7}\n.cmp-lab .fc-chip.na i{background:none;border:1px dashed var(--line)}\n.cmp-lab .flow-note{margin:16px 0 0;padding-top:14px;border-top:1px solid var(--line);\n  color:var(--muted);font-size:12.5px;line-height:1.7}\n.cmp-lab .ml-grid{display:grid;grid-template-columns:minmax(300px,.86fr) minmax(0,1.35fr);gap:20px;align-items:start}\n.cmp-lab .ml-tbl{width:100%;border-collapse:collapse}\n.cmp-lab .ml-tbl th{font-family:var(--mono);font-size:10px;letter-spacing:1px;text-transform:uppercase;\n  color:var(--faint);font-weight:500;text-align:left;padding:0 8px 10px;border-bottom:1px solid var(--line)}\n.cmp-lab .ml-tbl th.num{text-align:right}\n.cmp-lab .ml-tbl th img{width:16px;height:16px;border-radius:4px;vertical-align:-3px;margin-right:5px}\n.cmp-lab .ml-tbl td{padding:11px 8px;border-bottom:1px solid var(--line)}\n.cmp-lab .ml-tbl tr:last-child td{border-bottom:0}\n.cmp-lab .ml-row{cursor:pointer}\n.cmp-lab .ml-row:hover td{background:var(--panel2)}\n.cmp-lab .ml-row.on td{background:color-mix(in srgb,var(--accent) 12%,transparent)}\n.cmp-lab .ml-row.on td:first-child{box-shadow:inset 2px 0 0 var(--accent)}\n.cmp-lab .ml-row:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}\n.cmp-lab .ml-tbl td.metric b{display:block;font-size:13px;font-weight:600}\n.cmp-lab .ml-tbl td.metric span{font-family:var(--mono);font-size:9.5px;letter-spacing:.7px;text-transform:uppercase;color:var(--faint)}\n.cmp-lab .ml-tbl td.num{text-align:right;font-family:var(--mono);font-variant-numeric:tabular-nums}\n.cmp-lab .ml-tbl td.num b{font-size:13px;font-weight:700}\n.cmp-lab .ml-tbl td.num.me b{color:var(--accent)}\n.cmp-lab .ml-tbl td.num.na b{color:var(--faint);font-weight:500}\n.cmp-lab .ml-tbl td.num span{display:block;font-size:9.5px;color:var(--faint);letter-spacing:.3px;min-height:12px}\n.cmp-lab .ml-tbl td.num span.up{color:var(--pos)}\n.cmp-lab .ml-tbl td.num span.down{color:var(--neg)}\n.cmp-lab .ml-chart{border:1px solid var(--line);border-radius:12px;background:var(--panel2);padding:14px 14px 10px}\n.cmp-lab .ml-head{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;flex-wrap:wrap;margin-bottom:6px}\n.cmp-lab .ml-head b{display:block;font-size:15px}\n.cmp-lab .ml-head span{font-family:var(--mono);font-size:10px;letter-spacing:.5px;text-transform:uppercase;color:var(--faint)}\n.cmp-lab .ml-legend{display:flex;gap:12px;flex-wrap:wrap}\n.cmp-lab .ml-legend span{display:inline-flex;align-items:center;gap:6px;text-transform:none;letter-spacing:.2px;\n  font-size:11px;color:var(--muted)}\n.cmp-lab .ml-legend i{width:10px;height:10px;border-radius:3px;flex:none}\n.cmp-lab .ml-legend .v-me i{background:var(--accent)}\n.cmp-lab .ml-legend .v-ltr i{background:var(--field)}\n.cmp-lab .ml-legend .v-ext i{background:var(--pos)}\n.cmp-lab #mlChart{display:block;width:100%;height:auto;margin-top:4px}\n.cmp-lab #mlChart text{font-family:var(--mono);fill:var(--faint)}\n.cmp-lab #mlChart .ax{font-size:10px;letter-spacing:.3px}\n.cmp-lab #mlChart .wk{font-size:9px}\n.cmp-lab #mlChart .wk.dim{opacity:.65}\n.cmp-lab #mlChart .grid{stroke:var(--line);stroke-width:1}\n.cmp-lab #mlChart .axis{stroke:var(--line);stroke-width:1.5}\n.cmp-lab #mlChart .bar.v-me{fill:var(--accent)}\n.cmp-lab #mlChart .bar.v-ltr{fill:var(--field)}\n.cmp-lab #mlChart .bar.v-ext{fill:var(--pos)}\n.cmp-lab #mlChart .ln{fill:none;stroke-width:2.2;stroke-linejoin:round;stroke-linecap:round}\n.cmp-lab #mlChart .ln.v-me{stroke:var(--accent)}\n.cmp-lab #mlChart .ln.v-ltr{stroke:var(--field)}\n.cmp-lab #mlChart .ln.v-ext{stroke:var(--pos)}\n.cmp-lab #mlChart .dot.v-me{fill:var(--accent)}\n.cmp-lab #mlChart .dot.v-ltr{fill:var(--field)}\n.cmp-lab #mlChart .dot.v-ext{fill:var(--pos)}\n.cmp-lab .ml-read{margin-top:10px;padding-top:10px;border-top:1px solid var(--line)}\n.cmp-lab .ml-read p{margin:0 0 6px;font-size:12.5px;line-height:1.6;color:var(--muted)}\n.cmp-lab .ml-read .ml-src{font-family:var(--mono);font-size:10px;letter-spacing:.5px;text-transform:uppercase;color:var(--faint)}\n@media(max-width:900px){.cmp-lab .ml-grid{grid-template-columns:1fr}}\n.cmp-lab .ml-controls{display:flex;flex-direction:column;align-items:flex-end;gap:8px}\n.cmp-lab .ml-range{display:inline-flex;border:1px solid var(--line);border-radius:999px;overflow:hidden}\n.cmp-lab .ml-range .rg{background:transparent;border:0;color:var(--faint);font-family:var(--mono);font-size:10.5px;\n  letter-spacing:.6px;padding:5px 11px;cursor:pointer}\n.cmp-lab .ml-range .rg+.rg{border-left:1px solid var(--line)}\n.cmp-lab .ml-range .rg:hover:not(:disabled){color:var(--text)}\n.cmp-lab .ml-range .rg.on{background:var(--accent);color:var(--on-accent);font-weight:700}\n.cmp-lab .ml-range .rg:disabled{opacity:.4;cursor:not-allowed}\n.cmp-lab .ml-cards-head{margin-top:14px;font-size:13px;font-weight:700}\n.cmp-lab .ml-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(148px,1fr));gap:10px;margin-top:9px}\n.cmp-lab .ml-card{padding:10px 12px;border:1px solid var(--line);border-radius:9px;background:var(--panel);\n  border-top:2px solid var(--field)}\n.cmp-lab .ml-card.v-me{border-top-color:var(--accent)}\n.cmp-lab .ml-card.v-ext{border-top-color:var(--pos)}\n.cmp-lab .ml-card span{display:block;font-family:var(--mono);font-size:9.5px;letter-spacing:.7px;\n  text-transform:uppercase;color:var(--faint);margin-bottom:4px}\n.cmp-lab .ml-card b{font-size:12.5px;font-weight:600;line-height:1.45;color:var(--text)}\n.cmp-lab .ml-card b b{color:var(--accent)}\n.cmp-lab .ml-left{min-width:0}\n.cmp-lab .ml-venues{display:flex;flex-wrap:wrap;gap:5px;align-items:center;margin-bottom:12px}\n.cmp-lab .ml-vlabel,.cmp-lab .ml-vhint{font-family:var(--mono);font-size:9.5px;letter-spacing:.8px;text-transform:uppercase;color:var(--faint)}\n.cmp-lab .ml-vhint{margin-left:auto}\n.cmp-lab .ml-chip{background:transparent;border:1px solid var(--line);color:var(--faint);border-radius:999px;\n  padding:3px 9px;font-family:var(--mono);font-size:10px;letter-spacing:.5px;cursor:pointer}\n.cmp-lab .ml-chip:hover:not(:disabled){color:var(--text);border-color:var(--accent-deep)}\n.cmp-lab .ml-chip:disabled{opacity:.45;cursor:not-allowed}\n.cmp-lab .ml-chip.on{color:var(--on-accent);border-color:transparent;font-weight:700}\n.cmp-lab .ml-chip.on.v-me{background:var(--accent)}\n.cmp-lab .ml-chip.on.v-b{background:var(--field);color:var(--text)}\n.cmp-lab .ml-chip.on.v-c{background:var(--pos);color:var(--on-accent)}\n.cmp-lab .ml-chip.on.v-d{background:var(--ceiling);color:var(--on-accent)}\n.cmp-lab .ml-tbl tr.ml-group td{padding:14px 8px 4px;border:0;font-family:var(--mono);font-size:9.5px;\n  letter-spacing:1px;text-transform:uppercase;color:var(--faint)}\n.cmp-lab .ml-tbl tr.ml-group:first-child td{padding-top:2px}\n.cmp-lab .ml-legend .v-b i,.cmp-lab #mlChart .bar.v-b,.cmp-lab #mlChart .dot.v-b{background:var(--field);fill:var(--field)}\n.cmp-lab .ml-legend .v-c i,.cmp-lab #mlChart .bar.v-c,.cmp-lab #mlChart .dot.v-c{background:var(--pos);fill:var(--pos)}\n.cmp-lab .ml-legend .v-d i,.cmp-lab #mlChart .bar.v-d,.cmp-lab #mlChart .dot.v-d{background:var(--ceiling);fill:var(--ceiling)}\n.cmp-lab #mlChart .ln.v-b{stroke:var(--field)}\n.cmp-lab #mlChart .ln.v-c{stroke:var(--pos)}\n.cmp-lab #mlChart .ln.v-d{stroke:var(--ceiling)}\n.cmp-lab .ml-card.v-b{border-top-color:var(--field)}\n.cmp-lab .ml-card.v-c{border-top-color:var(--pos)}\n.cmp-lab .ml-card.v-d{border-top-color:var(--ceiling)}\n.cmp-lab .sec-head-row{display:flex;justify-content:space-between;align-items:flex-start;gap:18px;flex-wrap:wrap}\n.cmp-lab .sec-head-row>div:first-child{flex:1 1 420px;min-width:0}\n.cmp-lab #field .fitline{fill:none;stroke:var(--accent);stroke-opacity:.5;stroke-width:1.5;stroke-dasharray:6 4}\n.cmp-lab #field .node.val .dot{fill:var(--field);fill-opacity:.5;stroke:var(--field);stroke-width:1.25}\n.cmp-lab #field .node.val.prem .dot{fill:var(--pos);fill-opacity:.45;stroke:var(--pos)}\n.cmp-lab #field .node.val.disc .dot{fill:var(--neg);fill-opacity:.35;stroke:var(--neg)}\n.cmp-lab #field .node.val.me .dot{fill:none;stroke:var(--accent);stroke-width:2;stroke-dasharray:3 3}\n.cmp-lab #field .node.val .drop{stroke:var(--line);stroke-width:1;stroke-dasharray:2 3}\n.cmp-lab .lad{display:flex;flex-direction:column;gap:1px}\n.cmp-lab .lad-row{display:grid;grid-template-columns:34px minmax(0,1fr) auto;gap:10px;align-items:baseline;\n  padding:5px 8px;border-radius:6px;font-family:var(--mono);font-size:12px;\n  font-variant-numeric:tabular-nums;color:var(--muted)}\n.cmp-lab .lad-row .rk{color:var(--faint);font-size:11px}\n.cmp-lab .lad-row .nm{font-family:var(--sans);font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}\n.cmp-lab .lad-row .nm i{font-style:normal;font-family:var(--mono);font-size:9.5px;letter-spacing:.6px;\n  text-transform:uppercase;color:var(--faint);margin-left:5px}\n.cmp-lab .lad-row .vl{font-weight:700;color:var(--text)}\n.cmp-lab .lad-row.me{background:color-mix(in srgb,var(--accent) 14%,transparent)}\n.cmp-lab .lad-row.me .rk,.cmp-lab .lad-row.me .nm{color:var(--accent);font-weight:700}\n.cmp-lab .lad-row.me .vl{color:var(--accent)}\n.cmp-lab .lad-row.ceil .nm{color:var(--ceiling)}\n.cmp-lab .lad-gap{padding:2px 8px;font-family:var(--mono);font-size:9.5px;letter-spacing:.6px;\n  text-transform:uppercase;color:var(--faint)}\n.cmp-lab .lad-none{font-family:var(--mono);font-size:10.5px;color:var(--faint)}\n.cmp-lab .strip .read{margin-top:9px;padding-top:8px;border-top:1px solid var(--line);\n  font-size:12px;line-height:1.5;color:var(--muted)}\n.cmp-lab .strip .read b{color:var(--text)}\n.cmp-lab .dir-badge{display:inline-block;margin-top:7px;font-family:var(--mono);font-size:9.5px;letter-spacing:.6px;\n  text-transform:uppercase;padding:2px 7px;border-radius:999px;border:1px solid var(--line);color:var(--faint)}\n.cmp-lab .dir-badge.up{color:var(--pos);border-color:color-mix(in srgb,var(--pos) 40%,var(--line))}\n.cmp-lab .dir-badge.down{color:var(--accent-soft);border-color:color-mix(in srgb,var(--accent) 40%,var(--line))}\n.cmp-lab .dir-badge.mixed{color:var(--muted)}\n.cmp-lab .lad-row.best .rk{color:var(--pos);font-weight:700;font-size:9.5px;letter-spacing:.6px}\n.cmp-lab .lad-row.na{opacity:.55}\n.cmp-lab .lad-row.na .vl{font-weight:500;color:var(--faint);font-size:10.5px}\n.cmp-lab .strip .read .dir{font-family:var(--mono);font-size:10px;letter-spacing:.6px;text-transform:uppercase}\n.cmp-lab .strip .read .dir.up{color:var(--pos)}\n.cmp-lab .strip .read .dir.down{color:var(--accent-soft)}\n.cmp-lab .strip .read .dir.mixed{color:var(--muted)}\n.cmp-lab .strip .read .dir-note{display:inline-block;margin-top:4px;font-size:11.5px;color:var(--faint);line-height:1.45}\n.cmp-lab .basis-chip{display:inline-block;margin-right:6px;padding:1px 7px;border-radius:999px;border:1px solid var(--neg);\n  color:var(--neg);font-family:var(--mono);font-size:9.5px;letter-spacing:.7px;text-transform:uppercase}\n.cmp-lab .src-line.warn{border-color:color-mix(in srgb,var(--neg) 45%,var(--line));color:var(--muted)}\n.cmp-lab .src-line{margin:14px 0 0;padding:10px 13px;border:1px dashed var(--line);border-radius:9px;\n  font-family:var(--mono);font-size:10.5px;line-height:1.6;letter-spacing:.3px;color:var(--faint)}\n.cmp-lab .cl-callout{margin-top:22px;padding:16px 18px;border:1px solid var(--line);border-left:3px solid var(--accent);\n  border-radius:0 10px 10px 0;background:var(--panel2)}\n.cmp-lab .cl-callout>b{display:block;font-size:14px;margin-bottom:5px}\n.cmp-lab .cl-callout p b{color:var(--text)}\n.cmp-lab .cl-callout p{margin:0;color:var(--muted);font-size:13px;line-height:1.6}\n.cmp-lab details{margin-top:16px;border-top:1px solid var(--line);padding-top:14px}\n.cmp-lab summary{cursor:pointer;font-family:var(--mono);font-size:11px;letter-spacing:.8px;\n  text-transform:uppercase;color:var(--dim)}\n.cmp-lab summary:hover{color:var(--text)}\n.cmp-lab details .body{margin-top:11px;color:var(--muted);font-size:12.5px;line-height:1.7;max-width:96ch}\n.cmp-lab .foot{color:var(--faint);font-size:11.5px;font-family:var(--mono);letter-spacing:.4px;\n  text-align:center;padding-top:8px}\n@media(max-width:900px){.cmp-lab .wrap{padding:26px 16px 60px}\n.cmp-lab .field-wrap{overflow-x:auto;overflow-y:hidden}\n.cmp-lab #field{min-width:820px}\n.cmp-lab .head-side{align-items:flex-start;flex-direction:row}\n.cmp-lab .cl-panel{padding:20px 16px}\n.cmp-lab .ratio-tbl,.cmp-lab .ratio-tbl tbody,.cmp-lab .ratio-tbl tr,.cmp-lab .ratio-tbl td{display:block;width:auto}\n.cmp-lab .ratio-tbl thead{display:none}\n.cmp-lab .ratio-tbl tr{border-bottom:1px solid var(--line);padding:14px 0}\n.cmp-lab .ratio-tbl tr:last-child{border-bottom:0}\n.cmp-lab .ratio-tbl td{border:0;padding:4px 0}\n.cmp-lab .ratio-tbl td.num{text-align:left;display:inline-block;width:33%}\n.cmp-lab .ratio-tbl td.num:before{content:attr(data-venue);display:block;font-size:10px;\n    letter-spacing:.8px;text-transform:uppercase;color:var(--faint)}}\n/* denser inside the dashboard than on the standalone page */\n.cmp-lab .flow-grid{grid-template-columns:repeat(auto-fit,minmax(238px,1fr))}\n.cmp-lab .flow-card figcaption span{font-size:9.5px}\n.cmp-lab .ratio-tbl td{padding:12px 10px}\n/* the definition and the direction badge live in this cell \u2014 hiding it to save\n   height left five bare metric names with nothing saying what they measure */\n.cmp-lab .ratio-tbl td.metric span{font-size:11px;line-height:1.4}\n.cmp-lab .ratio-tbl td.metric{vertical-align:top;padding-top:14px}\n.cmp-lab .cl-panel{padding:22px 20px}\n.cmp-lab .cl-head p{max-width:none}\n";
-const CL_HTML = "<div class=\"cmp-lab\" data-cl=\"revmeta\"><section class=\"cl-panel\"></section></div><div class=\"cmp-lab\" data-cl=\"ratios\"><section class=\"cl-panel\">\n    <div class=\"cl-head\">\n      <h2>Scale-free ratios</h2>\n      <p>Size divided out, across the three venues this page compares. Each ratio states the direction that counts as better \u2014 two of them have none \u2014 and the last column ranks the three under that direction, so #1 always means best.</p>\n    </div>\n    <table class=\"ratio-tbl\">\n      <thead>\n        <tr>\n          <th>Ratio</th>\n          <th class=\"num\"><img src=\"variational-symbol-transparent.png\" alt=\"\" width=\"17\" height=\"17\">Variational</th>\n          <th class=\"num\"><img src=\"lighter-logo.png\" alt=\"\" width=\"17\" height=\"17\">Lighter</th>\n          <th class=\"num\"><img src=\"logo-extended.png\" alt=\"\" width=\"17\" height=\"17\">Extended</th>\n          <th>Where Variational sits</th>\n        </tr>\n      </thead>\n      <tbody id=\"ratioRows\"></tbody>\n    </table>\n    <p class=\"src-line\" data-src-line></p>\n    \n    \n  </section></div><div class=\"cmp-lab\" data-cl=\"metric\"><section class=\"cl-panel\">\n    <div class=\"cl-head\">\n      <h2>Metric browser</h2>\n      <p>Twelve metrics in three families. Pick a row, a window and up to four venues; flows are bars, levels and ratios are lines.</p>\n    </div>\n    <div class=\"ml-grid\">\n      <div class=\"ml-left\">\n        <div class=\"ml-venues\" id=\"mlVenues\"></div>\n        <table class=\"ml-tbl\">\n          <thead><tr id=\"mlHead\"></tr></thead>\n          <tbody id=\"mlRows\"></tbody>\n        </table>\n      </div>\n      <div class=\"ml-chart\">\n        <div class=\"ml-head\">\n          <div><b id=\"mlTitle\">\u2014</b><span id=\"mlWindow\"></span></div>\n          <div class=\"ml-controls\">\n            <div class=\"ml-range\" id=\"mlRange\"></div>\n            <div class=\"ml-legend\" id=\"mlLegend\"></div>\n          </div>\n        </div>\n        <svg id=\"mlChart\" viewBox=\"0 0 760 300\" role=\"img\" aria-label=\"Selected metric across eight weekly periods\"></svg>\n        <div class=\"ml-read\" id=\"mlRead\"></div>\n        <div class=\"ml-cards-head\">What these bars mean</div>\n        <div class=\"ml-cards\" id=\"mlCards\"></div>\n      </div>\n    </div>\n  </section></div><div class=\"cmp-lab\" data-cl=\"field\"><section class=\"cl-panel\">\n    <div class=\"cl-head sec-head-row\">\n      <div>\n        <h2>Positioning field</h2>\n        <p id=\"fieldNote\">Open interest against 24H volume, log\u2013log. Ring area is the 30D fee pool, the solid\n        core is the part booked as revenue, and the diagonals are constant turnover \u2014 so a venue's distance\n        from a diagonal is how hard it works its book. Dashed outlines mean no published fee series.</p>\n      </div>\n      <div class=\"ml-range\" id=\"fieldModes\"></div>\n    </div>\n    <div class=\"field-wrap\">\n      <svg id=\"field\" viewBox=\"0 0 1160 660\" role=\"img\"\n           aria-label=\"Open interest versus 24 hour volume for tracked perpetual DEXs, log-log scale\"></svg>\n      <div class=\"cl-tip\" id=\"tip\"></div>\n    </div>\n    <p class=\"field-read\" id=\"fieldRead\"></p>\n    <p class=\"src-line\" data-src-line></p>\n    <div class=\"cl-legend\" id=\"fieldLegend\">\n      <span><i class=\"k me\"></i>Variational</span>\n      <span><i class=\"k pk\"></i>Hyperliquid \u00b7 ceiling, not a peer</span>\n      <span><i class=\"k pf\"></i>Tracked field</span>\n      <span><i class=\"k nf\"></i>No published fee series</span>\n      <span>Circle size \u221d 30D trader fees</span>\n    </div>\n  </section></div><div class=\"cmp-lab\" data-cl=\"flow\"><section class=\"cl-panel\">\n    <div class=\"cl-head\">\n      <h2>Fee flow</h2>\n      <p>Trader fees split into what each protocol books and what it pays back out, then into what leaves for token holders. Cards are not scaled to each other \u2014 compare shapes.</p>\n    </div>\n    <div class=\"flow-grid\" id=\"flowGrid\"></div>\n    <p class=\"flow-note\" id=\"flowNote\"></p>\n  </section></div>";
+const CL_HTML = "<div class=\"cmp-lab\" data-cl=\"revmeta\"><section class=\"cl-panel\"></section></div><div class=\"cmp-lab\" data-cl=\"ratios\"><section class=\"cl-panel\">\n    <div class=\"cl-head\">\n      <h2>Scale-free ratios</h2>\n      <p>Size divided out, across the three venues this page compares. Each ratio states the direction that counts as better \u2014 two of them have none \u2014 and the last column ranks the three under that direction, so #1 always means best.</p>\n    </div>\n    <table class=\"ratio-tbl\">\n      <thead>\n        <tr>\n          <th>Ratio</th>\n          <th class=\"num\"><img src=\"variational-symbol-transparent.png\" alt=\"\" width=\"17\" height=\"17\">Variational</th>\n          <th class=\"num\"><img src=\"lighter-logo.png\" alt=\"\" width=\"17\" height=\"17\">Lighter</th>\n          <th class=\"num\"><img src=\"logo-extended.png\" alt=\"\" width=\"17\" height=\"17\">Extended</th>\n          <th>Where Variational sits</th>\n        </tr>\n      </thead>\n      <tbody id=\"ratioRows\"></tbody>\n    </table>\n    \n  </section></div><div class=\"cmp-lab\" data-cl=\"metric\"><section class=\"cl-panel\">\n    <div class=\"cl-head\">\n      <h2>Metric browser</h2>\n      <p>Twelve metrics in three families. Pick a row, a window and up to four venues; flows are bars, levels and ratios are lines.</p>\n    </div>\n    <div class=\"ml-grid\">\n      <div class=\"ml-left\">\n        <div class=\"ml-venues\" id=\"mlVenues\"></div>\n        <table class=\"ml-tbl\">\n          <thead><tr id=\"mlHead\"></tr></thead>\n          <tbody id=\"mlRows\"></tbody>\n        </table>\n      </div>\n      <div class=\"ml-chart\">\n        <div class=\"ml-head\">\n          <div><b id=\"mlTitle\">\u2014</b><span id=\"mlWindow\"></span></div>\n          <div class=\"ml-controls\">\n            <div class=\"ml-range\" id=\"mlRange\"></div>\n            <div class=\"ml-legend\" id=\"mlLegend\"></div>\n          </div>\n        </div>\n        <svg id=\"mlChart\" viewBox=\"0 0 760 300\" role=\"img\" aria-label=\"Selected metric across 7-day periods\"></svg>\n        <div class=\"ml-read\" id=\"mlRead\"></div>\n        <div class=\"ml-cards-head\">What these bars mean</div>\n        <div class=\"ml-cards\" id=\"mlCards\"></div>\n      </div>\n    </div>\n  </section></div><div class=\"cmp-lab\" data-cl=\"field\"><section class=\"cl-panel\">\n    <div class=\"cl-head sec-head-row\">\n      <div>\n        <h2>Positioning field</h2>\n        <p id=\"fieldNote\">Open interest against 24H volume, log\u2013log. Ring area is the 30D fee pool, the solid\n        core is the part booked as revenue, and the diagonals are constant turnover \u2014 so a venue's distance\n        from a diagonal is how hard it works its book. Dashed outlines mean no published fee series.</p>\n      </div>\n      <div class=\"ml-range\" id=\"fieldModes\"></div>\n    </div>\n    <div class=\"field-wrap\">\n      <svg id=\"field\" viewBox=\"0 0 1160 660\" role=\"img\"\n           aria-label=\"Open interest versus 24 hour volume for tracked perpetual DEXs, log-log scale\"></svg>\n      <div class=\"cl-tip\" id=\"tip\"></div>\n    </div>\n    <p class=\"field-read\" id=\"fieldRead\"></p>\n    <p class=\"src-line\" data-src-line></p>\n    <div class=\"cl-legend\" id=\"fieldLegend\">\n      <span><i class=\"k me\"></i>Variational</span>\n      <span><i class=\"k pk\"></i>Hyperliquid \u00b7 ceiling, not a peer</span>\n      <span><i class=\"k pf\"></i>Tracked field</span>\n      <span><i class=\"k nf\"></i>No published fee series</span>\n      <span>Circle size \u221d 30D trader fees</span>\n    </div>\n  </section></div><div class=\"cmp-lab\" data-cl=\"flow\"><section class=\"cl-panel\">\n    <div class=\"cl-head\">\n      <h2>Fee flow</h2>\n      <p>Trader fees split into what each protocol books and what it pays back out, then into what leaves for token holders. Cards are not scaled to each other \u2014 compare shapes.</p>\n    </div>\n    <div class=\"flow-grid\" id=\"flowGrid\"></div>\n    <p class=\"flow-note\" id=\"flowNote\"></p>\n  </section></div>";
 
 function mountLab(){
   const report=document.querySelector('.comparison-report');
@@ -1649,7 +1814,8 @@ function mountLab(){
 
 /* the dashboard already holds live peer numbers; borrow them instead of
    re-fetching CoinGecko from the same page */
-function borrowDashboard(){
+const borrowDashboard=()=>ingest();
+function ingest(){
   try{
     if(typeof PEERS!=='undefined' && PEERS.list && PEERS.list.length){
       PEERS.list.forEach(p=>{ const v=byName(p.n==='Variational'?'Variational':p.n);
@@ -1672,8 +1838,8 @@ function borrowDashboard(){
           +`while ${liveN} refreshed live`
         : '';
       OI_LABEL = boardLive
-        ? (typeof OI_SRC!=='undefined'&&OI_SRC==='llama'
-            ? 'DeFiLlama open interest (live)' : 'CoinGecko derivatives (live)')
+        ? (typeof MARKET_ACTIVITY!=='undefined'&&MARKET_ACTIVITY&&MARKET_ACTIVITY.live
+            ? 'CoinGecko derivatives (live) · Variational: its official live stats' : 'CoinGecko derivatives (live)')
         : (OI_MIXED ? `mixed — ${PEERS.snapAsOf||'snapshot'} for ${total-liveN} venues, live for ${liveN}`
                     : `CoinGecko ${PEERS.snapAsOf||'snapshot'}`);
       /* even on a good load a few venues are absent from the CoinGecko feed and keep
@@ -1691,9 +1857,20 @@ function borrowDashboard(){
     if(typeof VAL_FIT!=='undefined' && VAL_FIT && VAL_FIT.A){
       CL_VAL_FIT.A=VAL_FIT.A; CL_VAL_FIT.B=VAL_FIT.B; CL_VAL_FIT.r2=VAL_FIT.r2;
     }
-    /* the dashboard's treasury series runs to today; rebuild Variational's daily fee
-       and revenue from it and move the window anchor forward, otherwise the metric
-       browser stays pinned to the day this bundle was baked */
+    /* Variational's daily volume and open interest come from the dashboard's own DeFiLlama
+       fetch (same adapter this panel would call), so the take rate has its volume as soon as the
+       dashboard does, not after the 13-venue loop finishes */
+    if(typeof MARKET_ACTIVITY!=='undefined' && MARKET_ACTIVITY){
+      const vm={},om={};
+      (MARKET_ACTIVITY.volume||[]).forEach(x=>{ vm[x.d]=x.v; });
+      (MARKET_ACTIVITY.oi||[]).forEach(x=>{ om[x.d]=x.v; });
+      if(Object.keys(vm).length>7) DAILY['Variational'].vol=vm;
+      if(Object.keys(om).length>7) DAILY['Variational'].oi=om;
+    }
+    /* the dashboard's treasury series: rebuild Variational's daily fee and revenue from it.
+       The window anchor is the last day of that series — the same day recomputeSnapshot
+       reports as "treasury through" — so the metric browser can never sit on an older window
+       than the headline figures without saying so. */
     if(typeof SERIES!=='undefined' && Array.isArray(SERIES) && SERIES.length>2){
       const fee={},rev={},sup={};
       for(let i=1;i<SERIES.length;i++){
@@ -1703,14 +1880,7 @@ function borrowDashboard(){
       Object.assign(DAILY['Variational'],{fee,rev,sup});
       ANCHOR=SERIES[SERIES.length-1].d;
     }
-    if(typeof SERIES!=='undefined' && typeof cumAt==='function' && typeof addDays==='function'
-       && typeof impliedSpreadsBetween==='function'){
-      const last=SERIES[SERIES.length-1];
-      const rev30=Math.max(0,last.v-cumAt(addDays(last.d,-30)));
-      const fees30=impliedSpreadsBetween(addDays(last.d,-30),last.d,rev30);
-      const va=byName('Variational');
-      if(va && fees30>0){ va.fees30=fees30; va.rev30=rev30; }
-    }
+    recomputeSnapshot();
   }catch(err){ console.warn('comparison lab: dashboard handoff skipped', err); }
 }
 
@@ -1724,41 +1894,84 @@ function renderClaims(){
   const dashLive=(typeof PEERS!=='undefined'&&PEERS.list&&PEERS.list.length);
   const rank=dashLive&&PEERS.varRank?PEERS.varRank
     :[...VENUES].sort((a,b)=>b.oi-a.oi).findIndex(v=>v.me)+1;
-  const share=dashLive&&PEERS.varShare!=null?PEERS.varShare:oiShare(va);
+  const share=oiShare(va);
   const tr=takeRate(va), trL=takeRate(li), trH=takeRate(hl);
   const keep=capture(va);
-  const oiSrc=(typeof OI_SRC!=='undefined'&&OI_SRC==='llama')?'DeFiLlama open interest'
-    :(dashLive&&PEERS.live?'CoinGecko derivatives':'CoinGecko snapshot');
+  const oiSrc=(dashLive&&PEERS.live)?'CoinGecko derivatives (live)'+((typeof MARKET_ACTIVITY!=='undefined'&&MARKET_ACTIVITY&&MARKET_ACTIVITY.live)?' · Variational: its official live stats':'')
+    :'CoinGecko snapshot '+SNAP_AS_OF+((typeof MARKET_ACTIVITY!=='undefined'&&MARKET_ACTIVITY&&MARKET_ACTIVITY.live)?' · Variational: its official live stats':'');
   const row=(n,claim,figure,target,how)=>`<a class="cl-claim" href="#${target}">
       <span class="cl-claim-n">${n}</span>
       <span class="cl-claim-body"><b>${claim}</b><small>${how}</small></span>
       <span class="cl-claim-fig">${figure}</span></a>`;
+  /* each claim's wording is chosen from where the figure actually ranks */
+  const total=dashLive?PEERS.list.length:VENUES.length;
+  const c1=!rank?'Variational\'s position on the board is still loading.'
+    :rank<=Math.ceil(total/3)?'Variational runs one of the larger books on the board, not a small one.'
+    :rank<=Math.ceil(total*2/3)?'Variational runs a mid-sized book on the board, neither among the largest nor a small one.'
+    :'Variational runs one of the smaller books on the board.';
+  const trs=[{n:'Hyperliquid',v:trH},{n:'Lighter',v:trL}];
+  const stT=stand(tr,trs,false,bps);
+  let c2;
+  if(tr==null) c2='What traders pay it per dollar traded is still loading.';
+  else if(standClass(stT)==='win') c2='What traders pay it per dollar traded is above both Hyperliquid and Lighter.';
+  else if(standClass(stT)==='lose') c2='What traders pay it per dollar traded is below both Hyperliquid and Lighter — the lowest price of the three.';
+  else if(stT.level.length) c2=`What traders pay it per dollar traded is level with ${andList(stT.level)}.`;
+  else c2=`What traders pay it per dollar traded sits between the two: above ${andList(stT.ahead)}, below ${andList(stT.behind)}.`;
   host.innerHTML=
-    row('01','Variational runs one of the larger books on the board, not a small one.',
-        rank?(share!=null?`#${rank} · ${share.toFixed(1)}%`:`#${rank}`):'—',
-        'clEvA', `rank and share of open interest across ${dashLive?PEERS.list.length:VENUES.length} tracked venues · ${oiSrc}`
+    row('01',c1,
+        rank?(share!=null?`#${rank} · ${share.toFixed(2)}%`:`#${rank}`):'—',
+        'clEvA', `rank and share of open interest across ${total} tracked venues · ${oiSrc}`
           +(OI_MIXED?` · mixed basis: ${OI_MIXED_NOTE}`:''))
-   +row('02','What traders pay it per dollar traded sits with the ceiling, not below the field.',
+   +row('02',c2,
         tr!=null?bps(tr)+' bps *':'—',
         'clEvB',`Hyperliquid ${trH!=null?bps(trH):'—'} · Lighter ${trL!=null?bps(trL):'—'} bps · `
-        +`* Variational's fee pool is modeled, the peers' are published`)
+        +`30D fees ÷ 30D volume, same DeFiLlama basis for every venue · * Variational's fee pool is MODELED, the peers' are REPORTED`)
    +row('03','The low treasury line is a payout policy, not weak monetization.',
         keep!=null?keep.toFixed(0)+'% kept †':'—',
         'clEvC',`† the ${keep!=null?keep.toFixed(0):'20'}/${keep!=null?(100-keep).toFixed(0):'80'} split is the ratio the official reports state, `
         +`not a measured one · the rest funds OLP returns and market making`)
    +`<div class="cl-claim-src">Sources · open interest and volume: ${oiSrc}`
-    +` · peer fees and revenue: DeFiLlama · Variational fee pool: Arbitrum treasury inflow ÷ the reported `
-    +`${(VAR_SPREAD_SHARE*100).toFixed(0)}% allocation, so it is an estimate, not booked revenue</div>`;
+    +` · peer fees and revenue (REPORTED): DeFiLlama · Variational fee pool (MODELED): Arbitrum treasury WALLET INFLOW ÷ the reported `
+    +`${(VAR_SPREAD_SHARE*100).toFixed(0)}% allocation, so it is an estimate, not booked revenue · 30 days to ${WINDOW.end||SNAP_AS_OF}</div>`;
 }
 
-function syncAndRender(){ borrowDashboard(); renderAll(); renderClaims(); }
+/* the dashboard's own cards (verdict, KPIs, head-to-head) are redrawn from the same
+   snapshot every time this one is, so the two halves can never disagree */
+let FROM_LAB=false, RESYNC_T=null;
+function pushToDashboard(){
+  FROM_LAB=true;
+  try{ if(typeof renderVsLighter==='function') renderVsLighter(); }
+  catch(err){ console.warn('comparison lab: dashboard redraw skipped', err); }
+  finally{ FROM_LAB=false; }
+}
+function freshnessText(){
+  const m=(typeof PEERS!=='undefined'&&PEERS.asOf)?PEERS.asOf:'saved snapshot';
+  const fees=STATE.llamaLive&&WINDOW.end?`30D window to ${WINDOW.end}`:`fees snapshot ${SNAP_AS_OF}`;
+  const tre=TREAS.through?` · treasury through ${TREAS.through}${TREAS.stale?' (STALE)':''}`:'';
+  return `Market: ${m} · ${fees}${tre}`;
+}
+function syncAndRender(){ ingest(); renderAll(); renderClaims(); pushToDashboard(); }
+window.CmpSnap={
+  /* a fresh read of the single store; consumers never keep their own copy */
+  get(){
+    ingest();
+    return {
+      venue:byName, venues:VENUES, state:STATE, treasury:TREAS, window:WINDOW,
+      takeRate, turnover30:turnover, turnover24:v=>v&&v.oi?v.vol24/v.oi:null, oiShare, capture,
+      verdict:verdictText(), freshness:freshnessText(),
+      tag:TAG, tagNote:TAG_NOTE, stand, standClass, standPhrase, andList, near
+    };
+  }
+};
 
 /* a read-only handle for checking the panels against the dashboard's own numbers */
 window.__cmpLab={
   state:STATE, venues:VENUES,
   oiLabel:()=>OI_LABEL,
   share:()=>oiShare(byName('Variational')),
-  oiTotal:()=>VENUES.reduce((s,v)=>s+(v.oi||0),0)
+  oiTotal:()=>VENUES.reduce((s,v)=>s+(v.oi||0),0),
+  /* the dashboard calls this after each of its own data arrivals */
+  resync(){ if(FROM_LAB) return; clearTimeout(RESYNC_T); RESYNC_T=setTimeout(syncAndRender,150); }
 };
 
 function bootLab(){
@@ -1768,7 +1981,9 @@ function bootLab(){
      the panels never state a different share than the signal card above them */
   [1500,4000,9000,20000].forEach(ms=>setTimeout(syncAndRender,ms));
   (async ()=>{
-    if(!STATE.cgLive){ try{ await refreshCoinGecko(); }catch(err){} }
+    /* the dashboard's board is the one open-interest source; this panel only talks to CoinGecko
+       when it is running without a dashboard */
+    if(!STATE.cgLive && typeof PEERS==='undefined'){ try{ await refreshCoinGecko(); }catch(err){} }
     syncAndRender();
     try{ await refreshLlama(); }catch(err){}
     syncAndRender();

@@ -29,7 +29,7 @@
      panel files happened to insert their buttons. */
   var GROUPS = [
     { k: 'pre',  label: 'Pre-TGE',  note: 'Measuring the protocol',
-      tabs: ['overview', 'daily-news', 'efficiency', 'comparison', 'pretge', 'tradfi',
+      tabs: ['overview', 'daily-news', 'efficiency', 'comparison', 'pretge', 'tokenomics',
              'historical', 'biweekly', 'implied', 'roadmap'] },
     /* Points sits here, not in Pre-TGE: "what my points are worth at each FDV" is a question
        about the listing, and it makes the group read as one sequence — how much do I get,

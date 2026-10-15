@@ -566,6 +566,13 @@
   .zoom-controls{display:inline-flex;gap:4px;background:rgba(5,10,16,.72);border:1px solid var(--line);border-radius:8px;padding:3px}
   .zoom-controls button{border:0;background:transparent;color:var(--sub);font:800 10px var(--mono);letter-spacing:.8px;text-transform:uppercase;padding:6px 9px;border-radius:6px;cursor:pointer}
   .zoom-controls button.on{color:#06101c;background:linear-gradient(92deg,var(--grn),var(--cyan));box-shadow:0 0 14px rgba(34,230,160,.22)}
+  .chart-tools-left{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .fc-target{align-items:center}
+  .fc-target-lbl{font:800 10px var(--mono);letter-spacing:.8px;text-transform:uppercase;color:var(--dim);padding:0 4px 0 8px}
+  .fc-target button:disabled{opacity:.35;cursor:not-allowed}
+  .fc-target input[type=date]{background:transparent;border:0;outline:0;color:var(--sub);font:800 10px var(--mono);letter-spacing:.4px;padding:5px 6px;border-radius:6px;color-scheme:dark;min-width:0}
+  .fc-target input[type=date].on{color:#06101c;background:linear-gradient(92deg,var(--grn),var(--cyan))}
+  body.theme-light .fc-target input[type=date]{color-scheme:light}
   .chart-hint{font:700 10px var(--mono);letter-spacing:.7px;text-transform:uppercase;color:var(--dim)}
   /* keep charts from ballooning when a card is full-width in its tab */
   #curve{height:clamp(360px,30vw,520px);margin:0 auto}
@@ -8430,7 +8437,7 @@ body.theme-light .bw-viz text.bw-pct.in{fill:#fff!important}
     <button id="tab-points" type="button" role="tab" aria-selected="false" data-tab="points">Points</button>
     <button id="tab-comparison" type="button" role="tab" aria-selected="false" data-tab="comparison">Comparison</button>
     <button id="tab-pretge" type="button" role="tab" aria-selected="false" data-tab="pretge">Pre-TGE Comparison</button>
-    <button id="tab-tradfi" type="button" role="tab" aria-selected="false" data-tab="tradfi">TradFi</button>
+    <button id="tab-tokenomics" type="button" role="tab" aria-selected="false" data-tab="tokenomics">Tokenomics</button>
   </nav>
 </div>
 
@@ -8441,7 +8448,7 @@ body.theme-light .bw-viz text.bw-pct.in{fill:#fff!important}
   <button type="button" data-open-tab="efficiency" aria-label="03 Fundamentals"><span>03</span><strong>Fundamentals</strong></button>
   <button type="button" data-open-tab="comparison" aria-label="04 Comparison"><span>04</span><strong>Comparison</strong></button>
   <button type="button" data-open-tab="pretge" aria-label="05 Pre-TGE Comparison"><span>05</span><strong>Pre-TGE</strong></button>
-  <button type="button" data-open-tab="tradfi" aria-label="06 TradFi"><span>06</span><strong>TradFi</strong></button>
+  <button type="button" data-open-tab="tokenomics" title="Tokenomics / Fundraise history" aria-label="06 Tokenomics"><span>06</span><strong>Tokenomics</strong></button>
   <button type="button" data-open-tab="historical" aria-label="07 Historical Data"><span>07</span><strong>Historical Data</strong></button>
   <button type="button" data-open-tab="biweekly" aria-label="08 Official Reports"><span>08</span><strong>Official Reports</strong></button>
   <button type="button" data-open-tab="implied" aria-label="09 Money Mechanic"><span>09</span><strong>Money Mechanic</strong></button>
@@ -8565,7 +8572,7 @@ body.theme-light .bw-viz text.bw-pct.in{fill:#fff!important}
       <button type="button" data-open-tab="efficiency"><span>03</span><b>Fundamentals</b><small>Volume, OI, fees, and revenue</small></button>
       <button type="button" data-open-tab="comparison"><span>04</span><b>Comparison</b><small>Positioning and implied valuation</small></button>
       <button type="button" data-open-tab="pretge"><span>05</span><b>Pre-TGE Comparison</b><small>Lighter as the priced comparable</small></button>
-      <button type="button" data-open-tab="tradfi"><span>06</span><b>TradFi</b><small>The traditional book, from Variational’s own API</small></button>
+      <button type="button" data-open-tab="tokenomics"><span>06</span><b>Tokenomics / Fundraise history</b><small>Allocation, unlocks, supply sinks and funding rounds</small></button>
       <button type="button" data-open-tab="historical"><span>07</span><b>Historical Data</b><small>Accumulation and interval growth</small></button>
       <button type="button" data-open-tab="biweekly"><span>08</span><b>Official Reports</b><small>Biweekly operating history</small></button>
       <button type="button" data-open-tab="implied"><span>09</span><b>Money Mechanic</b><small>Verify every formula</small></button>
@@ -8588,7 +8595,7 @@ body.theme-light .bw-viz text.bw-pct.in{fill:#fff!important}
     <button type="button" data-open-tab="efficiency" title="Fundamentals" aria-label="03 Fundamentals"><span>03</span><strong>Fundamentals</strong></button>
     <button type="button" data-open-tab="comparison" title="Peer Comparison" aria-label="04 Peer Comparison"><span>04</span><strong>Comparison</strong></button>
     <button type="button" data-open-tab="pretge" title="Pre-TGE Comparison" aria-label="05 Pre-TGE Comparison"><span>05</span><strong>Pre-TGE</strong></button>
-    <button type="button" data-open-tab="tradfi" title="TradFi" aria-label="06 TradFi"><span>06</span><strong>TradFi</strong></button>
+    <button type="button" data-open-tab="tokenomics" title="Tokenomics / Fundraise history" aria-label="06 Tokenomics"><span>06</span><strong>Tokenomics</strong></button>
     <button type="button" data-open-tab="historical" title="Historical Data" aria-label="07 Historical Data"><span>07</span><strong>Historical Data</strong></button>
     <button type="button" data-open-tab="biweekly" title="Official Reports" aria-label="08 Official Reports"><span>08</span><strong>Official Reports</strong></button>
     <button type="button" data-open-tab="implied" title="Money Mechanic" aria-label="09 Money Mechanic"><span>09</span><strong>Money Mechanic</strong></button>
@@ -9473,11 +9480,19 @@ body.theme-light .bw-viz text.bw-pct.in{fill:#fff!important}
     <b><span class="sw cone"></span>Range (soft–hot)</b>
   </div>
   <div class="chart-tools">
+    <div class="chart-tools-left">
     <div class="zoom-controls" id="curveZoom" aria-label="Cumulative chart zoom">
       <button type="button" data-z="all" class="on">All</button>
       <button type="button" data-z="120">120D</button>
       <button type="button" data-z="60">60D</button>
       <button type="button" data-z="30">30D</button>
+    </div>
+    <div class="zoom-controls fc-target" id="curveTarget" aria-label="Forecast target date">
+      <span class="fc-target-lbl">Forecast to</span>
+      <button type="button" data-t="2026-10-31">Oct 31</button>
+      <button type="button" data-t="2026-11-30" class="on">Nov 30</button>
+      <input type="date" id="curveTgtDate" aria-label="Pick a forecast date" value="2026-11-30" max="2026-11-30">
+    </div>
     </div>
     <div class="chart-hint">Drag either endpoint to tune pace</div>
   </div>
@@ -9657,12 +9672,12 @@ body.theme-light .bw-viz text.bw-pct.in{fill:#fff!important}
         <div class="val-cell fdv">
           <div class="vh-k">Model-implied FDV</div>
           <div class="vh-big" id="valFdv">$—</div>
-          <div class="vh-sub">MCAP ÷ TGE float · 25% base · <b id="valFdvRange">—</b> range</div>
+          <div class="vh-sub">MCAP ÷ TGE float · 32% official base · <b id="valFdvRange">—</b> range</div>
         </div>
         <div class="val-cell">
           <div class="vh-k">Model-implied MCAP</div>
           <div class="vh-big" id="valMcap">$—</div>
-          <div class="vh-sub">From current OI <b id="valOiBase">$—</b> · <b id="valFloat">25%</b> TGE base</div>
+          <div class="vh-sub">From current OI <b id="valOiBase">$—</b> · <b id="valFloat">32%</b> TGE base (official)</div>
         </div>
         <div class="val-cell actual">
           <div class="vh-k">Gap to Hyperliquid</div>
@@ -9685,144 +9700,223 @@ body.theme-light .bw-viz text.bw-pct.in{fill:#fff!important}
   <details class="val-method"><summary>Model, sources, and limitations</summary><div class="val-note" id="valNote"></div></details>
 </section>
 
-<!-- tradfi:begin -->
-<section class="tradfi-report tsec tg-hide" data-tg="tradfi">
+<!-- tokenomics:begin -->
+<section class="tokenomics-report tsec tg-hide" data-tg="tokenomics">
   <div class="cmp-heading">
-    <span class="cmp-eyebrow">TRADITIONAL MARKETS</span>
-    <h2>The TradFi Book</h2>
-    <p>Both venues list traditional markets. The question is how much of each venue actually is one. Every figure here is measured the same way on both sides — taker long plus taker short, from each venue's own API — and cross-checked against the TradFi section Entropy publishes on arbdata.</p>
+    <span class="cmp-eyebrow">TOKENOMICS / FUNDRAISE</span>
+    <h2>Tokenomics / Fundraise history</h2>
+    <p>Who owns $VAR at TGE, when the rest can reach the market, what removes supply, and who funded Variational. Total token supply is not announced, so every allocation figure is a percentage. Each fact carries its source: official announcement, primary press, or reported by secondary outlets only.</p>
   </div>
 
-  <nav class="cmp-command" data-tf-command aria-label="Jump to section">
+  <nav class="cmp-command" data-tk-command aria-label="Jump to section">
     <span>VIEW</span>
-    <button type="button" class="on" data-tf-jump="tfBook">The book</button>
-    <button type="button" data-tf-jump="tfInside">What is in it</button>
-    <button type="button" data-tf-jump="tfSide">Who takes the other side</button>
-    <button type="button" data-tf-jump="tfExec">What it costs</button>
-    <button type="button" data-tf-jump="tfLimits">Limits</button>
-    <div class="cmp-freshness"><i></i><span id="tfAsOf">Snapshot</span></div>
+    <button type="button" class="on" data-tk-jump="tkAlloc">Allocation</button>
+    <button type="button" data-tk-jump="tkUnlock">Unlock timeline</button>
+    <button type="button" data-tk-jump="tkSinks">Supply sinks</button>
+    <button type="button" data-tk-jump="tkRaise">Fundraise</button>
+    <button type="button" data-tk-jump="tkSources">Sources</button>
+    <div class="cmp-freshness"><i></i><span>Allocation: official announcement, 2026-09-28</span></div>
   </nav>
 
   <div class="cmp-signal-grid">
-    <article class="cmp-signal tf-sig-lead">
-      <div class="cmp-signal-top"><span>01 · HOW MUCH OF THE BOOK IS TRADITIONAL</span><em class="high">MEASURED</em></div>
-      <strong id="tfSig1">—</strong>
-      <span class="tf-sig-sub">Traditional share of open interest — Variational vs Lighter</span>
-      <p id="tfSig1Sub">Reading both books.</p>
+    <article class="cmp-signal tk-sig-lead">
+      <div class="cmp-signal-top"><span>01 · CIRCULATING AT TGE</span><em class="high">OFFICIAL</em></div>
+      <strong>32%</strong>
+      <span class="tk-sig-sub">Genesis airdrop, 100% unlocked at TGE</span>
+      <p>Share of total supply. Total supply itself is not announced.</p>
     </article>
     <article class="cmp-signal">
-      <div class="cmp-signal-top"><span>02 · HOW MUCH OF THE FLOW</span><em class="high">MEASURED</em></div>
-      <strong id="tfSig2">—</strong>
-      <span class="tf-sig-sub">Traditional share of 24-hour volume — VAR vs LIT</span>
-      <p id="tfSig2Sub">Reading both tapes.</p>
+      <div class="cmp-signal-top"><span>02 · LOCKED AT TGE</span><em class="high">OFFICIAL</em></div>
+      <strong>50%</strong>
+      <span class="tk-sig-sub">Team + Investors</span>
+      <p>12-month lock after TGE, then unlock over at least 3 years.</p>
     </article>
     <article class="cmp-signal">
-      <div class="cmp-signal-top"><span>03 · WHAT IS ACTUALLY LISTED</span><em class="high">MEASURED</em></div>
-      <strong id="tfSig3">—</strong>
-      <span class="tf-sig-sub">Traditional markets on Variational, of all markets listed</span>
-      <p id="tfSig3Sub">Counting the shelf.</p>
+      <div class="cmp-signal-top"><span>03 · SUPPLY SINK</span><em class="high">OFFICIAL</em></div>
+      <strong>100%</strong>
+      <span class="tk-sig-sub">of treasury revenue goes to $VAR buy &amp; burn</span>
+      <p id="tkSig3Sub">Reading the live treasury.</p>
     </article>
     <article class="cmp-signal">
-      <div class="cmp-signal-top"><span>04 · WHO TAKES THE OTHER SIDE</span><em class="high">MEASURED</em></div>
-      <strong id="tfSig4">—</strong>
-      <span class="tf-sig-sub">Net long skew across the single-name equity book</span>
-      <p id="tfSig4Sub">Reading the imbalance.</p>
+      <div class="cmp-signal-top"><span>04 · DISCLOSED RAISE</span><em class="medium">PRIMARY PRESS</em></div>
+      <strong>≈ $61.8M</strong>
+      <span class="tk-sig-sub">Seed + Strategic + Series A</span>
+      <p>Valuation was not disclosed for any round.</p>
     </article>
   </div>
 
-  <section class="pt-block" id="tfBook">
+  <section class="pt-block" id="tkAlloc">
     <div class="cmp-section-head split">
-      <div><span class="cmp-eyebrow">01 · THE BOOK</span><h3>How much of each venue is traditional</h3></div>
-      <p>Two books on one dollar axis, each split into its traditional and its crypto half. Both are the gross basis — taker long plus taker short — which is what arbdata's own per-market rows sum to. Lighter is measured identically from its own API, across all its markets rather than the four visible in its top ten.</p>
+      <div><span class="cmp-eyebrow">A · ALLOCATION</span><h3>Who gets what at TGE</h3></div>
+      <p>Three buckets, 100% of supply. The airdrop is the only one that is liquid on day one.</p>
     </div>
-    <div class="tf-chart"><svg id="tfBookChart" role="img" aria-label="Open interest by venue, traditional and crypto halves, on one dollar scale"></svg></div>
-    <div class="tf-xcheck">
-      <span>CROSS-CHECK</span>
-      <p id="tfXcheck">Comparing the published figure with an independent classification.</p>
+    <div class="tk-bar" role="img" aria-label="Allocation: Genesis airdrop 32%, Ecosystem Reserve 18%, Team and Investors 50%">
+      <i class="a1" style="width:32%"><b>32%</b><span>Genesis airdrop</span></i>
+      <i class="a2" style="width:18%"><b>18%</b><span>Ecosystem</span></i>
+      <i class="a3" style="width:50%"><b>50%</b><span>Team + Investors</span></i>
+    </div>
+    <div class="tk-cards">
+      <article class="tk-card">
+        <div class="tk-card-h"><i class="a1"></i><b>Genesis airdrop · 32%</b><em class="tk-badge off">OFFICIAL</em></div>
+        <ul>
+          <li>100% unlocked at TGE.</li>
+          <li>Distributed pro-rata by points.</li>
+          <li>At least 1 point is required to be eligible.</li>
+          <li>Unclaimed tokens are burned.</li>
+        </ul>
+      </article>
+      <article class="tk-card">
+        <div class="tk-card-h"><i class="a2"></i><b>Ecosystem Reserve · 18%</b><em class="tk-badge off">OFFICIAL</em></div>
+        <ul>
+          <li>Held by the Variational Foundation.</li>
+          <li>Spent at the Foundation's discretion.</li>
+          <li>No schedule published.</li>
+        </ul>
+      </article>
+      <article class="tk-card">
+        <div class="tk-card-h"><i class="a3"></i><b>Team + Investors · 50%</b><em class="tk-badge off">OFFICIAL</em></div>
+        <ul>
+          <li>12-month lock after TGE, then unlock over at least 3 years.</li>
+          <li>Team members also have individual vesting.</li>
+          <li>Split between team and investors: <span class="tk-tba">TBA</span>, to be announced before TGE.</li>
+        </ul>
+      </article>
     </div>
   </section>
 
-  <section class="pt-block" id="tfInside">
+  <section class="pt-block" id="tkUnlock">
     <div class="cmp-section-head split">
-      <div><span class="cmp-eyebrow">02 · WHAT IS IN IT</span><h3>Metals, energy, index funds, single names</h3></div>
-      <p>"TradFi" on most venues means a gold market and an S&amp;P tracker. Here it is four distinct asset classes with real depth in each, including three pre-IPO markets that have no equivalent on any order-book venue.</p>
+      <div><span class="cmp-eyebrow">B · UNLOCK TIMELINE</span><h3>The fastest the official terms allow</h3></div>
+      <p>TGE is set for Q4 2026 with no exact date yet. This curve applies the official terms at their fastest — a 12-month lock, then exactly 3 years of linear unlock — and is not a published schedule.</p>
     </div>
-    <div class="tf-classes" id="tfClasses"></div>
-    <div class="tf-table" id="tfTop"></div>
-    <p class="tf-note">Gold is the anchor — $61.1M of open interest, more than a quarter of the entire traditional book, and the single most traded market on the venue after Bitcoin and Ether. Entropy's cumulative view puts commodities at 56.1% of all TradFi volume ever traded here, equities at 28.4% and ETFs at 15.5%.</p>
+    <div class="tk-chart"><svg id="tkChart" role="img" aria-label="Fastest unlock path allowed by the official terms: 32% circulating at TGE, Team and Investors locked for 12 months then unlocking over at least 3 years, Ecosystem unscheduled"></svg></div>
+    <div class="tk-key">
+      <span><i class="a1"></i>Genesis airdrop · circulating from TGE</span>
+      <span><i class="a3"></i>Team + Investors · unlocked (fastest case)</span>
+      <span><i class="a3l"></i>Team + Investors · still locked</span>
+      <span><i class="a2"></i>Ecosystem · discretionary, unscheduled</span>
+    </div>
+    <p class="tk-note">Circulating share of total supply: 32% at TGE, flat through the 12-month lock (~Q4 2027), then rising to 82% no earlier than ~Q4 2030 if the team and investor tokens unlock over exactly 3 years. The Ecosystem 18% is drawn hatched because it can move at any time or not at all.</p>
   </section>
 
-  <section class="pt-block" id="tfSide">
+  <section class="pt-block" id="tkSinks">
     <div class="cmp-section-head split">
-      <div><span class="cmp-eyebrow">03 · WHO TAKES THE OTHER SIDE</span><h3>The demand is one-directional</h3></div>
-      <p>This is the part that decides whether a venue can carry traditional markets at all. Nobody shorts Alphabet on a perp DEX. The long side is crowded, the short side is thin, and something has to hold the difference.</p>
+      <div><span class="cmp-eyebrow">C · SUPPLY SINKS AND DEMAND</span><h3>What removes supply, what feeds the airdrop</h3></div>
+      <p>The official policy sends all treasury revenue to buying and burning $VAR. The figures below are the live ones the rest of the dashboard already uses.</p>
     </div>
-    <div class="tf-chart"><svg id="tfSkewChart" role="img" aria-label="Long versus short open interest across the largest single-name equity markets"></svg></div>
-    <div class="tf-argue">
-      <div class="tf-argue-k">
-        <span>WHY IT MATTERS</span>
-        <p>An anonymous order book only makes a market where both sides show up. Where they do not — a single-name equity that everyone wants to own and nobody wants to short — there is no book to trade against, and the market either goes unlisted or sits empty.</p>
-        <p>Variational is bilateral: the OLP is the counterparty to every taker position, so it absorbs the imbalance directly onto its own balance sheet. That is why <b>73 single names</b> can be listed here and why the equity book runs at <b>+41.8% net long</b> without breaking.</p>
-        <p>It is also the honest cost of the model. That skew is real inventory risk carried by the pool, and it is the number to watch if this book keeps growing.</p>
+    <div class="tk-stats">
+      <div class="tk-stat">
+        <span>Buy &amp; burn policy <em class="tk-badge off">OFFICIAL</em></span>
+        <strong>100%</strong>
+        <small>of treasury revenue → $VAR buy &amp; burn. Intended, not yet executed: no outflows so far, so the balance below is dry powder, not burned tokens.</small>
       </div>
-      <div class="tf-argue-s">
-        <div class="tf-stat">
-          <span>Traditional turnover vs crypto</span>
-          <strong id="tfTurn">—</strong>
-          <small>Volume per dollar of book, per day. Traditional positions turn over more slowly than crypto ones on the same venue — held rather than farmed — though the gap on any single day is modest.</small>
-        </div>
-        <div class="tf-stat">
-          <span>The one they are fading</span>
-          <strong>MSTR −70.8%</strong>
-          <small>Strategy Inc is the only large traditional market where the book is net short. Everything else on the shelf is a crowded long.</small>
-        </div>
+      <div class="tk-stat">
+        <span>Treasury balance now</span>
+        <strong id="tkTreasury">—</strong>
+        <small id="tkTreasurySub">Arbitrum USDC treasury wallet, live.</small>
       </div>
-    </div>
-  </section>
-
-  <section class="pt-block" id="tfExec">
-    <div class="cmp-section-head split">
-      <div><span class="cmp-eyebrow">04 · WHAT IT COSTS</span><h3>Execution, including the part that cuts against us</h3></div>
-      <p>Variational's API publishes a quoted base spread for every market. Lighter publishes an all-in cost for a $100K Bitcoin trade. These are not the same measurement and are shown separately for that reason — but anyone comparing the two venues will look at both, so both are here.</p>
-    </div>
-    <div class="tf-exec">
-      <div class="tf-exec-c">
-        <div class="tf-chart"><svg id="tfSpreadChart" role="img" aria-label="Quoted base spread by market, Variational"></svg></div>
-        <p class="tf-note">Crypto majors quote inside 1.3 bps. The traditional shelf sits between 2.6 and 5.3 — wider, which is what a market with one-sided demand and an inventory-carrying counterparty should cost.</p>
+      <div class="tk-stat">
+        <span>30D treasury inflow</span>
+        <strong id="tkInflow">—</strong>
+        <small id="tkInflowSub">Net wallet-balance change over the last 30 days.</small>
       </div>
-      <div class="tf-exec-c">
-        <div class="tf-k">Cost to trade $100K of BTC · Lighter's published grid</div>
-        <div id="tfCostGrid"></div>
-        <p class="tf-note"><b>Lighter is genuinely cheap and it is their number, not ours</b> — 1.1 bps all-in against Hyperliquid's 5.1. Variational's quoted base spread on Bitcoin is 1.08 bps, which lands in the same band, but a quoted spread is not slippage at size. Read it as parity not yet disproved, not as a win. Read 2026-08-27 from app.lighter.xyz/stats.</p>
+      <div class="tk-stat">
+        <span>Points pool growth <em class="tk-badge off">OFFICIAL</em></span>
+        <strong>150k / week</strong>
+        <small>New points are added each week until TGE; the Genesis airdrop is shared pro-rata by points.</small>
       </div>
     </div>
   </section>
 
-  <section class="pt-block" id="tfLimits">
+  <section class="pt-block" id="tkRaise">
     <div class="cmp-section-head split">
-      <div><span class="cmp-eyebrow">05 · READ THIS FIRST</span><h3>What these numbers cannot carry</h3></div>
-      <p>Stated before anyone else states it.</p>
+      <div><span class="cmp-eyebrow">D · FUNDRAISE HISTORY</span><h3>Three rounds, ≈ $61.8M disclosed</h3></div>
+      <p>Valuation was not disclosed for any round. Names are tagged by how well they are sourced: primary press carries the round, secondary outlets add some participants.</p>
     </div>
-    <ol class="pt-limits">
-      <li><b>The basis is gross, not the headline.</b> Every open-interest figure here is taker long plus taker short. Variational's own headline number is twice this because it also counts the OLP's mirror of every position. Lighter is measured the same gross way, so the comparison holds — but do not set these figures next to a headline from either venue without saying which basis you are on.</li>
-      <li><b>The classification is ours.</b> All 545 listings were sorted into traditional and crypto by ticker and instrument name, not by a category either venue reports. It lands within half a point of the figure Entropy publishes, which is reassuring rather than conclusive.</li>
-      <li><b>Tokenised gold sits in neither column.</b> XAUT and PAXG carry $49.3M of open interest — gold exposure in a crypto wrapper. Counting them as traditional would move Variational's share from 31.0% to 37.8%. They are excluded here because Entropy excludes them.</li>
-      <li><b>One day, one reading.</b> These are snapshots taken 2026-08-27. Open interest moves, and a single heavy day in gold moves the turnover figures noticeably.</li>
-      <li><b>Skew is a risk as well as a moat.</b> A +41.8% net long equity book means the OLP is carrying that exposure. It is what lets these markets exist and it is also the thing that would hurt most in a sharp drawdown.</li>
-      <li><b>Spread is not slippage.</b> A quoted base spread and an executed cost at $100K are different measurements. Until Variational publishes taker slippage at stated sizes, the execution comparison stays incomplete.</li>
+    <ol class="tk-tl">
+      <li>
+        <i></i><span class="tk-tl-d">Closed Dec 2021 · announced 2024-10-23</span>
+        <b>Seed</b><strong>$10.3M</strong>
+      </li>
+      <li>
+        <i></i><span class="tk-tl-d">June 2025</span>
+        <b>Strategic</b><strong>$1.5M</strong>
+      </li>
+      <li>
+        <i></i><span class="tk-tl-d">Announced 2026-05-21</span>
+        <b>Series A</b><strong>$50M</strong>
+      </li>
     </ol>
-    <div class="pt-src">
-      <span>SOURCES</span>
-      <ul>
-        <li><b>Variational</b> <code>omni-client-api.prod.ap-northeast-1.variational.io/metadata/stats</code> — 545 listings, taker long/short, base spread and funding per market</li>
-        <li><b>Lighter</b> <code>mainnet.zklighter.elliot.ai/api/v1/orderBookDetails</code> — 230 perps, open interest × mark price</li>
-        <li><b>Published</b> <code>arbdata.com/variational/tradfi</code> — Entropy Advisors, TradFi share, category splits and the per-market gross table</li>
-        <li><b>Lighter cost grid</b> <code>app.lighter.xyz/stats</code></li>
-      </ul>
+    <div class="tk-table-wrap">
+      <table class="tk-table">
+        <thead><tr><th>Round</th><th>Amount</th><th>Date</th><th>Investors</th><th>Terms and purpose</th><th>Source</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><b>Seed</b></td>
+            <td class="n">$10.3M</td>
+            <td>Closed Dec 2021, announced 2024-10-23</td>
+            <td>Co-led by Bain Capital Crypto and Peak XV Partners; with Coinbase Ventures, Dragonfly, North Island Ventures, Hack VC. <span class="tk-rep">Brevan Howard <em class="tk-badge rep">REPORTED</em></span></td>
+            <td>Priced equity plus 1:1 token warrants. Valuation undisclosed.</td>
+            <td><em class="tk-badge press">PRIMARY PRESS</em> The Block</td>
+          </tr>
+          <tr>
+            <td><b>Strategic</b></td>
+            <td class="n">$1.5M</td>
+            <td>June 2025</td>
+            <td>Mirana Ventures, Caladan, Zoku Ventures (formerly Superpotion).</td>
+            <td>Partners rather than capital: development had been funded by the team's prior market-making profits.</td>
+            <td><em class="tk-badge rep">REPORTED</em> TechFlow</td>
+          </tr>
+          <tr>
+            <td><b>Series A</b></td>
+            <td class="n">$50M</td>
+            <td>Announced 2026-05-21</td>
+            <td>Led by Dragonfly; Bain Capital Crypto and Coinbase Ventures participated. <span class="tk-rep">Peak XV, Hack VC, Brevan Howard, North Island <em class="tk-badge rep">REPORTED</em></span></td>
+            <td>Use of funds: RWA perps (gold, silver, copper, WTI) and Variational Pro for institutions. Valuation undisclosed.</td>
+            <td><em class="tk-badge press">PRIMARY PRESS</em> CoinDesk, Fortune</td>
+          </tr>
+        </tbody>
+        <tfoot><tr><td><b>Total disclosed</b></td><td class="n">≈ $61.8M</td><td colspan="4">Seed $10.3M + Strategic $1.5M + Series A $50M.</td></tr></tfoot>
+      </table>
     </div>
+    <div class="tk-founders">
+      <span>FOUNDERS AND BACKGROUND <em class="tk-badge rep">REPORTED</em></span>
+      <p>Founded in 2021 by Lucas Schuermann (CEO) and Edward Yu, previously of Qu Capital (acquired by DCG). The team ran as a profitable proprietary market maker for about 2 years before building the protocol.</p>
+    </div>
+  </section>
+
+  <section class="pt-block" id="tkContext">
+    <div class="cmp-section-head split">
+      <div><span class="cmp-eyebrow">E · CONTEXT</span><h3>Raised vs implied valuation</h3></div>
+      <p>Two numbers side by side, not a return. Investor shares and entry prices are unknown, so no investor multiple can be computed from them.</p>
+    </div>
+    <div class="tk-ctx">
+      <div class="tk-stat">
+        <span>Total disclosed raise <em class="tk-badge press">PRIMARY PRESS</em></span>
+        <strong>≈ $61.8M</strong>
+        <small>Three rounds, 2021 – 2026. No round disclosed a valuation.</small>
+      </div>
+      <div class="tk-stat">
+        <span>Model-implied FDV <em class="tk-badge model">MODEL</em></span>
+        <strong id="tkFdv">—</strong>
+        <small id="tkFdvSub">The Comparison tab's open-interest model at the official 32% TGE float.</small>
+      </div>
+    </div>
+    <p class="tk-note">The implied FDV is the dashboard's own estimate — circulating market cap from a power-law fit of peers' open interest, divided by the 32% float — not a price, not a funding-round valuation, and not a forecast.</p>
+  </section>
+
+  <section class="pt-src" id="tkSources">
+    <span>SOURCES</span>
+    <ul>
+      <li><em class="tk-badge off">OFFICIAL</em> <b>Variational announcement</b> Allocation, unlock terms, buy &amp; burn policy. Shared 2026-09-28.</li>
+      <li><em class="tk-badge press">PRIMARY PRESS</em> <b>The Block</b> <a href="https://www.theblock.co/post/322653/arbitrum-crypto-protocol-variational-raises-10-3m-in-seed-funding" target="_blank" rel="noopener">theblock.co/post/322653 ↗</a> Seed round.</li>
+      <li><em class="tk-badge press">PRIMARY PRESS</em> <b>CoinDesk</b> <a href="https://www.coindesk.com/business/2026/05/21/peer-to-peer-trading-startup-variational-raises-usd50-million-for-real-world-perps-in-funding-round-led-by-dragonfly" target="_blank" rel="noopener">coindesk.com, 2026-05-21 ↗</a> Series A.</li>
+      <li><em class="tk-badge press">PRIMARY PRESS</em> <b>Fortune</b> <a href="https://fortune.com/2026/05/20/variational-raises-50-million-series-a/" target="_blank" rel="noopener">fortune.com, 2026-05-20 ↗</a> Series A.</li>
+      <li><em class="tk-badge rep">REPORTED</em> <b>TechFlow</b> <a href="https://www.techflowpost.com/en-US/newsletter/87027" target="_blank" rel="noopener">techflowpost.com/newsletter/87027 ↗</a> Strategic round.</li>
+    </ul>
   </section>
 </section>
-<!-- tradfi:end -->
+<!-- tokenomics:end -->
 <!-- pretge:begin -->
 <section class="pretge-report tsec tg-hide" data-tg="pretge">
   <div class="cmp-heading">
@@ -10242,159 +10336,131 @@ body.theme-light .bw-viz text.bw-pct.in{fill:#fff!important}
 
 
 
-<style id="tradfi-book-room">
-  /* TradFi. Prefixed .tf- and scoped under [data-tg="tradfi"]. It reuses the
-     Pre-TGE tab's .pt-block / .pt-limits / .pt-src shells deliberately — the two
-     tabs are a pair and should read as one voice. Colour: Variational takes the
-     accent, Lighter the pale steel, and the asset classes get a four-step ramp
-     off the accent so they read as one family rather than four brands. */
-  [data-tg="tradfi"]{
-    --tf-var:var(--grn);
-    /* Lighter was a pale blue, half a step from the accent — in the book chart
-       and in a "31.0% vs 11.4%" headline the two venues read as one colour.
-       It moves off the blue ramp to bone, and its fills are hatched as well,
-       so the pair separates by hue AND by texture. */
-    --tf-lit:#e6ecf5;
-    --tf-lg:var(--grn);
-    --tf-sh:#e0736f;
-  }
-  body.theme-light [data-tg="tradfi"]{--tf-lit:#2c3b4d;--tf-sh:#c0304a}
+<style id="tokenomics-room">
+  /* Tokenomics / Fundraise. Every selector is prefixed .tk- and scoped under [data-tg="tokenomics"]
+     so it cannot reach another workspace. It reuses the Pre-TGE tab's .pt-block / .pt-src shells and
+     the shell's own tokens only: the airdrop takes the accent, Team + Investors a muted mix of it,
+     Ecosystem a hatch (it is the one bucket with no schedule). */
+  [data-tg="tokenomics"] .pt-block{margin-top:30px;padding-top:24px;border-top:1px solid var(--line);scroll-margin-top:132px}
+  [data-tg="tokenomics"] .cmp-section-head h3{font:760 clamp(18px,1.7vw,24px)/1.15 var(--sans);letter-spacing:-.7px;color:var(--ink)}
+  [data-tg="tokenomics"] .cmp-section-head p{color:var(--sub);font:12.5px/1.6 var(--sans)}
+  [data-tg="tokenomics"] .tk-sig-lead>strong{color:var(--grn)}
+  [data-tg="tokenomics"] .cmp-signal>strong{margin-top:20px!important;font-size:clamp(21px,1.9vw,30px)!important;letter-spacing:-1px!important}
+  [data-tg="tokenomics"] .tk-sig-sub{display:block;margin-top:9px;color:var(--sub);font:750 11px/1.4 var(--sans)}
+  [data-tg="tokenomics"] .cmp-signal p{margin-top:8px!important;color:var(--dim)!important;font-size:11px!important}
+  [data-tg="tokenomics"] .cmp-signal{min-height:190px}
+  [data-tg="tokenomics"] .cmp-signal-top span{font-size:8.5px;letter-spacing:.8px;line-height:1.35}
 
-  [data-tg="tradfi"] .pt-block{margin-top:30px;padding-top:24px;border-top:1px solid var(--line);scroll-margin-top:132px}
-  [data-tg="tradfi"] .cmp-section-head h3{font:760 clamp(18px,1.7vw,24px)/1.15 var(--sans);letter-spacing:-.7px;color:var(--ink)}
-  [data-tg="tradfi"] .cmp-section-head p{color:var(--sub);font:12.5px/1.6 var(--sans)}
-  [data-tg="tradfi"] .tf-sig-lead>strong{color:var(--grn)}
-  [data-tg="tradfi"] .cmp-signal>strong{margin-top:20px!important;font-size:clamp(21px,1.9vw,30px)!important;letter-spacing:-1px!important}
-  [data-tg="tradfi"] .tf-sig-sub{display:block;margin-top:9px;color:var(--sub);font:750 11px/1.4 var(--sans)}
-  [data-tg="tradfi"] .cmp-signal p{margin-top:8px!important;color:var(--dim)!important;font-size:11px!important}
-  [data-tg="tradfi"] .cmp-signal{min-height:214px}
-  [data-tg="tradfi"] .cmp-signal-top span{font-size:8.5px;letter-spacing:.8px;line-height:1.35}
+  /* source badges: OFFICIAL / PRIMARY PRESS / REPORTED (and MODEL for the one estimate) */
+  [data-tg="tokenomics"] .tk-badge{display:inline-block;margin-left:6px;padding:2px 6px;border:1px solid var(--line);border-radius:3px;color:var(--dim);font:800 8px/1.3 var(--mono);font-style:normal;letter-spacing:.7px;text-transform:uppercase;vertical-align:middle;white-space:nowrap}
+  [data-tg="tokenomics"] .tk-badge.off{color:var(--grn);border-color:color-mix(in srgb,var(--grn) 40%,var(--line))}
+  [data-tg="tokenomics"] .tk-badge.press{color:var(--amber);border-color:color-mix(in srgb,var(--amber) 40%,var(--line))}
+  [data-tg="tokenomics"] .tk-badge.rep{color:var(--dim)}
+  [data-tg="tokenomics"] .tk-badge.model{color:var(--cyan);border-color:color-mix(in srgb,var(--cyan) 40%,var(--line))}
+  [data-tg="tokenomics"] .tk-tba{display:inline-block;padding:0 6px;border:1px dashed var(--dim);border-radius:3px;color:var(--ink);font:800 10px var(--mono);letter-spacing:.6px}
 
-  /* Two-venue headline. The logo is the identity — colour alone put Variational
-     and Lighter half a step apart and the reader had to fall back on the caption. */
-  [data-tg="tradfi"] .pt-vs,[data-tg="tradfi"] .tf-vs{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
-  [data-tg="tradfi"] .pt-vs-h,[data-tg="tradfi"] .tf-vs-h{display:flex;align-items:center;gap:7px;min-width:0}
-  [data-tg="tradfi"] .pt-vs-h img,[data-tg="tradfi"] .tf-vs-h img{flex:0 0 20px;width:20px;height:20px;object-fit:contain;border-radius:4px;background:rgba(255,255,255,.06);padding:1px}
-  [data-tg="tradfi"] .pt-vs-h b,[data-tg="tradfi"] .tf-vs-h b{font-weight:inherit;font-variant-numeric:tabular-nums;letter-spacing:-1px}
-  [data-tg="tradfi"] .pt-vs-h.var b,[data-tg="tradfi"] .tf-vs-h.var b{color:var(--grn)}
-  [data-tg="tradfi"] .pt-vs-h.lit b,[data-tg="tradfi"] .tf-vs-h.lit b{color:var(--tf-lit,#e6ecf5)}
-  [data-tg="tradfi"] .pt-vs-x,[data-tg="tradfi"] .tf-vs-x{color:var(--dim);font:500 12px var(--sans);letter-spacing:0}
-  body.theme-light [data-tg="tradfi"] .pt-vs-h img,body.theme-light [data-tg="tradfi"] .tf-vs-h img{background:#f4f9ff;border:1px solid rgba(11,111,232,.18)}
+  /* allocation bar */
+  [data-tg="tokenomics"] .tk-bar{display:flex;height:72px;margin-top:18px;border:1px solid var(--line);overflow:hidden}
+  [data-tg="tokenomics"] .tk-bar i{display:flex;flex-direction:column;justify-content:center;gap:3px;min-width:0;padding:0 12px;font-style:normal;border-left:1px solid var(--bg)}
+  [data-tg="tokenomics"] .tk-bar i:first-child{border-left:0}
+  [data-tg="tokenomics"] .tk-bar b{font:760 20px var(--mono);letter-spacing:-.6px;font-variant-numeric:tabular-nums}
+  [data-tg="tokenomics"] .tk-bar span{font:750 10.5px/1.2 var(--sans);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  [data-tg="tokenomics"] .tk-bar i.a1{background:var(--grn);color:var(--bg)}
+  [data-tg="tokenomics"] .tk-bar i.a2{background:repeating-linear-gradient(135deg,color-mix(in srgb,var(--sub) 50%,transparent) 0 5px,transparent 5px 10px);color:var(--ink)}
+  [data-tg="tokenomics"] .tk-bar i.a2 b,[data-tg="tokenomics"] .tk-bar i.a2 span{text-shadow:0 0 5px var(--bg),0 0 5px var(--bg),0 0 5px var(--bg)}
+  [data-tg="tokenomics"] .tk-bar i.a3{background:color-mix(in srgb,var(--grn) 52%,var(--panel));color:var(--ink)}
+  [data-tg="tokenomics"] .tk-cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px;margin-top:14px;background:var(--line);border:1px solid var(--line)}
+  [data-tg="tokenomics"] .tk-card{min-width:0;padding:16px;background:var(--bg)}
+  [data-tg="tokenomics"] .tk-card-h{display:flex;align-items:center;flex-wrap:wrap;gap:8px}
+  [data-tg="tokenomics"] .tk-card-h i,[data-tg="tokenomics"] .tk-key i{display:inline-block;width:11px;height:11px;border-radius:2px;flex:none}
+  [data-tg="tokenomics"] .tk-card-h b{color:var(--ink);font:750 13px var(--sans)}
+  [data-tg="tokenomics"] .tk-card-h .tk-badge{margin-left:auto}
+  [data-tg="tokenomics"] .tk-card ul{margin:12px 0 0;padding:0;list-style:none;display:grid;gap:8px}
+  [data-tg="tokenomics"] .tk-card li{position:relative;padding-left:14px;color:var(--sub);font:12px/1.55 var(--sans)}
+  [data-tg="tokenomics"] .tk-card li::before{content:"";position:absolute;left:0;top:8px;width:5px;height:1px;background:var(--dim)}
+  [data-tg="tokenomics"] i.a1{background:var(--grn)}
+  [data-tg="tokenomics"] i.a2{background:repeating-linear-gradient(135deg,var(--sub) 0 2px,transparent 2px 4px);border:1px solid var(--sub)}
+  [data-tg="tokenomics"] i.a3{background:color-mix(in srgb,var(--grn) 52%,var(--panel));border:1px solid color-mix(in srgb,var(--grn) 55%,var(--line))}
+  [data-tg="tokenomics"] i.a3l{background:transparent;border:1px dashed var(--dim)}
 
-  /* hatch — Lighter's slab in the book chart */
-  [data-tg="tradfi"] .tf-hatch-bg{fill:var(--tf-lit);opacity:.22}
-  [data-tg="tradfi"] .tf-hatch-l{stroke:var(--tf-lit);stroke-width:2.6}
+  /* unlock chart */
+  [data-tg="tokenomics"] .tk-chart{margin-top:16px}
+  [data-tg="tokenomics"] .tk-chart svg{display:block;width:100%;height:auto;overflow:visible}
+  [data-tg="tokenomics"] .tk-grid{stroke:var(--line);stroke-width:1;opacity:.55}
+  [data-tg="tokenomics"] .tk-ax{fill:var(--dim);font:9.5px var(--mono);font-variant-numeric:tabular-nums}
+  [data-tg="tokenomics"] .tk-ax.b{fill:var(--sub);font-weight:800}
+  [data-tg="tokenomics"] .tk-ax-t{fill:var(--sub);font:800 9px var(--mono);letter-spacing:.9px}
+  [data-tg="tokenomics"] .tk-s1{fill:var(--grn)}
+  [data-tg="tokenomics"] .tk-s3{fill:color-mix(in srgb,var(--grn) 52%,var(--panel));stroke:color-mix(in srgb,var(--grn) 55%,var(--line));stroke-width:1}
+  [data-tg="tokenomics"] .tk-s3l{fill:none;stroke:var(--dim);stroke-width:1;stroke-dasharray:4 4}
+  [data-tg="tokenomics"] .tk-s2{stroke:var(--sub);stroke-width:1}
+  [data-tg="tokenomics"] .tk-hatch{stroke:var(--sub);stroke-width:1.4;opacity:.8}
+  [data-tg="tokenomics"] .tk-mark{stroke:var(--ink);stroke-width:1;stroke-dasharray:2 4;opacity:.55}
+  [data-tg="tokenomics"] .tk-lab{fill:var(--ink);font:750 11px var(--sans)}
+  [data-tg="tokenomics"] .tk-lab.s{fill:var(--sub);font:10.5px var(--sans)}
+  [data-tg="tokenomics"] .tk-lab.on-a1{fill:var(--bg)}
+  [data-tg="tokenomics"] .tk-lab.hatch{paint-order:stroke;stroke:var(--bg);stroke-width:3px;stroke-linejoin:round}
+  [data-tg="tokenomics"] .tk-key{display:flex;flex-wrap:wrap;gap:8px 18px;margin-top:12px}
+  [data-tg="tokenomics"] .tk-key span{display:inline-flex;align-items:center;gap:7px;color:var(--sub);font:11px var(--sans)}
+  [data-tg="tokenomics"] .tk-note{margin-top:12px;color:var(--sub);font:11.5px/1.65 var(--sans)}
 
-  [data-tg="tradfi"] .tf-chart{margin-top:16px}
-  [data-tg="tradfi"] .tf-chart svg{display:block;width:100%;height:auto;overflow:visible}
-  [data-tg="tradfi"] .tf-grid{stroke:var(--line);stroke-width:1;opacity:.5}
-  [data-tg="tradfi"] .tf-mid{stroke:var(--line);stroke-width:1}
-  [data-tg="tradfi"] .tf-ax{fill:var(--dim);font:9.5px var(--mono);font-variant-numeric:tabular-nums}
-  [data-tg="tradfi"] .tf-cap{fill:var(--dim);font:800 8.5px var(--mono);letter-spacing:1.1px}
+  /* stat cards */
+  [data-tg="tokenomics"] .tk-stats,[data-tg="tokenomics"] .tk-ctx{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:18px}
+  [data-tg="tokenomics"] .tk-ctx{grid-template-columns:repeat(2,minmax(0,1fr))}
+  [data-tg="tokenomics"] .tk-stat{min-width:0;padding:14px 16px;border:1px solid var(--line)}
+  [data-tg="tokenomics"] .tk-stat>span{display:block;color:var(--dim);font:800 9px/1.5 var(--mono);letter-spacing:1px;text-transform:uppercase}
+  [data-tg="tokenomics"] .tk-stat>span .tk-badge{margin-left:4px}
+  [data-tg="tokenomics"] .tk-stat strong{display:block;margin-top:8px;color:var(--grn);font:760 22px var(--mono);letter-spacing:-.5px;font-variant-numeric:tabular-nums}
+  [data-tg="tokenomics"] .tk-stat small{display:block;margin-top:7px;color:var(--sub);font:10.5px/1.55 var(--sans)}
 
-  /* the book columns */
-  [data-tg="tradfi"] .tf-blk.trad.var{fill:var(--tf-var);opacity:.9}
-  [data-tg="tradfi"] .tf-blk.trad.lit{opacity:1}
-  [data-tg="tradfi"] .tf-blk.crypto{fill:var(--sub);opacity:.13}
-  [data-tg="tradfi"] .tf-blab{font:760 17px var(--mono);font-variant-numeric:tabular-nums}
-  [data-tg="tradfi"] .tf-blab.var{fill:var(--tf-var)}
-  [data-tg="tradfi"] .tf-blab.lit{fill:var(--tf-lit)}
-  [data-tg="tradfi"] .tf-bsub{fill:var(--sub);font:10.5px var(--sans)}
-  [data-tg="tradfi"] .tf-bcry{fill:var(--dim);font:10px var(--mono)}
-  [data-tg="tradfi"] .tf-bname{font:750 13px var(--sans)}
-  [data-tg="tradfi"] .tf-bname.var{fill:var(--tf-var)}
-  [data-tg="tradfi"] .tf-bname.lit{fill:var(--tf-lit)}
-  [data-tg="tradfi"] .tf-bnsub{fill:var(--dim);font:9.5px var(--mono)}
+  /* fundraise timeline + table */
+  [data-tg="tokenomics"] .tk-tl{list-style:none;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));margin:24px 0 8px;padding:0;position:relative}
+  [data-tg="tokenomics"] .tk-tl::before{content:"";position:absolute;left:0;right:0;top:5px;height:1px;background:var(--line)}
+  [data-tg="tokenomics"] .tk-tl li{position:relative;padding:22px 12px 0 0}
+  [data-tg="tokenomics"] .tk-tl li i{position:absolute;top:0;left:0;width:11px;height:11px;border-radius:50%;background:var(--grn);box-shadow:0 0 0 4px var(--bg)}
+  [data-tg="tokenomics"] .tk-tl-d{display:block;color:var(--dim);font:800 9px/1.5 var(--mono);letter-spacing:.8px;text-transform:uppercase}
+  [data-tg="tokenomics"] .tk-tl b{display:block;margin-top:6px;color:var(--ink);font:750 13px var(--sans)}
+  [data-tg="tokenomics"] .tk-tl strong{display:block;color:var(--grn);font:760 26px var(--mono);letter-spacing:-.8px;font-variant-numeric:tabular-nums}
+  [data-tg="tokenomics"] .tk-table-wrap{margin-top:18px;overflow-x:auto;border-top:1px solid var(--line)}
+  [data-tg="tokenomics"] .tk-table{width:100%;min-width:820px;border-collapse:collapse;font-family:var(--sans)}
+  [data-tg="tokenomics"] .tk-table th{padding:9px 12px;border-bottom:1px solid var(--line);background:color-mix(in srgb,var(--panel) 70%,transparent);color:var(--dim);font:800 9px var(--mono);letter-spacing:.9px;text-align:left;text-transform:uppercase}
+  [data-tg="tokenomics"] .tk-table td,[data-tg="tokenomics"] .tk-table tfoot td{padding:12px;border-bottom:1px solid var(--line);vertical-align:top;color:var(--sub);font:12px/1.55 var(--sans)}
+  [data-tg="tokenomics"] .tk-table td b{color:var(--ink);font:750 12.5px var(--sans)}
+  [data-tg="tokenomics"] .tk-table td.n{color:var(--ink);font:760 14px var(--mono);white-space:nowrap}
+  [data-tg="tokenomics"] .tk-table tfoot td{color:var(--ink)}
+  [data-tg="tokenomics"] .tk-table .tk-badge{margin:0 4px 0 0}
+  [data-tg="tokenomics"] .tk-rep{display:block;margin-top:6px;color:var(--dim)}
+  [data-tg="tokenomics"] .tk-rep .tk-badge{margin:0 0 0 6px}
+  [data-tg="tokenomics"] .tk-founders{margin-top:18px;padding:14px 16px;border:1px solid var(--line)}
+  [data-tg="tokenomics"] .tk-founders>span{display:block;margin-bottom:7px;color:var(--dim);font:800 9px var(--mono);letter-spacing:1.2px}
+  [data-tg="tokenomics"] .tk-founders p{color:var(--sub);font:12.5px/1.65 var(--sans)}
 
-  [data-tg="tradfi"] .tf-xcheck{margin-top:16px;padding:14px 16px;border:1px solid color-mix(in srgb,var(--grn) 30%,var(--line));background:color-mix(in srgb,var(--grn) 4%,transparent)}
-  [data-tg="tradfi"] .tf-xcheck>span{display:block;margin-bottom:7px;color:var(--grn);font:800 9px var(--mono);letter-spacing:1.4px}
-  [data-tg="tradfi"] .tf-xcheck p{color:var(--ink);font:12.5px/1.65 var(--sans)}
-
-  /* asset classes */
-  [data-tg="tradfi"] .tf-classes{margin-top:18px}
-  [data-tg="tradfi"] .tf-cbar{display:flex;height:34px;overflow:hidden;border:1px solid var(--line)}
-  [data-tg="tradfi"] .tf-cbar i{display:block;height:100%}
-  [data-tg="tradfi"] .c1{background:var(--grn)}
-  [data-tg="tradfi"] .c2{background:color-mix(in srgb,var(--grn) 70%,var(--sub))}
-  [data-tg="tradfi"] .c3{background:color-mix(in srgb,var(--grn) 34%,var(--sub))}
-  [data-tg="tradfi"] .c4{background:color-mix(in srgb,var(--sub) 78%,var(--bg))}
-  [data-tg="tradfi"] .tf-cbar i+i{border-left:1px solid var(--bg)}
-  [data-tg="tradfi"] .tf-crow{display:grid;grid-template-columns:14px minmax(90px,.7fr) minmax(80px,.6fr) minmax(90px,.6fr) minmax(170px,1.1fr) minmax(120px,.8fr);align-items:baseline;gap:12px;padding:11px 2px;border-bottom:1px solid var(--line)}
-  [data-tg="tradfi"] .tf-cdot{width:10px;height:10px;border-radius:2px}
-  [data-tg="tradfi"] .tf-crow b{color:var(--ink);font:750 12.5px var(--sans)}
-  [data-tg="tradfi"] .tf-crow em{color:var(--dim);font:9.5px var(--mono);font-style:normal}
-  [data-tg="tradfi"] .tf-crow strong{color:var(--ink);font:760 15px var(--mono);font-variant-numeric:tabular-nums}
-  [data-tg="tradfi"] .tf-crow u{color:var(--sub);font:11px var(--sans);text-decoration:none}
-  [data-tg="tradfi"] .tf-crow>i{color:var(--dim);font:10px var(--mono);font-style:normal}
-
-  /* market table */
-  [data-tg="tradfi"] .tf-table{margin-top:20px;border-top:1px solid var(--line)}
-  [data-tg="tradfi"] .tf-trow{display:grid;grid-template-columns:minmax(200px,1.5fr) repeat(4,minmax(96px,.7fr));border-bottom:1px solid var(--line)}
-  [data-tg="tradfi"] .tf-trow>div{min-width:0;padding:10px 14px;border-left:1px solid var(--line)}
-  [data-tg="tradfi"] .tf-trow>div:first-child{border-left:0;padding-left:0}
-  [data-tg="tradfi"] .tf-trow.head>div{padding-block:8px;background:color-mix(in srgb,var(--panel) 70%,transparent);color:var(--dim);font:800 9px var(--mono);letter-spacing:.9px;text-transform:uppercase}
-  [data-tg="tradfi"] .tf-trow .n{text-align:right}
-  [data-tg="tradfi"] .tf-trow b{display:block;color:var(--ink);font:750 12.5px var(--sans)}
-  [data-tg="tradfi"] .tf-trow small{display:block;margin-top:3px;color:var(--dim);font:9.5px/1.35 var(--mono)}
-  [data-tg="tradfi"] .tf-trow strong{color:var(--ink);font:760 14px var(--mono);font-variant-numeric:tabular-nums}
-  [data-tg="tradfi"] .tf-trow strong.lg{color:var(--tf-lg)}
-  [data-tg="tradfi"] .tf-trow strong.sh{color:var(--tf-sh)}
-  [data-tg="tradfi"] .tf-note{margin-top:12px;color:var(--sub);font:11.5px/1.65 var(--sans)}
-  [data-tg="tradfi"] .tf-note b{color:var(--ink)}
-
-  /* skew */
-  [data-tg="tradfi"] .tf-sk.lg{fill:var(--tf-lg);opacity:.85}
-  [data-tg="tradfi"] .tf-sk.sh{fill:var(--tf-sh);opacity:.7}
-  [data-tg="tradfi"] .tf-sk-t{fill:var(--ink);font:750 11px var(--mono)}
-  [data-tg="tradfi"] .tf-sk-v{fill:var(--sub);font:10.5px var(--mono);font-variant-numeric:tabular-nums}
-  [data-tg="tradfi"] .tf-argue{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(240px,.8fr);gap:24px;margin-top:20px;padding-top:18px;border-top:1px solid var(--line)}
-  [data-tg="tradfi"] .tf-argue-k>span{display:block;margin-bottom:9px;color:var(--grn);font:800 9px var(--mono);letter-spacing:1.4px}
-  [data-tg="tradfi"] .tf-argue-k p{margin-bottom:11px;color:var(--sub);font:12.5px/1.7 var(--sans)}
-  [data-tg="tradfi"] .tf-argue-k b{color:var(--ink)}
-  [data-tg="tradfi"] .tf-stat{padding:14px 16px;border:1px solid var(--line);margin-bottom:10px}
-  [data-tg="tradfi"] .tf-stat>span{display:block;color:var(--dim);font:800 9px var(--mono);letter-spacing:1px;text-transform:uppercase}
-  [data-tg="tradfi"] .tf-stat strong{display:block;margin-top:8px;color:var(--grn);font:760 22px var(--mono);letter-spacing:-.5px;font-variant-numeric:tabular-nums}
-  [data-tg="tradfi"] .tf-stat small{display:block;margin-top:7px;color:var(--sub);font:10.5px/1.55 var(--sans)}
-
-  /* execution */
-  [data-tg="tradfi"] .tf-sp{fill:var(--sub);opacity:.5}
-  [data-tg="tradfi"] .tf-sp.cr{fill:var(--grn);opacity:.9}
-  [data-tg="tradfi"] .tf-exec{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1px;margin-top:18px;background:var(--line);border:1px solid var(--line)}
-  [data-tg="tradfi"] .tf-exec-c{min-width:0;padding:16px;background:var(--bg)}
-  [data-tg="tradfi"] .tf-k{color:var(--dim);font:800 9px var(--mono);letter-spacing:1.1px;text-transform:uppercase}
-  [data-tg="tradfi"] .tf-cost-row{display:grid;grid-template-columns:minmax(84px,.5fr) minmax(0,1fr) 66px 56px;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}
-  [data-tg="tradfi"] .tf-cost-row b{color:var(--ink);font:750 12px var(--sans)}
-  [data-tg="tradfi"] .tf-cost-bar{height:10px;background:color-mix(in srgb,var(--line) 60%,transparent)}
-  [data-tg="tradfi"] .tf-cost-bar i{display:block;height:100%;background:var(--sub);opacity:.55}
-  [data-tg="tradfi"] .tf-cost-row.best .tf-cost-bar i{background:var(--tf-lit);opacity:1}
-  [data-tg="tradfi"] .tf-cost-row strong{text-align:right;color:var(--ink);font:760 13px var(--mono);font-variant-numeric:tabular-nums}
-  [data-tg="tradfi"] .tf-cost-row small{text-align:right;color:var(--dim);font:10px var(--mono)}
-
-  /* shared shells with the Pre-TGE tab — the rules there are scoped to that
-     tab, so they are restated here rather than unscoped globally */
-  [data-tg="tradfi"] .pt-limits{margin-top:18px;padding:0;list-style:none;counter-reset:tfl;border-top:1px solid var(--line)}
-  [data-tg="tradfi"] .pt-limits li{position:relative;padding:13px 0 13px 40px;border-bottom:1px solid var(--line);color:var(--sub);font:12.5px/1.65 var(--sans)}
-  [data-tg="tradfi"] .pt-limits li::before{counter-increment:tfl;content:counter(tfl,decimal-leading-zero);position:absolute;left:0;top:15px;color:var(--dim);font:800 10px var(--mono);letter-spacing:.6px}
-  [data-tg="tradfi"] .pt-limits b{color:var(--ink);font-weight:700}
-  [data-tg="tradfi"] .pt-src{margin-top:20px;padding:16px 0 0;border-top:1px solid var(--line)}
-  [data-tg="tradfi"] .pt-src>span{display:block;margin-bottom:10px;color:var(--dim);font:800 9px var(--mono);letter-spacing:1.3px}
-  [data-tg="tradfi"] .pt-src ul{list-style:none;padding:0;display:grid;gap:7px}
-  [data-tg="tradfi"] .pt-src li{color:var(--sub);font:11px/1.5 var(--sans)}
-  [data-tg="tradfi"] .pt-src b{display:inline-block;min-width:88px;color:var(--ink);font:750 11px var(--sans)}
-  [data-tg="tradfi"] .pt-src code{color:var(--dim);font:10px var(--mono);word-break:break-all}
+  /* sources, same shell as the Pre-TGE tab */
+  [data-tg="tokenomics"] .pt-src{margin-top:30px;padding:16px 0 0;border-top:1px solid var(--line)}
+  [data-tg="tokenomics"] .pt-src>span{display:block;margin-bottom:10px;color:var(--dim);font:800 9px var(--mono);letter-spacing:1.3px}
+  [data-tg="tokenomics"] .pt-src ul{list-style:none;padding:0;display:grid;gap:9px}
+  [data-tg="tokenomics"] .pt-src li{color:var(--sub);font:11.5px/1.6 var(--sans)}
+  [data-tg="tokenomics"] .pt-src li .tk-badge{margin:0 8px 0 0}
+  [data-tg="tokenomics"] .pt-src b{color:var(--ink);font:750 11.5px var(--sans);margin-right:6px}
+  [data-tg="tokenomics"] .pt-src a{color:var(--grn);word-break:break-all}
 
   @media(max-width:1050px){
-    [data-tg="tradfi"] .tf-argue{grid-template-columns:1fr}
-    [data-tg="tradfi"] .tf-exec{grid-template-columns:1fr}
-    [data-tg="tradfi"] .tf-table{overflow-x:auto}
-    [data-tg="tradfi"] .tf-trow{min-width:800px}
-    [data-tg="tradfi"] .tf-crow{grid-template-columns:14px minmax(80px,1fr) minmax(70px,.7fr) minmax(80px,.7fr);row-gap:4px}
-    [data-tg="tradfi"] .tf-crow u,[data-tg="tradfi"] .tf-crow>i{grid-column:2/-1}
+    [data-tg="tokenomics"] .tk-stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+    [data-tg="tokenomics"] .tk-cards{grid-template-columns:1fr}
   }
   @media(max-width:700px){
-    [data-tg="tradfi"] .cmp-command button{flex:0 0 auto}
-    [data-tg="tradfi"] .cmp-section-head.split{display:block}
-    [data-tg="tradfi"] .cmp-section-head.split p{margin-top:8px;max-width:none;text-align:left}
+    [data-tg="tokenomics"] .cmp-command button{flex:0 0 auto}
+    [data-tg="tokenomics"] .cmp-section-head.split{display:block}
+    [data-tg="tokenomics"] .cmp-section-head.split p{margin-top:8px;max-width:none;text-align:left}
+    [data-tg="tokenomics"] .tk-stats,[data-tg="tokenomics"] .tk-ctx{grid-template-columns:1fr}
+    [data-tg="tokenomics"] .tk-bar{height:84px}
+    [data-tg="tokenomics"] .tk-bar i{padding:0 4px 0 6px}
+    [data-tg="tokenomics"] .tk-bar b{font-size:15px}
+    [data-tg="tokenomics"] .tk-bar span{font-size:8.5px;letter-spacing:-.2px}
+    [data-tg="tokenomics"] .tk-tl{grid-template-columns:1fr;padding-left:24px}
+    [data-tg="tokenomics"] .tk-tl::before{left:5px;right:auto;top:6px;bottom:0;width:1px;height:auto}
+    [data-tg="tokenomics"] .tk-tl li{padding:0 0 18px 6px}
+    [data-tg="tokenomics"] .tk-tl li i{left:-24px;top:3px}
   }
 </style>
 
@@ -10709,16 +10775,15 @@ body.theme-light .bw-viz text.bw-pct.in{fill:#fff!important}
 </style>
 
 <script src="market-regime-data.js?v=1790400001" defer></script>
-<script src="dashboard.js?v=1791126504" defer></script>
+<script src="dashboard.js?v=1792036613" defer></script>
 <script src="paths-panels.js?v=1789148292" defer></script>
 <script src="playbook-panels.js?v=1790254731" defer></script>
 <script src="monitors-panels.js?v=1789148292" defer></script>
-<script src="i18n-dict.js?v=1790300201" defer></script>
+<script src="i18n-dict.js?v=1792036513" defer></script>
 <script src="i18n.js?v=1789148292" defer></script>
 <script src="app-inline.js?v=20260809-theme-toggle" defer></script>
-<script src="comparison-lab-panels.js?v=1791126504" defer></script>
+<script src="comparison-lab-panels.js?v=1792036513" defer></script>
 <script src="pretge-panels.js?v=1787844401" defer></script>
-<script src="tradfi-panels.js?v=1787844159" defer></script>
-<script src="tge-groups.js?v=1789150085" defer></script>
+<script src="tge-groups.js?v=1792036513" defer></script>
 </body>
 </html>

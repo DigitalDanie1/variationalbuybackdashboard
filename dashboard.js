@@ -1,5 +1,5 @@
 /* ---------- embedded snapshot data ---------- */
-const RAW = [{"d":"2026-01-23","v":0.0},{"d":"2026-01-24","v":23706.33},{"d":"2026-01-25","v":41927.09},{"d":"2026-01-26","v":66649.93},{"d":"2026-01-27","v":87872.5},{"d":"2026-01-28","v":111377.16},{"d":"2026-01-29","v":136903.55},{"d":"2026-01-30","v":164875.64},{"d":"2026-01-31","v":186039.26},{"d":"2026-02-01","v":211164.05},{"d":"2026-02-02","v":232497.4},{"d":"2026-02-03","v":254228.81},{"d":"2026-02-04","v":277052.34},{"d":"2026-02-05","v":295061.69},{"d":"2026-02-06","v":323531.62},{"d":"2026-02-07","v":347133.93},{"d":"2026-02-08","v":364201.23},{"d":"2026-02-09","v":374008.77},{"d":"2026-02-10","v":387930.33},{"d":"2026-02-11","v":398762.96},{"d":"2026-02-12","v":410491.45},{"d":"2026-02-13","v":420611.31},{"d":"2026-02-14","v":429708.75},{"d":"2026-02-15","v":439870.28},{"d":"2026-02-16","v":452553.64},{"d":"2026-02-17","v":464938.74},{"d":"2026-02-18","v":479148.84},{"d":"2026-02-19","v":491703.45},{"d":"2026-02-20","v":500545.7},{"d":"2026-02-21","v":512441.8},{"d":"2026-02-22","v":521582.54},{"d":"2026-02-23","v":528333.68},{"d":"2026-02-24","v":543476.24},{"d":"2026-02-25","v":556464.73},{"d":"2026-02-26","v":569910.36},{"d":"2026-02-27","v":581517.03},{"d":"2026-02-28","v":595234.92},{"d":"2026-03-01","v":606315.91},{"d":"2026-03-02","v":618346.95},{"d":"2026-03-03","v":635711.39},{"d":"2026-03-04","v":649868.71},{"d":"2026-03-05","v":664237.59},{"d":"2026-03-06","v":675936.98},{"d":"2026-03-07","v":688101.39},{"d":"2026-03-08","v":694423.04},{"d":"2026-03-09","v":702015.89},{"d":"2026-03-10","v":714095.74},{"d":"2026-03-11","v":731071.34},{"d":"2026-03-12","v":745220.57},{"d":"2026-03-13","v":756305.19},{"d":"2026-03-14","v":775519.38},{"d":"2026-03-15","v":783551.21},{"d":"2026-03-16","v":791800.32},{"d":"2026-03-17","v":810205.24},{"d":"2026-03-18","v":825333.77},{"d":"2026-03-19","v":839706.51},{"d":"2026-03-20","v":852208.8},{"d":"2026-03-21","v":865420.63},{"d":"2026-03-22","v":870066.19},{"d":"2026-03-23","v":878964.14},{"d":"2026-03-24","v":897890.84},{"d":"2026-03-25","v":909425.49},{"d":"2026-03-26","v":932970.57},{"d":"2026-03-27","v":952995.71},{"d":"2026-03-28","v":975968.73},{"d":"2026-03-29","v":994205.91},{"d":"2026-03-30","v":1005595.12},{"d":"2026-03-31","v":1029204.17},{"d":"2026-04-01","v":1052596.87},{"d":"2026-04-02","v":1079928.62},{"d":"2026-04-03","v":1112243.78},{"d":"2026-04-04","v":1130942.67},{"d":"2026-04-05","v":1141753.21},{"d":"2026-04-06","v":1154938.25},{"d":"2026-04-07","v":1176810.8},{"d":"2026-04-08","v":1199731.02},{"d":"2026-04-09","v":1230147.71},{"d":"2026-04-10","v":1251549.21},{"d":"2026-04-11","v":1276221.01},{"d":"2026-04-12","v":1289059.16},{"d":"2026-04-13","v":1306820.43},{"d":"2026-04-14","v":1326350.3},{"d":"2026-04-15","v":1362960.74},{"d":"2026-04-16","v":1380610.95},{"d":"2026-04-17","v":1409158.55},{"d":"2026-04-18","v":1449068.03},{"d":"2026-04-19","v":1468909.01},{"d":"2026-04-20","v":1486886.65},{"d":"2026-04-21","v":1511186.37},{"d":"2026-04-22","v":1531565.37},{"d":"2026-04-23","v":1555438.56},{"d":"2026-04-24","v":1579550.01},{"d":"2026-04-25","v":1599008.2},{"d":"2026-04-26","v":1613081.9},{"d":"2026-04-27","v":1626685.01},{"d":"2026-04-28","v":1653130.45},{"d":"2026-04-29","v":1672191.34},{"d":"2026-04-30","v":1698305.85},{"d":"2026-05-01","v":1717540.62},{"d":"2026-05-02","v":1735805.49},{"d":"2026-05-03","v":1756472.33},{"d":"2026-05-04","v":1769897.44},{"d":"2026-05-05","v":1798088.08},{"d":"2026-05-06","v":1820801.79},{"d":"2026-05-07","v":1854525.18},{"d":"2026-05-08","v":1881322.12},{"d":"2026-05-09","v":1903199.37},{"d":"2026-05-10","v":1920509.15},{"d":"2026-05-11","v":1948091.62},{"d":"2026-05-12","v":1977332.81},{"d":"2026-05-13","v":2002406.49},{"d":"2026-05-14","v":2028172.94},{"d":"2026-05-15","v":2051671.69},{"d":"2026-05-16","v":2075426.81},{"d":"2026-05-17","v":2091557.22},{"d":"2026-05-18","v":2104806.61},{"d":"2026-05-19","v":2130135.51},{"d":"2026-05-20","v":2155000.99},{"d":"2026-05-21","v":2183496.49},{"d":"2026-05-22","v":2227026.38},{"d":"2026-05-23","v":2271753.2},{"d":"2026-05-24","v":2307878.55},{"d":"2026-05-25","v":2338082.25},{"d":"2026-05-26","v":2366325.86},{"d":"2026-05-27","v":2410525.81},{"d":"2026-05-28","v":2447361.05},{"d":"2026-05-29","v":2496203.12},{"d":"2026-05-30","v":2544270.77},{"d":"2026-05-31","v":2576706.8},{"d":"2026-06-01","v":2611871.56},{"d":"2026-06-02","v":2685645.84},{"d":"2026-06-03","v":2785986.17},{"d":"2026-06-04","v":2876625.14},{"d":"2026-06-05","v":2982895.69},{"d":"2026-06-06","v":3091894.16},{"d":"2026-06-07","v":3139507.04},{"d":"2026-06-08","v":3181401.6},{"d":"2026-06-09","v":3223358.84},{"d":"2026-06-10","v":3278138.33},{"d":"2026-06-11","v":3329583.16},{"d":"2026-06-12","v":3367593.66},{"d":"2026-06-13","v":3412833.43},{"d":"2026-06-14","v":3442548.46},{"d":"2026-06-15","v":3473511.33},{"d":"2026-06-16","v":3530870.3},{"d":"2026-06-17","v":3603531.63},{"d":"2026-06-18","v":3661007.04},{"d":"2026-06-19","v":3703678.69},{"d":"2026-06-20","v":3738786.0},{"d":"2026-06-21","v":3768101.21},{"d":"2026-06-22","v":3801659.12},{"d":"2026-06-23","v":3845258.9},{"d":"2026-06-24","v":3885403.85},{"d":"2026-06-25","v":3941837.59},{"d":"2026-06-26","v":4004947.49},{"d":"2026-06-27","v":4060645.95},{"d":"2026-06-28","v":4086201.55},{"d":"2026-06-29","v":4119188.21},{"d":"2026-06-30","v":4233393.043065},{"d":"2026-07-01","v":4299277.38961},{"d":"2026-07-02","v":4348311.638263},{"d":"2026-07-03","v":4384717.360158},{"d":"2026-07-04","v":4413014.980669},{"d":"2026-07-05","v":4444846.907316},{"d":"2026-07-06","v":4502444.532293},{"d":"2026-07-07","v":4560622.912428},{"d":"2026-07-08","v":4606782.983054},{"d":"2026-07-09","v":4641407.981825},{"d":"2026-07-10","v":4675860.346893},{"d":"2026-07-11","v":4703316.878678},{"d":"2026-07-12","v":4732840.399557},{"d":"2026-07-13","v":4770938.511947}];
+const RAW = [{"d":"2026-01-23","v":0.0},{"d":"2026-01-24","v":23706.33},{"d":"2026-01-25","v":41927.09},{"d":"2026-01-26","v":66649.93},{"d":"2026-01-27","v":87872.5},{"d":"2026-01-28","v":111377.16},{"d":"2026-01-29","v":136903.55},{"d":"2026-01-30","v":164875.64},{"d":"2026-01-31","v":186039.26},{"d":"2026-02-01","v":211164.05},{"d":"2026-02-02","v":232497.4},{"d":"2026-02-03","v":254228.81},{"d":"2026-02-04","v":277052.34},{"d":"2026-02-05","v":295061.69},{"d":"2026-02-06","v":323531.62},{"d":"2026-02-07","v":347133.93},{"d":"2026-02-08","v":364201.23},{"d":"2026-02-09","v":374008.77},{"d":"2026-02-10","v":387930.33},{"d":"2026-02-11","v":398762.96},{"d":"2026-02-12","v":410491.45},{"d":"2026-02-13","v":420611.31},{"d":"2026-02-14","v":429708.75},{"d":"2026-02-15","v":439870.28},{"d":"2026-02-16","v":452553.64},{"d":"2026-02-17","v":464938.74},{"d":"2026-02-18","v":479148.84},{"d":"2026-02-19","v":491703.45},{"d":"2026-02-20","v":500545.7},{"d":"2026-02-21","v":512441.8},{"d":"2026-02-22","v":521582.54},{"d":"2026-02-23","v":528333.68},{"d":"2026-02-24","v":543476.24},{"d":"2026-02-25","v":556464.73},{"d":"2026-02-26","v":569910.36},{"d":"2026-02-27","v":581517.03},{"d":"2026-02-28","v":595234.92},{"d":"2026-03-01","v":606315.91},{"d":"2026-03-02","v":618346.95},{"d":"2026-03-03","v":635711.39},{"d":"2026-03-04","v":649868.71},{"d":"2026-03-05","v":664237.59},{"d":"2026-03-06","v":675936.98},{"d":"2026-03-07","v":688101.39},{"d":"2026-03-08","v":694423.04},{"d":"2026-03-09","v":702015.89},{"d":"2026-03-10","v":714095.74},{"d":"2026-03-11","v":731071.34},{"d":"2026-03-12","v":745220.57},{"d":"2026-03-13","v":756305.19},{"d":"2026-03-14","v":775519.38},{"d":"2026-03-15","v":783551.21},{"d":"2026-03-16","v":791800.32},{"d":"2026-03-17","v":810205.24},{"d":"2026-03-18","v":825333.77},{"d":"2026-03-19","v":839706.51},{"d":"2026-03-20","v":852208.8},{"d":"2026-03-21","v":865420.63},{"d":"2026-03-22","v":870066.19},{"d":"2026-03-23","v":878964.14},{"d":"2026-03-24","v":897890.84},{"d":"2026-03-25","v":909425.49},{"d":"2026-03-26","v":932970.57},{"d":"2026-03-27","v":952995.71},{"d":"2026-03-28","v":975968.73},{"d":"2026-03-29","v":994205.91},{"d":"2026-03-30","v":1005595.12},{"d":"2026-03-31","v":1029204.17},{"d":"2026-04-01","v":1052596.87},{"d":"2026-04-02","v":1079928.62},{"d":"2026-04-03","v":1112243.78},{"d":"2026-04-04","v":1130942.67},{"d":"2026-04-05","v":1141753.21},{"d":"2026-04-06","v":1154938.25},{"d":"2026-04-07","v":1176810.8},{"d":"2026-04-08","v":1199731.02},{"d":"2026-04-09","v":1230147.71},{"d":"2026-04-10","v":1251549.21},{"d":"2026-04-11","v":1276221.01},{"d":"2026-04-12","v":1289059.16},{"d":"2026-04-13","v":1306820.43},{"d":"2026-04-14","v":1326350.3},{"d":"2026-04-15","v":1362960.74},{"d":"2026-04-16","v":1380610.95},{"d":"2026-04-17","v":1409158.55},{"d":"2026-04-18","v":1449068.03},{"d":"2026-04-19","v":1468909.01},{"d":"2026-04-20","v":1486886.65},{"d":"2026-04-21","v":1511186.37},{"d":"2026-04-22","v":1531565.37},{"d":"2026-04-23","v":1555438.56},{"d":"2026-04-24","v":1579550.01},{"d":"2026-04-25","v":1599008.2},{"d":"2026-04-26","v":1613081.9},{"d":"2026-04-27","v":1626685.01},{"d":"2026-04-28","v":1653130.45},{"d":"2026-04-29","v":1672191.34},{"d":"2026-04-30","v":1698305.85},{"d":"2026-05-01","v":1717540.62},{"d":"2026-05-02","v":1735805.49},{"d":"2026-05-03","v":1756472.33},{"d":"2026-05-04","v":1769897.44},{"d":"2026-05-05","v":1798088.08},{"d":"2026-05-06","v":1820801.79},{"d":"2026-05-07","v":1854525.18},{"d":"2026-05-08","v":1881322.12},{"d":"2026-05-09","v":1903199.37},{"d":"2026-05-10","v":1920509.15},{"d":"2026-05-11","v":1948091.62},{"d":"2026-05-12","v":1977332.81},{"d":"2026-05-13","v":2002406.49},{"d":"2026-05-14","v":2028172.94},{"d":"2026-05-15","v":2051671.69},{"d":"2026-05-16","v":2075426.81},{"d":"2026-05-17","v":2091557.22},{"d":"2026-05-18","v":2104806.61},{"d":"2026-05-19","v":2130135.51},{"d":"2026-05-20","v":2155000.99},{"d":"2026-05-21","v":2183496.49},{"d":"2026-05-22","v":2227026.38},{"d":"2026-05-23","v":2271753.2},{"d":"2026-05-24","v":2307878.55},{"d":"2026-05-25","v":2338082.25},{"d":"2026-05-26","v":2366325.86},{"d":"2026-05-27","v":2410525.81},{"d":"2026-05-28","v":2447361.05},{"d":"2026-05-29","v":2496203.12},{"d":"2026-05-30","v":2544270.77},{"d":"2026-05-31","v":2576706.8},{"d":"2026-06-01","v":2611871.56},{"d":"2026-06-02","v":2685645.84},{"d":"2026-06-03","v":2785986.17},{"d":"2026-06-04","v":2876625.14},{"d":"2026-06-05","v":2982895.69},{"d":"2026-06-06","v":3091894.16},{"d":"2026-06-07","v":3139507.04},{"d":"2026-06-08","v":3181401.6},{"d":"2026-06-09","v":3223358.84},{"d":"2026-06-10","v":3278138.33},{"d":"2026-06-11","v":3329583.16},{"d":"2026-06-12","v":3367593.66},{"d":"2026-06-13","v":3412833.43},{"d":"2026-06-14","v":3442548.46},{"d":"2026-06-15","v":3473511.33},{"d":"2026-06-16","v":3530870.3},{"d":"2026-06-17","v":3603531.63},{"d":"2026-06-18","v":3661007.04},{"d":"2026-06-19","v":3703678.69},{"d":"2026-06-20","v":3738786.0},{"d":"2026-06-21","v":3768101.21},{"d":"2026-06-22","v":3801659.12},{"d":"2026-06-23","v":3845258.9},{"d":"2026-06-24","v":3885403.85},{"d":"2026-06-25","v":3941837.59},{"d":"2026-06-26","v":4004947.49},{"d":"2026-06-27","v":4060645.95},{"d":"2026-06-28","v":4086201.55},{"d":"2026-06-29","v":4119188.21},{"d":"2026-06-30","v":4233393.043065},{"d":"2026-07-01","v":4299277.38961},{"d":"2026-07-02","v":4348311.638263},{"d":"2026-07-03","v":4384717.360158},{"d":"2026-07-04","v":4413014.980669},{"d":"2026-07-05","v":4444846.907316},{"d":"2026-07-06","v":4502444.532293},{"d":"2026-07-07","v":4560622.912428},{"d":"2026-07-08","v":4606782.983054},{"d":"2026-07-09","v":4641407.981825},{"d":"2026-07-10","v":4675860.346893},{"d":"2026-07-11","v":4703316.878678},{"d":"2026-07-12","v":4732840.399557},{"d":"2026-07-13","v":4770938.511947},{"d":"2026-07-14","v":4808013.642929},{"d":"2026-07-15","v":4841980.450849},{"d":"2026-07-16","v":4880931.398024},{"d":"2026-07-17","v":4919883.515336},{"d":"2026-07-18","v":4939631.635213},{"d":"2026-07-19","v":4963298.678395},{"d":"2026-07-20","v":5006713.345334},{"d":"2026-07-21","v":5046023.110632},{"d":"2026-07-22","v":5085306.065167},{"d":"2026-07-23","v":5121980.338259},{"d":"2026-07-24","v":5155656.718095},{"d":"2026-07-25","v":5176585.950701},{"d":"2026-07-26","v":5203733.871567},{"d":"2026-07-27","v":5250359.135635},{"d":"2026-07-28","v":5294467.409678},{"d":"2026-07-29","v":5347342.399786},{"d":"2026-07-30","v":5401647.372013},{"d":"2026-07-31","v":5440858.224127},{"d":"2026-08-01","v":5478833.954881},{"d":"2026-08-02","v":5504681.299624},{"d":"2026-08-03","v":5540453.362508},{"d":"2026-08-04","v":5592089.176966},{"d":"2026-08-05","v":5636657.384661},{"d":"2026-08-06","v":5674633.585611},{"d":"2026-08-07","v":5714678.200167},{"d":"2026-08-08","v":5733730.029612},{"d":"2026-08-09","v":5763261.297049},{"d":"2026-08-10","v":5804706.366493},{"d":"2026-08-11","v":5842527.672241},{"d":"2026-08-12","v":5885595.864863},{"d":"2026-08-13","v":5924447.20605},{"d":"2026-08-14","v":5963262.497664},{"d":"2026-08-15","v":5982389.552918},{"d":"2026-08-16","v":6006115.59179},{"d":"2026-08-17","v":6049249.849414},{"d":"2026-08-18","v":6085188.986422},{"d":"2026-08-19","v":6184934.382804},{"d":"2026-08-20","v":6272250.355937},{"d":"2026-08-21","v":6388348.998746},{"d":"2026-08-22","v":6492211.229991},{"d":"2026-08-23","v":6568761.745029},{"d":"2026-08-24","v":6660046.427427},{"d":"2026-08-25","v":6769400.980916},{"d":"2026-08-26","v":6840788.306089},{"d":"2026-08-27","v":6927672.288933},{"d":"2026-08-28","v":6985029.632043},{"d":"2026-08-29","v":7014675.134415},{"d":"2026-08-30","v":7068170.490848},{"d":"2026-08-31","v":7115320.984163},{"d":"2026-09-01","v":7176675.409923},{"d":"2026-09-02","v":7228536.211256},{"d":"2026-09-03","v":7309309.544718},{"d":"2026-09-04","v":7377210.231033},{"d":"2026-09-05","v":7420237.35205},{"d":"2026-09-06","v":7481643.922991},{"d":"2026-09-07","v":7548802.285478},{"d":"2026-09-08","v":7629734.590397},{"d":"2026-09-09","v":7719494.144722},{"d":"2026-09-10","v":7784438.604471},{"d":"2026-09-11","v":7869554.656824},{"d":"2026-09-12","v":7898484.329388},{"d":"2026-09-13","v":7947151.923957},{"d":"2026-09-14","v":8010183.810344},{"d":"2026-09-15","v":8073345.979313},{"d":"2026-09-16","v":8141994.961181},{"d":"2026-09-17","v":8210457.377145},{"d":"2026-09-18","v":8320547.837084},{"d":"2026-09-19","v":8391597.80401},{"d":"2026-09-20","v":8465791.907218},{"d":"2026-09-21","v":8596948.808858},{"d":"2026-09-22","v":8700056.593024},{"d":"2026-09-23","v":8822622.421578},{"d":"2026-09-24","v":8957640.649117},{"d":"2026-09-25","v":9078952.479581},{"d":"2026-09-26","v":9143767.688905},{"d":"2026-09-27","v":9245205.752311},{"d":"2026-09-28","v":9379393.599368},{"d":"2026-09-29","v":9489676.338975},{"d":"2026-09-30","v":9596196.54337},{"d":"2026-10-01","v":9685983.723682},{"d":"2026-10-02","v":9810170.066245},{"d":"2026-10-03","v":9863684.144064},{"d":"2026-10-04","v":9923011.367098},{"d":"2026-10-05","v":10026054.648849},{"d":"2026-10-06","v":10119814.370896},{"d":"2026-10-07","v":10209421.895812},{"d":"2026-10-08","v":10329524.79021},{"d":"2026-10-09","v":10406056.889204},{"d":"2026-10-10","v":10465335.949646},{"d":"2026-10-11","v":10548862.658754},{"d":"2026-10-12","v":10702132.15312},{"d":"2026-10-13","v":10791360.948114}];
 
 /* Jun 30 onward is reconciled to the treasury balance at the exact next
    00:00 ET boundary, so each date is a completed ET day rather than a
@@ -1350,13 +1350,14 @@ function renderKing(){
   const hl=PEERS.list.find(p=>p.n==='Hyperliquid');
   if($('#kingOi'))$('#kingOi').textContent=hl?cB(hl.oi):'—';
   if($('#kingVol'))$('#kingVol').textContent=hl?cB(hl.vol):'—';
-  if($('#kingRev'))$('#kingRev').textContent=cB(VSL.hl.rev30);
+  const SK=window.CmpSnap?window.CmpSnap.get():null, hlv=SK?SK.venue('Hyperliquid'):null;
+  if($('#kingRev'))$('#kingRev').textContent=hlv&&hlv.rev30>0?cB(hlv.rev30):'—';
 }
 /* ---------- implied valuation: OI -> circulating market-cap power-law model ----------
    Peer perp-DEX tokens (OI vs circulating mcap); fit MCAP = A * OI^B by log-least-squares.
    A/B reproduce the Perpetual Pulse "Circulating MarketCap vs OI" model (R^2~0.74, log-log). */
 const VAL_FIT={A:10.0339,B:0.8753,r2:0.74};
-const VAL_FLOAT=0.25; // assumed circulating float at TGE, for FDV
+const VAL_FLOAT=0.32; // official: Genesis airdrop (32%) is 100% unlocked at TGE, so TGE circulating float = 32%
 let VAL_MCAP_ASOF='CoinGecko snapshot · 2026-10-04 22:36 SGT';
 /* Baked fallback for when the live CoinGecko call is rate-limited or CORS-blocked, which
    happens often enough that this snapshot is what most readers actually see. It had been
@@ -1378,6 +1379,7 @@ const VAL_COMPS=[
   {n:'Drift',cg:'drift-protocol',oi:123964778,mc:14274783,fdv:19933113}
 ];
 const valPred=oi=>VAL_FIT.A*Math.pow(oi,VAL_FIT.B);
+const VAL_OUT={mcap:null,fdv:null,oi:null};   // the last model output, reused by the Tokenomics tab
 function fmtBig(v){return v>=1e9?'$'+(v/1e9).toFixed(2)+'B':v>=1e6?'$'+(v/1e6).toFixed(0)+'M':'$'+fmtK(v);}
 function renderValuation(){
   const svg=$('#valScatter'); if(!svg)return;
@@ -1388,6 +1390,7 @@ function renderValuation(){
   const va=PEERS.list.find(p=>p.me);
   const oi=va&&va.oi>0?va.oi:1210288593;
   const mcap=valPred(oi), fdv=mcap/VAL_FLOAT;
+  VAL_OUT.mcap=mcap;VAL_OUT.fdv=fdv;VAL_OUT.oi=oi;
   const hlComp=VAL_COMPS.find(c=>c.n==='Hyperliquid');
   const hlVsVar=hlComp&&mcap>0?hlComp.mc/mcap:0;
   const varBelowHl=hlComp&&hlComp.mc>0?(1-mcap/hlComp.mc)*100:0;
@@ -1397,17 +1400,17 @@ function renderValuation(){
   $('#valOiBase')&&($('#valOiBase').textContent=fmtBig(oi)+(PEERS.live?' live':''));
   $('#valFdv')&&($('#valFdv').textContent=fmtBig(fdv));
   $('#valFloat')&&($('#valFloat').textContent=Math.round(VAL_FLOAT*100)+'%');
-  $('#valFdvRange')&&($('#valFdvRange').textContent=fmtBig(mcap/0.33)+' - '+fmtBig(mcap/0.20));
+  $('#valFdvRange')&&($('#valFdvRange').textContent=fmtBig(mcap/VAL_FLOAT)+' - '+fmtBig(mcap/0.20));
   const scenarioHost=$('#valScenarioTable');
   if(scenarioHost){
     const cases=[{k:'Bear',factor:.75,note:'75% of model'},{k:'Base',factor:1,note:'model midpoint'},{k:'Expansion',factor:1.25,note:'125% of model'}];
-    const floats=[.20,.25,.33];
+    const floats=[.20,.25,VAL_FLOAT];
     scenarioHost.innerHTML=`<div class="val-scenario-row head"><div>TGE circulating float</div>${cases.map(c=>`<div>${c.k}<br><small>${c.note}</small></div>`).join('')}</div>`+
-      floats.map(float=>`<div class="val-scenario-row"><div><b>${Math.round(float*100)}% float</b><small>FDV = MCAP ÷ float</small></div>${cases.map(c=>`<div class="val-scenario-cell${c.k==='Base'?' base':''}"><strong>${fmtBig(mcap*c.factor/float)}</strong><small>MCAP ${fmtBig(mcap*c.factor)}</small></div>`).join('')}</div>`).join('');
-    $('#valScenarioNote')&&($('#valScenarioNote').textContent=`Current OI ${fmtBig(oi)} feeds the model. A 20% float produces a higher FDV than 33% even when circulating value is unchanged.`);
+      floats.map(float=>`<div class="val-scenario-row${float===VAL_FLOAT?' base':''}"><div><b>${Math.round(float*100)}% float</b><small>${float===VAL_FLOAT?'BASE · official TGE float · ':'lower-float sensitivity · '}FDV = MCAP ÷ float</small></div>${cases.map(c=>`<div class="val-scenario-cell${c.k==='Base'?' base':''}"><strong>${fmtBig(mcap*c.factor/float)}</strong><small>MCAP ${fmtBig(mcap*c.factor)}</small></div>`).join('')}</div>`).join('');
+    $('#valScenarioNote')&&($('#valScenarioNote').textContent=`Current OI ${fmtBig(oi)} feeds the model. A 20% float produces a higher FDV than the official 32% even when circulating value is unchanged.`);
   }
   $('#cmpSignalValuation')&&($('#cmpSignalValuation').textContent=fmtBig(mcap)+' MCAP');
-  $('#cmpSignalValuationSub')&&($('#cmpSignalValuationSub').textContent=`Base FDV ${fmtBig(fdv)} at 25% float · ${hlVsVar.toFixed(1)}× below Hyperliquid MCAP.`);
+  $('#cmpSignalValuationSub')&&($('#cmpSignalValuationSub').textContent=`Base FDV ${fmtBig(fdv)} at 32% official float · ${hlVsVar.toFixed(1)}× below Hyperliquid MCAP.`);
   // The plot shows relationships; the exact values live in the table below.
   // Keeping numbers out of the plot prevents clustered protocols from covering
   // one another while preserving the actual-to-model distance visually.
@@ -1481,14 +1484,14 @@ function renderValuation(){
     dots+=drawLabel(c.n,x,ya,col,floatLabel)+`</g>`;
   });
   const vx=X(oi),vy=Y(mcap),vs=48;
-  const fdv20=mcap/.20,fdv25=mcap/.25,fdv30=mcap/.30;
+  const fdv20=mcap/.20,fdv25=mcap/.25,fdv30=mcap/VAL_FLOAT;
   const vlogo=PLOGO['Variational'];
-  const hero=`<g><title>Variational · Implied MCAP ${fmtBig(mcap)} · Model FDV: 20% ${fmtBig(fdv20)}, 25% ${fmtBig(fdv25)}, 30% ${fmtBig(fdv30)} tokens at TGE</title><circle cx="${vx.toFixed(1)}" cy="${vy.toFixed(1)}" r="28" fill="rgba(199,242,132,.13)"/>`+
+  const hero=`<g><title>Variational · Implied MCAP ${fmtBig(mcap)} · Model FDV: 20% ${fmtBig(fdv20)}, 25% ${fmtBig(fdv25)}, 32% (official) ${fmtBig(fdv30)} tokens at TGE</title><circle cx="${vx.toFixed(1)}" cy="${vy.toFixed(1)}" r="28" fill="rgba(199,242,132,.13)"/>`+
     `<rect x="${(vx-vs/2).toFixed(1)}" y="${(vy-vs/2).toFixed(1)}" width="${vs}" height="${vs}" rx="13" fill="var(--panel)" stroke="#c7f284" stroke-width="3"/>`+
     `<image href="${vlogo}" x="${(vx-vs/2+7).toFixed(1)}" y="${(vy-vs/2+7).toFixed(1)}" width="${vs-14}" height="${vs-14}" preserveAspectRatio="xMidYMid meet"/>`+
     `<text class="val-var-label" x="${Math.min(plotRight-12,vx+34).toFixed(1)}" y="${(vy-9).toFixed(1)}" text-anchor="start">Variational</text>`+
     `<text class="val-peer-sub" x="${Math.min(plotRight-12,vx+34).toFixed(1)}" y="${(vy+6).toFixed(1)}" text-anchor="start">Implied MCAP ${fmtBig(mcap)}</text>`+
-    `<text class="val-peer-sub val-tge-assumption" x="${Math.min(plotRight-12,vx+34).toFixed(1)}" y="${(vy+20).toFixed(1)}" text-anchor="start">FDV: 20% ${fmtBig(fdv20)} · 25% ${fmtBig(fdv25)} · 30% ${fmtBig(fdv30)}</text></g>`;
+    `<text class="val-peer-sub val-tge-assumption" x="${Math.min(plotRight-12,vx+34).toFixed(1)}" y="${(vy+20).toFixed(1)}" text-anchor="start">FDV: 20% ${fmtBig(fdv20)} · 25% ${fmtBig(fdv25)} · 32% ${fmtBig(fdv30)}</text></g>`;
   svg.innerHTML=`<defs>`+
     `<linearGradient id="valTrend" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#4f7fc4"/><stop offset="1" stop-color="#c7f284"/></linearGradient></defs>`+
     grid+trend+dots+legend+hero;
@@ -1500,13 +1503,14 @@ function renderValuation(){
     const varRows=`<section class="var-scenario-card">
       <div class="var-scenario-head"><span class="n">${chip('Variational')}<span class="vs-nm"><b>Variational · pre-TGE valuation</b><small>Not traded yet · model estimate</small></span></span><span class="var-common-mcap"><small>ONE SHARED ESTIMATE</small><b>${fmtBig(mcap)} MCAP</b></span></div>
       <p class="var-scenario-explain">Same estimated market cap. Fewer tokens released at TGE means a higher FDV.</p>
-      <div class="var-scenario-grid">${[20,25,30].map(p=>`<div class="var-scenario${p===25?' base':''}"><span class="var-float"><b>${p}%</b><small>tokens at TGE</small></span><span class="var-arrow">→</span><span class="var-fdv"><b>${fmtBig(mcap/(p/100))}</b><small>implied FDV</small></span>${p===25?'<em>BASE CASE</em>':''}</div>`).join('')}</div>
+      <div class="var-scenario-grid">${[20,25,32].map(p=>`<div class="var-scenario${p===32?' base':''}"><span class="var-float"><b>${p}%</b><small>tokens at TGE</small></span><span class="var-arrow">→</span><span class="var-fdv"><b>${fmtBig(mcap/(p/100))}</b><small>implied FDV</small></span>${p===32?'<em>BASE · OFFICIAL</em>':''}</div>`).join('')}</div>
     </section>`;
     side.innerHTML=`<div class="vs-h"><span>Protocol</span><span>FDV</span><span>MCAP</span><span>vs model</span><em>${escapeHTML(VAL_MCAP_ASOF)}</em></div>`+
       varRows+
       rows.map(r=>{const s=status(r.prem),pct=(r.prem-1)*100;return `<div class="vs-row"><span class="n">${chip(r.n)}<span class="vs-nm"><b>${escapeHTML(r.n)}</b></span></span><span class="vs-values"><span class="vs-mcap"><b>${Number.isFinite(r.fdv)&&r.fdv>0?fmtBig(r.fdv):'—'}</b><small>FDV</small></span><span class="vs-mcap model"><b>${fmtBig(r.mc)}</b><small>actual MCAP</small></span></span><span class="v ${s.cls}" title="Actual market cap minus model-implied market cap"><b>${pct>=0?'+':''}${pct.toFixed(0)}%</b><small>${s.word} · ${r.prem.toFixed(2)}x</small></span></div>`}).join('');}
   const note=$('#valNote');
   if(note)note.innerHTML=`$VAR has no traded market cap before TGE. The ${fmtBig(mcap)} figure is a model estimate, not a current price. Model: MCAP ≈ ${VAL_FIT.A.toFixed(1)} × OI<sup>${VAL_FIT.B}</sup>, R² ${VAL_FIT.r2}. Market caps and available OI update from <a href="https://www.coingecko.com/" target="_blank" rel="noopener">CoinGecko</a>. Framework reference: <a href="https://www.perpetualpulse.xyz/" target="_blank" rel="noopener">Perpetual Pulse</a>. Not financial advice.`;
+  if(typeof renderTokenomics==='function')renderTokenomics();
 }
 
 async function refreshValuationMcaps(){
@@ -1698,7 +1702,22 @@ function applyMarketModels(){
   }
   recalcVariationalPeer();
 }
+/* The header used to be drawn only by render(), so it kept the baked 2026-07-06 open interest
+   ($1.18B) after Variational's live stats had moved every other figure to $1.97B. It is now
+   redrawn whenever the market feed lands and says which basis it is on. */
+function renderHeadMarket(){
+  const live=!!(MARKET_ACTIVITY&&MARKET_ACTIVITY.live);
+  if($('#headVol24'))$('#headVol24').textContent=fmtBig(MKT.vol.d1||MKT.vol.d30/30);
+  if($('#headOi'))$('#headOi').textContent=fmtBig(MKT.oi);
+  const tip=live?'Variational official live stats · '+MKT.asOf:'Saved snapshot '+MKT.asOf+' · live feed not received yet';
+  [['headVol24','current activity'],['headOi','market capacity']].forEach(([id,base])=>{
+    const b=$('#'+id); if(!b||!b.parentNode)return;
+    b.parentNode.title=tip;
+    const sm=b.parentNode.querySelector('small'); if(sm)sm.textContent=live?base:'snapshot '+MKT.asOf;
+  });
+}
 function renderMarketConsumers(){
+  renderHeadMarket();
   renderMarketActivity();
   renderPeers();renderPulseTable();renderVsLighter();renderKing();renderValuation();
   renderEfficiency();renderFeeOi();
@@ -1872,107 +1891,122 @@ async function refreshComparisonFees(){
 }
 function renderVsLighter(){
   if(!$('#h2hRows'))return;
+  /* Every figure on this block is read from the comparison lab's single snapshot
+     (comparison-lab-panels.js · window.CmpSnap): one store, one 30-day window, one set of
+     rounding rules. Nothing here is recomputed from PEERS / VSL / SERIES on its own any more,
+     which is what used to let the verdict, the KPIs and the table disagree with each other. */
+  const S=window.CmpSnap?window.CmpSnap.get():null;
+  if(!S)return;
   const cB=v=>{
     if(v==null||v==='')return '—';
     const n=Number(v);
     return !Number.isFinite(n)?'—':n>=1e9?'$'+(n/1e9).toFixed(2)+'B':n>=1e6?'$'+(n/1e6).toFixed(2)+'M':'$'+fmtK(n);
   };
-  const va=PEERS.list.find(p=>p.me), li=VSL.li, ext=PEERS.list.find(p=>p.n==='Extended');
-  const last=SERIES[SERIES.length-1];
-  const rev30=Math.max(0,last.v-cumAt(addDays(last.d,-30)));
-  const fees30=impliedSpreadsBetween(addDays(last.d,-30),last.d,rev30);
-  const extFees30=COMP_FEES.extended.fees30;
+  const va=S.venue('Variational'), liV=S.venue('Lighter'), ext=S.venue('Extended');
+  const li={oi:liV.oi,vol1d:liV.vol24,fees30:liV.fees30,rev30:liV.rev30};
+  const rev30=va.rev30, fees30=va.fees30, extFees30=ext?ext.fees30:null;
   const oiEdge=li.oi?va.oi/li.oi:0;
   const oiExtEdge=ext?.oi?va.oi/ext.oi:0;
   const feeEdge=li.fees30?fees30/li.fees30:0;
   const feeExtEdge=extFees30?fees30/extFees30:0;
-  const revGap=rev30?li.rev30/rev30:0;
-  const totalOi=PEERS.total||PEERS.list.reduce((sum,p)=>sum+(Number(p.oi)||0),0)||1;
-  const varShare=va?.oi>0?va.oi/totalOi*100:0;
-  const turnover=(p)=>p?.oi>0?(Number(p.vol)||0)/p.oi:null;
+  const xr=v=>v>=10?v.toFixed(1):v.toFixed(2);
+  const share=S.oiShare(va);
+  const rank=[...S.venues].sort((a,b)=>b.oi-a.oi).findIndex(v=>v.me)+1;
+  const turnover=p=>p?.oi>0?(Number(p.vol)||0)/p.oi:null;
   const feePerOi=(fee,p)=>p?.oi>0&&Number.isFinite(Number(fee))?Number(fee)/p.oi:null;
-  const feeRate=(fee,p)=>Number(p?.vol)>0&&Number.isFinite(Number(fee))?Number(fee)/(p.vol*30):null;
   const pct=v=>v==null?'—':(v*100).toFixed(v*100>=10?1:2)+'%';
   const ratio=v=>v==null?'—':v.toFixed(2)+'×';
+  const bpsF=v=>v==null?'—':v.toFixed(2)+' bps';
+  const win=S.window.end||'saved snapshot';
   $('#valOiEdge') && ($('#valOiEdge').textContent='Variational '+oiEdge.toFixed(1)+'×');
   $('#valOiEdgeSub') && ($('#valOiEdgeSub').textContent=`${oiEdge.toFixed(1)}× Lighter · ${oiExtEdge.toFixed(1)}× Extended`);
-  $('#valFeeEdge') && ($('#valFeeEdge').textContent='Variational '+feeEdge.toFixed(1)+'×');
-  $('#valFeeEdgeSub') && ($('#valFeeEdgeSub').textContent=`${feeEdge.toFixed(1)}× Lighter · ${feeExtEdge.toFixed(1)}× Extended`);
+  $('#valFeeEdge') && ($('#valFeeEdge').textContent='Variational '+xr(feeEdge)+'×');
+  $('#valFeeEdgeSub') && ($('#valFeeEdgeSub').textContent=`${xr(feeEdge)}× Lighter · ${xr(feeExtEdge)}× Extended · MODELED vs REPORTED`);
   if($('#cmpRevenueEdge'))$('#cmpRevenueEdge').textContent='Not same basis';
-  if($('#cmpRevenueEdgeSub'))$('#cmpRevenueEdgeSub').textContent=`VAR ${cB(rev30)} wallet inflow · Lighter ${cB(li.rev30)} reported revenue`;
-  if($('#cmpVerdict'))$('#cmpVerdict').textContent=`Variational leads both peers on OI and modeled 30D fee pool. Monetization is not directly comparable.`;
-  if($('#cmpVerdictSub'))$('#cmpVerdictSub').textContent=`Variational has ${oiEdge.toFixed(1)}× Lighter OI and ${oiExtEdge.toFixed(1)}× Extended OI. Its treasury figure is a net wallet-balance change; Lighter's is reported protocol revenue. Extended has no matched revenue series.`;
-  $('#cmpSignalScale')&&($('#cmpSignalScale').textContent='#'+PEERS.varRank+' · '+varShare.toFixed(2)+'% share');
-  $('#cmpSignalScaleSub')&&($('#cmpSignalScaleSub').textContent=`${oiEdge.toFixed(1)}× Lighter OI and ${oiExtEdge.toFixed(1)}× Extended OI across ${PEERS.count} tracked venues.`);
-  const vaTurn=turnover(va),liTurn=turnover({oi:li.oi,vol:li.vol1d}),extTurn=turnover(ext);
+  if($('#cmpRevenueEdgeSub'))$('#cmpRevenueEdgeSub').textContent=`VAR ${cB(rev30)} WALLET INFLOW · Lighter ${cB(li.rev30)} REPORTED revenue`;
+  /* the verdict is generated from the numbers above, not typed */
+  const vd=S.verdict;
+  if($('#cmpVerdict'))$('#cmpVerdict').textContent=vd.head;
+  if($('#cmpVerdictSub'))$('#cmpVerdictSub').textContent=`Variational has ${oiEdge.toFixed(1)}× Lighter OI and ${oiExtEdge.toFixed(1)}× Extended OI. Modeled 30D fee pool: Variational ${cB(fees30)}, Lighter ${cB(li.fees30)}, Extended ${cB(extFees30)}. Its treasury figure is a net wallet-balance change; Lighter's is reported protocol revenue. Extended has no matched revenue series.`;
+  $('#cmpSignalScale')&&($('#cmpSignalScale').textContent='#'+rank+' · '+share.toFixed(2)+'% share');
+  $('#cmpSignalScaleSub')&&($('#cmpSignalScaleSub').textContent=`${oiEdge.toFixed(1)}× Lighter OI and ${oiExtEdge.toFixed(1)}× Extended OI across ${S.venues.length} tracked venues.`);
+  const vaTurn=S.turnover24(va),liTurn=S.turnover24(liV),extTurn=S.turnover24(ext);
   $('#cmpSignalActivity')&&($('#cmpSignalActivity').textContent=ratio(vaTurn)+' daily turn');
   $('#cmpSignalActivitySub')&&($('#cmpSignalActivitySub').textContent=`24H volume per $1 OI · Lighter ${ratio(liTurn)} · Extended ${ratio(extTurn)}.`);
-  const vaFeeOi=feePerOi(fees30,va),liFeeOi=feePerOi(li.fees30,{oi:li.oi}),extFeeOi=feePerOi(extFees30,ext);
+  const vaFeeOi=feePerOi(fees30,va),liFeeOi=feePerOi(li.fees30,li),extFeeOi=feePerOi(extFees30,ext);
   $('#cmpSignalEfficiency')&&($('#cmpSignalEfficiency').textContent=pct(vaFeeOi)+' fee / OI');
   $('#cmpSignalEfficiencySub')&&($('#cmpSignalEfficiencySub').textContent=`Modeled 30D trader fees per current OI · Lighter ${pct(liFeeOi)} · Extended ${pct(extFeeOi)}.`);
-  $('#cmpFreshness')&&($('#cmpFreshness').textContent=`Market: ${PEERS.asOf||'saved snapshot'} · Fees through ${COMP_FEES.asOf||last.d}`);
+  $('#cmpFreshness')&&($('#cmpFreshness').textContent=S.freshness);
+  if($('#kingRev')){const hv=S.venue('Hyperliquid');$('#kingRev').textContent=hv&&hv.rev30>0?cB(hv.rev30):'—';}
 
   const effHost=$('#cmpEfficiencyTable');
   if(effHost){
     const venues=[
-      {n:'Variational',turn:vaTurn,feeOi:vaFeeOi,take:feeRate(fees30,va),model:true},
-      {n:'Lighter',turn:liTurn,feeOi:liFeeOi,take:feeRate(li.fees30,{vol:li.vol1d}),model:false},
-      {n:'Extended',turn:extTurn,feeOi:extFeeOi,take:feeRate(extFees30,ext),model:false}
+      {n:'Variational',turn:vaTurn,feeOi:vaFeeOi,take:S.takeRate(va),model:true},
+      {n:'Lighter',turn:liTurn,feeOi:liFeeOi,take:S.takeRate(liV),model:false},
+      {n:'Extended',turn:extTurn,feeOi:extFeeOi,take:S.takeRate(ext),model:false}
     ];
     const best=(key,low=false)=>venues.filter(v=>Number.isFinite(v[key])).sort((a,b)=>low?a[key]-b[key]:b[key]-a[key])[0]?.n;
     const valCell=(venue,key,format)=>`<div class="cmp-eff-value${best(key)===venue.n?' best':''}"><strong>${format(venue[key])}</strong><small>${venue.model&&key!=='turn'?'MODELED':'MATCHED BASIS'}</small></div>`;
     const rows=[
       {name:'Volume / OI',sub:'24H capital turnover proxy',key:'turn',fmt:ratio,read:'Higher means more trading activity is generated from each dollar of open interest.'},
       {name:'30D fees / OI',sub:'Fee yield on current OI',key:'feeOi',fmt:pct,read:'Normalizes fee generation for venue size; Variational remains an allocation-based estimate.'},
-      {name:'Fee take rate',sub:'30D fees ÷ (24H volume × 30)',key:'take',fmt:pct,read:'A directional proxy using current daily volume, not a fully matched 30-day volume series.'}
+      {name:'Fee take rate',sub:'30D fees ÷ 30D volume',key:'take',fmt:bpsF,read:'Both sides are DeFiLlama 30-day sums over the same days for every venue; only the Variational fee pool is modeled.'}
     ];
     effHost.innerHTML=`<div class="cmp-eff-row head"><div>Metric</div>${venues.map(v=>`<div>${v.n}</div>`).join('')}<div>How to read it</div></div>`+
       rows.map(r=>`<div class="cmp-eff-row"><div><b>${r.name}</b><small>${r.sub}</small></div>${venues.map(v=>valCell(v,r.key,r.fmt)).join('')}<div class="cmp-eff-read">${r.read}</div></div>`).join('');
   }
-  $('#varThesis') && ($('#varThesis').innerHTML=`<b>${oiEdge.toFixed(1)}× Lighter OI</b> and <b>${feeEdge.toFixed(1)}× Lighter modeled 30D fee pool</b>. Variational's monetization signal here is net treasury-wallet inflow, not audited revenue.`);
+  $('#varThesis') && ($('#varThesis').innerHTML=`<b>${oiEdge.toFixed(1)}× Lighter OI</b> and <b>${xr(feeEdge)}× Lighter modeled 30D fee pool</b>. Variational's monetization signal here is net treasury-wallet inflow, not audited revenue.`);
   $('#lighterThesis') && ($('#lighterThesis').innerHTML=`Lighter publishes protocol revenue through DeFiLlama. Do not divide it by Variational's wallet inflow to infer a revenue lead; the definitions differ.`);
   const SRC={
     cg:{cls:'src-cg',label:PEERS.live?'CoinGecko live':'Pulse snapshot'},
     chain:{cls:'src-chain',label:'On-chain wallet'},
     llama:{cls:'src-llama',label:'DeFiLlama'},
-    dune:{cls:'src-dune',label:'Dune'}
+    dune:{cls:'src-dune',label:'Dune'},
+    official:{cls:'src-chain',label:'Variational live'},
+    modeled:{cls:'src-chain',label:'MODELED'},
+    wallet:{cls:'src-chain',label:'WALLET INFLOW'},
+    reported:{cls:'src-llama',label:'REPORTED'}
   };
   const srcChip=s=>SRC[s]?`<span class="src ${SRC[s].cls}" title="Data source: ${SRC[s].label}"><i></i>${SRC[s].label}</span>`:'';
   const srcChips=s=>(Array.isArray(s)?s:[s]).filter(Boolean).map(srcChip).join('');
   const rows=[
-    {k:'Open interest', a:va.oi, b:li.oi, c:ext?.oi, an:'live venue capacity', bn:'live venue capacity', cn:'live venue capacity', as:OI_SRC, bs:OI_SRC, cs:OI_SRC},
-    {k:'24H trading volume', a:va.vol, b:li.vol1d, c:ext?.vol, an:'current activity', bn:'current activity', cn:'current activity', as:'cg', bs:'cg', cs:'cg'},
-    {k:'30D trader fee pool', a:fees30, b:li.fees30, c:extFees30, an:'modeled gross spreads', bn:'fees collected', cn:`fees collected · Dune all-time ≈ ${cB(COMP_FEES.extended.duneAll)}`, as:'chain', bs:'llama', cs:['llama','dune']},
-    {k:'30D monetization signal', a:rev30, b:li.rev30, c:null, an:'net treasury-wallet inflow', bn:'DeFiLlama protocol revenue', cn:'not published on a matched basis', as:'chain', bs:'llama', cs:null,comparable:false},
+    {k:'Open interest', a:va.oi, b:li.oi, c:ext?.oi, an:'live venue capacity', bn:'live venue capacity', cn:'live venue capacity', as:(MARKET_ACTIVITY.live?'official':'cg'), bs:'cg', cs:'cg'},
+    {k:'24H trading volume', a:va.vol24, b:li.vol1d, c:ext?.vol24, an:'current activity', bn:'current activity', cn:'current activity', as:'cg', bs:'cg', cs:'cg'},
+    {k:'30D trader fee pool', a:fees30, b:li.fees30, c:extFees30, an:'wallet inflow ÷ 20% allocation', bn:`fees collected · 30D to ${win}`, cn:`fees collected · Dune all-time ≈ ${cB(COMP_FEES.extended.duneAll)}`, as:['modeled'], bs:['reported'], cs:['reported','dune']},
+    {k:'30D monetization signal', a:rev30, b:li.rev30, c:null, an:'net treasury-wallet inflow', bn:'DeFiLlama protocol revenue', cn:'not published on a matched basis', as:['wallet'], bs:['reported'], cs:null,comparable:false},
   ];
   const cell=(cls,v,note,src,win)=>{
     const unavailable=!Number.isFinite(Number(v));
     return `<td class="${cls}${win&&!unavailable?' win':''}${unavailable?' is-na':''}"><b>${cB(v)}</b>${note?`<span class="sub">${note}</span>`:''}${srcChips(src)}</td>`;
   };
-  $('#h2hRows').innerHTML=`<div class="h2h-src-legend"><span>Sources</span>${srcChip('cg')}${srcChip('chain')}${srcChip('llama')}${srcChip('dune')}<span style="text-transform:none;letter-spacing:0">same badge = same source, comparable · different badges = different measurement</span></div>
+  $('#h2hRows').innerHTML=`<div class="h2h-src-legend"><span>Sources</span>${srcChip('cg')}${srcChip('official')}${srcChip('wallet')}${srcChip('modeled')}${srcChip('reported')}${srcChip('dune')}<span style="text-transform:none;letter-spacing:0">same badge = same source, comparable · different badges = different measurement</span></div>
   <table class="h2h-tbl">
     <thead><tr><th>Metric</th><th class="cva"><img class="cmp-logo" src="variational-symbol-transparent.png" alt="" width="20" height="20">Variational</th><th class="cli"><img class="cmp-logo" src="lighter-logo.png" alt="" width="20" height="20">Lighter</th><th class="cex"><a href="https://dune.com/extended/extended" target="_blank" rel="noopener"><img class="cmp-logo" src="logo-extended.png" alt="" width="20" height="20">Extended ↗</a></th><th>Lead</th></tr></thead>
     <tbody>${rows.map(r=>{
       const vals=[{c:'var',n:'Variational',v:r.a},{c:'ltr',n:'Lighter',v:r.b},{c:'ext',n:'Extended',v:r.c}]
         .filter(x=>Number.isFinite(Number(x.v))&&Number(x.v)>0)
         .sort((x,y)=>y.v-x.v);
+      const lr=vals[1]?.v>0?vals[0].v/vals[1].v:0;
       const lead=r.comparable===false
         ? {c:'na',t:'not same basis'}
-        : (vals[0]?{c:vals[0].c,t:vals[0].n+' '+(vals[1]?.v>0?(vals[0].v/vals[1].v).toFixed(1)+'×':'sets it')}:{c:'na',t:'not comparable'});
-      const win=x=>vals[0]&&vals[0].v===x;
+        : (vals[0]?{c:vals[0].c,t:vals[0].n+' '+(lr>0?(lr>=10?lr.toFixed(1):lr<1.5?lr.toFixed(2):lr.toFixed(1))+'×':'sets it')}:{c:'na',t:'not comparable'});
+      const winner=x=>vals[0]&&vals[0].v===x;
       return `<tr>
         <td>${r.k}</td>
-        ${cell('cva',r.a,r.an,r.as,r.comparable!==false&&win(r.a))}
-        ${cell('cli',r.b,r.bn,r.bs,r.comparable!==false&&win(r.b))}
-        ${cell('cex',r.c,r.cn,r.cs,r.comparable!==false&&win(r.c))}
+        ${cell('cva',r.a,r.an,r.as,r.comparable!==false&&winner(r.a))}
+        ${cell('cli',r.b,r.bn,r.bs,r.comparable!==false&&winner(r.b))}
+        ${cell('cex',r.c,r.cn,r.cs,r.comparable!==false&&winner(r.c))}
         <td><span class="lead ${lead.c}">${lead.t}</span></td>
       </tr>`;
     }).join('')}</tbody></table>`;
-  $('#h2hNote').innerHTML=`Variational's 30D fee pool is an estimate: each day's net treasury-wallet inflow is divided by the latest official report-observed allocation available for that date. This is not audited protocol revenue, and non-revenue wallet transfers could affect it. Current Docs still describe a 10% treasury share; recent official reports imply 20%. OI basis: ${PEERS.mixed
+  $('#h2hNote').innerHTML=`Variational's 30D fee pool is an estimate (MODELED): the net treasury-wallet inflow over the 30 days to ${win} (WALLET INFLOW) divided by the ${(MKT.spreadShare*100).toFixed(0)}% allocation the latest official reports observe. This is not audited protocol revenue, and non-revenue wallet transfers could affect it. Current Docs still describe a 10% treasury share; recent official reports imply 20%. Lighter and Extended fee pools are REPORTED: DeFiLlama daily fees summed over the same 30 days, from <a href="https://defillama.com/protocol/lighter" target="_blank" rel="noopener">DeFiLlama Lighter</a> and <a href="https://defillama.com/protocol/extended" target="_blank" rel="noopener">DeFiLlama Extended</a>; Extended's <a href="https://dune.com/extended/extended" target="_blank" rel="noopener">Dune dashboard</a> all-time fee total is shown only as a source check. OI basis: ${PEERS.mixed
     ?'<b>mixed</b> — Variational is live from its own feed while '+PEERS.mixedNote.replace(/^\d+ of \d+ venues live · /,'')+', so shares across the two are marked on the board'
     :(PEERS.live?'live CoinGecko derivatives for the peers, Variational from its own live feed'
-               :'the '+PEERS.snapAsOf+' snapshot for every venue')}. Volume uses ${PEERS.live?'live CoinGecko data':'the '+PEERS.snapAsOf+' snapshot'} for the current activity column. Lighter and Extended 30D fee pools come from <a href="https://defillama.com/protocol/lighter" target="_blank" rel="noopener">DeFiLlama Lighter</a> and <a href="https://defillama.com/protocol/extended" target="_blank" rel="noopener">DeFiLlama Extended</a>; Extended's <a href="https://dune.com/extended/extended" target="_blank" rel="noopener">Dune dashboard</a> all-time fee total is shown only as a source check. Extended does not publish a matched booked-revenue series here, so the revenue cell stays unavailable instead of being guessed. Same-basis fee-pool check: ${cB(fees30)} Variational (modeled) vs ${cB(li.fees30)} Lighter and ${cB(extFees30)} Extended over the last 30 days.`;
+               :'the '+PEERS.snapAsOf+' snapshot for every venue')}. Volume uses ${PEERS.live?'live CoinGecko data':'the '+PEERS.snapAsOf+' snapshot'} for the current activity column. Extended does not publish a matched booked-revenue series here, so the revenue cell stays unavailable instead of being guessed. Same-basis fee-pool check: ${cB(fees30)} Variational (modeled) vs ${cB(li.fees30)} Lighter and ${cB(extFees30)} Extended over the 30 days to ${win}. Snapshot: ${S.freshness}.`;
   renderFeeVs();
+  /* tell the lab the dashboard has redrawn, so its panels follow any change made here */
+  if(window.__cmpLab&&window.__cmpLab.resync)window.__cmpLab.resync();
 }
 
 function initComparisonRoom(){
@@ -3396,13 +3430,17 @@ function renderChanges(){
   renderBiweekly();
   renderMath();
   renderPointsCalc();
+  renderTokenomics();
 }
 
 /* ---------- rate helpers & forecast state ---------- */
 function dailyRate(days){const n=SERIES.length;if(n-1<days)days=n-1;return (SERIES[n-1].v-SERIES[n-1-days].v)/days;}
 function allTimeRate(){const n=SERIES.length;const dd=Math.max(1,(new Date(SERIES[n-1].d)-new Date(SERIES[0].d))/864e5);return SERIES[n-1].v/dd;}
 const rateOf={ '7d':()=>dailyRate(7), '30d':()=>dailyRate(30), '60d':()=>dailyRate(60), 'all':()=>allTimeRate() };
-const FC={ rate:0, target:'2026-09-30', burn:100 };
+/* TGE is "Q4 2026" (Daniel's working dates: Oct 30 / Nov 30), so the forecast runs to the end of November
+   by default; the target selector next to the zoom pills moves it anywhere from tomorrow to FC_MAX */
+const FC_MAX='2026-11-30';
+const FC={ rate:0, target:FC_MAX, burn:100 };
 const CHART={curveZoom:'all'};
 function daysTo(dstr){return Math.max(0,Math.round((new Date(dstr+'T00:00:00Z')-new Date(SERIES[SERIES.length-1].d+'T00:00:00Z'))/864e5));}
 function clamp(n,min,max){return Math.max(min,Math.min(max,n));}
@@ -3421,6 +3459,7 @@ function renderCurve(){
   const nDays=daysTo(FC.target);                 // forecast horizon
   $('#curveTag').textContent='actual + '+nDays+'d forecast';
   document.querySelectorAll('#curveZoom button').forEach(b=>b.classList.toggle('on',b.dataset.z===CHART.curveZoom));
+  renderCurveTarget();
   const rLo=Math.min(dailyRate(60),allTimeRate()), rHi=dailyRate(7); // cone bounds
   const projBase=last.v+FC.rate*nDays, projHi=last.v+rHi*nDays;
   const visibleStart=CHART.curveZoom==='all'?d0:addDays(last.d,-Number(CHART.curveZoom));
@@ -3450,20 +3489,29 @@ function renderCurve(){
   let grid='';for(let g=0;g<=4;g++){const v=ymin+yrange*g/4,y=Y(v);
     grid+=`<line x1="${pl}" y1="${y}" x2="${W-pr}" y2="${y}" stroke="#16203040"/>`+
           `<text class="axis" x="${pl-10}" y="${y+4}" text-anchor="end">$${fmtK(v)}</text>`;}
-  // month labels across full domain
-  const monthEvery=CHART.curveZoom==='30'?1:CHART.curveZoom==='60'?1:CHART.curveZoom==='120'?2:1;
-  let xl='';SERIES.forEach(p=>{
-    if(p.d.slice(-2)!=='01'||p.d<startDay)return;
-    const mo=+p.d.slice(5,7);
-    if(CHART.curveZoom!=='all'||mo%monthEvery===0)
-      xl+=`<text class="axis-date" x="${X(dayOff(p.d))}" y="${H-10}" text-anchor="middle">${p.d.slice(0,7)}</text>`;
-  });
-  if(CHART.curveZoom!=='all')xl+=`<text class="axis-date" x="${pl}" y="${H-10}" text-anchor="start">${startDay}</text>`;
+  // x-axis: month ticks across the whole domain (history AND the forecast horizon), one target-date
+  // label, and — when the zoom does not start on the series start — the start date. Labels are
+  // thinned by priority (target, start, months) so none can sit on top of another.
+  const tgtShort=new Date(resetMidnightTs(FC.target)*1000).toLocaleDateString('en-US',{month:'short',day:'numeric',timeZone:RESET_TZ.tz});
+  const monthEvery=CHART.curveZoom==='120'?2:1;
+  const xlabs=[{x:X(oTgt)-4,t:tgtShort,a:'end',w:tgtShort.length*6.2+8,cls:' tgt'}];
+  if(CHART.curveZoom!=='all')xlabs.push({x:pl,t:startDay,a:'start',w:startDay.length*6.2+8,cls:''});
+  for(let m=startDay.slice(0,7);;){
+    const first=m+'-01';
+    if(first>endDay)break;
+    const mo=+m.slice(5,7);
+    if(first>=startDay&&(CHART.curveZoom!=='all'||mo%monthEvery===0))
+      xlabs.push({x:X(dayOff(first)),t:m,a:'middle',w:m.length*6.2+8,cls:''});
+    const nx=new Date(first+'T00:00:00Z');nx.setUTCMonth(nx.getUTCMonth()+1);
+    m=nx.toISOString().slice(0,7);
+  }
+  const xbox=l=>l.a==='end'?[l.x-l.w,l.x]:l.a==='start'?[l.x,l.x+l.w]:[l.x-l.w/2,l.x+l.w/2];
+  const kept=[];
+  xlabs.forEach(l=>{const b=xbox(l);if(!kept.some(k=>{const kb=xbox(k);return b[0]<kb[1]+6&&kb[0]<b[1]+6;}))kept.push(l);});
+  const xl=kept.map(l=>`<text class="axis-date" x="${l.x.toFixed(1)}" y="${H-10}" text-anchor="${l.a}">${l.t}</text>`).join('');
   // today + target markers
   const mkToday=`<line x1="${histEndX}" y1="${pt}" x2="${histEndX}" y2="${H-pb}" stroke="#2a3750" stroke-dasharray="2 3"/>`;
-  const tgtShort=new Date(resetMidnightTs(FC.target)*1000).toLocaleDateString('en-US',{month:'short',day:'numeric',timeZone:RESET_TZ.tz});
-  const mkTgt=`<line x1="${X(oTgt)}" y1="${pt}" x2="${X(oTgt)}" y2="${H-pb}" stroke="rgba(139,108,255,.42)" stroke-dasharray="3 4"/>`+
-    `<text class="axis-date" x="${X(oTgt)-4}" y="${H-10}" text-anchor="end">${tgtShort}</text>`;
+  const mkTgt=`<line x1="${X(oTgt)}" y1="${pt}" x2="${X(oTgt)}" y2="${H-pb}" stroke="rgba(139,108,255,.42)" stroke-dasharray="3 4"/>`;
   const pill=(x,y,text,fill,anchor='middle')=>{
     const w=Math.max(58,text.length*6.6+14), h=18;
     const bx=anchor==='end'?x-w:anchor==='start'?x:x-w/2;
@@ -3474,10 +3522,23 @@ function renderCurve(){
   };
   const actualAnchor=histEndX>W-210?'end':'start';
   const lastLabelX=actualAnchor==='end'?histEndX-12:histEndX+12;
-  const lastLabelY=clamp(Y(last.v)-10,pt+16,H-pb-14);
+  let lastLabelY=clamp(Y(last.v)-10,pt+16,H-pb-14);
   const tgtAnchor=X(oTgt)>W-170?'end':'start';
   const tgtLabelX=tgtAnchor==='end'?X(oTgt)-12:X(oTgt)+12;
-  const tgtLabelY=clamp(Y(projBase)-10,pt+16,H-pb-14);
+  let tgtLabelY=clamp(Y(projBase)-10,pt+16,H-pb-14);
+  /* the two endpoints sit close together when the horizon is short: no second label at all when
+     the forecast has not left the last point, otherwise push the labels apart vertically */
+  const showTgt=nDays>0&&Math.abs(projBase-last.v)>1;
+  if(showTgt){
+    const lbox=(t,x,a)=>{const w=Math.max(58,t.length*6.6+14);return a==='end'?[x-w,x]:a==='start'?[x,x+w]:[x-w/2,x+w/2];};
+    const A=lbox(fmtUSD(last.v),lastLabelX,actualAnchor), B=lbox(fmtUSD(projBase),tgtLabelX,tgtAnchor);
+    if(A[0]<B[1]+8&&B[0]<A[1]+8&&Math.abs(lastLabelY-tgtLabelY)<24){
+      /* the actual endpoint's label goes below its dot, the projected one stays above its own */
+      lastLabelY=clamp(Y(last.v)+26,pt+16,H-pb-14);
+      tgtLabelY=clamp(Y(projBase)-10,pt+16,H-pb-14);
+      if(Math.abs(lastLabelY-tgtLabelY)<24)tgtLabelY=clamp(lastLabelY-26,pt+16,H-pb-14);
+    }
+  }
   svg.innerHTML=`
    <defs>
      <linearGradient id="ag" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#22e6a0" stop-opacity=".38"/><stop offset="1" stop-color="#22e6a0" stop-opacity="0"/></linearGradient>
@@ -3490,7 +3551,7 @@ function renderCurve(){
    <path d="${d}" fill="none" stroke="url(#lg)" stroke-width="2.4" filter="url(#glow)" stroke-linejoin="round"/>
    <path d="${fBase}" fill="none" stroke="#8b6cff" stroke-width="2.2" stroke-dasharray="5 4" filter="url(#glow)"/>
    ${pill(lastLabelX,lastLabelY,fmtUSD(last.v),'#65ffd2',actualAnchor)}
-   ${pill(tgtLabelX,tgtLabelY,fmtUSD(projBase),'#d7ccff',tgtAnchor)}
+   ${showTgt?pill(tgtLabelX,tgtLabelY,fmtUSD(projBase),'#d7ccff',tgtAnchor):''}
    <g class="drag-handle" data-handle="actual" style="color:#22e6a0" filter="url(#glow)">
      <circle class="handle-ring" cx="${histEndX}" cy="${Y(last.v)}" r="6.5"/>
      <circle cx="${histEndX}" cy="${Y(last.v)}" r="3.8" fill="#22e6a0"/>
@@ -4507,8 +4568,7 @@ function render(){
   const rows=buildPeriods(CUR);
   const total=currentTreasuryBalance();
   _ctToken++;$('#totalVal').textContent=fmtUSD(total);
-  if($('#headVol24'))$('#headVol24').textContent=fmtBig(MKT.vol.d1||MKT.vol.d30/30);
-  if($('#headOi'))$('#headOi').textContent=fmtBig(MKT.oi);
+  renderHeadMarket();
   if($('#headSpreads'))$('#headSpreads').textContent=fmtBig(impliedSpreadsAllTime());
   renderImpliedSpreadTotal(total);
   if($('#vIntroTotal'))$('#vIntroTotal').textContent=fmtUSD(total);
@@ -4554,6 +4614,31 @@ function renderRunningTotals(){
 $('#seg').addEventListener('click',e=>{
   const b=e.target.closest('button');if(!b)return;
   CUR=b.dataset.i;[...$('#seg').children].forEach(x=>x.classList.toggle('on',x===b));
+  render();
+});
+/* forecast target: presets and a date box, limited to tomorrow .. FC_MAX */
+function renderCurveTarget(){
+  const host=$('#curveTarget'); if(!host)return;
+  const tomorrow=addDays(resetDateKey(),1);
+  host.querySelectorAll('button[data-t]').forEach(b=>{
+    b.disabled=b.dataset.t<tomorrow||b.dataset.t>FC_MAX;
+    b.classList.toggle('on',b.dataset.t===FC.target);
+  });
+  const inp=$('#curveTgtDate');
+  if(inp){
+    inp.min=tomorrow; inp.max=FC_MAX; inp.value=FC.target;
+    inp.classList.toggle('on',![...host.querySelectorAll('button[data-t]')].some(b=>b.dataset.t===FC.target));
+  }
+}
+$('#curveTarget')?.addEventListener('click',e=>{
+  const b=e.target.closest('button[data-t]');if(!b||b.disabled)return;
+  FC.target=b.dataset.t;
+  render();
+});
+$('#curveTgtDate')?.addEventListener('change',e=>{
+  const v=e.target.value, tomorrow=addDays(resetDateKey(),1);
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(v))return;
+  FC.target=v<tomorrow?tomorrow:v>FC_MAX?FC_MAX:v;
   render();
 });
 $('#curveZoom')?.addEventListener('click',e=>{
@@ -4714,7 +4799,7 @@ async function refresh({deep=false,silent=true}={}){
     // Daily history is independent: a rate limit here never downgrades the live total.
     try{
       const closedThrough=addDays(todayET,-1);
-      const maxDays=deep?180:32;
+      const maxDays=deep?180:45;
       const knownDates=new Set(SERIES.map(x=>x.d));
       const missing=[];
       for(let d=addDays(SERIES[0].d,1);d<=closedThrough&&missing.length<maxDays;d=addDays(d,1)){
@@ -4735,6 +4820,8 @@ async function refresh({deep=false,silent=true}={}){
         SERIES.sort((a,b)=>a.d<b.d?-1:1);
         persistLiveSeries();
         buildCalendar();
+        /* the comparison tab's 30D windows follow the last closed day of this series */
+        if(window.__cmpLab&&window.__cmpLab.resync)window.__cmpLab.resync();
       }
     }catch(_){
       note.classList.remove('show');
@@ -4885,11 +4972,75 @@ async function refreshOfficialRoadmap(){
   }finally{ROADMAP_SYNC_BUSY=false;}
 }
 
+/* ---------- Tokenomics / Fundraise tab ----------
+   Static facts live in index.html; this draws the unlock chart and fills the three live figures from
+   values the dashboard already holds (treasury balance, the comparison snapshot's 30D inflow, the
+   valuation model's last output) — nothing is fetched here. */
+function renderTokenomics(){
+  const host=document.querySelector('[data-tg="tokenomics"]'); if(!host)return;
+  const S=window.CmpSnap?window.CmpSnap.get():null;
+  const bal=currentTreasuryBalance();
+  const t30=S&&S.treasury&&S.treasury.value>0?S.treasury.value:null;
+  if($('#tkTreasury'))$('#tkTreasury').textContent=fmtUSD(Math.floor(bal));
+  if($('#tkTreasurySub'))$('#tkTreasurySub').textContent='Arbitrum USDC treasury wallet · '+(Number.isFinite(LIVE_TOTAL)?'live':'saved close '+currentTreasuryDate());
+  if($('#tkInflow'))$('#tkInflow').textContent=t30?marketBig(t30):'—';
+  if($('#tkInflowSub'))$('#tkInflowSub').textContent=t30
+    ?`WALLET INFLOW over the 30 days to ${S.window.end||currentTreasuryDate()} · all of it committed to buy & burn by policy`
+    :'Net wallet-balance change over the last 30 days.';
+  if($('#tkSig3Sub'))$('#tkSig3Sub').textContent=`Treasury now ${fmtUSD(Math.floor(bal))}${t30?' · 30D inflow '+marketBig(t30):''}. Intended, not yet executed.`;
+  if($('#tkFdv'))$('#tkFdv').textContent=VAL_OUT.fdv?fmtBig(VAL_OUT.fdv):'—';
+  if($('#tkFdvSub'))$('#tkFdvSub').textContent=VAL_OUT.fdv
+    ?`Model MCAP ${fmtBig(VAL_OUT.mcap)} ÷ ${Math.round(VAL_FLOAT*100)}% official TGE float, from current open interest ${fmtBig(VAL_OUT.oi)}. A model estimate, not a price.`
+    :'The Comparison tab\'s open-interest model at the official 32% TGE float.';
+
+  /* unlock chart: the fastest path the official terms allow (12-month lock, then exactly 3 years linear) */
+  const svg=$('#tkChart'); if(!svg||host.classList.contains('tg-hide'))return;
+  /* drawn 1:1 at the container's own width (the svg is width:100% / height:auto), so type stays real size on a phone */
+  const W=Math.max(300,Math.round(svg.parentElement.clientWidth||760)), H=W<520?300:Math.round(Math.min(380,W*0.46)), pl=44,pr=14,pt=30,pb=56, MX=54;
+  const X=m=>pl+m/MX*(W-pl-pr), Y=p=>pt+(1-p/100)*(H-pt-pb);
+  const narrow=W<520;
+  let g=`<defs><pattern id="tkHatchP" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line class="tk-hatch" x1="0" y1="0" x2="0" y2="7"/></pattern></defs>`;
+  [0,25,50,75,100].forEach(p=>{g+=`<line class="tk-grid" x1="${pl}" y1="${Y(p).toFixed(1)}" x2="${W-pr}" y2="${Y(p).toFixed(1)}"/><text class="tk-ax" x="${pl-8}" y="${(Y(p)+3.5).toFixed(1)}" text-anchor="end">${p}%</text>`;});
+  const f=n=>n.toFixed(1);
+  g+=`<rect class="tk-s1" x="${f(X(0))}" y="${f(Y(32))}" width="${f(X(MX)-X(0))}" height="${f(Y(0)-Y(32))}"/>`;
+  g+=`<polygon class="tk-s3" points="${f(X(12))},${f(Y(32))} ${f(X(48))},${f(Y(82))} ${f(X(MX))},${f(Y(82))} ${f(X(MX))},${f(Y(32))}"/>`;
+  g+=`<polygon class="tk-s3l" points="${f(X(0))},${f(Y(32))} ${f(X(12))},${f(Y(32))} ${f(X(48))},${f(Y(82))} ${f(X(0))},${f(Y(82))}"/>`;
+  g+=`<rect class="tk-s2" fill="url(#tkHatchP)" x="${f(X(0))}" y="${f(Y(100))}" width="${f(X(MX)-X(0))}" height="${f(Y(82)-Y(100))}"/>`;
+  [12,48].forEach(m=>{g+=`<line class="tk-mark" x1="${f(X(m))}" y1="${f(Y(100))}" x2="${f(X(m))}" y2="${f(Y(0))}"/>`;});
+  g+=`<text class="tk-lab on-a1" x="${f(X(1))}" y="${f(Y(16)+4)}">${narrow?'Genesis 32%':'Genesis airdrop 32% · circulating from TGE'}</text>`;
+  g+=`<text class="tk-lab hatch" x="${f(X(1))}" y="${f(Y(91)+4)}">${narrow?'Ecosystem 18%':'Ecosystem 18% · discretionary, unscheduled'}</text>`;
+  g+=`<text class="tk-lab s" x="${f(X(1))}" y="${f(Y(62)+4)}">${narrow?'Team + Investors 50%':'Team + Investors 50% · locked, then unlocking'}</text>`;
+  if(!narrow){
+    g+=`<text class="tk-lab s" x="${f(X(12)+6)}" y="${f(Y(100)-8)}">12-month lock ends</text>`;
+    g+=`<text class="tk-lab s" x="${f(X(48)-6)}" y="${f(Y(100)-8)}" text-anchor="end">earliest full unlock</text>`;
+  }
+  g+=`<text class="tk-lab s" x="${f(W-pr-4)}" y="${f(Y(82)+14)}" text-anchor="end">${narrow?'82%':'82% circulating, excluding Ecosystem'}</text>`;
+  [[0,'TGE','Q4 2026'],[12,'+12 months','~Q4 2027'],[24,'+24 months','~Q4 2028'],[36,'+36 months','~Q4 2029'],[48,'+48 months','~Q4 2030']].forEach(([m,a,b],i)=>{
+    if(narrow&&i>0&&i<4)return;
+    const anchor=m===0?'start':'middle';
+    g+=`<text class="tk-ax b" x="${f(X(m))}" y="${f(H-pb+18)}" text-anchor="${anchor}">${a}</text><text class="tk-ax" x="${f(X(m))}" y="${f(H-pb+32)}" text-anchor="${anchor}">${b}</text>`;
+  });
+  g+=`<text class="tk-ax-t" x="${f(W-pr)}" y="${f(H-6)}" text-anchor="end">MONTHS AFTER TGE · SHARE OF TOTAL SUPPLY</text>`;
+  svg.setAttribute('viewBox',`0 0 ${W} ${H}`);
+  svg.innerHTML=g;
+}
+function initTokenomics(){
+  const bar=document.querySelector('[data-tk-command]'); if(!bar)return;
+  bar.addEventListener('click',e=>{
+    const b=e.target.closest('button[data-tk-jump]'); if(!b)return;
+    const t=document.getElementById(b.dataset.tkJump); if(!t)return;
+    bar.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));
+    t.scrollIntoView({behavior:'smooth',block:'start'});
+  });
+  let rt=null;
+  window.addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(renderTokenomics,140);});
+}
+
 /* ---------- tabs ---------- */
 const TABS=$('#tabs');
 const TAB_ORDER_KEY='variationalTabOrderV2';
-const VALID_TABS=['overview','daily-news','meme','implied','historical','efficiency','biweekly','roadmap','points','comparison'];
-const DEFAULT_TAB_ORDER=['overview','daily-news','efficiency','comparison','historical','implied','biweekly','roadmap','points','meme'];
+const VALID_TABS=['overview','daily-news','meme','implied','historical','efficiency','biweekly','roadmap','points','comparison','tokenomics'];
+const DEFAULT_TAB_ORDER=['overview','daily-news','efficiency','comparison','tokenomics','historical','implied','biweekly','roadmap','points','meme'];
 const SECTION_COPY={
   overview:{
     eyebrow:'Live dashboard',
@@ -4908,6 +5059,12 @@ const SECTION_COPY={
     title:'Fundamentals',
     description:'How volume and open interest translate into spread fees, treasury revenue, burn firepower, and valuation context.',
     chip:'money engine'
+  },
+  tokenomics:{
+    eyebrow:'Allocation and funding',
+    title:'Tokenomics / Fundraise history',
+    description:'Who owns $VAR at TGE, when the locked share can unlock, what removes supply, and who funded Variational. Percentages only: total supply is not announced.',
+    chip:'tokenomics'
   },
   comparison:{
     eyebrow:'Market position',
@@ -4955,6 +5112,7 @@ const SECTION_COPY={
 const normalizeTabName=name=>{
   if(name==='charts'||name==='interval')return 'historical';
   if(name==='peers')return 'comparison';
+  if(name==='tradfi')return 'tokenomics';   // the TradFi tab was replaced by Tokenomics / Fundraise history
   if(name==='spreads'||name==='implied-fees')return 'implied';
   if(name==='news'||name==='daily-var-news')return 'daily-news';
   if(name==='calendar'||name==='total-earnings'||name==='earnings')return 'overview';
@@ -5048,8 +5206,18 @@ initRadarTheme();
 initMemeLab();
 initDraggableTabs();
 initComparisonRoom();
+initTokenomics();
 const INITIAL_TAB=location.hash.replace('#','')||'overview';
 showTab(INITIAL_TAB,{push:false,scroll:INITIAL_TAB==='meme'});
+/* an old #tradfi link lands on the tab that replaced it, and the address bar follows */
+if(normalizeTabName(INITIAL_TAB)!==INITIAL_TAB&&VALID_TABS.includes(normalizeTabName(INITIAL_TAB)))history.replaceState(null,'','#'+normalizeTabName(INITIAL_TAB));
+window.addEventListener('hashchange',()=>{
+  const n=normalizeTabName(location.hash.replace('#',''));
+  const cur=document.querySelector('#tabs button.on');
+  if(!VALID_TABS.includes(n))return;
+  if(!cur||cur.dataset.tab!==n)showTab(n,{push:true});
+  else if(n!==location.hash.replace('#',''))history.replaceState(null,'','#'+n);
+});
 try{
   initForecast();
   render();
