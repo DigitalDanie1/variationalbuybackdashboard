@@ -707,6 +707,35 @@ const BIWEEKLY_HISTORY=[
   olpPnl2w:1571309,          // OLP PnL
   olpPnlLife:21358678,       // lifetime OLP PnL
   treasuryHoldings:9758014   // current protocol treasury holdings (USDC)
+},
+{
+  asOf:'2026-10-17', src:'https://x.com/search?q=from%3Avariational_io%20biweekly%20update!&src=typed_query',
+  release:'v0.38.1',
+  product:[
+    'Improvements to portfolio page',
+    'Extended QR-linked mobile session log in timer to 30 days',
+    'Preparations for trading API release',
+    '/v2/stats read API endpoint'
+  ],
+  totalVolume:417.92e9,      // Total Volume Traded
+  oi:2.04e9,                 // Current Dual-Sided OI
+  tvl:290.88e6,              // TVL (excludes OLP hedging accounts)
+  markets:575,               // Total markets currently listed
+  rewardsClaimed:8831643,    // Total rewards claimed (lifetime)
+  lossesRefunded:4559196,    // Total losses refunded (Sunset) — unchanged, programme closed
+  referralClaimed:4272447,   // Total referral rewards claimed (lifetime)
+  dau:null,                  // not published in this report
+  wau:null,                  // not published in this report
+  spreads2w:6561755,         // 2w spreads paid (gross revenue)
+  mmCosts2w:2879618,         // derived: spreads minus net revenue
+  netRevenue2w:3682137,      // 2w net revenue
+  rewards2w:303768,          // 2w rewards (all referral rewards in this report)
+  referralRewards2w:303768,  // 2w referral rewards
+  netProfit2w:3378369,       // 2w net profit
+  treasury2w:1312351,        // protocol treasury (20.00% of spreads, on policy)
+  olpPnl2w:2066018,          // OLP PnL
+  olpPnlLife:23424969,       // lifetime OLP PnL
+  treasuryHoldings:11077933  // current protocol treasury holdings (USDC)
 }
 ];
 const BIWEEKLY=BIWEEKLY_HISTORY[BIWEEKLY_HISTORY.length-1];
@@ -2504,7 +2533,7 @@ function renderBiweeklyChange(){
   }
   const rel=(B.release&&P.release&&B.release!==P.release)?B.release:null;
   const ships=Array.isArray(B.product)?B.product:[];
-  if(rel||ships.length) bits.push(`Product moved from <b>${esc(P.release||'the previous build')}</b> to <b>${esc(B.release||'the latest build')}</b>${ships.length?`, shipping ${ships.map(x=>esc(x.replace(/^(Added|Launched|Final preparations for) /i,'').toLowerCase())).join(', ')}`:''}.`);
+  if(rel||ships.length) bits.push(`Product moved from <b>${esc(P.release||'the previous build')}</b> to <b>${esc(B.release||'the latest build')}</b>${ships.length?`, shipping ${ships.map(x=>esc(x.replace(/^(Added|Launched|Final preparations for) /i,'').replace(/^[A-Z](?![A-Z])/,c=>c.toLowerCase()))).join(', ')}`:''}.`);
 
   const verdictCls=dn.length===0?'all-up':up.length>dn.length?'mostly-up':'mixed';
   const rowHtml=r=>`<div class="bwc-row${r.record?' record':''}">
