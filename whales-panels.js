@@ -119,6 +119,13 @@
       pointsLabel: '~10,500',
       pointsSource: 'https://w.twstalker.com/RlEylKAy17',
       note: 'An indexed repost attributes a historical self-report of about 8k points on the main account and 2.5k on an alt to JUDEAU_1 (~10.5k combined). Original post date and current balances unverified; no rank inferred. Excluded from dated totals and valuation.'
+    },
+    {
+      handle: 'Mennodeg', name: 'Menno 族',
+      profile: 'https://x.com/Mennodeg',
+      post: 'https://x.com/Mennodeg/status/2090876949463728467',
+      asOf: '2026-08-22',
+      note: 'Discusses an investment thesis for Variational and backing the team. No personal points total or points rank verified in the public material reviewed.'
     }
   ];
 
