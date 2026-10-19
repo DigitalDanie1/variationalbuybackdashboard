@@ -301,6 +301,28 @@
       '<div class="wh-said"><p>' + esc(w.note) + '</p></div></li>';
   }
 
+  function distributionReport() {
+    var source = 'https://x.com/yh_0x/status/2106449057933857025';
+    return '<article class="wh-distribution" aria-labelledby="wh-distribution-title">' +
+      '<div class="wh-distribution-head"><div class="wh-who"><img src="assets/whales/yh_0x.jpg" alt="yh_0x profile" width="40" height="40">' +
+      '<div><b>yh_0x</b><a href="' + source + '" target="_blank" rel="noopener noreferrer">@yh_0x · original post ↗</a></div></div>' +
+      '<span class="wh-tier">Unofficial · Week 42</span></div>' +
+      '<h3 id="wh-distribution-title">How the points are distributed</h3>' +
+      '<p>Historical Week 42 snapshot, posted Oct 4, 2026 (SGT). Community-sourced estimates by yh_0x; these describe the overall points board, not the author’s personal balance.</p>' +
+      '<div class="wh-distribution-metrics"><div><span>Issued points</span><b>9.44M</b></div>' +
+      '<div><span>Weekly earners</span><b>31,693</b><em>+4.4% vs prior week</em></div>' +
+      '<div><span>Weekly distribution</span><b>150,000</b></div>' +
+      '<div><span>Top 1,000 share</span><b>~50%</b></div></div>' +
+      '<p>Reported cutoffs: top 10 at 35,200+ points; top 150 at 7,250+; top 1,000 at 1,430+. The 2,000–5,000 rank band holds 15.3% of issued points. These are historical estimates, separate from the dated account cards below.</p>' +
+      '<div class="wh-distribution-images"><figure><a href="assets/whales/yh-week42-1.jpg" target="_blank" rel="noopener noreferrer">' +
+      '<img src="assets/whales/yh-week42-1.jpg" alt="yh_0x Week 42 points distribution by rank band: 9.44 million points issued" width="1080" height="1350" loading="lazy"></a>' +
+      '<figcaption>Week 42 points distribution · open full image ↗</figcaption></figure>' +
+      '<figure><a href="assets/whales/yh-week42-2.jpg" target="_blank" rel="noopener noreferrer">' +
+      '<img src="assets/whales/yh-week42-2.jpg" alt="yh_0x unofficial Week 42 rank cutoffs, from top 2 at 89,111 points to top 29,000 at 15+ points" width="1080" height="1350" loading="lazy"></a>' +
+      '<figcaption>Week 42 rank cutoffs · open full image ↗</figcaption></figure></div>' +
+      '<a class="wh-distribution-source" href="' + source + '" target="_blank" rel="noopener noreferrer">Read the full analysis on X ↗</a></article>';
+  }
+
   function render() {
     var host = document.querySelector('[data-tg="whales"]');
     if (!host) return;
@@ -318,6 +340,7 @@
       '<div class="cmp-heading"><span class="cmp-eyebrow">WHALES</span>' +
       '<h2>Who sits at the top of the points board</h2>' +
       '<p>Tracked accounts and their publicly disclosed Variational points. Dated share cards are self-reported; cards older than two weeks are marked stale. Accounts without a verified total remain in the list below the dated cards. Reported ranges are labeled and excluded from combined points and valuation.</p></div>' +
+      distributionReport() +
       '<div class="wh-readouts">' +
         '<div><span>Accounts tracked</span><b>' + (rs.length + WATCHLIST.length) + '</b><em>' + rs.length + ' dated totals · ' + WATCHLIST.length + ' awaiting exact totals</em></div>' +
         '<div><span>Combined disclosed points</span><b>' + int(total) + '</b><em>' + (total / pool * 100).toFixed(2) + '% of all points · dated totals only</em></div>' +
@@ -331,6 +354,20 @@
   }
 
   var STYLE =
+    '.wh-distribution{margin:0 0 28px;padding:22px;border:1px solid var(--line);background:var(--panel)}' +
+    '.wh-distribution-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}' +
+    '.wh-distribution h3{margin:20px 0 10px;color:var(--text);font-size:22px}' +
+    '.wh-distribution p{margin:10px 0 18px;color:var(--muted)!important;font-size:13px;line-height:1.7}' +
+    '.wh-distribution-metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:20px 0}' +
+    '.wh-distribution-metrics>div{padding:14px;border:1px solid var(--line);min-width:0}' +
+    '.wh-distribution-metrics span{display:block;color:var(--muted)!important;font:800 10px var(--mono);text-transform:uppercase}' +
+    '.wh-distribution-metrics b{display:block;margin-top:8px;color:var(--text);font:700 23px var(--mono)}' +
+    '.wh-distribution-metrics em{display:block;margin-top:5px;color:var(--muted)!important;font-size:11px;font-style:normal}' +
+    '.wh-distribution-images{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}' +
+    '.wh-distribution-images figure{margin:0;min-width:0}.wh-distribution-images img{display:block;width:100%;height:auto;border:1px solid var(--line)}' +
+    '.wh-distribution-images figcaption{margin-top:8px;color:var(--muted)!important;font-size:11px}' +
+    '.wh-distribution-source{display:inline-block;margin-top:18px;color:var(--v2-accent,#4c9af8)!important;font:700 12px var(--mono)}' +
+    '@media(max-width:700px){.wh-distribution{padding:16px}.wh-distribution-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.wh-distribution-images{grid-template-columns:1fr}}' +
     '.wh-readouts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:0 0 18px}' +
     '.wh-readouts>div{padding:14px 16px;border:1px solid var(--line);background:color-mix(in srgb,var(--panel) 72%,transparent);min-width:0}' +
     '.wh-readouts span{display:block;color:var(--muted)!important;font:800 9.5px var(--mono);letter-spacing:.7px;text-transform:uppercase}' +
