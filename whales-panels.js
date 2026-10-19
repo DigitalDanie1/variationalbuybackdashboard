@@ -141,6 +141,11 @@
       handle: 'SystemicStratHL', name: 'SystemicStratHL',
       profile: 'https://x.com/SystemicStratHL',
       note: 'Added to the tracked people list. Points not researched.'
+    },
+    {
+      handle: 'izebel_eth', name: 'izebel_eth',
+      profile: 'https://x.com/izebel_eth',
+      note: 'Added to the tracked people list. Points not researched.'
     }
   ];
 
