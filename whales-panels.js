@@ -112,6 +112,13 @@
       post: 'https://x.com/choffstein/status/2099488773985775639',
       asOf: '2026-09-14',
       note: 'Hosted a discussion with Variational co-founder Lucas Scheurmann on Omni, RFQ liquidity and swaps. No personal points total verified; the interview is not evidence of a points holding.'
+    },
+    {
+      handle: 'JUDEAU_1', name: 'Judeau.Var',
+      profile: 'https://x.com/JUDEAU_1',
+      pointsLabel: '~10,500',
+      pointsSource: 'https://w.twstalker.com/RlEylKAy17',
+      note: 'An indexed repost attributes a historical self-report of about 8k points on the main account and 2.5k on an alt to JUDEAU_1 (~10.5k combined). Original post date and current balances unverified; no rank inferred. Excluded from dated totals and valuation.'
     }
   ];
 
