@@ -70,6 +70,13 @@
       post: 'https://x.com/punk2498_/status/2108381438840107417',
       asOf: '2026-10-09',
       note: 'Plans to hold VAR and buy spot at TGE, according to the linked post.'
+    },
+    {
+      handle: 'Defi_Maestro', name: 'Defi_Maestro ✺',
+      profile: 'https://x.com/Defi_Maestro',
+      post: 'https://x.com/Defi_Maestro/status/2103852141345677503',
+      asOf: '2026-09-26',
+      note: 'Expects VAR points farming to become more competitive after APIs launch, according to the linked post.'
     }
   ];
 
