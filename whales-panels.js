@@ -84,6 +84,13 @@
       post: 'https://x.com/yh_0x/status/2110799569936388198',
       asOf: '2026-10-15',
       note: 'Reports delta-neutral trading across Variational and RiseX for funding arbitrage and points, plus a small oil long.'
+    },
+    {
+      handle: 'hansolar21', name: 'hansolar',
+      profile: 'https://x.com/hansolar21',
+      post: 'https://x.com/hansolar21/status/2111720672955355624',
+      asOf: '2026-10-18',
+      note: 'Shares the Variational roadmap covering RWA perps, swaps and institutional derivatives, with a comment on first-principles thinking.'
     }
   ];
 
