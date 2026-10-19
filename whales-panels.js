@@ -131,6 +131,11 @@
       handle: 'whitesocks256', name: 'whitesocks 💜',
       profile: 'https://x.com/whitesocks256',
       note: 'Korean crypto commentator. Lists Variational among the perp DEX projects followed in the public profile.'
+    },
+    {
+      handle: 'ElNachoCrypto', name: 'Nacho',
+      profile: 'https://x.com/ElNachoCrypto',
+      note: 'Added to the tracked people list. Points not researched.'
     }
   ];
 
