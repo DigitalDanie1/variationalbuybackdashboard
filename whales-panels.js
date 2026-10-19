@@ -61,6 +61,18 @@
     }
   ];
 
+  /* Profile supplied for tracking; keep it outside point totals until a dated
+     points card is available. A volume ranking is not a points ranking. */
+  var WATCHLIST = [
+    {
+      handle: 'punk2498_', name: 'an0n2498.hl',
+      profile: 'https://x.com/punk2498_',
+      post: 'https://x.com/punk2498_/status/2108381438840107417',
+      asOf: '2026-10-09',
+      note: 'Plans to hold VAR and buy spot at TGE, according to the linked post.'
+    }
+  ];
+
   var FDVS = [1e9, 2.5e9, 5e9, 10e9];
   var fdv = 5e9;
 
@@ -154,6 +166,19 @@
       usd((hi.value - lo.value)) + ' of airdrop at ' + esc(fdvLabel(fdv)) + ' FDV.</p>';
   }
 
+  function watchlist() {
+    if (!WATCHLIST.length) return '';
+    return '<div class="wh-watch"><h3>More accounts to watch</h3>' +
+      '<p>Points and rank unverified. These accounts are excluded from the totals and valuation above.</p>' +
+      '<ul>' + WATCHLIST.map(function (w) {
+        return '<li><b>' + esc(w.name) + '</b> ' +
+          '<a href="' + esc(w.profile) + '" target="_blank" rel="noopener noreferrer">@' + esc(w.handle) + '</a>' +
+          '<span>Points / rank: unverified</span>' +
+          '<p>' + esc(w.note) + ' <a href="' + esc(w.post) + '" target="_blank" rel="noopener noreferrer">' +
+          esc(dateLabel(w.asOf)) + ' source ↗</a></p></li>';
+      }).join('') + '</ul></div>';
+  }
+
   function render() {
     var host = document.querySelector('[data-tg="whales"]');
     if (!host) return;
@@ -179,6 +204,7 @@
       '<div class="tp-chips wh-chips"><span>Value at FDV</span>' + chips + '</div>' +
       '<ol class="wh-list">' + rs.map(function (r) { return row(r, top); }).join('') + '</ol>' +
       spread(rs) +
+      watchlist() +
       '<div class="tp-note"><b>How the value is worked out.</b> Share of all points at the card’s date × the 32% Genesis airdrop × the FDV picked above — the same model as the Points Calculator, and the all-points total is that tab’s weekly estimate, not a published figure. Weekly drops are read off the Distribution History on the card where it shows. Know an account that has posted its card? It goes in by hand, with the post as the source.</div>';
   }
 
@@ -219,6 +245,15 @@
     '.wh-weekly b{color:var(--text);font:700 12px var(--mono)}' +
     '.wh-spread{margin:0 0 18px;color:var(--muted)!important;font-size:13px;line-height:1.6}' +
     '.wh-spread b{color:var(--text);font-weight:700}' +
+    '.wh-watch{margin:0 0 18px;padding:16px;border:1px solid var(--line)}' +
+    '.wh-watch h3{margin:0 0 8px;color:var(--text);font-size:15px}' +
+    '.wh-watch p{margin:6px 0;color:var(--muted)!important;font-size:12px;line-height:1.6}' +
+    '.wh-watch ul{margin:12px 0 0;padding:0;list-style:none}' +
+    '.wh-watch li{padding-top:12px;border-top:1px solid var(--line);overflow-wrap:anywhere}' +
+    '.wh-watch b{color:var(--text);font-size:15px}' +
+    '.wh-watch a{color:var(--v2-accent,#4c9af8)!important;text-decoration:none}' +
+    '.wh-watch a:hover{text-decoration:underline}' +
+    '.wh-watch span{display:block;margin-top:6px;color:var(--muted)!important;font-size:12px}' +
     '@media (max-width:860px){' +
       '.wh-readouts{grid-template-columns:1fr}' +
       '.wh-row{grid-template-columns:44px minmax(0,1fr) minmax(0,1fr);gap:10px 14px;align-items:start}' +
