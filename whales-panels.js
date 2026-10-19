@@ -146,6 +146,11 @@
       handle: 'izebel_eth', name: 'izebel_eth',
       profile: 'https://x.com/izebel_eth',
       note: 'Added to the tracked people list. Points not researched.'
+    },
+    {
+      handle: '0xdetweiler', name: '0xdetweiler',
+      profile: 'https://x.com/0xdetweiler',
+      note: 'Added to the tracked people list. Points not researched.'
     }
   ];
 
