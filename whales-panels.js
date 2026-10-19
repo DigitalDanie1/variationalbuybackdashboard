@@ -105,6 +105,13 @@
       post: 'https://x.com/corgil/status/2112005661894836603',
       asOf: '2026-10-19',
       note: 'Shares anticipation for Variational in the linked post.'
+    },
+    {
+      handle: 'choffstein', name: 'Corey Hoffstein',
+      profile: 'https://x.com/choffstein',
+      post: 'https://x.com/choffstein/status/2099488773985775639',
+      asOf: '2026-09-14',
+      note: 'Hosted a discussion with Variational co-founder Lucas Scheurmann on Omni, RFQ liquidity and swaps. No personal points total verified; the interview is not evidence of a points holding.'
     }
   ];
 
