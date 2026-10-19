@@ -23,6 +23,27 @@
 
   var AIRDROP_SHARE = 0.32;   /* Genesis airdrop, same constant the calculator uses */
   var STALE_DAYS = 14;
+  var PROFILES = {};
+
+  function profileFor(w) { return PROFILES[w.handle.toLowerCase()] || w; }
+
+  function profileAvatar(w) {
+    var p = profileFor(w);
+    return p.avatar
+      ? '<img src="' + esc(p.avatar) + '" alt="' + esc(p.name || w.name) + ' profile" width="56" height="56" loading="lazy">'
+      : '<span class="wh-avatar" aria-hidden="true">' + esc(w.name.slice(0, 2).toUpperCase()) + '</span>';
+  }
+
+  function loadProfiles() {
+    fetch('assets/whales/profiles.json').then(function (response) {
+      if (!response.ok) throw new Error('Profiles unavailable');
+      return response.json();
+    }).then(function (profiles) {
+      PROFILES = profiles;
+      render();
+      renderNext();
+    }).catch(function () { /* Existing names and links remain usable. */ });
+  }
 
   var WHALES = [
     {
@@ -240,8 +261,8 @@
       (w.rank ? '<span class="wh-rank"><i>#</i>' + w.rank + '</span>'
               : '<span class="wh-rank none" title="rank not shown on the posted card">—<small>not shown</small></span>') +
       '<div class="wh-who">' +
-        '<img src="' + esc(w.avatar) + '" alt="" width="40" height="40" loading="lazy">' +
-        '<div><b>' + esc(w.name) + '</b>' +
+        profileAvatar(w) +
+        '<div><b>' + esc(profileFor(w).name || w.name) + '</b>' +
         '<a href="' + esc(w.post) + '" target="_blank" rel="noopener noreferrer">@' + esc(w.handle) + '</a>' +
         '<span class="wh-tier">' + esc(w.tier) + '</span></div>' +
       '</div>' +
@@ -271,8 +292,8 @@
     var evidence = w.pointsSource || w.post;
     return '<li class="wh-row wh-pending">' +
       '<span class="wh-rank none">' + esc(w.rankLabel || '—') + '<small>' + (w.rankLabel ? 'reported' : 'unverified') + '</small></span>' +
-      '<div class="wh-who"><span class="wh-avatar" aria-hidden="true">' + esc(w.name.slice(0, 2).toUpperCase()) + '</span>' +
-      '<div><b>' + esc(w.name) + '</b><a href="' + esc(w.profile) + '" target="_blank" rel="noopener noreferrer">@' + esc(w.handle) + '</a></div></div>' +
+      '<div class="wh-who">' + profileAvatar(w) +
+      '<div><b>' + esc(profileFor(w).name || w.name) + '</b><a href="' + esc(w.profile) + '" target="_blank" rel="noopener noreferrer">@' + esc(w.handle) + '</a></div></div>' +
       '<div class="wh-pts"><b>' + esc(w.pointsLabel || '—') + '</b><em>' + (w.pointsLabel ? 'indirect report · exact total unverified' : 'public points total unverified') + '</em></div>' +
       '<div class="wh-val"><b>—</b><em>excluded from valuation</em></div>' +
       '<div class="wh-asof"><b>Unverified</b><em>points snapshot date</em>' +
@@ -391,8 +412,10 @@
       (!added ? '<div class="nf-empty"><h3>The people are here. Their next farms come next.</h3><p>No next projects have been added yet. Each entry will show the project and the original post when available.</p></div>' : '') +
       '<div class="nf-grid">' + people.map(function (w) {
         var farm = NEXT_FARMS[w.handle.toLowerCase()];
-        return '<article class="nf-card"><h3>' + esc(w.name) + '</h3>' +
+        var p = profileFor(w);
+        return '<article class="nf-card"><div class="nf-profile"><a class="nf-avatar" href="' + esc(w.profile || 'https://x.com/' + w.handle) + '" target="_blank" rel="noopener noreferrer">' + profileAvatar(w) + '</a><div><h3>' + esc(p.name || w.name) + '</h3>' +
           '<a href="' + esc(w.profile || 'https://x.com/' + w.handle) + '" target="_blank" rel="noopener noreferrer">@' + esc(w.handle) + ' ↗</a>' +
+          '</div></div>' + (p.bio ? '<p class="nf-bio">' + esc(p.bio) + '</p>' : '') +
           '<div class="nf-project"><span>Next farm</span><b>' + esc(farm ? farm.project : 'Not added yet') + '</b>' +
           (farm && farm.source ? '<a href="' + esc(farm.source) + '" target="_blank" rel="noopener noreferrer">Original post ↗</a>' : '') + '</div></article>';
       }).join('') + '</div>';
@@ -432,6 +455,9 @@
     style.textContent = '.nf-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}' +
       '.nf-card,.nf-empty{border:1px solid var(--line);padding:20px;background:var(--panel)}' +
       '.nf-card{min-width:0}.nf-card h3,.nf-empty h3{margin:0 0 8px;color:var(--text);font-size:16px}' +
+      '.nf-profile{display:flex;align-items:center;gap:12px}.nf-profile>div{min-width:0}.nf-profile h3{overflow-wrap:anywhere}' +
+      '.nf-avatar{flex:0 0 56px}.nf-avatar img{display:block;width:56px;height:56px;object-fit:cover;border-radius:50%;border:1px solid var(--line)}' +
+      '.nf-bio{color:var(--muted)!important;font-size:12px;line-height:1.6;white-space:pre-line;overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;margin:16px 0 0;min-height:58px}' +
       '.nf-card a{color:var(--v2-accent,#4c9af8)!important;font:700 12px var(--mono);overflow-wrap:anywhere;text-decoration:none}' +
       '.nf-card a:hover{text-decoration:underline}.nf-project{border-top:1px solid var(--line);margin-top:20px;padding-top:16px}' +
       '.nf-project span{display:block;color:var(--muted)!important;font:800 10px var(--mono);text-transform:uppercase;letter-spacing:.7px}' +
@@ -522,6 +548,7 @@
     render();
     mountNext();
     renderNext();
+    loadProfiles();
     /* dashboard.js resolves the opening hash before this tab exists, so a shared
        #whales link would land on Overview without this */
     if ((location.hash === '#whales' || location.hash === '#whales-next') && typeof showTab === 'function') {
