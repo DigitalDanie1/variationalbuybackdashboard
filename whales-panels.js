@@ -156,6 +156,11 @@
       handle: 'TaikiMaeda2', name: 'Taiki Maeda',
       profile: 'https://x.com/TaikiMaeda2',
       note: 'Added to the tracked people list. Points not researched.'
+    },
+    {
+      handle: 'shadowofintent3', name: 'shadowofintent3',
+      profile: 'https://x.com/shadowofintent3',
+      note: 'Added to the tracked people list. Points not researched.'
     }
   ];
 
