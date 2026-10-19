@@ -126,6 +126,11 @@
       post: 'https://x.com/Mennodeg/status/2090876949463728467',
       asOf: '2026-08-22',
       note: 'Discusses an investment thesis for Variational and backing the team. No personal points total or points rank verified in the public material reviewed.'
+    },
+    {
+      handle: 'whitesocks256', name: 'whitesocks 💜',
+      profile: 'https://x.com/whitesocks256',
+      note: 'Korean crypto commentator. Lists Variational among the perp DEX projects followed in the public profile.'
     }
   ];
 
