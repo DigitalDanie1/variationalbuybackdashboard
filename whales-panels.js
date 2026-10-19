@@ -77,6 +77,13 @@
       post: 'https://x.com/Defi_Maestro/status/2103852141345677503',
       asOf: '2026-09-26',
       note: 'Expects VAR points farming to become more competitive after APIs launch, according to the linked post.'
+    },
+    {
+      handle: 'yh_0x', name: 'yh_0x',
+      profile: 'https://x.com/yh_0x',
+      post: 'https://x.com/yh_0x/status/2110799569936388198',
+      asOf: '2026-10-16',
+      note: 'Reports delta-neutral trading across Variational and RiseX for funding arbitrage and points, plus a small oil long.'
     }
   ];
 
