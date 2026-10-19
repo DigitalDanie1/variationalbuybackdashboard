@@ -96,6 +96,13 @@
       handle: 'lynn000333', name: 'Lynn03',
       profile: 'https://x.com/lynn000333',
       note: 'Protected account. Posts and points could not be verified from the public profile.'
+    },
+    {
+      handle: 'corgil', name: 'CorgiI',
+      profile: 'https://x.com/corgil',
+      post: 'https://x.com/corgil/status/2112005661894836603',
+      asOf: '2026-10-19',
+      note: 'Shares anticipation for Variational in the linked post.'
     }
   ];
 
