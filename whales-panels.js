@@ -82,7 +82,7 @@
       handle: 'yh_0x', name: 'yh_0x',
       profile: 'https://x.com/yh_0x',
       post: 'https://x.com/yh_0x/status/2110799569936388198',
-      asOf: '2026-10-16',
+      asOf: '2026-10-15',
       note: 'Reports delta-neutral trading across Variational and RiseX for funding arbitrage and points, plus a small oil long.'
     }
   ];
