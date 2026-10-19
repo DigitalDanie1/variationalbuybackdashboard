@@ -161,6 +161,11 @@
       handle: 'shadowofintent3', name: 'shadowofintent3',
       profile: 'https://x.com/shadowofintent3',
       note: 'Added to the tracked people list. Points not researched.'
+    },
+    {
+      handle: 'derteil00', name: 'derteil00',
+      profile: 'https://x.com/derteil00',
+      note: 'Added to the tracked people list. Points not researched.'
     }
   ];
 
