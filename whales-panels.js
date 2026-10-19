@@ -61,8 +61,8 @@
     }
   ];
 
-  /* Profile supplied for tracking; keep it outside point totals until a dated
-     points card is available. A volume ranking is not a points ranking. */
+  /* Tracked accounts without a verified, dated total. Render in the main list,
+     but exclude ranges, volume rankings and missing totals from valuation. */
   var WATCHLIST = [
     {
       handle: 'punk2498_', name: 'an0n2498.hl',
@@ -95,7 +95,9 @@
     {
       handle: 'lynn000333', name: 'Lynn03',
       profile: 'https://x.com/lynn000333',
-      note: 'Protected account. Posts and points could not be verified from the public profile.'
+      pointsLabel: '30,000+ band', rankLabel: '~6',
+      pointsSource: 'https://ngntipkolamrenang.twstalker.com/poorlydrNFT',
+      note: 'An indexed repost of Lynn03’s earlier public list places Lynn03 around #6 and describes the top 10 as holding 30k+ points. This is an indirect range, not an exact balance. Original date unverified; account now protected.'
     },
     {
       handle: 'corgil', name: 'CorgiI',
@@ -199,19 +201,17 @@
       usd((hi.value - lo.value)) + ' of airdrop at ' + esc(fdvLabel(fdv)) + ' FDV.</p>';
   }
 
-  function watchlist() {
-    if (!WATCHLIST.length) return '';
-    return '<div class="wh-watch"><h3>More accounts to watch</h3>' +
-      '<p>Points and rank unverified. These accounts are excluded from the totals and valuation above.</p>' +
-      '<ul>' + WATCHLIST.map(function (w) {
-        return '<li><b>' + esc(w.name) + '</b> ' +
-          '<a href="' + esc(w.profile) + '" target="_blank" rel="noopener noreferrer">@' + esc(w.handle) + '</a>' +
-          '<span>Points / rank: unverified</span>' +
-          '<p>' + esc(w.note) + (w.post && w.asOf
-            ? ' <a href="' + esc(w.post) + '" target="_blank" rel="noopener noreferrer">' +
-              esc(dateLabel(w.asOf)) + ' source ↗</a>'
-            : '') + '</p></li>';
-      }).join('') + '</ul></div>';
+  function pendingRow(w) {
+    var evidence = w.pointsSource || w.post;
+    return '<li class="wh-row wh-pending">' +
+      '<span class="wh-rank none">' + esc(w.rankLabel || '—') + '<small>' + (w.rankLabel ? 'reported' : 'unverified') + '</small></span>' +
+      '<div class="wh-who"><span class="wh-avatar" aria-hidden="true">' + esc(w.name.slice(0, 2).toUpperCase()) + '</span>' +
+      '<div><b>' + esc(w.name) + '</b><a href="' + esc(w.profile) + '" target="_blank" rel="noopener noreferrer">@' + esc(w.handle) + '</a></div></div>' +
+      '<div class="wh-pts"><b>' + esc(w.pointsLabel || '—') + '</b><em>' + (w.pointsLabel ? 'indirect report · exact total unverified' : 'public points total unverified') + '</em></div>' +
+      '<div class="wh-val"><b>—</b><em>excluded from valuation</em></div>' +
+      '<div class="wh-asof"><b>Unverified</b><em>points snapshot date</em>' +
+      (evidence ? '<a href="' + esc(evidence) + '" target="_blank" rel="noopener noreferrer">' + (w.pointsSource ? 'indexed repost ↗' : 'related post ↗') + '</a>' : '') + '</div>' +
+      '<div class="wh-said"><p>' + esc(w.note) + '</p></div></li>';
   }
 
   function render() {
@@ -230,16 +230,16 @@
     host.innerHTML =
       '<div class="cmp-heading"><span class="cmp-eyebrow">WHALES</span>' +
       '<h2>Who sits at the top of the points board</h2>' +
-      '<p>Variational does not publish its leaderboard. What it does give every account is a share card with points, rank and the date it was made, and some accounts post theirs on X. Each row below is one of those cards, linked to its post. Rows are self-reported and dated; anything older than two weeks is marked stale.</p></div>' +
+      '<p>Tracked accounts and their publicly disclosed Variational points. Dated share cards are self-reported; cards older than two weeks are marked stale. Accounts without a verified total remain in the list below the dated cards. Reported ranges are labeled and excluded from combined points and valuation.</p></div>' +
       '<div class="wh-readouts">' +
-        '<div><span>Accounts tracked</span><b>' + rs.length + '</b></div>' +
-        '<div><span>Their combined points</span><b>' + int(total) + '</b><em>' + (total / pool * 100).toFixed(2) + '% of all points</em></div>' +
+        '<div><span>Accounts tracked</span><b>' + (rs.length + WATCHLIST.length) + '</b><em>' + rs.length + ' dated totals · ' + WATCHLIST.length + ' awaiting exact totals</em></div>' +
+        '<div><span>Combined disclosed points</span><b>' + int(total) + '</b><em>' + (total / pool * 100).toFixed(2) + '% of all points · dated totals only</em></div>' +
         '<div><span>All points issued, est.</span><b>' + (pool / 1e6).toFixed(2) + 'M</b><em>calculator schedule, this week</em></div>' +
       '</div>' +
       '<div class="tp-chips wh-chips"><span>Value at FDV</span>' + chips + '</div>' +
-      '<ol class="wh-list">' + rs.map(function (r) { return row(r, top); }).join('') + '</ol>' +
+      '<ol class="wh-list">' + rs.map(function (r) { return row(r, top); }).join('') + WATCHLIST.map(pendingRow).join('') + '</ol>' +
       spread(rs) +
-      watchlist() +
+      '<p class="wh-spread">Public disclosure check: Oct 19, 2026. A related post supports account context, not a points balance. Missing figures are unknown, not zero. Ranges from indexed reposts require confirmation against the original card.</p>' +
       '<div class="tp-note"><b>How the value is worked out.</b> Share of all points at the card’s date × the 32% Genesis airdrop × the FDV picked above — the same model as the Points Calculator, and the all-points total is that tab’s weekly estimate, not a published figure. Weekly drops are read off the Distribution History on the card where it shows. Know an account that has posted its card? It goes in by hand, with the post as the source.</div>';
   }
 
@@ -280,15 +280,8 @@
     '.wh-weekly b{color:var(--text);font:700 12px var(--mono)}' +
     '.wh-spread{margin:0 0 18px;color:var(--muted)!important;font-size:13px;line-height:1.6}' +
     '.wh-spread b{color:var(--text);font-weight:700}' +
-    '.wh-watch{margin:0 0 18px;padding:16px;border:1px solid var(--line)}' +
-    '.wh-watch h3{margin:0 0 8px;color:var(--text);font-size:15px}' +
-    '.wh-watch p{margin:6px 0;color:var(--muted)!important;font-size:12px;line-height:1.6}' +
-    '.wh-watch ul{margin:12px 0 0;padding:0;list-style:none}' +
-    '.wh-watch li{padding-top:12px;border-top:1px solid var(--line);overflow-wrap:anywhere}' +
-    '.wh-watch b{color:var(--text);font-size:15px}' +
-    '.wh-watch a{color:var(--v2-accent,#4c9af8)!important;text-decoration:none}' +
-    '.wh-watch a:hover{text-decoration:underline}' +
-    '.wh-watch span{display:block;margin-top:6px;color:var(--muted)!important;font-size:12px}' +
+    '.wh-avatar{display:grid;place-items:center;flex:0 0 auto;width:40px;height:40px;border-radius:50%;border:1px solid var(--line);color:var(--muted);font:700 12px var(--mono)}' +
+    '.wh-pending .wh-said p{margin:0;color:var(--muted)!important;font-size:12px;line-height:1.6;overflow-wrap:anywhere}' +
     '@media (max-width:860px){' +
       '.wh-readouts{grid-template-columns:1fr}' +
       '.wh-row{grid-template-columns:44px minmax(0,1fr) minmax(0,1fr);gap:10px 14px;align-items:start}' +
