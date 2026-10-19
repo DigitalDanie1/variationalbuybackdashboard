@@ -151,6 +151,11 @@
       handle: '0xdetweiler', name: '0xdetweiler',
       profile: 'https://x.com/0xdetweiler',
       note: 'Added to the tracked people list. Points not researched.'
+    },
+    {
+      handle: 'TaikiMaeda2', name: 'Taiki Maeda',
+      profile: 'https://x.com/TaikiMaeda2',
+      note: 'Added to the tracked people list. Points not researched.'
     }
   ];
 
