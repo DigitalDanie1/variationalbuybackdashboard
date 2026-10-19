@@ -91,6 +91,11 @@
       post: 'https://x.com/hansolar21/status/2111720672955355624',
       asOf: '2026-10-18',
       note: 'Shares the Variational roadmap covering RWA perps, swaps and institutional derivatives, with a comment on first-principles thinking.'
+    },
+    {
+      handle: 'lynn000333', name: 'Lynn03',
+      profile: 'https://x.com/lynn000333',
+      note: 'Protected account. Posts and points could not be verified from the public profile.'
     }
   ];
 
@@ -195,8 +200,10 @@
         return '<li><b>' + esc(w.name) + '</b> ' +
           '<a href="' + esc(w.profile) + '" target="_blank" rel="noopener noreferrer">@' + esc(w.handle) + '</a>' +
           '<span>Points / rank: unverified</span>' +
-          '<p>' + esc(w.note) + ' <a href="' + esc(w.post) + '" target="_blank" rel="noopener noreferrer">' +
-          esc(dateLabel(w.asOf)) + ' source ↗</a></p></li>';
+          '<p>' + esc(w.note) + (w.post && w.asOf
+            ? ' <a href="' + esc(w.post) + '" target="_blank" rel="noopener noreferrer">' +
+              esc(dateLabel(w.asOf)) + ' source ↗</a>'
+            : '') + '</p></li>';
       }).join('') + '</ul></div>';
   }
 
