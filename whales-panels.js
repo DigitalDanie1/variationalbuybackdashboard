@@ -136,6 +136,11 @@
       handle: 'ElNachoCrypto', name: 'Nacho',
       profile: 'https://x.com/ElNachoCrypto',
       note: 'Added to the tracked people list. Points not researched.'
+    },
+    {
+      handle: 'SystemicStratHL', name: 'SystemicStratHL',
+      profile: 'https://x.com/SystemicStratHL',
+      note: 'Added to the tracked people list. Points not researched.'
     }
   ];
 
