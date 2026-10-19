@@ -35,7 +35,7 @@
        about the listing, and it makes the group read as one sequence — how much do I get,
        what shape does it take, what do I do about it. */
     { k: 'post', label: 'Post-TGE', note: 'After the token lists',
-      tabs: ['points', 'paths', 'plan', 'monitors', 'whales'] }
+      tabs: ['points', 'paths', 'plan', 'monitors', 'whales', 'whales-next'] }
   ];
 
   /* Headings carry the same two strings as the switch and are capitalised in CSS, not in the
