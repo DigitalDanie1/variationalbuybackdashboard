@@ -428,7 +428,7 @@
   /* Reuse the people list so newly tracked accounts appear here automatically.
      Add future farm disclosures by handle, with a project and a source URL. */
   var NEXT_FARMS = {};
-  var NEXT_TITLE = 'what are the whales farming next';
+  var NEXT_TITLE = 'Next Farm by Varriors';
 
   function renderNext() {
     var host = document.querySelector('[data-tg="whales-next"]');
@@ -446,7 +446,10 @@
       '<div class="wh-readouts"><div><span>People tracked</span><b>' + people.length + '</b><em>from the Whales list</em></div>' +
       '<div><span>Next farms added</span><b>' + added + '</b><em>accounts with a project entry</em></div>' +
       '<div><span>Tracking</span><b>After VAR</b><em>where they go next</em></div></div>' +
-      (!added ? '<div class="nf-empty"><h3>The people are here. Their next farms come next.</h3><p>No next projects have been added yet. Each entry will show the project and the original post when available.</p></div>' : '') +
+      '<div class="nf-categories" aria-label="Upcoming farming projects">' +
+      '<section class="nf-category" aria-labelledby="nf-non-perp"><span class="nf-part">PART 01</span><h3 id="nf-non-perp">Non Perp DEX</h3><div class="nf-empty"><h4>Coming soon</h4><p>Projects will be listed here. Varriors’ picks will be highlighted.</p></div></section>' +
+      '<section class="nf-category" aria-labelledby="nf-perp"><span class="nf-part">PART 02</span><h3 id="nf-perp">Perp DEX</h3><div class="nf-empty"><h4>Coming soon</h4><p>Projects will be listed here. Varriors’ picks will be highlighted.</p></div></section></div>' +
+      '<h3 class="nf-people-title">The Varriors</h3>' +
       '<div class="nf-grid">' + people.map(function (w) {
         var farm = NEXT_FARMS[w.handle.toLowerCase()];
         var p = profileFor(w);
@@ -499,7 +502,7 @@
       '.nf-card a:hover{text-decoration:underline}.nf-project{border-top:1px solid var(--line);margin-top:20px;padding-top:16px}' +
       '.nf-project span{display:block;color:var(--muted)!important;font:800 10px var(--mono);text-transform:uppercase;letter-spacing:.7px}' +
       '.nf-project b{display:block;margin-top:8px;color:var(--muted)!important;font-size:14px}.nf-project a{display:block;margin-top:10px}' +
-      '.nf-empty{margin-bottom:20px;border-style:dashed}.nf-empty p{margin:0;color:var(--muted)!important;font-size:13px;line-height:1.6}' +
+      '.nf-categories{margin:28px 0 36px}.nf-category{padding:24px 0}.nf-category+.nf-category{border-top:1px solid var(--line);margin-top:8px;padding-top:32px}.nf-part{color:var(--v2-accent,#4c9af8);font:800 10px var(--mono);letter-spacing:1px}.nf-category>h3{margin:10px 0 18px;color:var(--text);font-size:24px}.nf-empty{border-style:dashed}.nf-empty h4{margin:0 0 8px;color:var(--text);font-size:18px}.nf-empty p{margin:0;color:var(--muted)!important;font-size:13px;line-height:1.6}.nf-people-title{margin:0 0 18px;color:var(--text);font-size:20px}' +
       '[data-open-tab="whales-next"]{height:auto!important;min-height:54px;white-space:normal!important;padding-top:10px!important;padding-bottom:10px!important}' +
       '[data-open-tab="whales-next"] strong,[data-open-tab="whales-next"] b{white-space:normal!important;line-height:1.4!important}' +
       '@media(max-width:1000px){.nf-grid{grid-template-columns:repeat(2,minmax(0,1fr))}[data-open-tab="whales-next"]{max-width:235px}}' +
