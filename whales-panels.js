@@ -425,40 +425,16 @@
     document.head.appendChild(s);
   }
 
-  /* Reuse the people list so newly tracked accounts appear here automatically.
-     Add future farm disclosures by handle, with a project and a source URL. */
-  var NEXT_FARMS = {};
   var NEXT_TITLE = 'Next Farm by Varriors';
 
   function renderNext() {
     var host = document.querySelector('[data-tg="whales-next"]');
     if (!host) return;
-    var seen = {};
-    var people = WHALES.concat(WATCHLIST).filter(function (w) {
-      var key = w.handle.toLowerCase();
-      if (seen[key]) return false;
-      seen[key] = true;
-      return true;
-    });
-    var added = people.filter(function (w) { return !!NEXT_FARMS[w.handle.toLowerCase()]; }).length;
     host.innerHTML = '<div class="cmp-heading"><span class="cmp-eyebrow">POST-TGE · NEXT FARMS</span>' +
-      '<h2>' + NEXT_TITLE + '</h2><p>Follow the people on the Whales list into their next farming projects.</p></div>' +
-      '<div class="wh-readouts"><div><span>People tracked</span><b>' + people.length + '</b><em>from the Whales list</em></div>' +
-      '<div><span>Next farms added</span><b>' + added + '</b><em>accounts with a project entry</em></div>' +
-      '<div><span>Tracking</span><b>After VAR</b><em>where they go next</em></div></div>' +
+      '<h2>' + NEXT_TITLE + '</h2><p>Farming projects, with Varriors’ picks and reasons to farm.</p></div>' +
       '<div class="nf-categories" aria-label="Upcoming farming projects">' +
-      '<section class="nf-category" aria-labelledby="nf-non-perp"><span class="nf-part">PART 01</span><h3 id="nf-non-perp">Non Perp DEX</h3><div class="nf-empty"><h4>Coming soon</h4><p>Projects will be listed here. Varriors’ picks will be highlighted.</p></div></section>' +
-      '<section class="nf-category" aria-labelledby="nf-perp"><span class="nf-part">PART 02</span><h3 id="nf-perp">Perp DEX</h3><div class="nf-empty"><h4>Coming soon</h4><p>Projects will be listed here. Varriors’ picks will be highlighted.</p></div></section></div>' +
-      '<h3 class="nf-people-title">The Varriors</h3>' +
-      '<div class="nf-grid">' + people.map(function (w) {
-        var farm = NEXT_FARMS[w.handle.toLowerCase()];
-        var p = profileFor(w);
-        return '<article class="nf-card"><div class="nf-profile"><a class="nf-avatar" href="' + esc(w.profile || 'https://x.com/' + w.handle) + '" target="_blank" rel="noopener noreferrer">' + profileAvatar(w) + '</a><div><h3>' + esc(p.name || w.name) + '</h3>' +
-          '<a href="' + esc(w.profile || 'https://x.com/' + w.handle) + '" target="_blank" rel="noopener noreferrer">@' + esc(w.handle) + ' ↗</a>' +
-          '</div></div>' + (p.bio ? '<p class="nf-bio">' + esc(p.bio) + '</p>' : '') +
-          '<div class="nf-project"><span>Next farm</span><b>' + esc(farm ? farm.project : 'Not added yet') + '</b>' +
-          (farm && farm.source ? '<a href="' + esc(farm.source) + '" target="_blank" rel="noopener noreferrer">Original post ↗</a>' : '') + '</div></article>';
-      }).join('') + '</div>';
+      '<section class="nf-category" aria-labelledby="nf-non-perp"><span class="nf-part">PART 01</span><h3 id="nf-non-perp">Non Perp DEX</h3><div class="nf-empty"><h4>Coming soon</h4></div></section>' +
+      '<section class="nf-category" aria-labelledby="nf-perp"><span class="nf-part">PART 02</span><h3 id="nf-perp">Perp DEX</h3><div class="nf-empty"><h4>Coming soon</h4></div></section></div>';
   }
 
   function mountNext() {
@@ -488,25 +464,16 @@
       var title = next.querySelector('strong') || next.querySelector('b');
       if (title) title.textContent = NEXT_TITLE;
       var small = next.querySelector('small');
-      if (small) small.textContent = 'follow their next projects';
+      if (small) small.textContent = 'projects & Varriors’ picks';
       rail.insertBefore(next, btn.nextSibling);
     });
     var style = document.createElement('style');
-    style.textContent = '.nf-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}' +
-      '.nf-card,.nf-empty{border:1px solid var(--line);padding:20px;background:var(--panel)}' +
-      '.nf-card{min-width:0}.nf-card h3,.nf-empty h3{margin:0 0 8px;color:var(--text);font-size:16px}' +
-      '.nf-profile{display:flex;align-items:center;gap:12px}.nf-profile>div{min-width:0}.nf-profile h3{overflow-wrap:anywhere}' +
-      '.nf-avatar{flex:0 0 56px}.nf-avatar img{display:block;width:56px;height:56px;object-fit:cover;border-radius:50%;border:1px solid var(--line)}' +
-      '.nf-bio{color:var(--muted)!important;font-size:12px;line-height:1.6;white-space:pre-line;overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;margin:16px 0 0;min-height:58px}' +
-      '.nf-card a{color:var(--v2-accent,#4c9af8)!important;font:700 12px var(--mono);overflow-wrap:anywhere;text-decoration:none}' +
-      '.nf-card a:hover{text-decoration:underline}.nf-project{border-top:1px solid var(--line);margin-top:20px;padding-top:16px}' +
-      '.nf-project span{display:block;color:var(--muted)!important;font:800 10px var(--mono);text-transform:uppercase;letter-spacing:.7px}' +
-      '.nf-project b{display:block;margin-top:8px;color:var(--muted)!important;font-size:14px}.nf-project a{display:block;margin-top:10px}' +
-      '.nf-categories{margin:28px 0 36px}.nf-category{padding:24px 0}.nf-category+.nf-category{border-top:1px solid var(--line);margin-top:8px;padding-top:32px}.nf-part{color:var(--v2-accent,#4c9af8);font:800 10px var(--mono);letter-spacing:1px}.nf-category>h3{margin:10px 0 18px;color:var(--text);font-size:24px}.nf-empty{border-style:dashed}.nf-empty h4{margin:0 0 8px;color:var(--text);font-size:18px}.nf-empty p{margin:0;color:var(--muted)!important;font-size:13px;line-height:1.6}.nf-people-title{margin:0 0 18px;color:var(--text);font-size:20px}' +
+    style.textContent = '.nf-empty{border:1px dashed var(--line);padding:20px;background:var(--panel)}' +
+      '.nf-categories{margin:28px 0 36px}.nf-category{padding:24px 0}.nf-category+.nf-category{border-top:1px solid var(--line);margin-top:8px;padding-top:32px}.nf-part{color:var(--v2-accent,#4c9af8);font:800 10px var(--mono);letter-spacing:1px}.nf-category>h3{margin:10px 0 18px;color:var(--text);font-size:24px}.nf-empty{border-style:dashed}.nf-empty h4{margin:0 0 8px;color:var(--text);font-size:18px}.nf-empty p{margin:0;color:var(--muted)!important;font-size:13px;line-height:1.6}' +
       '[data-open-tab="whales-next"]{height:auto!important;min-height:54px;white-space:normal!important;padding-top:10px!important;padding-bottom:10px!important}' +
       '[data-open-tab="whales-next"] strong,[data-open-tab="whales-next"] b{white-space:normal!important;line-height:1.4!important}' +
-      '@media(max-width:1000px){.nf-grid{grid-template-columns:repeat(2,minmax(0,1fr))}[data-open-tab="whales-next"]{max-width:235px}}' +
-      '@media(max-width:600px){.nf-grid{grid-template-columns:1fr}.nf-card,.nf-empty{padding:16px}}';
+      '@media(max-width:1000px){[data-open-tab="whales-next"]{max-width:235px}}' +
+      '@media(max-width:600px){.nf-empty{padding:16px}}';
     document.head.appendChild(style);
   }
 
@@ -565,7 +532,7 @@
       if (typeof DEFAULT_TAB_ORDER !== 'undefined' && DEFAULT_TAB_ORDER.indexOf('whales-next') < 0) DEFAULT_TAB_ORDER.push('whales-next');
       if (typeof SECTION_COPY !== 'undefined') SECTION_COPY['whales-next'] = {
         eyebrow: 'Post-TGE', title: NEXT_TITLE,
-        description: 'Follow the tracked whales into their next farming projects.', chip: 'next farms'
+        description: 'Farming projects, with Varriors’ picks and reasons to farm.', chip: 'next farms'
       };
       if (typeof VALID_TABS !== 'undefined' && VALID_TABS.indexOf('whales') < 0) VALID_TABS.push('whales');
       if (typeof DEFAULT_TAB_ORDER !== 'undefined' && DEFAULT_TAB_ORDER.indexOf('whales') < 0) {
