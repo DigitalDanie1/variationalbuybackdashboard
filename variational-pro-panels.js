@@ -19,19 +19,19 @@
     var section = document.createElement('section');
     section.className = 'tsec tg-hide';
     section.setAttribute('data-tg', TAB);
-    section.innerHTML = '<div class="cmp-heading"><span class="cmp-eyebrow">POST-TGE</span>' +
-      '<h2>Variational Pro</h2></div>' +
-      '<div class="vp-game-layout"><figure class="vp-game"><div class="vp-game-toolbar"><span>VARIATIONAL PRO · TITLE SCREEN</span>' +
+    section.innerHTML = '<div class="vp-game-layout"><figure class="vp-game">' +
+      '<div class="vp-game-toolbar"><span><i></i> THE NEXT CHAPTER OF VARIATIONAL</span>' +
       '<button class="vp-sound-toggle" type="button" aria-pressed="false" aria-label="Play music">▶ Play music</button></div>' +
-      '<div class="vp-title-screen"><img class="vp-wordmark" src="assets/pro/variational-wordmark.png" width="1275" height="400" alt="Variational">' +
-      '<div class="vp-version"><span>PRO VERSION</span><small>A NEW CHAPTER AWAITS</small></div>' +
-      '<img class="vp-landscape" src="assets/pro/pro-version-title.svg?v=compact" width="512" height="296" alt="A mysterious flying silhouette above a retro pixel landscape. Coming soon."><div class="vp-coming">COMING SOON<span>UNKNOWN TERRITORY. FAMILIAR INSTINCT.</span></div></div>' +
+      '<div class="vp-title-screen"><div class="vp-brand"><img class="vp-wordmark" src="assets/pro/variational-wordmark.png" width="1275" height="400" alt="Variational"><span>PRO</span></div>' +
+      '<div class="vp-hero-copy"><p class="vp-kicker">A NEW HORIZON</p><h2>BIGGER MARKETS.<br><em>BIGGER AMBITION.</em></h2>' +
+      '<p class="vp-intro">For traders looking beyond the next trade.<br>The next chapter of Variational is on the horizon.</p></div>' +
+      '<div class="vp-horizon" aria-hidden="true"><span class="vp-giant-pro">PRO</span><img class="vp-landscape" src="assets/pro/pro-version-title.svg?v=compact" width="512" height="296" alt=""></div>' +
+      '<div class="vp-coming"><span class="vp-coming-label">COMING SOON</span><span class="vp-coming-note">SOMETHING BIGGER IS TAKING SHAPE.</span><span class="vp-coming-index">01 / A NEW ERA</span></div></div>' +
       '<figcaption>Variational Pro · The next chapter.</figcaption></figure>' +
-      '<aside class="vp-sound" aria-label="Title screen soundtrack"><span class="cmp-eyebrow">GAME BOY CLASSICS</span>' +
-      '<h3 class="vp-sound-title">Pokémon Gold &amp; Silver</h3><p>Title Screen</p>' +
+      '<aside class="vp-sound" aria-label="Title screen soundtrack">' +
       '<p class="vp-sound-status" role="status" aria-live="polite">Press play to start the title theme.</p>' +
       '<div class="vp-sound-player" hidden></div>' +
-      '<a href="https://www.youtube.com/watch?v=' + MUSIC_VIDEO + '" target="_blank" rel="noopener noreferrer">Soundtrack on YouTube ↗</a></aside></div>';
+      '<a href="https://www.youtube.com/watch?v=' + MUSIC_VIDEO + '" target="_blank" rel="noopener noreferrer">Pokémon Gold &amp; Silver · Title Screen ↗</a></aside></div>';
     main.appendChild(section);
 
     var soundToggle = section.querySelector('.vp-sound-toggle');
@@ -94,25 +94,31 @@
 
     var style = document.createElement('style');
     style.textContent = `
-.vp-game-layout{display:grid;gap:16px;max-width:680px;margin:24px auto 0}
-.vp-game{margin:0;padding:14px;border:1px solid var(--line);background:var(--panel)}
-.vp-game-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px;color:var(--muted);font:10px/1.5 var(--mono);letter-spacing:1px}
-.vp-title-screen{background:#1b2032;border:1px solid #40506d;box-shadow:0 0 0 4px #111827;overflow:hidden;text-align:center}
-.vp-title-screen .vp-wordmark{display:block;width:min(100%,360px);height:auto;margin:0 auto}
-.vp-version{display:grid;justify-items:center;gap:12px;margin-top:-12px;padding:0 12px 18px;color:#fff}
-.vp-version>span{font:900 clamp(18px,3vw,25px)/1.2 var(--mono);letter-spacing:5px;padding:8px 14px 8px 19px;color:#dcecff;background:#263a5b;border:2px solid #4c9af8;box-shadow:3px 3px 0 #080d1e;text-shadow:2px 2px #080d1e}
-.vp-version small{font:9px/1.4 var(--mono);letter-spacing:3px;color:#8da7cf}
-.vp-landscape{display:block;width:100%;height:150px;object-fit:fill;image-rendering:pixelated}
-.vp-coming{padding:14px 12px 16px;background:#050806;color:#f3f7e9;font:700 clamp(18px,3vw,22px)/1.2 var(--mono);letter-spacing:4px;text-shadow:2px 2px #3a4b42}
-.vp-coming span{display:block;margin-top:12px;font:9px/1.5 var(--mono);letter-spacing:1.5px;color:#77958e;text-shadow:none}
-.vp-game figcaption{margin-top:14px;color:var(--muted);font:10px/1.5 var(--mono);text-align:center}
-.vp-sound{padding:0 6px;min-width:0}.vp-sound .cmp-eyebrow,.vp-sound>.vp-sound-title,.vp-sound>p:not(.vp-sound-status){display:none}
-.vp-sound .vp-sound-status{color:var(--muted)!important;font:11px/1.5 var(--mono);margin:0 0 8px}
-.vp-sound-toggle{padding:10px 16px;min-height:42px;border:1px solid #4c9af8;border-radius:3px;background:#1b2a43;color:#dcecff;font:700 11px var(--mono);cursor:pointer;white-space:nowrap;letter-spacing:0}
-.vp-sound-toggle[aria-pressed="true"]{background:#4c9af8;color:#081326}.vp-sound-toggle:hover{border-color:#91c4ff}.vp-sound-toggle:focus-visible{outline:2px solid #91c4ff;outline-offset:3px}
-.vp-sound a{color:var(--v2-accent,#4c9af8);font:10px var(--mono)}
-.vp-sound-player[hidden]{display:none!important}.vp-sound-player{margin:12px 0;max-width:360px}.vp-sound-player iframe{display:block;width:100%;height:203px;min-width:200px;min-height:200px;border:0;background:#000}
-@media(max-width:600px){.vp-game{padding:12px}.vp-game-toolbar{font-size:8px;letter-spacing:0}.vp-sound-toggle{padding:10px;font-size:10px}.vp-version{margin-top:-4px}.vp-landscape{height:145px}.vp-coming span{font-size:8px;letter-spacing:.5px}}
+.tsec[data-tg="variational-pro"]{padding-top:18px}
+.vp-game-layout{display:grid;gap:14px;width:100%;margin:0}
+.vp-game{position:relative;margin:0;border:1px solid #334768;background:#111a2c;overflow:hidden;color:#fff}
+.vp-game-toolbar{position:relative;z-index:3;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:18px 28px;border-bottom:1px solid #344767;color:#b9c9e5;font:10px/1.5 var(--mono);letter-spacing:1.5px}
+.vp-game-toolbar>span{display:flex;align-items:center;gap:10px}.vp-game-toolbar i{width:6px;height:6px;background:#4c9af8;box-shadow:0 0 16px #4c9af8;border-radius:50%;flex:none}
+.vp-title-screen{position:relative;isolation:isolate;display:flex;flex-direction:column;min-height:660px;min-height:max(660px,calc(100svh - 245px));background:radial-gradient(ellipse at 90% 65%,#224677 0,transparent 58%),linear-gradient(135deg,#1b2032 30%,#101d34 100%);overflow:hidden}
+.vp-title-screen:after{content:"";position:absolute;inset:0;z-index:-1;opacity:.12;background-image:linear-gradient(#8bacda 1px,transparent 1px),linear-gradient(90deg,#8bacda 1px,transparent 1px);background-size:64px 64px;mask-image:linear-gradient(transparent,#000)}
+.vp-brand{display:flex;align-items:center;gap:8px;padding:12px 30px 0;position:relative;z-index:2}.vp-wordmark{display:block;width:min(52%,390px);height:auto;mix-blend-mode:screen}.vp-brand>span{font:700 13px/1 var(--mono);letter-spacing:3px;border:1px solid #588fda;padding:8px 10px;color:#a6cbff;margin-left:-12px}
+.vp-hero-copy{position:relative;z-index:2;padding:5px 44px 0}.vp-kicker{color:#83b7ff!important;font:11px/1.5 var(--mono)!important;letter-spacing:4px;margin:0 0 22px!important}
+body.v2-dashboard .vp-hero-copy h2{font:900 clamp(36px,5.4vw,86px)/.99 var(--sans,Arial,sans-serif)!important;letter-spacing:-.065em!important;color:#fff!important;margin:0!important;text-transform:uppercase;max-width:100%}
+.vp-hero-copy h2 em{font-style:normal;color:#68a8ff;text-shadow:0 0 50px #4c9af822}
+.vp-intro{font:14px/1.8 var(--sans,Arial,sans-serif)!important;color:#bdcde6!important;margin:26px 0 0!important;max-width:460px}
+.vp-horizon{position:relative;min-height:150px;flex:1;margin-top:10px;overflow:hidden}
+.vp-giant-pro{position:absolute;right:18px;bottom:-32px;font:900 clamp(150px,25vw,340px)/.8 var(--sans,Arial,sans-serif);letter-spacing:-.08em;color:transparent;-webkit-text-stroke:1px #6298e43d;user-select:none}
+.vp-landscape{position:absolute;inset:auto 0 0;display:block;width:100%;height:110px;object-fit:fill;image-rendering:pixelated;opacity:.28;mix-blend-mode:screen;mask-image:linear-gradient(transparent,#000 40%)}
+.vp-coming{position:relative;z-index:2;display:flex;align-items:center;flex-wrap:wrap;gap:12px 22px;padding:24px 44px;background:#0a1220d9;border-top:1px solid #527bae66}
+.vp-coming-label{color:#fff;font:800 15px/1.3 var(--mono);letter-spacing:3px}.vp-coming-note{color:#8da7cb;font:9px/1.5 var(--mono);letter-spacing:1.5px}.vp-coming-index{margin-left:auto;color:#6695d2;font:9px/1.5 var(--mono);letter-spacing:1px}
+.vp-game figcaption{display:none}
+.vp-sound{padding:0 2px;min-width:0}.vp-sound .vp-sound-status{color:var(--muted)!important;font:11px/1.5 var(--mono);margin:0 0 8px}
+.vp-sound-toggle{padding:10px 14px;min-height:42px;border:1px solid #5d83b5;border-radius:2px;background:#1c304d;color:#e2edff;font:700 11px var(--mono);cursor:pointer;white-space:nowrap;letter-spacing:0}
+.vp-sound-toggle[aria-pressed="true"]{background:#4c9af8;color:#081326}.vp-sound-toggle:hover{border-color:#acd0ff}.vp-sound-toggle:focus-visible{outline:2px solid #acd0ff;outline-offset:3px}
+.vp-sound a{color:var(--v2-accent,#4c9af8);font:10px var(--mono)}.vp-sound-player[hidden]{display:none!important}.vp-sound-player{margin:12px 0;max-width:360px}.vp-sound-player iframe{display:block;width:100%;height:203px;min-width:200px;min-height:200px;border:0;background:#000}
+@media(min-width:1500px){body.v2-dashboard .vp-hero-copy h2{font-size:clamp(86px,5.6vw,128px)!important}.vp-title-screen{min-height:740px}}
+@media(max-width:900px){.vp-hero-copy{padding:12px 26px 0}body.v2-dashboard .vp-hero-copy h2{font-size:clamp(34px,6.2vw,62px)!important}.vp-coming{padding:22px 26px}.vp-brand{padding-left:18px}.vp-title-screen{min-height:620px}}
+@media(max-width:600px){.vp-game-toolbar{padding:12px 16px;font-size:8px;letter-spacing:.5px}.vp-game-toolbar>span{max-width:155px}.vp-sound-toggle{padding:9px;font-size:10px}.vp-brand{padding:16px 4px 12px}.vp-wordmark{width:70%}.vp-brand>span{font-size:10px;padding:6px;margin-left:-6px}.vp-hero-copy{padding:5px 20px 0}body.v2-dashboard .vp-hero-copy h2{font-size:clamp(30px,8.2vw,48px)!important;letter-spacing:-.06em!important}.vp-kicker{font-size:9px!important;letter-spacing:2px;margin-bottom:20px!important}.vp-intro{font-size:12px!important;margin-top:22px!important}.vp-title-screen{min-height:580px}.vp-coming{padding:20px;gap:12px}.vp-coming-label{font-size:13px}.vp-coming-note{font-size:8px}.vp-coming-index{display:none}.vp-giant-pro{font-size:200px;right:10px;bottom:-16px}}
 `;
     document.head.appendChild(style);
 
