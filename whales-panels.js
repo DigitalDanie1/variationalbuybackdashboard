@@ -278,7 +278,7 @@
       '</div>' +
       '<div class="wh-pts"><b>' + (w.approximate ? '~' : '') + int(w.points) + '</b>' +
         '<span class="wh-bar" aria-hidden="true"><i style="width:' + bar.toFixed(1) + '%"></i></span>' +
-        '<em>' + (w.approximate ? '예상치 · approximate self-report · ' : '') + (r.share * 100).toFixed(2) + '% of all points</em></div>' +
+        '<em>' + (w.approximate ? 'approximate self-report · ' : '') + (r.share * 100).toFixed(2) + '% of all points</em></div>' +
       '<div class="wh-val"><b>' + esc(usd(r.value)) + '</b><em>at ' + esc(fdvLabel(fdv)) + ' FDV</em></div>' +
       '<div class="wh-asof' + (stale ? ' stale' : '') + '"><b>' + esc(dateLabel(w.asOf)) + '</b>' +
         '<em>' + (stale ? r.age + 'd old · stale' : (r.age <= 0 ? 'today' : r.age + 'd ago')) + '</em>' +
@@ -314,14 +314,14 @@
     var indirect = !!w.minimumEstimate;
     var share = points / projection.pool;
     return '<li class="wh-row wh-pending">' +
-      '<span class="wh-rank">' + (indirect ? esc(w.rankLabel || '—') : '≤100') + '<small>예상치 · ' + (indirect ? 'indirect report' : 'assumed') + '</small></span>' +
+      '<span class="wh-rank">' + (indirect ? esc(w.rankLabel || '—') : '≤100') + '<small>' + (indirect ? 'indirect report' : 'assumed') + '</small></span>' +
       '<div class="wh-who">' + profileAvatar(w) +
       '<div><b>' + esc(profileFor(w).name || w.name) + '</b><a href="' + esc(w.profile) + '" target="_blank" rel="noopener noreferrer">@' + esc(w.handle) + '</a></div></div>' +
-      '<div class="wh-pts"><b>' + (floor || indirect ? '≥' : '~') + int(points) + '</b><em>예상치 · ' + (indirect ? '30,000+ band · indirect report' : floor ? '20,000-point minimum scenario' : 'Top 100 cutoff scenario') + '</em><em>' + (share * 100).toFixed(3) + '% of projected points</em></div>' +
-      '<div class="wh-val"><b>~' + esc(usd(share * AIRDROP_SHARE * fdv)) + '</b><em>예상치 · at ' + esc(fdvLabel(fdv)) + ' FDV</em></div>' +
+      '<div class="wh-pts"><b>' + (floor || indirect ? '≥' : '~') + int(points) + '</b><em>' + (indirect ? '30,000+ band · indirect report' : floor ? '20,000-point minimum scenario' : 'Top 100 cutoff scenario') + '</em><em>' + (share * 100).toFixed(3) + '% of projected points</em></div>' +
+      '<div class="wh-val"><b>~' + esc(usd(share * AIRDROP_SHARE * fdv)) + '</b><em>at ' + esc(fdvLabel(fdv)) + ' FDV</em></div>' +
       '<div class="wh-asof"><b>' + esc(dateLabel(projection.asOf)) + '</b><em>model week · not a disclosure</em>' +
       (evidence ? '<a href="' + esc(evidence) + '" target="_blank" rel="noopener noreferrer">' + (indirect ? 'indexed report ↗' : 'context only ↗') + '</a>' : '') + '</div>' +
-      '<div class="wh-said"><p>' + (indirect ? '예상치: an indexed repost places Lynn03 around #6 and the Top 10 in the 30,000+ points band. Valued at a 30,000-point floor; original post date and exact balance remain unverified.' : floor ? '예상치: user-specified minimum of 20,000 points; valued at the higher of that floor and the projected Top 100 cutoff.' : '예상치: assumed to be at least Top 100; valued at the projected #100 cutoff.') + ' Actual current balance and rank are unverified.' +
+      '<div class="wh-said"><p>' + (indirect ? 'an indexed repost places Lynn03 around #6 and the Top 10 in the 30,000+ points band. Valued at a 30,000-point floor; original post date and exact balance remain unverified.' : floor ? 'user-specified minimum of 20,000 points; valued at the higher of that floor and the projected Top 100 cutoff.' : 'assumed to be at least Top 100; valued at the projected #100 cutoff.') + ' Actual current balance and rank are unverified.' +
       (w.pointsLabel && !indirect ? ' Earlier indirect report: ' + esc(w.pointsLabel) + ' points; not used in this scenario.' : '') + '</p></div></li>';
   }
 
@@ -333,17 +333,17 @@
     return '<article class="wh-distribution" aria-labelledby="wh-distribution-title">' +
       '<div class="wh-distribution-head"><div class="wh-who"><img src="assets/whales/yh_0x.jpg" alt="yh_0x profile" width="40" height="40">' +
       '<div><b>yh_0x · baseline source</b><a href="' + source + '" target="_blank" rel="noopener noreferrer">@yh_0x · original post ↗</a></div></div>' +
-      '<span class="wh-tier">예상치 · weekly projection</span></div>' +
+      '<span class="wh-tier">weekly projection</span></div>' +
       '<h3 id="wh-distribution-title">How the points are distributed</h3>' +
-      '<p>예상치 · Model week ' + esc(d.asOf) + ' (SGT), +' + d.weeks + ' completed weeks from the Oct 4, 2026 Week 42 snapshot. Next increase: ' + esc(d.next) + ' at 00:00 SGT.</p>' +
-      '<div class="wh-distribution-metrics"><div><span>Issued points · 예상치</span><b>' + (d.pool / 1e6).toFixed(2) + 'M</b><em>9.44M + ' + d.weeks + ' × 150,000</em></div>' +
-      '<div><span>Top 100 cutoff · 예상치</span><b>~' + int(d.top100) + '</b><em>9,340 × pool growth</em></div>' +
+      '<p>Model week ' + esc(d.asOf) + ' (SGT), +' + d.weeks + ' completed weeks from the Oct 4, 2026 Week 42 snapshot. Next increase: ' + esc(d.next) + ' at 00:00 SGT.</p>' +
+      '<div class="wh-distribution-metrics"><div><span>Issued points</span><b>' + (d.pool / 1e6).toFixed(2) + 'M</b><em>9.44M + ' + d.weeks + ' × 150,000</em></div>' +
+      '<div><span>Top 100 cutoff</span><b>~' + int(d.top100) + '</b><em>9,340 × pool growth</em></div>' +
       '<div><span>Weekly increase · assumed</span><b>150,000</b><em>every Sunday · SGT</em></div>' +
       '<div><span>Top 1,000 share · assumed</span><b>~50.7%</b><em>baseline shares held constant</em></div></div>' +
       '<p>This scenario adds 150,000 points per completed week and scales rank cutoffs in proportion to the pool. Rank-band shares stay constant; this is a projection, not a refreshed leaderboard. The 31,693 weekly earners were observed in Week 42 only.</p>' +
-      '<div class="wh-projection-grid"><div><h4>Points by rank band · 예상치</h4><table class="wh-projection-table"><thead><tr><th>Rank band</th><th>Share assumed</th><th>Points est.</th></tr></thead><tbody>' +
+      '<div class="wh-projection-grid"><div><h4>Points by rank band</h4><table class="wh-projection-table"><thead><tr><th>Rank band</th><th>Share assumed</th><th>Points est.</th></tr></thead><tbody>' +
       bands.map(function (b) { return '<tr><td>' + b[0] + '</td><td>' + b[1].toFixed(1) + '%</td><td>' + int(d.pool * b[1] / 100) + '</td></tr>'; }).join('') +
-      '</tbody></table></div><div><h4>Rank cutoffs · 예상치</h4><table class="wh-projection-table"><thead><tr><th>Rank</th><th>Points est.</th></tr></thead><tbody>' +
+      '</tbody></table></div><div><h4>Rank cutoffs</h4><table class="wh-projection-table"><thead><tr><th>Rank</th><th>Points est.</th></tr></thead><tbody>' +
       cutoffs.map(function (c) { return '<tr' + (c[0] === 100 ? ' class="wh-cutoff-selected"' : '') + '><td>Top ' + int(c[0]) + '</td><td>~' + int(c[1] * d.scale) + '</td></tr>'; }).join('') +
       '</tbody></table></div></div>' +
       '<details class="wh-baseline"><summary>Original Week 42 snapshot · historical reference</summary><p>Oct 4, 2026 source images. These remain unchanged; the current scenario is shown above.</p>' +
@@ -374,26 +374,26 @@
     host.innerHTML =
       '<div class="cmp-heading"><span class="cmp-eyebrow">WHALES</span>' +
       '<h2>Who sits at the top of the points board</h2>' +
-      '<p>Publicly disclosed points and explicit scenarios. Dated cards are self-reported; cards older than two weeks are marked stale. Unverified accounts use a Top 100 cutoff scenario, with a 20,000-point minimum for seven selected accounts and a 30,000-point indirect estimate for Lynn03. CorgiI’s dated ~10,000 figure is an approximate self-report. All assumptions are labeled 예상치 (estimate).</p></div>' +
+      '<p>Publicly disclosed points and explicit scenarios. Dated cards are self-reported; cards older than two weeks are marked stale. Unverified accounts use a Top 100 cutoff scenario, with a 20,000-point minimum for seven selected accounts and a 30,000-point indirect estimate for Lynn03. CorgiI’s dated ~10,000 figure is an approximate self-report. All assumptions are labeled estimates.</p></div>' +
       distributionReport() +
       '<div class="wh-readouts">' +
         '<div><span>Accounts tracked</span><b>' + (rs.length + WATCHLIST.length) + '</b><em>' + rs.length + ' dated disclosures · ' + WATCHLIST.length + ' estimates (7 at 20k; Lynn03 at 30k)</em></div>' +
-        '<div><span>Combined points · mixed / 예상치</span><b>~' + int(total + estimatedTotal) + '</b><em>' + int(total) + ' dated + ' + int(estimatedTotal) + ' estimated · ' + ((total + estimatedTotal) / pool * 100).toFixed(2) + '% of projected pool</em></div>' +
+        '<div><span>Combined points · mixed</span><b>~' + int(total + estimatedTotal) + '</b><em>' + int(total) + ' dated + ' + int(estimatedTotal) + ' estimated · ' + ((total + estimatedTotal) / pool * 100).toFixed(2) + '% of projected pool</em></div>' +
         '<div><span>All points issued, est.</span><b>' + (pool / 1e6).toFixed(2) + 'M</b><em>weekly distribution scenario</em></div>' +
       '</div>' +
       '<div class="tp-chips wh-chips"><span>Value at FDV</span>' + chips + '</div>' +
       '<div class="wh-readouts wh-economic" aria-label="Combined economic weight estimates">' +
-        '<div><span>Economic weight · 예상치</span><b>~' + (airdropWeight * 100).toFixed(2) + '%</b><em>share of the 32% Genesis airdrop allocation</em></div>' +
-        '<div><span>Share of total token supply · 예상치</span><b>~' + (supplyWeight * 100).toFixed(2) + '%</b><em>32% allocation × ' + (airdropWeight * 100).toFixed(2) + '% points share</em></div>' +
-        '<div><span>Combined economic value · 예상치</span><b>~' + esc(usd(supplyWeight * fdv)) + '</b><em>at ' + esc(fdvLabel(fdv)) + ' FDV · all ' + (rs.length + WATCHLIST.length) + ' accounts</em></div>' +
+        '<div><span>Economic weight</span><b>~' + (airdropWeight * 100).toFixed(2) + '%</b><em>share of the 32% Genesis airdrop allocation</em></div>' +
+        '<div><span>Share of total token supply</span><b>~' + (supplyWeight * 100).toFixed(2) + '%</b><em>32% allocation × ' + (airdropWeight * 100).toFixed(2) + '% points share</em></div>' +
+        '<div><span>Combined economic value</span><b>~' + esc(usd(supplyWeight * fdv)) + '</b><em>at ' + esc(fdvLabel(fdv)) + ' FDV · all ' + (rs.length + WATCHLIST.length) + ' accounts</em></div>' +
       '</div>' +
       '<div class="wh-allocation"><div class="wh-allocation-label"><b>Inside the 32% airdrop allocation</b><span>Tracked whales ~' + (airdropWeight * 100).toFixed(2) + '% · Others ~' + ((1 - airdropWeight) * 100).toFixed(2) + '%</span></div>' +
         '<div class="wh-allocation-bar" role="img" aria-label="Tracked whales receive an estimated ' + (airdropWeight * 100).toFixed(2) + ' percent of the Genesis airdrop allocation"><span style="width:' + (airdropWeight * 100).toFixed(4) + '%"></span></div>' +
-        '<p>예상치 · ' + int(combinedPoints) + ' combined points ÷ ' + int(pool) + ' projected points = ' + (airdropWeight * 100).toFixed(2) + '% of the airdrop. That is ' + (supplyWeight * 100).toFixed(2) + ' percentage points out of the 32% of total supply reserved for Genesis. Uses disclosed balances and scenario estimates together, with one current projected pool; dated account-row valuations use their historical pools.</p></div>' +
+        '<p>' + int(combinedPoints) + ' combined points ÷ ' + int(pool) + ' projected points = ' + (airdropWeight * 100).toFixed(2) + '% of the airdrop. That is ' + (supplyWeight * 100).toFixed(2) + ' percentage points out of the 32% of total supply reserved for Genesis. Uses disclosed balances and scenario estimates together, with one current projected pool; dated account-row valuations use their historical pools.</p></div>' +
       '<ol class="wh-list">' + rs.map(function (r) { return row(r, top); }).join('') + WATCHLIST.map(pendingRow).join('') + '</ol>' +
       spread(rs) +
       '<p class="wh-spread">Scenario assumption: nine accounts use the projected Top 100 cutoff; seven use a user-specified 20,000-point minimum; Lynn03 uses a 30,000-point floor from an indirect report. Floors apply unless the projected Top 100 cutoff is higher. This is not evidence of their actual rank or balance. The combined figure mixes dated disclosures with these estimates; related posts are context only.</p>' +
-      '<div class="tp-note"><b>How the value is worked out.</b> Dated disclosures (including CorgiI’s approximate self-report): points ÷ the Points Calculator pool at the card date × 32% Genesis airdrop × selected FDV. 예상치 rows: scenario points ÷ the projected distribution pool × 32% × selected FDV. Both models are estimates. The 20,000 and 30,000-point minimums stay fixed until revised; its projected share and value change as the pool grows.</div>';
+      '<div class="tp-note"><b>How the value is worked out.</b> Dated disclosures (including CorgiI’s approximate self-report): points ÷ the Points Calculator pool at the card date × 32% Genesis airdrop × selected FDV. Estimated rows: scenario points ÷ the projected distribution pool × 32% × selected FDV. Both models are estimates. The 20,000 and 30,000-point minimums stay fixed until revised; its projected share and value change as the pool grows.</div>';
   }
 
   var STYLE =
