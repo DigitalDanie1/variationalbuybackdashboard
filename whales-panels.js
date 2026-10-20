@@ -325,6 +325,39 @@
       (w.pointsLabel && !indirect ? ' Earlier indirect report: ' + esc(w.pointsLabel) + ' points; not used in this scenario.' : '') + '</p></div></li>';
   }
 
+  function sellPressureGroups() {
+    return [
+      { rank: 2, share: 2 * 89111 / DISTRIBUTION_BASE_POOL, lowerBound: true },
+      { rank: 5, share: (2 * 89111 + 3 * 52500) / DISTRIBUTION_BASE_POOL, lowerBound: true },
+      { rank: 10, share: 0.061 },
+      { rank: 50, share: 0.148 },
+      { rank: 100, share: 0.208 },
+      { rank: 150, share: 0.208 + 50 * 7250 / DISTRIBUTION_BASE_POOL, lowerBound: true }
+    ];
+  }
+
+  function sellPressureReport() {
+    var chips = FDVS.map(function (v) {
+      return '<button type="button" data-wh-fdv="' + v + '" aria-pressed="' + (v === fdv) + '"' + (v === fdv ? ' class="on"' : '') + '>' + fdvLabel(v) + '</button>';
+    }).join('');
+    return '<section class="wh-sell-pressure" aria-labelledby="wh-sell-title">' +
+      '<h4 id="wh-sell-title">Potential airdrop sell pressure</h4>' +
+      '<p>Cumulative rank groups across the entire points board, not just the 23 tracked accounts. Each group receives its points share of the 32% Genesis allocation. Selling scenarios below use ' + esc(fdvLabel(fdv)) + ' FDV.</p>' +
+      '<div class="tp-chips wh-chips"><span>Value at FDV</span>' + chips + '</div>' +
+      '<div class="wh-sell-scroll"><table class="wh-projection-table wh-sell-table"><thead><tr><th scope="col">Rank group</th><th scope="col">Share of 32% airdrop</th><th scope="col">Share of total supply</th><th scope="col">Sell 25%</th><th scope="col">Sell 50%</th><th scope="col">Sell 100%</th></tr></thead><tbody>' +
+      sellPressureGroups().map(function (g) {
+        var prefix = g.lowerBound ? '≥' : '~';
+        var value = g.share * AIRDROP_SHARE * fdv;
+        return '<tr' + (g.rank === 100 ? ' class="wh-cutoff-selected"' : '') + '><th scope="row">Top ' + g.rank + '<small>' + (g.lowerBound ? 'cutoff lower bound' : 'band share model') + '</small></th>' +
+          '<td>' + prefix + (g.share * 100).toFixed(2) + '%</td><td>' + prefix + (g.share * AIRDROP_SHARE * 100).toFixed(2) + '%</td>' +
+          '<td>' + prefix + usd(value * 0.25) + '</td><td>' + prefix + usd(value * 0.5) + '</td><td>' + prefix + usd(value) + '</td></tr>';
+      }).join('') + '</tbody></table></div>' +
+      '<p><b>Read each row separately.</b> Top 100 includes Top 50, Top 10, Top 5 and Top 2; adding rows would double count. At ' + esc(fdvLabel(fdv)) + ' FDV, Top 100 holds ~6.66% of total supply: selling half corresponds to ~3.33% of supply, or ~' + usd(0.208 * AIRDROP_SHARE * fdv * 0.5) + ' in nominal value.</p>' +
+      '<details class="wh-baseline"><summary>Calculation &amp; assumptions</summary><p>Group allocation = group points share × 32% of total supply. Sale value = allocation × selected FDV × fraction sold. Top 10 = 6.1%; Top 50 = 6.1% + 8.7%; Top 100 = 6.1% + 8.7% + 6.0%, from the baseline rank bands.</p>' +
+      '<p>Exact group totals for Top 2, Top 5 and Top 150 are unavailable. Their lower bounds use the baseline cutoffs: Top 2 = 2 × 89,111 points; Top 5 = that Top 2 floor + 3 × 52,500; Top 150 = Top 100 band share + 50 × 7,250 points ÷ 9.44M. Proportional weekly growth preserves these shares. Rounded baseline data make these indicative bounds.</p></details>' +
+      '<p>These are hypothetical nominal sale values at the selected FDV, not forecasts of who will sell, executable proceeds, or price declines. Assumes the full 32% Genesis allocation is distributed proportionally to points and available to sell; final point totals and distribution terms may change.</p></section>';
+  }
+
   function distributionReport() {
     var source = 'https://x.com/yh_0x/status/2106449057933857025';
     var d = distributionAt(Date.now());
@@ -346,6 +379,7 @@
       '</tbody></table></div><div><h4>Rank cutoffs</h4><table class="wh-projection-table"><thead><tr><th>Rank</th><th>Points est.</th></tr></thead><tbody>' +
       cutoffs.map(function (c) { return '<tr' + (c[0] === 100 ? ' class="wh-cutoff-selected"' : '') + '><td>Top ' + int(c[0]) + '</td><td>~' + int(c[1] * d.scale) + '</td></tr>'; }).join('') +
       '</tbody></table></div></div>' +
+      sellPressureReport() +
       '<details class="wh-baseline"><summary>Original Week 42 snapshot · historical reference</summary><p>Oct 4, 2026 source images. These remain unchanged; the current scenario is shown above.</p>' +
       '<div class="wh-distribution-images"><figure><a href="assets/whales/yh-week42-1.jpg" target="_blank" rel="noopener noreferrer">' +
       '<img src="assets/whales/yh-week42-1.jpg" alt="Historical Week 42 points distribution, 9.44M points" width="1080" height="1350" loading="lazy"></a><figcaption>Historical distribution</figcaption></figure>' +
@@ -397,6 +431,7 @@
   }
 
   var STYLE =
+    '.wh-sell-pressure{border-top:1px solid var(--line);padding-top:22px;margin-top:24px}.wh-sell-pressure>h4{margin:0;color:var(--text);font:800 18px var(--sans)}.wh-sell-scroll{overflow-x:auto;margin:18px 0}.wh-sell-table{min-width:690px}.wh-sell-table tbody th{color:var(--text);font-size:12px;font-weight:700}.wh-sell-table small{display:block;margin-top:4px;color:var(--muted);font-size:9px;font-weight:400}.wh-sell-table td{white-space:nowrap}' +
     '.wh-economic>div{border-color:color-mix(in srgb,var(--v2-accent,#4c9af8) 40%,var(--line))}.wh-economic b{color:var(--v2-accent,#4c9af8)!important}.wh-allocation{margin:0 0 24px;padding:16px;border:1px solid var(--line);background:var(--panel)}.wh-allocation-label{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font:11px/1.6 var(--mono);color:var(--text)}.wh-allocation-label span{color:var(--muted)}.wh-allocation-bar{height:12px;overflow:hidden;margin:12px 0;background:color-mix(in srgb,var(--muted) 20%,transparent);border-radius:2px}.wh-allocation-bar>span{display:block;height:100%;background:var(--v2-accent,#4c9af8)}.wh-allocation p{margin:0;color:var(--muted)!important;font-size:11px;line-height:1.7}' +
     '.wh-distribution{margin:0 0 28px;padding:22px;border:1px solid var(--line);background:var(--panel)}' +
     '.wh-distribution-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}' +
