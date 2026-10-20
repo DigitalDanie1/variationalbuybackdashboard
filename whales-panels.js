@@ -198,6 +198,9 @@
 
   var FDVS = [1e9, 2.5e9, 5e9, 10e9];
   var fdv = 5e9;
+  var whaleSort = 'points';
+  var whaleSortDirection = 'desc';
+  var WHALE_SORT_FIELDS = { points: 'Points', value: 'Value', rank: 'Disclosed rank', name: 'Name', date: 'Disclosure date' };
 
   function esc(s) {
     return String(s).replace(/[&<>"]/g, function (c) {
@@ -267,7 +270,7 @@
       ? '<p class="wh-weekly"><span>Last ' + w.weekly.length + ' weekly drops</span>' +
         w.weekly.map(function (v) { return '<b>' + esc(v.toFixed(1)) + '</b>'; }).join('') + '</p>'
       : '';
-    return '<li class="wh-row">' +
+    return '<li class="wh-row" data-wh-handle="' + esc(w.handle) + '">' +
       (w.rank ? '<span class="wh-rank"><i>#</i>' + w.rank + '</span>'
               : '<span class="wh-rank none" title="rank not shown on the posted card">—<small>not shown</small></span>') +
       '<div class="wh-who">' +
@@ -313,7 +316,7 @@
     var floor = has20kFloor(w);
     var indirect = !!w.minimumEstimate;
     var share = points / projection.pool;
-    return '<li class="wh-row wh-pending">' +
+    return '<li class="wh-row wh-pending" data-wh-handle="' + esc(w.handle) + '">' +
       '<span class="wh-rank">' + (indirect ? esc(w.rankLabel || '—') : '≤100') + '<small>' + (indirect ? 'indirect report' : 'assumed') + '</small></span>' +
       '<div class="wh-who">' + profileAvatar(w) +
       '<div><b>' + esc(profileFor(w).name || w.name) + '</b><a href="' + esc(w.profile) + '" target="_blank" rel="noopener noreferrer">@' + esc(w.handle) + '</a></div></div>' +
@@ -405,11 +408,66 @@
       '<a class="wh-distribution-source" href="' + source + '" target="_blank" rel="noopener noreferrer">Read the baseline analysis on X ↗</a></article>';
   }
 
+  function sortedWhaleRows() {
+    var projection = distributionAt(Date.now());
+    var all = rows().map(function (r) {
+      return { w: r.w, disclosed: r, points: r.w.points, value: r.value,
+        rank: r.w.rank || null, date: r.w.asOf || null, name: profileFor(r.w).name || r.w.name };
+    }).concat(WATCHLIST.map(function (w) {
+      var points = estimatedPoints(w, projection);
+      return { w: w, disclosed: null, points: points, value: points / projection.pool * AIRDROP_SHARE * fdv,
+        rank: null, date: null, name: profileFor(w).name || w.name };
+    }));
+    return all.sort(function (a, b) {
+      var av = a[whaleSort], bv = b[whaleSort];
+      // A scenario rank or model week is not a disclosed rank or balance date.
+      // Missing disclosure fields stay last in either direction.
+      if (av == null && bv != null) return 1;
+      if (bv == null && av != null) return -1;
+      var result = av == null ? 0 : typeof av === 'number' ? av - bv : av.localeCompare(bv, 'en', { sensitivity: 'base' });
+      return (whaleSortDirection === 'asc' ? result : -result) || a.w.handle.localeCompare(b.w.handle);
+    });
+  }
+
+  function whaleListHtml() {
+    var all = sortedWhaleRows();
+    var top = Math.max.apply(null, all.map(function (r) { return r.points; }).concat([1]));
+    return all.map(function (r) { return r.disclosed ? row(r.disclosed, top) : pendingRow(r.w); }).join('');
+  }
+
+  function whaleSortStatus() {
+    return (WHALES.length + WATCHLIST.length) + ' accounts · ' + WHALE_SORT_FIELDS[whaleSort] + ' · ' + whaleSortDirection + 'ending' +
+      (whaleSort === 'rank' || whaleSort === 'date' ? ' · undisclosed last' : '');
+  }
+
+  function whaleSortControls() {
+    return '<div class="wh-sort"><label for="wh-sort-field">Sort by</label>' +
+      '<select id="wh-sort-field" data-wh-sort>' + Object.keys(WHALE_SORT_FIELDS).map(function (key) {
+        return '<option value="' + key + '"' + (key === whaleSort ? ' selected' : '') + '>' + WHALE_SORT_FIELDS[key] + '</option>';
+      }).join('') + '</select>' +
+      '<button type="button" data-wh-sort-direction aria-label="Switch to ' + (whaleSortDirection === 'asc' ? 'descending' : 'ascending') + ' order">' +
+        (whaleSortDirection === 'asc' ? 'Ascending ↑' : 'Descending ↓') + '</button>' +
+      '<span class="wh-sort-status" role="status" aria-live="polite">' + esc(whaleSortStatus()) + '</span></div>';
+  }
+
+  function updateWhaleSort() {
+    var host = document.querySelector('[data-tg="whales"]');
+    if (!host) return;
+    var list = host.querySelector('.wh-list');
+    if (list) list.innerHTML = whaleListHtml();
+    var button = host.querySelector('[data-wh-sort-direction]');
+    if (button) {
+      button.textContent = whaleSortDirection === 'asc' ? 'Ascending ↑' : 'Descending ↓';
+      button.setAttribute('aria-label', 'Switch to ' + (whaleSortDirection === 'asc' ? 'descending' : 'ascending') + ' order');
+    }
+    var status = host.querySelector('.wh-sort-status');
+    if (status) status.textContent = whaleSortStatus();
+  }
+
   function render() {
     var host = document.querySelector('[data-tg="whales"]');
     if (!host) return;
     var rs = rows();
-    var top = rs.length ? rs[0].w.points : 1;
     var total = rs.reduce(function (a, r) { return a + r.w.points; }, 0);
     var projection = distributionAt(Date.now());
     var pool = projection.pool;
@@ -439,13 +497,15 @@
       '<div class="wh-allocation"><div class="wh-allocation-label"><b>Inside the 32% airdrop allocation</b><span>Tracked whales ~' + (airdropWeight * 100).toFixed(2) + '% · Others ~' + ((1 - airdropWeight) * 100).toFixed(2) + '%</span></div>' +
         '<div class="wh-allocation-bar" role="img" aria-label="Tracked whales receive an estimated ' + (airdropWeight * 100).toFixed(2) + ' percent of the Genesis airdrop allocation"><span style="width:' + (airdropWeight * 100).toFixed(4) + '%"></span></div>' +
         '<p>' + int(combinedPoints) + ' combined points ÷ ' + int(pool) + ' projected points = ' + (airdropWeight * 100).toFixed(2) + '% of the airdrop. That is ' + (supplyWeight * 100).toFixed(2) + ' percentage points out of the 32% of total supply reserved for Genesis. Uses disclosed balances and scenario estimates together, with one current projected pool; dated account-row valuations use their historical pools.</p></div>' +
-      '<ol class="wh-list">' + rs.map(function (r) { return row(r, top); }).join('') + WATCHLIST.map(pendingRow).join('') + '</ol>' +
+      whaleSortControls() +
+      '<ol class="wh-list">' + whaleListHtml() + '</ol>' +
       spread(rs) +
       '<p class="wh-spread">Scenario assumption: nine accounts use the projected Top 100 cutoff; seven use a user-specified 20,000-point minimum; Lynn03 uses a 30,000-point floor from an indirect report. Floors apply unless the projected Top 100 cutoff is higher. This is not evidence of their actual rank or balance. The combined figure mixes dated disclosures with these estimates; related posts are context only.</p>' +
       '<div class="tp-note"><b>How the value is worked out.</b> Dated disclosures (including CorgiI’s approximate self-report): points ÷ the Points Calculator pool at the card date × 32% Genesis airdrop × selected FDV. Estimated rows: scenario points ÷ the projected distribution pool × 32% × selected FDV. Both models are estimates. The 20,000 and 30,000-point minimums stay fixed until revised; its projected share and value change as the pool grows.</div>';
   }
 
   var STYLE =
+    '.wh-sort{display:flex;align-items:center;flex-wrap:wrap;gap:10px;margin:20px 0 14px}.wh-sort label{font:700 11px var(--mono);color:var(--muted)}.wh-sort select,.wh-sort button{min-height:40px;padding:9px 12px;border:1px solid var(--line);border-radius:4px;background:var(--panel);color:var(--text);font:700 12px var(--mono);cursor:pointer}.wh-sort select:focus-visible,.wh-sort button:focus-visible{outline:2px solid var(--v2-accent,#4c9af8);outline-offset:2px}.wh-sort-status{margin-left:auto;color:var(--muted);font:11px/1.5 var(--mono)}@media(max-width:600px){.wh-sort-status{flex-basis:100%;margin-left:0}.wh-sort select{max-width:50%}}' +
     '.wh-total-pressure{padding:22px;margin:0 0 28px;border:1px solid var(--line);background:var(--panel)}.wh-total-pressure h3{margin:12px 0 18px;color:var(--text);font-size:22px}.wh-total-pressure p{color:var(--muted)!important;font-size:13px;line-height:1.7}.wh-total-pressure .wh-readouts{margin:20px 0 30px}.wh-total-table{margin:20px 0}.wh-total-table tbody th{color:var(--text);font-size:12px}.wh-total-formula{font:12px/1.7 var(--mono)}.wh-flow-step{display:block;margin-top:24px}@media(max-width:700px){.wh-total-pressure{padding:16px}.wh-total-table th,.wh-total-table td{font-size:10px;padding:10px 4px}}' +
     '.wh-sell-pressure{border-top:1px solid var(--line);padding-top:22px;margin-top:24px}.wh-sell-pressure>h4{margin:0;color:var(--text);font:800 18px var(--sans)}.wh-sell-scroll{overflow-x:auto;margin:18px 0}.wh-sell-table{min-width:690px}.wh-sell-table tbody th{color:var(--text);font-size:12px;font-weight:700}.wh-sell-table small{display:block;margin-top:4px;color:var(--muted);font-size:9px;font-weight:400}.wh-sell-table td{white-space:nowrap}' +
     '.wh-economic>div{border-color:color-mix(in srgb,var(--v2-accent,#4c9af8) 40%,var(--line))}.wh-economic b{color:var(--v2-accent,#4c9af8)!important}.wh-allocation{margin:0 0 24px;padding:16px;border:1px solid var(--line);background:var(--panel)}.wh-allocation-label{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font:11px/1.6 var(--mono);color:var(--text)}.wh-allocation-label span{color:var(--muted)}.wh-allocation-bar{height:12px;overflow:hidden;margin:12px 0;background:color-mix(in srgb,var(--muted) 20%,transparent);border-radius:2px}.wh-allocation-bar>span{display:block;height:100%;background:var(--v2-accent,#4c9af8)}.wh-allocation p{margin:0;color:var(--muted)!important;font-size:11px;line-height:1.7}' +
@@ -663,10 +723,21 @@
       try { showTab(location.hash.slice(1), { push: false }); } catch (_) {}
     }
     document.addEventListener('click', function (e) {
+      if (e.target && e.target.closest && e.target.closest('[data-wh-sort-direction]')) {
+        whaleSortDirection = whaleSortDirection === 'asc' ? 'desc' : 'asc';
+        updateWhaleSort();
+        return;
+      }
       var b = e.target && e.target.closest && e.target.closest('[data-wh-fdv]');
       if (!b) return;
       fdv = +b.getAttribute('data-wh-fdv');
       render();
+    });
+    document.addEventListener('change', function (e) {
+      if (!e.target || !e.target.matches('[data-wh-sort]') || !Object.prototype.hasOwnProperty.call(WHALE_SORT_FIELDS, e.target.value)) return;
+      whaleSort = e.target.value;
+      whaleSortDirection = whaleSort === 'rank' || whaleSort === 'name' ? 'asc' : 'desc';
+      updateWhaleSort();
     });
   }
 
