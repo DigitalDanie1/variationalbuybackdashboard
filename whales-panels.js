@@ -365,12 +365,37 @@
       '<p class="wh-caption">Nominal selling scenario at the selected FDV, assuming the full Genesis allocation is available. Actual proceeds and price impact depend on holders and liquidity.</p></article>';
   }
 
+  function concentrationModel(d) {
+    var topShare = RANK_BANDS.slice(0, 3).reduce(function (sum, b) { return sum + b[1]; }, 0) / 100;
+    var nextShare = RANK_BANDS.slice(3, 6).reduce(function (sum, b) { return sum + b[1]; }, 0) / 100;
+    return { topShare: topShare, nextShare: nextShare, topPoints: d.pool * topShare, nextPoints: d.pool * nextShare,
+      equivalentAccounts: topShare / nextShare * 900,
+      perAccountMultiple: (topShare / 100) / (nextShare / 900),
+      circleDiameterRatio: Math.sqrt(topShare / nextShare),
+      top1000Share: topShare / (topShare + nextShare) };
+  }
+
+  function concentrationReport(d) {
+    var c = concentrationModel(d);
+    return '<figure class="wh-concentration" aria-labelledby="wh-concentration-title">' +
+      '<div class="wh-concentration-heading"><div><span class="cmp-eyebrow">THE CONCENTRATION GAP</span>' +
+      '<h4 id="wh-concentration-title">100 accounts.<br>The points of ~' + int(c.equivalentAccounts) + '.</h4></div>' +
+      '<b class="wh-concentration-multiple">' + c.perAccountMultiple.toFixed(2) + '×<small>points per account</small></b></div>' +
+      '<p class="wh-caption">Compared with the average account ranked 101–1,000. Circle area represents points held; the numbers inside are account counts.</p>' +
+      '<div class="wh-bubble-grid"><div class="wh-bubble-cohort"><div class="wh-bubble-stage"><div class="wh-point-bubble wh-top-bubble" style="width:' + (c.circleDiameterRatio * 100).toFixed(4) + '%"><b>100</b><span>accounts</span></div></div>' +
+      '<b class="wh-cohort-label">TOP 100</b><strong>~' + int(c.topPoints) + ' points</strong><span>' + (c.topShare * 100).toFixed(1) + '% of all points · ~' + int(c.topPoints / 100) + ' each</span></div>' +
+      '<div class="wh-bubble-cohort"><div class="wh-bubble-stage"><div class="wh-point-bubble wh-next-bubble"><b>900</b><span>accounts</span></div></div>' +
+      '<b class="wh-cohort-label">RANKS 101–1,000</b><strong>~' + int(c.nextPoints) + ' points</strong><span>' + (c.nextShare * 100).toFixed(1) + '% of all points · ~' + int(c.nextPoints / 900) + ' each</span></div></div>' +
+      '<figcaption>Within the Top 1,000, <b>10% of accounts hold ' + (c.top1000Share * 100).toFixed(1) + '% of the points.</b> The ~' + int(c.equivalentAccounts) + '-account comparison uses the next 900 accounts’ average, not ' + int(c.equivalentAccounts) + ' identified wallets. Based on the projected rank-band distribution.</figcaption></figure>';
+  }
+
   function distributionReport() {
     var source = 'https://x.com/yh_0x/status/2106449057933857025';
     var d = distributionAt(Date.now());
     return '<article class="wh-distribution" aria-labelledby="wh-distribution-title">' +
       '<span class="cmp-eyebrow">02 · DISTRIBUTION</span><h3 id="wh-distribution-title">Where could the selling come from?</h3>' +
       '<p class="wh-caption">' + (d.pool / 1e6).toFixed(2) + 'M projected points · model week ' + d.asOf + ' · +150,000 per week · next update ' + d.next + ' (00:00 SGT).</p>' +
+      concentrationReport(d) +
       '<div class="wh-band-bar" role="img" aria-label="Airdrop distribution: Top 100 holds 20.8 percent, ranks 101 to 1000 hold 29.9 percent, ranks 1001 and below hold 49.3 percent"><span style="width:20.8%"></span><span style="width:29.9%"></span><span style="width:49.3%"></span></div>' +
       '<div class="wh-band-legend"><span>Top 100 <b>20.8%</b></span><span>101–1,000 <b>29.9%</b></span><span>1,001+ <b>49.3%</b></span></div>' +
       sellPressureReport() +
@@ -475,6 +500,7 @@
   }
 
   var STYLE =
+    '.wh-concentration{margin:24px 0;padding:24px;border:1px solid var(--line);background:color-mix(in srgb,var(--v2-accent,#4c9af8) 4%,var(--panel));border-radius:6px}.wh-concentration-heading{display:flex;justify-content:space-between;align-items:center;gap:20px}.wh-concentration-heading h4{margin:10px 0 0;color:var(--text);font:800 clamp(24px,3vw,34px)/1.15 var(--sans);letter-spacing:-.8px}.wh-concentration-multiple{flex-shrink:0;color:var(--v2-accent,#4c9af8);font:800 38px/1 var(--mono);text-align:right}.wh-concentration-multiple small{display:block;margin-top:8px;color:var(--muted);font:11px/1.4 var(--mono)}.wh-bubble-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:28px;max-width:650px;margin:18px auto 22px}.wh-bubble-cohort{text-align:center;min-width:0}.wh-bubble-stage{display:grid;place-items:center;aspect-ratio:1;max-width:240px;margin:auto;width:100%}.wh-point-bubble{width:100%;aspect-ratio:1;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff}.wh-top-bubble{background:#2866bb}.wh-next-bubble{background:#665db3}.wh-point-bubble b{font:800 clamp(28px,4vw,54px)/1 var(--mono);color:#fff!important}.wh-point-bubble span{margin-top:8px;font:12px var(--mono);color:#fff!important}.wh-cohort-label{display:block;margin:14px 0 8px;color:var(--v2-accent,#4c9af8);font:800 10px var(--mono);letter-spacing:.7px}.wh-bubble-cohort:nth-child(2) .wh-cohort-label{color:#8f80d9}.wh-bubble-cohort>strong{display:block;color:var(--text);font:800 clamp(14px,1.8vw,20px)/1.5 var(--mono)}.wh-bubble-cohort>span{display:block;margin-top:4px;color:var(--muted);font:11px/1.6 var(--mono)}.wh-concentration figcaption{border-top:1px solid var(--line);padding-top:16px;color:var(--muted);font:12px/1.7 var(--sans)}.wh-concentration figcaption b{color:var(--text)}@media(max-width:600px){.wh-concentration{padding:16px}.wh-concentration-heading{gap:10px}.wh-concentration-heading h4{font-size:23px}.wh-concentration-multiple{font-size:28px}.wh-concentration-multiple small{font-size:9px}.wh-bubble-grid{gap:16px}.wh-point-bubble span{font-size:10px;margin-top:5px}.wh-bubble-cohort>span{font-size:10px}}' +
     '.wh-distribution .wh-top100-comparison{margin:18px 0 0;font-size:12px;line-height:1.7}.wh-top100-comparison b{color:var(--text)}.wh-group-points b{color:var(--text);font:700 12px var(--mono)}.wh-group-points>span{display:block;height:4px;margin-top:7px;background:color-mix(in srgb,var(--muted) 18%,transparent)}.wh-group-points i{display:block;height:100%;background:var(--v2-accent,#4c9af8)}' +
     '.wh-scenario-controls{display:flex;flex-wrap:wrap;gap:12px 28px;margin:18px 0}.wh-scenario-controls .wh-chips{margin:0}.wh-total-pressure .wh-readouts{margin:20px 0 14px}.wh-total-pressure .wh-caption,.wh-distribution .wh-caption{font-size:12px;margin:12px 0 0;line-height:1.6}.wh-band-bar{display:flex;height:20px;overflow:hidden;border-radius:3px;margin:22px 0 12px;gap:2px;background:var(--panel)}.wh-band-bar>span:nth-child(1){background:#4c9af8}.wh-band-bar>span:nth-child(2){background:#aaa2e8}.wh-band-bar>span:nth-child(3){background:#688099}.wh-band-legend{display:flex;flex-wrap:wrap;gap:10px 24px;font:11px/1.5 var(--mono);color:var(--muted)}.wh-band-legend>span::before{content:"";display:inline-block;width:8px;height:8px;margin-right:7px;background:#4c9af8}.wh-band-legend>span:nth-child(2)::before{background:#aaa2e8}.wh-band-legend>span:nth-child(3)::before{background:#688099}.wh-band-legend b{color:var(--text);margin-left:5px}.wh-inline-source{color:var(--v2-accent,#4c9af8)!important}.wh-account-notes{margin:0 0 18px}.wh-account-notes p{font-size:12px;line-height:1.7;color:var(--muted)!important}' +
     '.wh-sort{display:flex;align-items:center;flex-wrap:wrap;gap:10px;margin:20px 0 14px}.wh-sort label{font:700 11px var(--mono);color:var(--muted)}.wh-sort select,.wh-sort button{min-height:40px;padding:9px 12px;border:1px solid var(--line);border-radius:4px;background:var(--panel);color:var(--text);font:700 12px var(--mono);cursor:pointer}.wh-sort select:focus-visible,.wh-sort button:focus-visible{outline:2px solid var(--v2-accent,#4c9af8);outline-offset:2px}.wh-sort-status{margin-left:auto;color:var(--muted);font:11px/1.5 var(--mono)}@media(max-width:600px){.wh-sort-status{flex-basis:100%;margin-left:0}.wh-sort select{max-width:50%}}' +
