@@ -335,14 +335,16 @@
 
   function sellPressureReport() {
     var d = distributionAt(Date.now());
-    return '<div class="wh-sell-scroll"><table class="wh-projection-table wh-sell-table"><thead><tr><th scope="col">Cumulative rank</th><th scope="col">Points cutoff</th><th scope="col">Airdrop share</th><th scope="col">Total supply</th><th scope="col">Sell ' + int(sellFraction * 100) + '% · ' + fdvLabel(fdv) + ' FDV</th></tr></thead><tbody>' +
+    return '<p class="wh-top100-comparison"><b>Top 100 holds ~' + int(d.pool * 0.208) + ' points</b> out of ' + int(d.pool) + ' total (20.8%). Average: ~' + int(d.pool * 0.208 / 100) + ' per account; the #100 cutoff is ~' + int(d.top100) + '.</p>' +
+      '<div class="wh-sell-scroll"><table class="wh-projection-table wh-sell-table"><thead><tr><th scope="col">Cumulative rank</th><th scope="col">Group points</th><th scope="col">Cutoff / account</th><th scope="col">Airdrop share</th><th scope="col">Total supply</th><th scope="col">Sell ' + int(sellFraction * 100) + '% · ' + fdvLabel(fdv) + ' FDV</th></tr></thead><tbody>' +
       sellPressureGroups().map(function (g, i) {
         var prefix = g.lowerBound ? '≥' : '~';
         return '<tr' + (g.rank === 100 ? ' class="wh-cutoff-selected"' : '') + '><th scope="row">Top ' + g.rank + (g.lowerBound ? '<small>lower bound</small>' : '') + '</th>' +
+          '<td class="wh-group-points"><b>' + prefix + int(g.share * d.pool) + '</b><span aria-hidden="true"><i style="width:' + (g.share * 100).toFixed(2) + '%"></i></span></td>' +
           '<td>~' + int(RANK_CUTOFFS[i][1] * d.scale) + '</td><td>' + prefix + (g.share * 100).toFixed(2) + '%</td><td>' + prefix + (g.share * AIRDROP_SHARE * 100).toFixed(2) + '%</td>' +
           '<td>' + prefix + usd(g.share * AIRDROP_SHARE * fdv * sellFraction) + '</td></tr>';
       }).join('') + '</tbody></table></div>' +
-      '<p class="wh-caption">Cumulative groups overlap; read rows separately. Cutoffs are per account; shares and sale values cover the whole group. ≥ indicates an indicative lower bound.</p>';
+      '<p class="wh-caption">Group points are the combined holdings of all accounts in that rank group; cutoff is the minimum per-account balance at its boundary. Cumulative groups overlap; do not add rows. Bars use the same total-points scale. ≥ indicates an indicative lower bound.</p>';
   }
 
   function totalSellPressureReport() {
@@ -473,6 +475,7 @@
   }
 
   var STYLE =
+    '.wh-distribution .wh-top100-comparison{margin:18px 0 0;font-size:12px;line-height:1.7}.wh-top100-comparison b{color:var(--text)}.wh-group-points b{color:var(--text);font:700 12px var(--mono)}.wh-group-points>span{display:block;height:4px;margin-top:7px;background:color-mix(in srgb,var(--muted) 18%,transparent)}.wh-group-points i{display:block;height:100%;background:var(--v2-accent,#4c9af8)}' +
     '.wh-scenario-controls{display:flex;flex-wrap:wrap;gap:12px 28px;margin:18px 0}.wh-scenario-controls .wh-chips{margin:0}.wh-total-pressure .wh-readouts{margin:20px 0 14px}.wh-total-pressure .wh-caption,.wh-distribution .wh-caption{font-size:12px;margin:12px 0 0;line-height:1.6}.wh-band-bar{display:flex;height:20px;overflow:hidden;border-radius:3px;margin:22px 0 12px;gap:2px;background:var(--panel)}.wh-band-bar>span:nth-child(1){background:#4c9af8}.wh-band-bar>span:nth-child(2){background:#aaa2e8}.wh-band-bar>span:nth-child(3){background:#688099}.wh-band-legend{display:flex;flex-wrap:wrap;gap:10px 24px;font:11px/1.5 var(--mono);color:var(--muted)}.wh-band-legend>span::before{content:"";display:inline-block;width:8px;height:8px;margin-right:7px;background:#4c9af8}.wh-band-legend>span:nth-child(2)::before{background:#aaa2e8}.wh-band-legend>span:nth-child(3)::before{background:#688099}.wh-band-legend b{color:var(--text);margin-left:5px}.wh-inline-source{color:var(--v2-accent,#4c9af8)!important}.wh-account-notes{margin:0 0 18px}.wh-account-notes p{font-size:12px;line-height:1.7;color:var(--muted)!important}' +
     '.wh-sort{display:flex;align-items:center;flex-wrap:wrap;gap:10px;margin:20px 0 14px}.wh-sort label{font:700 11px var(--mono);color:var(--muted)}.wh-sort select,.wh-sort button{min-height:40px;padding:9px 12px;border:1px solid var(--line);border-radius:4px;background:var(--panel);color:var(--text);font:700 12px var(--mono);cursor:pointer}.wh-sort select:focus-visible,.wh-sort button:focus-visible{outline:2px solid var(--v2-accent,#4c9af8);outline-offset:2px}.wh-sort-status{margin-left:auto;color:var(--muted);font:11px/1.5 var(--mono)}@media(max-width:600px){.wh-sort-status{flex-basis:100%;margin-left:0}.wh-sort select{max-width:50%}}' +
     '.wh-total-pressure{padding:22px;margin:0 0 28px;border:1px solid var(--line);background:var(--panel)}.wh-total-pressure h3{margin:12px 0 18px;color:var(--text);font-size:22px}.wh-total-pressure p{color:var(--muted)!important;font-size:13px;line-height:1.7}.wh-total-pressure .wh-readouts{margin:20px 0 30px}.wh-total-table{margin:20px 0}.wh-total-table tbody th{color:var(--text);font-size:12px}.wh-total-formula{font:12px/1.7 var(--mono)}.wh-flow-step{display:block;margin-top:24px}@media(max-width:700px){.wh-total-pressure{padding:16px}.wh-total-table th,.wh-total-table td{font-size:10px;padding:10px 4px}}' +
