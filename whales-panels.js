@@ -47,6 +47,14 @@
 
   var WHALES = [
     {
+      handle: 'corgil', name: 'CorgiI',
+      points: 10000, approximate: true, rank: null, tier: 'Self-reported', asOf: '2026-10-09',
+      post: 'https://x.com/corgil/status/2108398853141508484',
+      cardSource: 'https://x.com/corgil/status/2083904756980883565',
+      cardImage: 'assets/whales/corgil-2026-08-02-card.jpg',
+      said: ['Oct 9: self-reported ~10k points after 15 months', 'Earlier Aug 2 card: 9,143 points · rank 90 · Silver', 'Current rank not disclosed; the Aug 2 rank is historical']
+    },
+    {
       handle: 'linenmito', name: 'LinenMito', avatar: 'assets/whales/linenmito.jpg',
       points: 90358.1, rank: 2, tier: 'Platinum', asOf: '2026-10-16',
       post: 'https://x.com/linenmito/status/2111046106272379225',
@@ -116,15 +124,9 @@
       handle: 'lynn000333', name: 'Lynn03',
       profile: 'https://x.com/lynn000333',
       pointsLabel: '30,000+ band', rankLabel: '~6',
+      minimumEstimate: 30000,
       pointsSource: 'https://ngntipkolamrenang.twstalker.com/poorlydrNFT',
       note: 'An indexed repost of Lynn03’s earlier public list places Lynn03 around #6 and describes the top 10 as holding 30k+ points. This is an indirect range, not an exact balance. Original date unverified; account now protected.'
-    },
-    {
-      handle: 'corgil', name: 'CorgiI',
-      profile: 'https://x.com/corgil',
-      post: 'https://x.com/corgil/status/2112005661894836603',
-      asOf: '2026-10-19',
-      note: 'Shares anticipation for Variational in the linked post.'
     },
     {
       handle: 'choffstein', name: 'Corey Hoffstein',
@@ -274,13 +276,14 @@
         '<a href="' + esc(w.post) + '" target="_blank" rel="noopener noreferrer">@' + esc(w.handle) + '</a>' +
         '<span class="wh-tier">' + esc(w.tier) + '</span></div>' +
       '</div>' +
-      '<div class="wh-pts"><b>' + int(w.points) + '</b>' +
+      '<div class="wh-pts"><b>' + (w.approximate ? '~' : '') + int(w.points) + '</b>' +
         '<span class="wh-bar" aria-hidden="true"><i style="width:' + bar.toFixed(1) + '%"></i></span>' +
-        '<em>' + (r.share * 100).toFixed(2) + '% of all points</em></div>' +
+        '<em>' + (w.approximate ? '예상치 · approximate self-report · ' : '') + (r.share * 100).toFixed(2) + '% of all points</em></div>' +
       '<div class="wh-val"><b>' + esc(usd(r.value)) + '</b><em>at ' + esc(fdvLabel(fdv)) + ' FDV</em></div>' +
       '<div class="wh-asof' + (stale ? ' stale' : '') + '"><b>' + esc(dateLabel(w.asOf)) + '</b>' +
         '<em>' + (stale ? r.age + 'd old · stale' : (r.age <= 0 ? 'today' : r.age + 'd ago')) + '</em>' +
-        '<a href="' + esc(w.post) + '" target="_blank" rel="noopener noreferrer">source ↗</a></div>' +
+        '<a href="' + esc(w.post) + '" target="_blank" rel="noopener noreferrer">source ↗</a>' +
+        (w.cardSource ? '<br><a href="' + esc(w.cardSource) + '" target="_blank" rel="noopener noreferrer">earlier card post ↗</a><br><a href="' + esc(w.cardImage) + '" target="_blank" rel="noopener noreferrer">view Aug 2 card ↗</a>' : '') + '</div>' +
       (said || weekly ? '<div class="wh-said">' + (said ? '<ul>' + said + '</ul>' : '') + weekly + '</div>' : '') +
       '</li>';
   }
@@ -291,14 +294,15 @@
     if (rs.length < 2) return '';
     var hi = rs[0], lo = rs[rs.length - 1];
     var mult = hi.w.points / lo.w.points;
-    return '<p class="wh-spread"><b>' + esc(hi.w.name) + ' holds ' + mult.toFixed(1) + '× the points of ' + esc(lo.w.name) + '.</b> ' +
-      'The gap between them is ' + int(hi.w.points - lo.w.points) + ' points — about ' +
+    return '<p class="wh-spread"><b>' + esc(hi.w.name) + ' holds ' + (hi.w.approximate || lo.w.approximate ? 'about ' : '') + mult.toFixed(1) + '× the points of ' + esc(lo.w.name) + '.</b> ' +
+      'The gap between them is ' + (hi.w.approximate || lo.w.approximate ? 'about ' : '') + int(hi.w.points - lo.w.points) + ' points — about ' +
       usd((hi.value - lo.value)) + ' of airdrop at ' + esc(fdvLabel(fdv)) + ' FDV.</p>';
   }
 
   var MIN_20K_HANDLES = ['systemicstrathl', 'izebel_eth', '0xdetweiler', 'taikimaeda2', 'shadowofintent3', 'derteil00', 'momentumkevin'];
   function has20kFloor(w) { return MIN_20K_HANDLES.indexOf(w.handle.toLowerCase()) >= 0; }
   function estimatedPoints(w, projection) {
+    if (w.minimumEstimate) return Math.max(w.minimumEstimate, projection.top100);
     return has20kFloor(w) ? Math.max(20000, projection.top100) : projection.top100;
   }
 
@@ -307,17 +311,18 @@
     var projection = distributionAt(Date.now());
     var points = estimatedPoints(w, projection);
     var floor = has20kFloor(w);
+    var indirect = !!w.minimumEstimate;
     var share = points / projection.pool;
     return '<li class="wh-row wh-pending">' +
-      '<span class="wh-rank">≤100<small>예상치 · assumed</small></span>' +
+      '<span class="wh-rank">' + (indirect ? esc(w.rankLabel || '—') : '≤100') + '<small>예상치 · ' + (indirect ? 'indirect report' : 'assumed') + '</small></span>' +
       '<div class="wh-who">' + profileAvatar(w) +
       '<div><b>' + esc(profileFor(w).name || w.name) + '</b><a href="' + esc(w.profile) + '" target="_blank" rel="noopener noreferrer">@' + esc(w.handle) + '</a></div></div>' +
-      '<div class="wh-pts"><b>' + (floor ? '≥' : '~') + int(points) + '</b><em>예상치 · ' + (floor ? '20,000-point minimum scenario' : 'Top 100 cutoff scenario') + '</em><em>' + (share * 100).toFixed(3) + '% of projected points</em></div>' +
+      '<div class="wh-pts"><b>' + (floor || indirect ? '≥' : '~') + int(points) + '</b><em>예상치 · ' + (indirect ? '30,000+ band · indirect report' : floor ? '20,000-point minimum scenario' : 'Top 100 cutoff scenario') + '</em><em>' + (share * 100).toFixed(3) + '% of projected points</em></div>' +
       '<div class="wh-val"><b>~' + esc(usd(share * AIRDROP_SHARE * fdv)) + '</b><em>예상치 · at ' + esc(fdvLabel(fdv)) + ' FDV</em></div>' +
       '<div class="wh-asof"><b>' + esc(dateLabel(projection.asOf)) + '</b><em>model week · not a disclosure</em>' +
-      (evidence ? '<a href="' + esc(evidence) + '" target="_blank" rel="noopener noreferrer">context only ↗</a>' : '') + '</div>' +
-      '<div class="wh-said"><p>' + (floor ? '예상치: user-specified minimum of 20,000 points; valued at the higher of that floor and the projected Top 100 cutoff.' : '예상치: assumed to be at least Top 100; valued at the projected #100 cutoff.') + ' Actual balance and rank are unverified.' +
-      (w.pointsLabel ? ' Earlier indirect report: ' + esc(w.pointsLabel) + ' points; not used in this scenario.' : '') + '</p></div></li>';
+      (evidence ? '<a href="' + esc(evidence) + '" target="_blank" rel="noopener noreferrer">' + (indirect ? 'indexed report ↗' : 'context only ↗') + '</a>' : '') + '</div>' +
+      '<div class="wh-said"><p>' + (indirect ? '예상치: an indexed repost places Lynn03 around #6 and the Top 10 in the 30,000+ points band. Valued at a 30,000-point floor; original post date and exact balance remain unverified.' : floor ? '예상치: user-specified minimum of 20,000 points; valued at the higher of that floor and the projected Top 100 cutoff.' : '예상치: assumed to be at least Top 100; valued at the projected #100 cutoff.') + ' Actual current balance and rank are unverified.' +
+      (w.pointsLabel && !indirect ? ' Earlier indirect report: ' + esc(w.pointsLabel) + ' points; not used in this scenario.' : '') + '</p></div></li>';
   }
 
   function distributionReport() {
@@ -366,18 +371,18 @@
     host.innerHTML =
       '<div class="cmp-heading"><span class="cmp-eyebrow">WHALES</span>' +
       '<h2>Who sits at the top of the points board</h2>' +
-      '<p>Publicly disclosed points and explicit scenarios. Dated cards are self-reported; cards older than two weeks are marked stale. Unverified accounts use a Top 100 cutoff scenario, with a 20,000-point minimum for seven selected accounts. All assumptions are labeled 예상치 (estimate).</p></div>' +
+      '<p>Publicly disclosed points and explicit scenarios. Dated cards are self-reported; cards older than two weeks are marked stale. Unverified accounts use a Top 100 cutoff scenario, with a 20,000-point minimum for seven selected accounts and a 30,000-point indirect estimate for Lynn03. CorgiI’s dated ~10,000 figure is an approximate self-report. All assumptions are labeled 예상치 (estimate).</p></div>' +
       distributionReport() +
       '<div class="wh-readouts">' +
-        '<div><span>Accounts tracked</span><b>' + (rs.length + WATCHLIST.length) + '</b><em>' + rs.length + ' dated totals · ' + WATCHLIST.length + ' estimates (7 at 20k minimum)</em></div>' +
+        '<div><span>Accounts tracked</span><b>' + (rs.length + WATCHLIST.length) + '</b><em>' + rs.length + ' dated disclosures · ' + WATCHLIST.length + ' estimates (7 at 20k; Lynn03 at 30k)</em></div>' +
         '<div><span>Combined points · mixed / 예상치</span><b>~' + int(total + estimatedTotal) + '</b><em>' + int(total) + ' dated + ' + int(estimatedTotal) + ' estimated · ' + ((total + estimatedTotal) / pool * 100).toFixed(2) + '% of projected pool</em></div>' +
         '<div><span>All points issued, est.</span><b>' + (pool / 1e6).toFixed(2) + 'M</b><em>weekly distribution scenario</em></div>' +
       '</div>' +
       '<div class="tp-chips wh-chips"><span>Value at FDV</span>' + chips + '</div>' +
       '<ol class="wh-list">' + rs.map(function (r) { return row(r, top); }).join('') + WATCHLIST.map(pendingRow).join('') + '</ol>' +
       spread(rs) +
-      '<p class="wh-spread">Scenario assumption: 11 unverified accounts use the projected Top 100 cutoff; seven selected accounts use a user-specified 20,000-point minimum (or the Top 100 cutoff if higher). This is not evidence of their actual rank or balance. The combined figure mixes dated disclosures with these estimates; related posts are context only.</p>' +
-      '<div class="tp-note"><b>How the value is worked out.</b> Dated cards: disclosed points ÷ the Points Calculator pool at the card date × 32% Genesis airdrop × selected FDV. 예상치 rows: scenario points ÷ the projected distribution pool × 32% × selected FDV. Both models are estimates. The 20,000-point minimum stays fixed until revised; its projected share and value change as the pool grows.</div>';
+      '<p class="wh-spread">Scenario assumption: nine accounts use the projected Top 100 cutoff; seven use a user-specified 20,000-point minimum; Lynn03 uses a 30,000-point floor from an indirect report. Floors apply unless the projected Top 100 cutoff is higher. This is not evidence of their actual rank or balance. The combined figure mixes dated disclosures with these estimates; related posts are context only.</p>' +
+      '<div class="tp-note"><b>How the value is worked out.</b> Dated disclosures (including CorgiI’s approximate self-report): points ÷ the Points Calculator pool at the card date × 32% Genesis airdrop × selected FDV. 예상치 rows: scenario points ÷ the projected distribution pool × 32% × selected FDV. Both models are estimates. The 20,000 and 30,000-point minimums stay fixed until revised; its projected share and value change as the pool grows.</div>';
   }
 
   var STYLE =
