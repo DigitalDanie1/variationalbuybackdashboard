@@ -40,7 +40,6 @@
     function stopMusic() {
       soundPlayer.replaceChildren(); // Removing the player also stops audio immediately.
       soundPlayer.hidden = true;
-      section.classList.remove('vp-music-active');
       soundToggle.setAttribute('aria-pressed', 'false');
       soundToggle.textContent = '▶ Play music';
       soundToggle.setAttribute('aria-label', 'Play music');
@@ -60,14 +59,14 @@
       frame.width = '360';
       frame.height = '203';
       soundPlayer.hidden = false;
-      section.classList.add('vp-music-active');
       soundPlayer.appendChild(frame);
       soundToggle.setAttribute('aria-pressed', 'true');
       soundToggle.textContent = '■ Stop music';
       soundToggle.setAttribute('aria-label', 'Stop music');
       soundStatus.textContent = 'Use Stop music above to turn the soundtrack off.';
     });
-    // showTab uses replaceState, so section visibility must also be observed.
+    // Observe navigation visibility only. Playback must not change this class list,
+    // otherwise stopping audio while hidden would trigger this observer again.
     new MutationObserver(function () { if (!isProActive()) stopMusic(); }).observe(section, { attributes: true, attributeFilter: ['class'] });
     window.addEventListener('hashchange', function () { if (!isProActive()) stopMusic(); });
     window.addEventListener('pagehide', stopMusic);
