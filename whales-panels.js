@@ -362,6 +362,9 @@
     var projection = distributionAt(Date.now());
     var pool = projection.pool;
     var estimatedTotal = WATCHLIST.reduce(function (sum, w) { return sum + estimatedPoints(w, projection); }, 0);
+    var combinedPoints = total + estimatedTotal;
+    var airdropWeight = combinedPoints / pool;
+    var supplyWeight = airdropWeight * AIRDROP_SHARE;
 
     var chips = FDVS.map(function (v) {
       return '<button type="button" data-wh-fdv="' + v + '"' + (v === fdv ? ' class="on" aria-pressed="true"' : ' aria-pressed="false"') + '>' +
@@ -379,6 +382,14 @@
         '<div><span>All points issued, est.</span><b>' + (pool / 1e6).toFixed(2) + 'M</b><em>weekly distribution scenario</em></div>' +
       '</div>' +
       '<div class="tp-chips wh-chips"><span>Value at FDV</span>' + chips + '</div>' +
+      '<div class="wh-readouts wh-economic" aria-label="Combined economic weight estimates">' +
+        '<div><span>Economic weight · 예상치</span><b>~' + (airdropWeight * 100).toFixed(2) + '%</b><em>share of the 32% Genesis airdrop allocation</em></div>' +
+        '<div><span>Share of total token supply · 예상치</span><b>~' + (supplyWeight * 100).toFixed(2) + '%</b><em>32% allocation × ' + (airdropWeight * 100).toFixed(2) + '% points share</em></div>' +
+        '<div><span>Combined economic value · 예상치</span><b>~' + esc(usd(supplyWeight * fdv)) + '</b><em>at ' + esc(fdvLabel(fdv)) + ' FDV · all ' + (rs.length + WATCHLIST.length) + ' accounts</em></div>' +
+      '</div>' +
+      '<div class="wh-allocation"><div class="wh-allocation-label"><b>Inside the 32% airdrop allocation</b><span>Tracked whales ~' + (airdropWeight * 100).toFixed(2) + '% · Others ~' + ((1 - airdropWeight) * 100).toFixed(2) + '%</span></div>' +
+        '<div class="wh-allocation-bar" role="img" aria-label="Tracked whales receive an estimated ' + (airdropWeight * 100).toFixed(2) + ' percent of the Genesis airdrop allocation"><span style="width:' + (airdropWeight * 100).toFixed(4) + '%"></span></div>' +
+        '<p>예상치 · ' + int(combinedPoints) + ' combined points ÷ ' + int(pool) + ' projected points = ' + (airdropWeight * 100).toFixed(2) + '% of the airdrop. That is ' + (supplyWeight * 100).toFixed(2) + ' percentage points out of the 32% of total supply reserved for Genesis. Uses disclosed balances and scenario estimates together, with one current projected pool; dated account-row valuations use their historical pools.</p></div>' +
       '<ol class="wh-list">' + rs.map(function (r) { return row(r, top); }).join('') + WATCHLIST.map(pendingRow).join('') + '</ol>' +
       spread(rs) +
       '<p class="wh-spread">Scenario assumption: nine accounts use the projected Top 100 cutoff; seven use a user-specified 20,000-point minimum; Lynn03 uses a 30,000-point floor from an indirect report. Floors apply unless the projected Top 100 cutoff is higher. This is not evidence of their actual rank or balance. The combined figure mixes dated disclosures with these estimates; related posts are context only.</p>' +
@@ -386,6 +397,7 @@
   }
 
   var STYLE =
+    '.wh-economic>div{border-color:color-mix(in srgb,var(--v2-accent,#4c9af8) 40%,var(--line))}.wh-economic b{color:var(--v2-accent,#4c9af8)!important}.wh-allocation{margin:0 0 24px;padding:16px;border:1px solid var(--line);background:var(--panel)}.wh-allocation-label{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font:11px/1.6 var(--mono);color:var(--text)}.wh-allocation-label span{color:var(--muted)}.wh-allocation-bar{height:12px;overflow:hidden;margin:12px 0;background:color-mix(in srgb,var(--muted) 20%,transparent);border-radius:2px}.wh-allocation-bar>span{display:block;height:100%;background:var(--v2-accent,#4c9af8)}.wh-allocation p{margin:0;color:var(--muted)!important;font-size:11px;line-height:1.7}' +
     '.wh-distribution{margin:0 0 28px;padding:22px;border:1px solid var(--line);background:var(--panel)}' +
     '.wh-distribution-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}' +
     '.wh-distribution h3{margin:20px 0 10px;color:var(--text);font-size:22px}' +
