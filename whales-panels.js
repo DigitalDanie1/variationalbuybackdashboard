@@ -198,6 +198,7 @@
 
   var FDVS = [1e9, 2.5e9, 5e9, 10e9];
   var fdv = 5e9;
+  var sellFraction = 0.5;
   var whaleSort = 'points';
   var whaleSortDirection = 'desc';
   var WHALE_SORT_FIELDS = { points: 'Points', value: 'Value', rank: 'Disclosed rank', name: 'Name', date: 'Disclosure date' };
@@ -291,17 +292,6 @@
       '</li>';
   }
 
-  /* One sentence about the spread between the rows, worked out from them so it stays true
-     as accounts are added. With fewer than two rows there is nothing to compare. */
-  function spread(rs) {
-    if (rs.length < 2) return '';
-    var hi = rs[0], lo = rs[rs.length - 1];
-    var mult = hi.w.points / lo.w.points;
-    return '<p class="wh-spread"><b>' + esc(hi.w.name) + ' holds ' + (hi.w.approximate || lo.w.approximate ? 'about ' : '') + mult.toFixed(1) + '× the points of ' + esc(lo.w.name) + '.</b> ' +
-      'The gap between them is ' + (hi.w.approximate || lo.w.approximate ? 'about ' : '') + int(hi.w.points - lo.w.points) + ' points — about ' +
-      usd((hi.value - lo.value)) + ' of airdrop at ' + esc(fdvLabel(fdv)) + ' FDV.</p>';
-  }
-
   var MIN_20K_HANDLES = ['systemicstrathl', 'izebel_eth', '0xdetweiler', 'taikimaeda2', 'shadowofintent3', 'derteil00', 'momentumkevin'];
   function has20kFloor(w) { return MIN_20K_HANDLES.indexOf(w.handle.toLowerCase()) >= 0; }
   function estimatedPoints(w, projection) {
@@ -324,9 +314,13 @@
       '<div class="wh-val"><b>~' + esc(usd(share * AIRDROP_SHARE * fdv)) + '</b><em>at ' + esc(fdvLabel(fdv)) + ' FDV</em></div>' +
       '<div class="wh-asof"><b>' + esc(dateLabel(projection.asOf)) + '</b><em>model week · not a disclosure</em>' +
       (evidence ? '<a href="' + esc(evidence) + '" target="_blank" rel="noopener noreferrer">' + (indirect ? 'indexed report ↗' : 'context only ↗') + '</a>' : '') + '</div>' +
-      '<div class="wh-said"><p>' + (indirect ? 'an indexed repost places Lynn03 around #6 and the Top 10 in the 30,000+ points band. Valued at a 30,000-point floor; original post date and exact balance remain unverified.' : floor ? 'user-specified minimum of 20,000 points; valued at the higher of that floor and the projected Top 100 cutoff.' : 'assumed to be at least Top 100; valued at the projected #100 cutoff.') + ' Actual current balance and rank are unverified.' +
-      (w.pointsLabel && !indirect ? ' Earlier indirect report: ' + esc(w.pointsLabel) + ' points; not used in this scenario.' : '') + '</p></div></li>';
+      (indirect ? '<div class="wh-said"><p>30,000+ band from an indexed repost; original date and exact balance unverified.</p></div>' :
+        w.pointsLabel ? '<div class="wh-said"><p>Earlier indirect report: ' + esc(w.pointsLabel) + ' points; not used in this scenario.</p></div>' : '') + '</li>';
+
   }
+
+  var RANK_BANDS = [['Top 10',6.1],['11–50',8.7],['51–100',6.0],['101–250',10.6],['251–500',9.2],['501–1,000',10.1],['1,001–2,000',11.1],['2,001–5,000',15.3],['5,001–10,000',10.9],['10,001–25,000',10.0],['25,001–74,000',2.0]];
+  var RANK_CUTOFFS = [[2,89111],[5,52500],[10,35200],[50,13900],[100,9340],[150,7250],[500,2570],[1000,1430],[2000,770],[5000,290],[10000,150],[15000,70],[25000,22],[29000,15]];
 
   function sellPressureGroups() {
     return [
@@ -340,21 +334,15 @@
   }
 
   function sellPressureReport() {
-    return '<section class="wh-sell-pressure" aria-labelledby="wh-sell-title">' +
-      '<h4 id="wh-sell-title">Sell pressure by rank group</h4>' +
-      '<p>Cumulative rank groups across the entire points board, not just the 23 tracked accounts. Each group receives its points share of the 32% Genesis allocation. Selling scenarios below use ' + esc(fdvLabel(fdv)) + ' FDV.</p>' +
-      '<div class="wh-sell-scroll"><table class="wh-projection-table wh-sell-table"><thead><tr><th scope="col">Rank group</th><th scope="col">Share of 32% airdrop</th><th scope="col">Share of total supply</th><th scope="col">Sell 25%</th><th scope="col">Sell 50%</th><th scope="col">Sell 100%</th></tr></thead><tbody>' +
-      sellPressureGroups().map(function (g) {
+    var d = distributionAt(Date.now());
+    return '<div class="wh-sell-scroll"><table class="wh-projection-table wh-sell-table"><thead><tr><th scope="col">Cumulative rank</th><th scope="col">Points cutoff</th><th scope="col">Airdrop share</th><th scope="col">Total supply</th><th scope="col">Sell ' + int(sellFraction * 100) + '% · ' + fdvLabel(fdv) + ' FDV</th></tr></thead><tbody>' +
+      sellPressureGroups().map(function (g, i) {
         var prefix = g.lowerBound ? '≥' : '~';
-        var value = g.share * AIRDROP_SHARE * fdv;
-        return '<tr' + (g.rank === 100 ? ' class="wh-cutoff-selected"' : '') + '><th scope="row">Top ' + g.rank + '<small>' + (g.lowerBound ? 'cutoff lower bound' : 'band share model') + '</small></th>' +
-          '<td>' + prefix + (g.share * 100).toFixed(2) + '%</td><td>' + prefix + (g.share * AIRDROP_SHARE * 100).toFixed(2) + '%</td>' +
-          '<td>' + prefix + usd(value * 0.25) + '</td><td>' + prefix + usd(value * 0.5) + '</td><td>' + prefix + usd(value) + '</td></tr>';
+        return '<tr' + (g.rank === 100 ? ' class="wh-cutoff-selected"' : '') + '><th scope="row">Top ' + g.rank + (g.lowerBound ? '<small>lower bound</small>' : '') + '</th>' +
+          '<td>~' + int(RANK_CUTOFFS[i][1] * d.scale) + '</td><td>' + prefix + (g.share * 100).toFixed(2) + '%</td><td>' + prefix + (g.share * AIRDROP_SHARE * 100).toFixed(2) + '%</td>' +
+          '<td>' + prefix + usd(g.share * AIRDROP_SHARE * fdv * sellFraction) + '</td></tr>';
       }).join('') + '</tbody></table></div>' +
-      '<p><b>Read each row separately.</b> Top 100 includes Top 50, Top 10, Top 5 and Top 2; adding rows would double count. At ' + esc(fdvLabel(fdv)) + ' FDV, Top 100 holds ~6.66% of total supply: selling half corresponds to ~3.33% of supply, or ~' + usd(0.208 * AIRDROP_SHARE * fdv * 0.5) + ' in nominal value.</p>' +
-      '<details class="wh-baseline"><summary>Calculation &amp; assumptions</summary><p>Group allocation = group points share × 32% of total supply. Sale value = allocation × selected FDV × fraction sold. Top 10 = 6.1%; Top 50 = 6.1% + 8.7%; Top 100 = 6.1% + 8.7% + 6.0%, from the baseline rank bands.</p>' +
-      '<p>Exact group totals for Top 2, Top 5 and Top 150 are unavailable. Their lower bounds use the baseline cutoffs: Top 2 = 2 × 89,111 points; Top 5 = that Top 2 floor + 3 × 52,500; Top 150 = Top 100 band share + 50 × 7,250 points ÷ 9.44M. Proportional weekly growth preserves these shares. Rounded baseline data make these indicative bounds.</p></details>' +
-      '<p>These are hypothetical nominal sale values at the selected FDV, not forecasts of who will sell, executable proceeds, or price declines. Assumes the full 32% Genesis allocation is distributed proportionally to points and available to sell; final point totals and distribution terms may change.</p></section>';
+      '<p class="wh-caption">Cumulative groups overlap; read rows separately. Cutoffs are per account; shares and sale values cover the whole group. ≥ indicates an indicative lower bound.</p>';
   }
 
   function totalSellPressureReport() {
@@ -362,50 +350,38 @@
     var chips = FDVS.map(function (v) {
       return '<button type="button" data-wh-fdv="' + v + '" aria-pressed="' + (v === fdv) + '"' + (v === fdv ? ' class="on"' : '') + '>' + fdvLabel(v) + '</button>';
     }).join('');
+    var saleChips = [0.25, 0.5, 1].map(function (rate) {
+      return '<button type="button" data-wh-sell="' + rate + '" aria-pressed="' + (rate === sellFraction) + '"' + (rate === sellFraction ? ' class="on"' : '') + '>' + int(rate * 100) + '%</button>';
+    }).join('');
     return '<article class="wh-total-pressure" aria-labelledby="wh-total-title">' +
-      '<span class="cmp-eyebrow">01 · SET THE FDV</span><h3 id="wh-total-title">Value the 32% Genesis airdrop</h3>' +
-      '<div class="tp-chips wh-chips"><span>FDV scenario</span>' + chips + '</div>' +
-      '<div class="wh-readouts wh-economic"><div><span>Selected FDV</span><b>' + fdvLabel(fdv) + '</b><em>valuation scenario</em></div>' +
-      '<div><span>Genesis airdrop allocation</span><b>32%</b><em>of total token supply</em></div>' +
-      '<div><span>Total airdrop value</span><b>' + usd(allocationValue) + '</b><em>' + fdvLabel(fdv) + ' FDV × 32%</em></div></div>' +
-      '<span class="cmp-eyebrow">02 · TOTAL SELL PRESSURE</span><h3>How much could reach the market?</h3>' +
-      '<p>Start with the entire airdrop. Compare the selling scenarios below before looking at which rank groups hold the allocation.</p>' +
-      '<table class="wh-projection-table wh-total-table"><thead><tr><th scope="col">Fraction of airdrop sold</th><th scope="col">Total supply sold</th><th scope="col">Nominal sale value</th></tr></thead><tbody>' +
-      [0.25, 0.5, 1].map(function (rate) {
-        return '<tr' + (rate === 0.5 ? ' class="wh-cutoff-selected"' : '') + '><th scope="row">' + int(rate * 100) + '% sold</th><td>' + int(AIRDROP_SHARE * rate * 100) + '% of supply</td><td>' + usd(allocationValue * rate) + '</td></tr>';
-      }).join('') + '</tbody></table>' +
-      '<p class="wh-total-formula">FDV × 32% allocation × fraction sold = nominal sell pressure.</p>' +
-      '<p>Assumes the full Genesis allocation is available to sell. These are sale scenarios at the selected valuation; actual selling, executable proceeds and price impact depend on holders and market liquidity.</p></article>';
+      '<span class="cmp-eyebrow">01 · AIRDROP &amp; SELL PRESSURE</span><h3 id="wh-total-title">32% of supply. How much could be sold?</h3>' +
+      '<div class="wh-scenario-controls"><div class="tp-chips wh-chips" role="group" aria-label="FDV scenario"><span>FDV</span>' + chips + '</div>' +
+      '<div class="tp-chips wh-chips" role="group" aria-label="Fraction of airdrop sold"><span>Airdrop sold</span>' + saleChips + '</div></div>' +
+      '<div class="wh-readouts wh-economic"><div><span>Total airdrop value</span><b>' + usd(allocationValue) + '</b><em>' + fdvLabel(fdv) + ' FDV × 32% of supply</em></div>' +
+      '<div><span>Potential sell pressure</span><b>' + usd(allocationValue * sellFraction) + '</b><em>' + int(sellFraction * 100) + '% of the airdrop sold</em></div>' +
+      '<div><span>Total supply sold</span><b>' + int(AIRDROP_SHARE * sellFraction * 100) + '%</b><em>32% allocation × ' + int(sellFraction * 100) + '% sold</em></div></div>' +
+      '<p class="wh-caption">Nominal selling scenario at the selected FDV, assuming the full Genesis allocation is available. Actual proceeds and price impact depend on holders and liquidity.</p></article>';
   }
 
   function distributionReport() {
     var source = 'https://x.com/yh_0x/status/2106449057933857025';
     var d = distributionAt(Date.now());
-    var bands = [['Top 10',6.1],['11–50',8.7],['51–100',6.0],['101–250',10.6],['251–500',9.2],['501–1,000',10.1],['1,001–2,000',11.1],['2,001–5,000',15.3],['5,001–10,000',10.9],['10,001–25,000',10.0],['25,001–74,000',2.0]];
-    var cutoffs = [[2,89111],[5,52500],[10,35200],[50,13900],[100,9340],[150,7250],[500,2570],[1000,1430],[2000,770],[5000,290],[10000,150],[15000,70],[25000,22],[29000,15]];
     return '<article class="wh-distribution" aria-labelledby="wh-distribution-title">' +
-      '<div class="wh-distribution-head"><div class="wh-who"><img src="assets/whales/yh_0x.jpg" alt="yh_0x profile" width="40" height="40">' +
-      '<div><b>yh_0x · baseline source</b><a href="' + source + '" target="_blank" rel="noopener noreferrer">@yh_0x · original post ↗</a></div></div>' +
-      '<span class="wh-tier">weekly projection</span></div>' +
-      '<span class="cmp-eyebrow wh-flow-step">03 · DISTRIBUTION</span><h3 id="wh-distribution-title">Who receives the airdrop?</h3>' +
-      '<p>The total ' + usd(AIRDROP_SHARE * fdv) + ' allocation at ' + fdvLabel(fdv) + ' FDV is split in proportion to points. The bands below show how that allocation is distributed.</p>' +
-      '<p>Model week ' + esc(d.asOf) + ' (SGT), +' + d.weeks + ' completed weeks from the Oct 4, 2026 Week 42 snapshot. Next increase: ' + esc(d.next) + ' at 00:00 SGT.</p>' +
-      '<div class="wh-distribution-metrics"><div><span>Issued points</span><b>' + (d.pool / 1e6).toFixed(2) + 'M</b><em>9.44M + ' + d.weeks + ' × 150,000</em></div>' +
-      '<div><span>Top 100 cutoff</span><b>~' + int(d.top100) + '</b><em>9,340 × pool growth</em></div>' +
-      '<div><span>Weekly increase · assumed</span><b>150,000</b><em>every Sunday · SGT</em></div>' +
-      '<div><span>Top 1,000 share · assumed</span><b>~50.7%</b><em>baseline shares held constant</em></div></div>' +
-      '<p>This scenario adds 150,000 points per completed week and scales rank cutoffs in proportion to the pool. Rank-band shares stay constant; this is a projection, not a refreshed leaderboard. The 31,693 weekly earners were observed in Week 42 only.</p>' +
-      '<div class="wh-projection-grid"><div><h4>Points by rank band</h4><table class="wh-projection-table"><thead><tr><th>Rank band</th><th>Share assumed</th><th>Points est.</th></tr></thead><tbody>' +
-      bands.map(function (b) { return '<tr><td>' + b[0] + '</td><td>' + b[1].toFixed(1) + '%</td><td>' + int(d.pool * b[1] / 100) + '</td></tr>'; }).join('') +
-      '</tbody></table></div><div><h4>Rank cutoffs</h4><table class="wh-projection-table"><thead><tr><th>Rank</th><th>Points est.</th></tr></thead><tbody>' +
-      cutoffs.map(function (c) { return '<tr' + (c[0] === 100 ? ' class="wh-cutoff-selected"' : '') + '><td>Top ' + int(c[0]) + '</td><td>~' + int(c[1] * d.scale) + '</td></tr>'; }).join('') +
-      '</tbody></table></div></div>' +
+      '<span class="cmp-eyebrow">02 · DISTRIBUTION</span><h3 id="wh-distribution-title">Where could the selling come from?</h3>' +
+      '<p class="wh-caption">' + (d.pool / 1e6).toFixed(2) + 'M projected points · model week ' + d.asOf + ' · +150,000 per week · next update ' + d.next + ' (00:00 SGT).</p>' +
+      '<div class="wh-band-bar" role="img" aria-label="Airdrop distribution: Top 100 holds 20.8 percent, ranks 101 to 1000 hold 29.9 percent, ranks 1001 and below hold 49.3 percent"><span style="width:20.8%"></span><span style="width:29.9%"></span><span style="width:49.3%"></span></div>' +
+      '<div class="wh-band-legend"><span>Top 100 <b>20.8%</b></span><span>101–1,000 <b>29.9%</b></span><span>1,001+ <b>49.3%</b></span></div>' +
       sellPressureReport() +
-      '<details class="wh-baseline"><summary>Original Week 42 snapshot · historical reference</summary><p>Oct 4, 2026 source images. These remain unchanged; the current scenario is shown above.</p>' +
-      '<div class="wh-distribution-images"><figure><a href="assets/whales/yh-week42-1.jpg" target="_blank" rel="noopener noreferrer">' +
-      '<img src="assets/whales/yh-week42-1.jpg" alt="Historical Week 42 points distribution, 9.44M points" width="1080" height="1350" loading="lazy"></a><figcaption>Historical distribution</figcaption></figure>' +
-      '<figure><a href="assets/whales/yh-week42-2.jpg" target="_blank" rel="noopener noreferrer"><img src="assets/whales/yh-week42-2.jpg" alt="Historical Week 42 rank cutoffs, Top 100 at 9,340+" width="1080" height="1350" loading="lazy"></a><figcaption>Historical rank cutoffs</figcaption></figure></div></details>' +
-      '<a class="wh-distribution-source" href="' + source + '" target="_blank" rel="noopener noreferrer">Read the baseline analysis on X ↗</a></article>';
+      '<details class="wh-baseline"><summary>Full distribution &amp; rank cutoffs</summary><div class="wh-projection-grid"><div><h4>Non-overlapping rank bands</h4><table class="wh-projection-table"><thead><tr><th>Rank band</th><th>Airdrop share</th><th>Points</th></tr></thead><tbody>' +
+      RANK_BANDS.map(function (b) { return '<tr><td>' + b[0] + '</td><td>' + b[1].toFixed(1) + '%</td><td>' + int(d.pool * b[1] / 100) + '</td></tr>'; }).join('') +
+      '</tbody></table></div><div><h4>Per-account cutoffs</h4><table class="wh-projection-table"><thead><tr><th>Rank</th><th>Points</th></tr></thead><tbody>' +
+      RANK_CUTOFFS.map(function (c) { return '<tr><td>Top ' + int(c[0]) + '</td><td>~' + int(c[1] * d.scale) + '</td></tr>'; }).join('') +
+      '</tbody></table></div></div></details>' +
+      '<details class="wh-baseline"><summary>Source &amp; projection method</summary><p>Baseline: <a class="wh-inline-source" href="' + source + '" target="_blank" rel="noopener noreferrer">yh_0x · Week 42 analysis ↗</a>, posted Oct 4, 2026 (SGT). Community-sourced, unofficial figures: 9.44M points; 31,693 weekly earners.</p>' +
+      '<p>Pool = 9.44M + completed weeks × 150,000. Cutoffs grow proportionally; rank-band shares stay fixed. This is a projection, not a refreshed leaderboard. Group supply share = points share × 32%; nominal sale value = supply share × FDV × fraction sold.</p>' +
+      '<p>Top 10 / 50 / 100 cumulative shares are 6.1% / 14.8% / 20.8%. Other group totals are unavailable: Top 2 floor = 2 × 89,111 points; Top 5 floor = Top 2 floor + 3 × 52,500; Top 150 floor = Top 100 band share + 50 × 7,250 ÷ 9.44M. Rounded baseline figures make these indicative bounds.</p>' +
+      '<div class="wh-distribution-images"><figure><a href="assets/whales/yh-week42-1.jpg" target="_blank" rel="noopener noreferrer"><img src="assets/whales/yh-week42-1.jpg" alt="Original Week 42 points distribution" width="1080" height="1350" loading="lazy"></a><figcaption>Original rank-band shares</figcaption></figure>' +
+      '<figure><a href="assets/whales/yh-week42-2.jpg" target="_blank" rel="noopener noreferrer"><img src="assets/whales/yh-week42-2.jpg" alt="Original Week 42 rank cutoffs" width="1080" height="1350" loading="lazy"></a><figcaption>Original cutoffs</figcaption></figure></div></details></article>';
   }
 
   function sortedWhaleRows() {
@@ -482,48 +458,34 @@
       '<p>Value the 32% Genesis allocation, size the potential selling, then see how the allocation is distributed across rank groups and tracked whales.</p></div>' +
       totalSellPressureReport() +
       distributionReport() +
-      '<div class="cmp-heading"><span class="cmp-eyebrow">04 · TRACKED WHALES</span><h3>The people behind the points</h3>' +
-      '<p>These ' + (rs.length + WATCHLIST.length) + ' tracked accounts are a subset of the full distribution above. Dated disclosures and scenario balances are mixed; cards older than two weeks are marked stale. Seven accounts use a 20,000-point minimum; Lynn03 uses an indirect 30,000-point floor; CorgiI’s ~10,000 is an approximate self-report.</p></div>' +
-      '<div class="wh-readouts">' +
-        '<div><span>Accounts tracked</span><b>' + (rs.length + WATCHLIST.length) + '</b><em>' + rs.length + ' dated disclosures · ' + WATCHLIST.length + ' estimates (7 at 20k; Lynn03 at 30k)</em></div>' +
-        '<div><span>Combined points · mixed</span><b>~' + int(total + estimatedTotal) + '</b><em>' + int(total) + ' dated + ' + int(estimatedTotal) + ' estimated · ' + ((total + estimatedTotal) / pool * 100).toFixed(2) + '% of projected pool</em></div>' +
-        '<div><span>All points issued, est.</span><b>' + (pool / 1e6).toFixed(2) + 'M</b><em>weekly distribution scenario</em></div>' +
+      '<div class="cmp-heading"><span class="cmp-eyebrow">03 · TRACKED WHALES</span><h3>The people behind the points</h3>' +
+      '<p>' + (rs.length + WATCHLIST.length) + ' tracked accounts · ' + rs.length + ' dated disclosures · ' + WATCHLIST.length + ' scenario balances.</p></div>' +
+      '<div class="wh-readouts wh-economic" aria-label="Tracked whale summary">' +
+        '<div><span>Combined points</span><b>~' + int(combinedPoints) + '</b><em>' + int(total) + ' disclosed + ' + int(estimatedTotal) + ' scenario points</em></div>' +
+        '<div><span>Share of airdrop</span><b>~' + (airdropWeight * 100).toFixed(2) + '%</b><em>~' + (supplyWeight * 100).toFixed(2) + '% of total token supply</em></div>' +
+        '<div><span>Potential selling · ' + int(sellFraction * 100) + '% sold</span><b>~' + esc(usd(supplyWeight * fdv * sellFraction)) + '</b><em>~' + esc(usd(supplyWeight * fdv)) + ' allocation at ' + esc(fdvLabel(fdv)) + ' FDV</em></div>' +
       '</div>' +
-      '<div class="wh-readouts wh-economic" aria-label="Combined economic weight estimates">' +
-        '<div><span>Economic weight</span><b>~' + (airdropWeight * 100).toFixed(2) + '%</b><em>share of the 32% Genesis airdrop allocation</em></div>' +
-        '<div><span>Share of total token supply</span><b>~' + (supplyWeight * 100).toFixed(2) + '%</b><em>32% allocation × ' + (airdropWeight * 100).toFixed(2) + '% points share</em></div>' +
-        '<div><span>Combined economic value</span><b>~' + esc(usd(supplyWeight * fdv)) + '</b><em>at ' + esc(fdvLabel(fdv)) + ' FDV · all ' + (rs.length + WATCHLIST.length) + ' accounts</em></div>' +
-      '</div>' +
-      '<div class="wh-allocation"><div class="wh-allocation-label"><b>Inside the 32% airdrop allocation</b><span>Tracked whales ~' + (airdropWeight * 100).toFixed(2) + '% · Others ~' + ((1 - airdropWeight) * 100).toFixed(2) + '%</span></div>' +
-        '<div class="wh-allocation-bar" role="img" aria-label="Tracked whales receive an estimated ' + (airdropWeight * 100).toFixed(2) + ' percent of the Genesis airdrop allocation"><span style="width:' + (airdropWeight * 100).toFixed(4) + '%"></span></div>' +
-        '<p>' + int(combinedPoints) + ' combined points ÷ ' + int(pool) + ' projected points = ' + (airdropWeight * 100).toFixed(2) + '% of the airdrop. That is ' + (supplyWeight * 100).toFixed(2) + ' percentage points out of the 32% of total supply reserved for Genesis. Uses disclosed balances and scenario estimates together, with one current projected pool; dated account-row valuations use their historical pools.</p></div>' +
+      '<details class="wh-baseline wh-account-notes"><summary>Account data &amp; valuation notes</summary>' +
+      '<p>Disclosures are self-reported and dated; records older than two weeks are marked stale. CorgiI’s Oct 9 balance is approximate. Scenario accounts have no verified current balance or rank: nine use the projected Top 100 cutoff; seven have a user-specified 20,000-point floor; Lynn03 has an indirect 30,000-point floor. The higher of a floor or the Top 100 cutoff is used.</p>' +
+      '<p>Combined points mix dated disclosures with scenario balances. Aggregate value uses one current projected pool: combined points ÷ pool × 32% × selected FDV. Dated rows retain card-date pools; scenario rows use the current pool. Sale scenarios multiply value by the selected fraction sold. Context links do not establish an account’s points balance.</p></details>' +
       whaleSortControls() +
-      '<ol class="wh-list">' + whaleListHtml() + '</ol>' +
-      spread(rs) +
-      '<p class="wh-spread">Scenario assumption: nine accounts use the projected Top 100 cutoff; seven use a user-specified 20,000-point minimum; Lynn03 uses a 30,000-point floor from an indirect report. Floors apply unless the projected Top 100 cutoff is higher. This is not evidence of their actual rank or balance. The combined figure mixes dated disclosures with these estimates; related posts are context only.</p>' +
-      '<div class="tp-note"><b>How the value is worked out.</b> Dated disclosures (including CorgiI’s approximate self-report): points ÷ the Points Calculator pool at the card date × 32% Genesis airdrop × selected FDV. Estimated rows: scenario points ÷ the projected distribution pool × 32% × selected FDV. Both models are estimates. The 20,000 and 30,000-point minimums stay fixed until revised; its projected share and value change as the pool grows.</div>';
+      '<ol class="wh-list">' + whaleListHtml() + '</ol>';
   }
 
   var STYLE =
+    '.wh-scenario-controls{display:flex;flex-wrap:wrap;gap:12px 28px;margin:18px 0}.wh-scenario-controls .wh-chips{margin:0}.wh-total-pressure .wh-readouts{margin:20px 0 14px}.wh-total-pressure .wh-caption,.wh-distribution .wh-caption{font-size:12px;margin:12px 0 0;line-height:1.6}.wh-band-bar{display:flex;height:20px;overflow:hidden;border-radius:3px;margin:22px 0 12px;gap:2px;background:var(--panel)}.wh-band-bar>span:nth-child(1){background:#4c9af8}.wh-band-bar>span:nth-child(2){background:#aaa2e8}.wh-band-bar>span:nth-child(3){background:#688099}.wh-band-legend{display:flex;flex-wrap:wrap;gap:10px 24px;font:11px/1.5 var(--mono);color:var(--muted)}.wh-band-legend>span::before{content:"";display:inline-block;width:8px;height:8px;margin-right:7px;background:#4c9af8}.wh-band-legend>span:nth-child(2)::before{background:#aaa2e8}.wh-band-legend>span:nth-child(3)::before{background:#688099}.wh-band-legend b{color:var(--text);margin-left:5px}.wh-inline-source{color:var(--v2-accent,#4c9af8)!important}.wh-account-notes{margin:0 0 18px}.wh-account-notes p{font-size:12px;line-height:1.7;color:var(--muted)!important}' +
     '.wh-sort{display:flex;align-items:center;flex-wrap:wrap;gap:10px;margin:20px 0 14px}.wh-sort label{font:700 11px var(--mono);color:var(--muted)}.wh-sort select,.wh-sort button{min-height:40px;padding:9px 12px;border:1px solid var(--line);border-radius:4px;background:var(--panel);color:var(--text);font:700 12px var(--mono);cursor:pointer}.wh-sort select:focus-visible,.wh-sort button:focus-visible{outline:2px solid var(--v2-accent,#4c9af8);outline-offset:2px}.wh-sort-status{margin-left:auto;color:var(--muted);font:11px/1.5 var(--mono)}@media(max-width:600px){.wh-sort-status{flex-basis:100%;margin-left:0}.wh-sort select{max-width:50%}}' +
     '.wh-total-pressure{padding:22px;margin:0 0 28px;border:1px solid var(--line);background:var(--panel)}.wh-total-pressure h3{margin:12px 0 18px;color:var(--text);font-size:22px}.wh-total-pressure p{color:var(--muted)!important;font-size:13px;line-height:1.7}.wh-total-pressure .wh-readouts{margin:20px 0 30px}.wh-total-table{margin:20px 0}.wh-total-table tbody th{color:var(--text);font-size:12px}.wh-total-formula{font:12px/1.7 var(--mono)}.wh-flow-step{display:block;margin-top:24px}@media(max-width:700px){.wh-total-pressure{padding:16px}.wh-total-table th,.wh-total-table td{font-size:10px;padding:10px 4px}}' +
     '.wh-sell-pressure{border-top:1px solid var(--line);padding-top:22px;margin-top:24px}.wh-sell-pressure>h4{margin:0;color:var(--text);font:800 18px var(--sans)}.wh-sell-scroll{overflow-x:auto;margin:18px 0}.wh-sell-table{min-width:690px}.wh-sell-table tbody th{color:var(--text);font-size:12px;font-weight:700}.wh-sell-table small{display:block;margin-top:4px;color:var(--muted);font-size:9px;font-weight:400}.wh-sell-table td{white-space:nowrap}' +
-    '.wh-economic>div{border-color:color-mix(in srgb,var(--v2-accent,#4c9af8) 40%,var(--line))}.wh-economic b{color:var(--v2-accent,#4c9af8)!important}.wh-allocation{margin:0 0 24px;padding:16px;border:1px solid var(--line);background:var(--panel)}.wh-allocation-label{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font:11px/1.6 var(--mono);color:var(--text)}.wh-allocation-label span{color:var(--muted)}.wh-allocation-bar{height:12px;overflow:hidden;margin:12px 0;background:color-mix(in srgb,var(--muted) 20%,transparent);border-radius:2px}.wh-allocation-bar>span{display:block;height:100%;background:var(--v2-accent,#4c9af8)}.wh-allocation p{margin:0;color:var(--muted)!important;font-size:11px;line-height:1.7}' +
+    '.wh-economic>div{border-color:color-mix(in srgb,var(--v2-accent,#4c9af8) 40%,var(--line))}.wh-economic b{color:var(--v2-accent,#4c9af8)!important}' +
     '.wh-distribution{margin:0 0 28px;padding:22px;border:1px solid var(--line);background:var(--panel)}' +
-    '.wh-distribution-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}' +
     '.wh-distribution h3{margin:20px 0 10px;color:var(--text);font-size:22px}' +
     '.wh-distribution p{margin:10px 0 18px;color:var(--muted)!important;font-size:13px;line-height:1.7}' +
-    '.wh-distribution-metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:20px 0}' +
-    '.wh-distribution-metrics>div{padding:14px;border:1px solid var(--line);min-width:0}' +
-    '.wh-distribution-metrics span{display:block;color:var(--muted)!important;font:800 10px var(--mono);text-transform:uppercase}' +
-    '.wh-distribution-metrics b{display:block;margin-top:8px;color:var(--text);font:700 23px var(--mono)}' +
-    '.wh-distribution-metrics em{display:block;margin-top:5px;color:var(--muted)!important;font-size:11px;font-style:normal}' +
     '.wh-projection-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px;margin:24px 0}.wh-projection-grid h4{color:var(--text);margin:0 0 12px;font-size:14px}.wh-projection-table{width:100%;border-collapse:collapse;font:12px var(--mono);color:var(--text)}.wh-projection-table th,.wh-projection-table td{padding:10px 6px;text-align:right;border-bottom:1px solid var(--line)}.wh-projection-table th:first-child,.wh-projection-table td:first-child{text-align:left}.wh-projection-table th{color:var(--muted);font-size:10px}.wh-cutoff-selected{background:color-mix(in srgb,var(--v2-accent,#4c9af8) 15%,transparent);font-weight:800}.wh-baseline{margin-top:20px}.wh-baseline summary{cursor:pointer;color:var(--muted);font:12px var(--mono)}' +
     '.wh-distribution-images{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}' +
     '.wh-distribution-images figure{margin:0;min-width:0}.wh-distribution-images img{display:block;width:100%;height:auto;border:1px solid var(--line)}' +
     '.wh-distribution-images figcaption{margin-top:8px;color:var(--muted)!important;font-size:11px}' +
-    '.wh-distribution-source{display:inline-block;margin-top:18px;color:var(--v2-accent,#4c9af8)!important;font:700 12px var(--mono)}' +
-    '@media(max-width:700px){.wh-distribution{padding:16px}.wh-distribution-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.wh-distribution-images,.wh-projection-grid{grid-template-columns:1fr}}' +
+    '@media(max-width:700px){.wh-distribution{padding:16px}.wh-distribution-images,.wh-projection-grid{grid-template-columns:1fr}}' +
     '.wh-readouts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:0 0 18px}' +
     '.wh-readouts>div{padding:14px 16px;border:1px solid var(--line);background:color-mix(in srgb,var(--panel) 72%,transparent);min-width:0}' +
     '.wh-readouts span{display:block;color:var(--muted)!important;font:800 9.5px var(--mono);letter-spacing:.7px;text-transform:uppercase}' +
@@ -726,6 +688,12 @@
       if (e.target && e.target.closest && e.target.closest('[data-wh-sort-direction]')) {
         whaleSortDirection = whaleSortDirection === 'asc' ? 'desc' : 'asc';
         updateWhaleSort();
+        return;
+      }
+      var sale = e.target && e.target.closest && e.target.closest('[data-wh-sell]');
+      if (sale && [0.25, 0.5, 1].indexOf(+sale.dataset.whSell) >= 0) {
+        sellFraction = +sale.dataset.whSell;
+        render();
         return;
       }
       var b = e.target && e.target.closest && e.target.closest('[data-wh-fdv]');
