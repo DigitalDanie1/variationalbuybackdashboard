@@ -337,13 +337,9 @@
   }
 
   function sellPressureReport() {
-    var chips = FDVS.map(function (v) {
-      return '<button type="button" data-wh-fdv="' + v + '" aria-pressed="' + (v === fdv) + '"' + (v === fdv ? ' class="on"' : '') + '>' + fdvLabel(v) + '</button>';
-    }).join('');
     return '<section class="wh-sell-pressure" aria-labelledby="wh-sell-title">' +
-      '<h4 id="wh-sell-title">Potential airdrop sell pressure</h4>' +
+      '<h4 id="wh-sell-title">Sell pressure by rank group</h4>' +
       '<p>Cumulative rank groups across the entire points board, not just the 23 tracked accounts. Each group receives its points share of the 32% Genesis allocation. Selling scenarios below use ' + esc(fdvLabel(fdv)) + ' FDV.</p>' +
-      '<div class="tp-chips wh-chips"><span>Value at FDV</span>' + chips + '</div>' +
       '<div class="wh-sell-scroll"><table class="wh-projection-table wh-sell-table"><thead><tr><th scope="col">Rank group</th><th scope="col">Share of 32% airdrop</th><th scope="col">Share of total supply</th><th scope="col">Sell 25%</th><th scope="col">Sell 50%</th><th scope="col">Sell 100%</th></tr></thead><tbody>' +
       sellPressureGroups().map(function (g) {
         var prefix = g.lowerBound ? '≥' : '~';
@@ -358,6 +354,27 @@
       '<p>These are hypothetical nominal sale values at the selected FDV, not forecasts of who will sell, executable proceeds, or price declines. Assumes the full 32% Genesis allocation is distributed proportionally to points and available to sell; final point totals and distribution terms may change.</p></section>';
   }
 
+  function totalSellPressureReport() {
+    var allocationValue = AIRDROP_SHARE * fdv;
+    var chips = FDVS.map(function (v) {
+      return '<button type="button" data-wh-fdv="' + v + '" aria-pressed="' + (v === fdv) + '"' + (v === fdv ? ' class="on"' : '') + '>' + fdvLabel(v) + '</button>';
+    }).join('');
+    return '<article class="wh-total-pressure" aria-labelledby="wh-total-title">' +
+      '<span class="cmp-eyebrow">01 · SET THE FDV</span><h3 id="wh-total-title">Value the 32% Genesis airdrop</h3>' +
+      '<div class="tp-chips wh-chips"><span>FDV scenario</span>' + chips + '</div>' +
+      '<div class="wh-readouts wh-economic"><div><span>Selected FDV</span><b>' + fdvLabel(fdv) + '</b><em>valuation scenario</em></div>' +
+      '<div><span>Genesis airdrop allocation</span><b>32%</b><em>of total token supply</em></div>' +
+      '<div><span>Total airdrop value</span><b>' + usd(allocationValue) + '</b><em>' + fdvLabel(fdv) + ' FDV × 32%</em></div></div>' +
+      '<span class="cmp-eyebrow">02 · TOTAL SELL PRESSURE</span><h3>How much could reach the market?</h3>' +
+      '<p>Start with the entire airdrop. Compare the selling scenarios below before looking at which rank groups hold the allocation.</p>' +
+      '<table class="wh-projection-table wh-total-table"><thead><tr><th scope="col">Fraction of airdrop sold</th><th scope="col">Total supply sold</th><th scope="col">Nominal sale value</th></tr></thead><tbody>' +
+      [0.25, 0.5, 1].map(function (rate) {
+        return '<tr' + (rate === 0.5 ? ' class="wh-cutoff-selected"' : '') + '><th scope="row">' + int(rate * 100) + '% sold</th><td>' + int(AIRDROP_SHARE * rate * 100) + '% of supply</td><td>' + usd(allocationValue * rate) + '</td></tr>';
+      }).join('') + '</tbody></table>' +
+      '<p class="wh-total-formula">FDV × 32% allocation × fraction sold = nominal sell pressure.</p>' +
+      '<p>Assumes the full Genesis allocation is available to sell. These are sale scenarios at the selected valuation; actual selling, executable proceeds and price impact depend on holders and market liquidity.</p></article>';
+  }
+
   function distributionReport() {
     var source = 'https://x.com/yh_0x/status/2106449057933857025';
     var d = distributionAt(Date.now());
@@ -367,7 +384,8 @@
       '<div class="wh-distribution-head"><div class="wh-who"><img src="assets/whales/yh_0x.jpg" alt="yh_0x profile" width="40" height="40">' +
       '<div><b>yh_0x · baseline source</b><a href="' + source + '" target="_blank" rel="noopener noreferrer">@yh_0x · original post ↗</a></div></div>' +
       '<span class="wh-tier">weekly projection</span></div>' +
-      '<h3 id="wh-distribution-title">How the points are distributed</h3>' +
+      '<span class="cmp-eyebrow wh-flow-step">03 · DISTRIBUTION</span><h3 id="wh-distribution-title">Who receives the airdrop?</h3>' +
+      '<p>The total ' + usd(AIRDROP_SHARE * fdv) + ' allocation at ' + fdvLabel(fdv) + ' FDV is split in proportion to points. The bands below show how that allocation is distributed.</p>' +
       '<p>Model week ' + esc(d.asOf) + ' (SGT), +' + d.weeks + ' completed weeks from the Oct 4, 2026 Week 42 snapshot. Next increase: ' + esc(d.next) + ' at 00:00 SGT.</p>' +
       '<div class="wh-distribution-metrics"><div><span>Issued points</span><b>' + (d.pool / 1e6).toFixed(2) + 'M</b><em>9.44M + ' + d.weeks + ' × 150,000</em></div>' +
       '<div><span>Top 100 cutoff</span><b>~' + int(d.top100) + '</b><em>9,340 × pool growth</em></div>' +
@@ -400,22 +418,19 @@
     var airdropWeight = combinedPoints / pool;
     var supplyWeight = airdropWeight * AIRDROP_SHARE;
 
-    var chips = FDVS.map(function (v) {
-      return '<button type="button" data-wh-fdv="' + v + '"' + (v === fdv ? ' class="on" aria-pressed="true"' : ' aria-pressed="false"') + '>' +
-        esc(fdvLabel(v)) + '</button>';
-    }).join('');
-
     host.innerHTML =
       '<div class="cmp-heading"><span class="cmp-eyebrow">WHALES</span>' +
-      '<h2>Who sits at the top of the points board</h2>' +
-      '<p>Publicly disclosed points and explicit scenarios. Dated cards are self-reported; cards older than two weeks are marked stale. Unverified accounts use a Top 100 cutoff scenario, with a 20,000-point minimum for seven selected accounts and a 30,000-point indirect estimate for Lynn03. CorgiI’s dated ~10,000 figure is an approximate self-report. All assumptions are labeled estimates.</p></div>' +
+      '<h2>From FDV to airdrop sell pressure</h2>' +
+      '<p>Value the 32% Genesis allocation, size the potential selling, then see how the allocation is distributed across rank groups and tracked whales.</p></div>' +
+      totalSellPressureReport() +
       distributionReport() +
+      '<div class="cmp-heading"><span class="cmp-eyebrow">04 · TRACKED WHALES</span><h3>The people behind the points</h3>' +
+      '<p>These ' + (rs.length + WATCHLIST.length) + ' tracked accounts are a subset of the full distribution above. Dated disclosures and scenario balances are mixed; cards older than two weeks are marked stale. Seven accounts use a 20,000-point minimum; Lynn03 uses an indirect 30,000-point floor; CorgiI’s ~10,000 is an approximate self-report.</p></div>' +
       '<div class="wh-readouts">' +
         '<div><span>Accounts tracked</span><b>' + (rs.length + WATCHLIST.length) + '</b><em>' + rs.length + ' dated disclosures · ' + WATCHLIST.length + ' estimates (7 at 20k; Lynn03 at 30k)</em></div>' +
         '<div><span>Combined points · mixed</span><b>~' + int(total + estimatedTotal) + '</b><em>' + int(total) + ' dated + ' + int(estimatedTotal) + ' estimated · ' + ((total + estimatedTotal) / pool * 100).toFixed(2) + '% of projected pool</em></div>' +
         '<div><span>All points issued, est.</span><b>' + (pool / 1e6).toFixed(2) + 'M</b><em>weekly distribution scenario</em></div>' +
       '</div>' +
-      '<div class="tp-chips wh-chips"><span>Value at FDV</span>' + chips + '</div>' +
       '<div class="wh-readouts wh-economic" aria-label="Combined economic weight estimates">' +
         '<div><span>Economic weight</span><b>~' + (airdropWeight * 100).toFixed(2) + '%</b><em>share of the 32% Genesis airdrop allocation</em></div>' +
         '<div><span>Share of total token supply</span><b>~' + (supplyWeight * 100).toFixed(2) + '%</b><em>32% allocation × ' + (airdropWeight * 100).toFixed(2) + '% points share</em></div>' +
@@ -431,6 +446,7 @@
   }
 
   var STYLE =
+    '.wh-total-pressure{padding:22px;margin:0 0 28px;border:1px solid var(--line);background:var(--panel)}.wh-total-pressure h3{margin:12px 0 18px;color:var(--text);font-size:22px}.wh-total-pressure p{color:var(--muted)!important;font-size:13px;line-height:1.7}.wh-total-pressure .wh-readouts{margin:20px 0 30px}.wh-total-table{margin:20px 0}.wh-total-table tbody th{color:var(--text);font-size:12px}.wh-total-formula{font:12px/1.7 var(--mono)}.wh-flow-step{display:block;margin-top:24px}@media(max-width:700px){.wh-total-pressure{padding:16px}.wh-total-table th,.wh-total-table td{font-size:10px;padding:10px 4px}}' +
     '.wh-sell-pressure{border-top:1px solid var(--line);padding-top:22px;margin-top:24px}.wh-sell-pressure>h4{margin:0;color:var(--text);font:800 18px var(--sans)}.wh-sell-scroll{overflow-x:auto;margin:18px 0}.wh-sell-table{min-width:690px}.wh-sell-table tbody th{color:var(--text);font-size:12px;font-weight:700}.wh-sell-table small{display:block;margin-top:4px;color:var(--muted);font-size:9px;font-weight:400}.wh-sell-table td{white-space:nowrap}' +
     '.wh-economic>div{border-color:color-mix(in srgb,var(--v2-accent,#4c9af8) 40%,var(--line))}.wh-economic b{color:var(--v2-accent,#4c9af8)!important}.wh-allocation{margin:0 0 24px;padding:16px;border:1px solid var(--line);background:var(--panel)}.wh-allocation-label{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font:11px/1.6 var(--mono);color:var(--text)}.wh-allocation-label span{color:var(--muted)}.wh-allocation-bar{height:12px;overflow:hidden;margin:12px 0;background:color-mix(in srgb,var(--muted) 20%,transparent);border-radius:2px}.wh-allocation-bar>span{display:block;height:100%;background:var(--v2-accent,#4c9af8)}.wh-allocation p{margin:0;color:var(--muted)!important;font-size:11px;line-height:1.7}' +
     '.wh-distribution{margin:0 0 28px;padding:22px;border:1px solid var(--line);background:var(--panel)}' +
@@ -622,7 +638,7 @@
       if (typeof SECTION_COPY !== 'undefined') SECTION_COPY.whales = {
         eyebrow: 'Whales',
         title: 'Whales',
-        description: 'Public share cards and labeled Top 100 estimates, valued at a chosen FDV.',
+        description: 'FDV, total airdrop sell pressure, rank distribution and tracked whales.',
         chip: 'disclosed + estimates'
       };
     } catch (_) {}
