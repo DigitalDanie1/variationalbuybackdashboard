@@ -82,8 +82,7 @@
     }
   ];
 
-  /* Tracked accounts without a verified, dated total. Render in the main list,
-     but exclude ranges, volume rankings and missing totals from valuation. */
+  /* Missing dated balances use an explicit Top 100 scenario, never a verified rank. */
   var WATCHLIST = [
     {
       handle: 'punk2498_', name: 'an0n2498.hl',
@@ -229,9 +228,18 @@
     try { if (typeof ptsPoolAt === 'function') return ptsPoolAt(d); } catch (_) {}
     return 9.4e6;
   }
-  function poolNow() {
-    try { if (typeof ptsPoolToday === 'function') return ptsPoolToday(); } catch (_) {}
-    return 9.4e6;
+  /* Week 42 community snapshot. Projection boundaries use Singapore midnight.
+     Keep source observations separate from the weekly scenario. */
+  var DISTRIBUTION_BASE_TS = Date.parse('2026-10-04T00:00:00+08:00');
+  var DISTRIBUTION_BASE_POOL = 9440000;
+  var DISTRIBUTION_WEEKLY = 150000;
+  function distributionAt(now) {
+    var weeks = Math.max(0, Math.floor((now - DISTRIBUTION_BASE_TS) / (7 * 864e5)));
+    var pool = DISTRIBUTION_BASE_POOL + weeks * DISTRIBUTION_WEEKLY;
+    return { weeks: weeks, pool: pool, scale: pool / DISTRIBUTION_BASE_POOL,
+      top100: 9340 * pool / DISTRIBUTION_BASE_POOL,
+      asOf: new Date(DISTRIBUTION_BASE_TS + weeks * 7 * 864e5 + 8 * 36e5).toISOString().slice(0, 10),
+      next: new Date(DISTRIBUTION_BASE_TS + (weeks + 1) * 7 * 864e5 + 8 * 36e5).toISOString().slice(0, 10) };
   }
 
   function rows() {
@@ -290,37 +298,46 @@
 
   function pendingRow(w) {
     var evidence = w.pointsSource || w.post;
+    var projection = distributionAt(Date.now());
+    var share = projection.top100 / projection.pool;
     return '<li class="wh-row wh-pending">' +
-      '<span class="wh-rank none">' + esc(w.rankLabel || '—') + '<small>' + (w.rankLabel ? 'reported' : 'unverified') + '</small></span>' +
+      '<span class="wh-rank">≤100<small>예상치 · assumed</small></span>' +
       '<div class="wh-who">' + profileAvatar(w) +
       '<div><b>' + esc(profileFor(w).name || w.name) + '</b><a href="' + esc(w.profile) + '" target="_blank" rel="noopener noreferrer">@' + esc(w.handle) + '</a></div></div>' +
-      '<div class="wh-pts"><b>' + esc(w.pointsLabel || '—') + '</b><em>' + (w.pointsLabel ? 'indirect report · exact total unverified' : 'public points total unverified') + '</em></div>' +
-      '<div class="wh-val"><b>—</b><em>excluded from valuation</em></div>' +
-      '<div class="wh-asof"><b>Unverified</b><em>points snapshot date</em>' +
-      (evidence ? '<a href="' + esc(evidence) + '" target="_blank" rel="noopener noreferrer">' + (w.pointsSource ? 'indexed repost ↗' : 'related post ↗') + '</a>' : '') + '</div>' +
-      '<div class="wh-said"><p>' + esc(w.note) + '</p></div></li>';
+      '<div class="wh-pts"><b>~' + int(projection.top100) + '</b><em>예상치 · Top 100 cutoff scenario</em><em>' + (share * 100).toFixed(3) + '% of projected points</em></div>' +
+      '<div class="wh-val"><b>~' + esc(usd(share * AIRDROP_SHARE * fdv)) + '</b><em>예상치 · at ' + esc(fdvLabel(fdv)) + ' FDV</em></div>' +
+      '<div class="wh-asof"><b>' + esc(dateLabel(projection.asOf)) + '</b><em>model week · not a disclosure</em>' +
+      (evidence ? '<a href="' + esc(evidence) + '" target="_blank" rel="noopener noreferrer">context only ↗</a>' : '') + '</div>' +
+      '<div class="wh-said"><p>예상치: assumed to be at least Top 100; valued at the projected #100 cutoff. Actual balance and rank are unverified.' +
+      (w.pointsLabel ? ' Earlier indirect report: ' + esc(w.pointsLabel) + ' points; not used in this scenario.' : '') + '</p></div></li>';
   }
 
   function distributionReport() {
     var source = 'https://x.com/yh_0x/status/2106449057933857025';
+    var d = distributionAt(Date.now());
+    var bands = [['Top 10',6.1],['11–50',8.7],['51–100',6.0],['101–250',10.6],['251–500',9.2],['501–1,000',10.1],['1,001–2,000',11.1],['2,001–5,000',15.3],['5,001–10,000',10.9],['10,001–25,000',10.0],['25,001–74,000',2.0]];
+    var cutoffs = [[2,89111],[5,52500],[10,35200],[50,13900],[100,9340],[150,7250],[500,2570],[1000,1430],[2000,770],[5000,290],[10000,150],[15000,70],[25000,22],[29000,15]];
     return '<article class="wh-distribution" aria-labelledby="wh-distribution-title">' +
       '<div class="wh-distribution-head"><div class="wh-who"><img src="assets/whales/yh_0x.jpg" alt="yh_0x profile" width="40" height="40">' +
-      '<div><b>yh_0x</b><a href="' + source + '" target="_blank" rel="noopener noreferrer">@yh_0x · original post ↗</a></div></div>' +
-      '<span class="wh-tier">Unofficial · Week 42</span></div>' +
+      '<div><b>yh_0x · baseline source</b><a href="' + source + '" target="_blank" rel="noopener noreferrer">@yh_0x · original post ↗</a></div></div>' +
+      '<span class="wh-tier">예상치 · weekly projection</span></div>' +
       '<h3 id="wh-distribution-title">How the points are distributed</h3>' +
-      '<p>Historical Week 42 snapshot, posted Oct 4, 2026 (SGT). Community-sourced estimates by yh_0x; these describe the overall points board, not the author’s personal balance.</p>' +
-      '<div class="wh-distribution-metrics"><div><span>Issued points</span><b>9.44M</b></div>' +
-      '<div><span>Weekly earners</span><b>31,693</b><em>+4.4% vs prior week</em></div>' +
-      '<div><span>Weekly distribution</span><b>150,000</b></div>' +
-      '<div><span>Top 1,000 share</span><b>~50%</b></div></div>' +
-      '<p>Reported cutoffs: top 10 at 35,200+ points; top 150 at 7,250+; top 1,000 at 1,430+. The 2,000–5,000 rank band holds 15.3% of issued points. These are historical estimates, separate from the dated account cards below.</p>' +
+      '<p>예상치 · Model week ' + esc(d.asOf) + ' (SGT), +' + d.weeks + ' completed weeks from the Oct 4, 2026 Week 42 snapshot. Next increase: ' + esc(d.next) + ' at 00:00 SGT.</p>' +
+      '<div class="wh-distribution-metrics"><div><span>Issued points · 예상치</span><b>' + (d.pool / 1e6).toFixed(2) + 'M</b><em>9.44M + ' + d.weeks + ' × 150,000</em></div>' +
+      '<div><span>Top 100 cutoff · 예상치</span><b>~' + int(d.top100) + '</b><em>9,340 × pool growth</em></div>' +
+      '<div><span>Weekly increase · assumed</span><b>150,000</b><em>every Sunday · SGT</em></div>' +
+      '<div><span>Top 1,000 share · assumed</span><b>~50.7%</b><em>baseline shares held constant</em></div></div>' +
+      '<p>This scenario adds 150,000 points per completed week and scales rank cutoffs in proportion to the pool. Rank-band shares stay constant; this is a projection, not a refreshed leaderboard. The 31,693 weekly earners were observed in Week 42 only.</p>' +
+      '<div class="wh-projection-grid"><div><h4>Points by rank band · 예상치</h4><table class="wh-projection-table"><thead><tr><th>Rank band</th><th>Share assumed</th><th>Points est.</th></tr></thead><tbody>' +
+      bands.map(function (b) { return '<tr><td>' + b[0] + '</td><td>' + b[1].toFixed(1) + '%</td><td>' + int(d.pool * b[1] / 100) + '</td></tr>'; }).join('') +
+      '</tbody></table></div><div><h4>Rank cutoffs · 예상치</h4><table class="wh-projection-table"><thead><tr><th>Rank</th><th>Points est.</th></tr></thead><tbody>' +
+      cutoffs.map(function (c) { return '<tr' + (c[0] === 100 ? ' class="wh-cutoff-selected"' : '') + '><td>Top ' + int(c[0]) + '</td><td>~' + int(c[1] * d.scale) + '</td></tr>'; }).join('') +
+      '</tbody></table></div></div>' +
+      '<details class="wh-baseline"><summary>Original Week 42 snapshot · historical reference</summary><p>Oct 4, 2026 source images. These remain unchanged; the current scenario is shown above.</p>' +
       '<div class="wh-distribution-images"><figure><a href="assets/whales/yh-week42-1.jpg" target="_blank" rel="noopener noreferrer">' +
-      '<img src="assets/whales/yh-week42-1.jpg" alt="yh_0x Week 42 points distribution by rank band: 9.44 million points issued" width="1080" height="1350" loading="lazy"></a>' +
-      '<figcaption>Week 42 points distribution · open full image ↗</figcaption></figure>' +
-      '<figure><a href="assets/whales/yh-week42-2.jpg" target="_blank" rel="noopener noreferrer">' +
-      '<img src="assets/whales/yh-week42-2.jpg" alt="yh_0x unofficial Week 42 rank cutoffs, from top 2 at 89,111 points to top 29,000 at 15+ points" width="1080" height="1350" loading="lazy"></a>' +
-      '<figcaption>Week 42 rank cutoffs · open full image ↗</figcaption></figure></div>' +
-      '<a class="wh-distribution-source" href="' + source + '" target="_blank" rel="noopener noreferrer">Read the full analysis on X ↗</a></article>';
+      '<img src="assets/whales/yh-week42-1.jpg" alt="Historical Week 42 points distribution, 9.44M points" width="1080" height="1350" loading="lazy"></a><figcaption>Historical distribution</figcaption></figure>' +
+      '<figure><a href="assets/whales/yh-week42-2.jpg" target="_blank" rel="noopener noreferrer"><img src="assets/whales/yh-week42-2.jpg" alt="Historical Week 42 rank cutoffs, Top 100 at 9,340+" width="1080" height="1350" loading="lazy"></a><figcaption>Historical rank cutoffs</figcaption></figure></div></details>' +
+      '<a class="wh-distribution-source" href="' + source + '" target="_blank" rel="noopener noreferrer">Read the baseline analysis on X ↗</a></article>';
   }
 
   function render() {
@@ -329,7 +346,9 @@
     var rs = rows();
     var top = rs.length ? rs[0].w.points : 1;
     var total = rs.reduce(function (a, r) { return a + r.w.points; }, 0);
-    var pool = poolNow();
+    var projection = distributionAt(Date.now());
+    var pool = projection.pool;
+    var estimatedTotal = WATCHLIST.length * projection.top100;
 
     var chips = FDVS.map(function (v) {
       return '<button type="button" data-wh-fdv="' + v + '"' + (v === fdv ? ' class="on" aria-pressed="true"' : ' aria-pressed="false"') + '>' +
@@ -339,18 +358,18 @@
     host.innerHTML =
       '<div class="cmp-heading"><span class="cmp-eyebrow">WHALES</span>' +
       '<h2>Who sits at the top of the points board</h2>' +
-      '<p>Tracked accounts and their publicly disclosed Variational points. Dated share cards are self-reported; cards older than two weeks are marked stale. Accounts without a verified total remain in the list below the dated cards. Reported ranges are labeled and excluded from combined points and valuation.</p></div>' +
+      '<p>Publicly disclosed points and explicit scenarios. Dated cards are self-reported; cards older than two weeks are marked stale. Unverified accounts are assumed to be at least Top 100 and valued at the projected #100 cutoff, labeled 예상치 (estimate).</p></div>' +
       distributionReport() +
       '<div class="wh-readouts">' +
-        '<div><span>Accounts tracked</span><b>' + (rs.length + WATCHLIST.length) + '</b><em>' + rs.length + ' dated totals · ' + WATCHLIST.length + ' awaiting exact totals</em></div>' +
-        '<div><span>Combined disclosed points</span><b>' + int(total) + '</b><em>' + (total / pool * 100).toFixed(2) + '% of all points · dated totals only</em></div>' +
-        '<div><span>All points issued, est.</span><b>' + (pool / 1e6).toFixed(2) + 'M</b><em>calculator schedule, this week</em></div>' +
+        '<div><span>Accounts tracked</span><b>' + (rs.length + WATCHLIST.length) + '</b><em>' + rs.length + ' dated totals · ' + WATCHLIST.length + ' Top 100 estimates</em></div>' +
+        '<div><span>Combined points · mixed / 예상치</span><b>~' + int(total + estimatedTotal) + '</b><em>' + int(total) + ' dated + ' + int(estimatedTotal) + ' estimated · ' + ((total + estimatedTotal) / pool * 100).toFixed(2) + '% of projected pool</em></div>' +
+        '<div><span>All points issued, est.</span><b>' + (pool / 1e6).toFixed(2) + 'M</b><em>weekly distribution scenario</em></div>' +
       '</div>' +
       '<div class="tp-chips wh-chips"><span>Value at FDV</span>' + chips + '</div>' +
       '<ol class="wh-list">' + rs.map(function (r) { return row(r, top); }).join('') + WATCHLIST.map(pendingRow).join('') + '</ol>' +
       spread(rs) +
-      '<p class="wh-spread">Public disclosure check: Oct 19, 2026. A related post supports account context, not a points balance. Missing figures are unknown, not zero. Ranges from indexed reposts require confirmation against the original card.</p>' +
-      '<div class="tp-note"><b>How the value is worked out.</b> Share of all points at the card’s date × the 32% Genesis airdrop × the FDV picked above — the same model as the Points Calculator, and the all-points total is that tab’s weekly estimate, not a published figure. Weekly drops are read off the Distribution History on the card where it shows. Know an account that has posted its card? It goes in by hand, with the post as the source.</div>';
+      '<p class="wh-spread">Scenario assumption: all 18 unverified accounts are treated as at least Top 100 and valued at the #100 cutoff. This is not evidence of their actual rank or balance. The combined figure mixes dated disclosures with these estimates; related posts are context only.</p>' +
+      '<div class="tp-note"><b>How the value is worked out.</b> Dated cards: disclosed points ÷ the Points Calculator pool at the card date × 32% Genesis airdrop × selected FDV. 예상치 rows: projected Top 100 cutoff ÷ the projected distribution pool × 32% × selected FDV. Both models are estimates. Proportional growth keeps the estimated Top 100 share and its FDV value constant while points increase weekly.</div>';
   }
 
   var STYLE =
@@ -363,11 +382,12 @@
     '.wh-distribution-metrics span{display:block;color:var(--muted)!important;font:800 10px var(--mono);text-transform:uppercase}' +
     '.wh-distribution-metrics b{display:block;margin-top:8px;color:var(--text);font:700 23px var(--mono)}' +
     '.wh-distribution-metrics em{display:block;margin-top:5px;color:var(--muted)!important;font-size:11px;font-style:normal}' +
+    '.wh-projection-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px;margin:24px 0}.wh-projection-grid h4{color:var(--text);margin:0 0 12px;font-size:14px}.wh-projection-table{width:100%;border-collapse:collapse;font:12px var(--mono);color:var(--text)}.wh-projection-table th,.wh-projection-table td{padding:10px 6px;text-align:right;border-bottom:1px solid var(--line)}.wh-projection-table th:first-child,.wh-projection-table td:first-child{text-align:left}.wh-projection-table th{color:var(--muted);font-size:10px}.wh-cutoff-selected{background:color-mix(in srgb,var(--v2-accent,#4c9af8) 15%,transparent);font-weight:800}.wh-baseline{margin-top:20px}.wh-baseline summary{cursor:pointer;color:var(--muted);font:12px var(--mono)}' +
     '.wh-distribution-images{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}' +
     '.wh-distribution-images figure{margin:0;min-width:0}.wh-distribution-images img{display:block;width:100%;height:auto;border:1px solid var(--line)}' +
     '.wh-distribution-images figcaption{margin-top:8px;color:var(--muted)!important;font-size:11px}' +
     '.wh-distribution-source{display:inline-block;margin-top:18px;color:var(--v2-accent,#4c9af8)!important;font:700 12px var(--mono)}' +
-    '@media(max-width:700px){.wh-distribution{padding:16px}.wh-distribution-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.wh-distribution-images{grid-template-columns:1fr}}' +
+    '@media(max-width:700px){.wh-distribution{padding:16px}.wh-distribution-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.wh-distribution-images,.wh-projection-grid{grid-template-columns:1fr}}' +
     '.wh-readouts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:0 0 18px}' +
     '.wh-readouts>div{padding:14px 16px;border:1px solid var(--line);background:color-mix(in srgb,var(--panel) 72%,transparent);min-width:0}' +
     '.wh-readouts span{display:block;color:var(--muted)!important;font:800 9.5px var(--mono);letter-spacing:.7px;text-transform:uppercase}' +
@@ -542,8 +562,8 @@
       if (typeof SECTION_COPY !== 'undefined') SECTION_COPY.whales = {
         eyebrow: 'Whales',
         title: 'Whales',
-        description: 'The accounts at the top of the points board, from the share cards they posted, with what each holding is worth at a chosen FDV.',
-        chip: 'self-reported'
+        description: 'Public share cards and labeled Top 100 estimates, valued at a chosen FDV.',
+        chip: 'disclosed + estimates'
       };
     } catch (_) {}
   }
@@ -556,6 +576,11 @@
     mountNext();
     renderNext();
     loadProfiles();
+    var renderedWeek = distributionAt(Date.now()).weeks;
+    setInterval(function () {
+      var week = distributionAt(Date.now()).weeks;
+      if (week !== renderedWeek) { renderedWeek = week; render(); }
+    }, 60000);
     /* dashboard.js resolves the opening hash before this tab exists, so a shared
        #whales link would land on Overview without this */
     if ((location.hash === '#whales' || location.hash === '#whales-next') && typeof showTab === 'function') {
