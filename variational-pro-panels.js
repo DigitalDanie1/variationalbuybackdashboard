@@ -21,12 +21,12 @@
     section.setAttribute('data-tg', TAB);
     section.innerHTML = '<div class="cmp-heading"><span class="cmp-eyebrow">POST-TGE</span>' +
       '<h2>Variational Pro</h2></div>' +
-      '<div class="vp-game-layout"><figure class="vp-game"><div class="vp-game-toolbar"><span>PRO VERSION · COMING SOON</span>' +
-      '<button class="vp-sound-toggle" type="button" aria-pressed="false" aria-label="Play music">▶ MUSIC OFF</button></div>' +
+      '<div class="vp-game-layout"><figure class="vp-game"><div class="vp-game-toolbar"><span>VARIATIONAL PRO · TITLE SCREEN</span>' +
+      '<button class="vp-sound-toggle" type="button" aria-pressed="false" aria-label="Play music">▶ Play music</button></div>' +
       '<div class="vp-title-screen"><img class="vp-wordmark" src="assets/pro/variational-wordmark.png" width="1275" height="400" alt="Variational">' +
-      '<div class="vp-version"><span>PRO</span><small>THE NEXT CHAPTER</small></div>' +
-      '<img class="vp-landscape" src="assets/pro/pro-version-title.svg?v=brand" width="512" height="296" alt="A mysterious flying silhouette above a retro pixel landscape. Coming soon."></div>' +
-      '<figcaption>The next chapter. Coming soon.</figcaption></figure>' +
+      '<div class="vp-version"><span>PRO VERSION</span><small>A NEW CHAPTER AWAITS</small></div>' +
+      '<img class="vp-landscape" src="assets/pro/pro-version-title.svg?v=compact" width="512" height="296" alt="A mysterious flying silhouette above a retro pixel landscape. Coming soon."><div class="vp-coming">COMING SOON<span>UNKNOWN TERRITORY. FAMILIAR INSTINCT.</span></div></div>' +
+      '<figcaption>Variational Pro · The next chapter.</figcaption></figure>' +
       '<aside class="vp-sound" aria-label="Title screen soundtrack"><span class="cmp-eyebrow">GAME BOY CLASSICS</span>' +
       '<h3 class="vp-sound-title">Pokémon Gold &amp; Silver</h3><p>Title Screen</p>' +
       '<p class="vp-sound-status" role="status" aria-live="polite">Press play to start the title theme.</p>' +
@@ -40,8 +40,9 @@
     function stopMusic() {
       soundPlayer.replaceChildren(); // Removing the player also stops audio immediately.
       soundPlayer.hidden = true;
+      section.classList.remove('vp-music-active');
       soundToggle.setAttribute('aria-pressed', 'false');
-      soundToggle.textContent = '▶ MUSIC OFF';
+      soundToggle.textContent = '▶ Play music';
       soundToggle.setAttribute('aria-label', 'Play music');
       soundStatus.textContent = 'Press play to start the title theme.';
     }
@@ -59,11 +60,12 @@
       frame.width = '360';
       frame.height = '203';
       soundPlayer.hidden = false;
+      section.classList.add('vp-music-active');
       soundPlayer.appendChild(frame);
       soundToggle.setAttribute('aria-pressed', 'true');
-      soundToggle.textContent = '■ MUSIC ON';
+      soundToggle.textContent = '■ Stop music';
       soundToggle.setAttribute('aria-label', 'Stop music');
-      soundStatus.textContent = 'Music on. Press MUSIC ON to turn it off. Volume controls are below.';
+      soundStatus.textContent = 'Use Stop music above to turn the soundtrack off.';
     });
     // showTab uses replaceState, so section visibility must also be observed.
     new MutationObserver(function () { if (!isProActive()) stopMusic(); }).observe(section, { attributes: true, attributeFilter: ['class'] });
@@ -91,12 +93,27 @@
     });
 
     var style = document.createElement('style');
-    style.textContent = '.vp-game-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(260px,340px);gap:20px;align-items:start;margin-top:24px}.vp-game{margin:0;padding:24px;border:1px solid var(--line);background:var(--panel);display:grid;justify-items:center;gap:16px}' +
-      '.vp-game-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;color:var(--muted);font:10px/1.6 var(--mono);letter-spacing:1px}.vp-title-screen{width:100%;max-width:560px;background:#1b2133;border:4px solid #111827;box-shadow:0 0 0 1px #44516b;box-sizing:border-box;overflow:hidden}.vp-title-screen .vp-wordmark{display:block;width:100%;height:auto;margin:16px 0 0}.vp-version{display:grid;justify-items:center;gap:12px;padding:0 20px 24px;color:#fff}.vp-version>span{font:900 32px/1 var(--mono);letter-spacing:14px;padding:8px 8px 8px 22px;color:#4c9af8;border-block:2px solid #4c9af8;text-shadow:3px 3px #080d1e}.vp-version small{font:10px/1.4 var(--mono);letter-spacing:3px;color:#a7b9d9}.vp-landscape{display:block;width:100%;height:auto;image-rendering:pixelated}' +
-      '.vp-game figcaption{color:var(--muted);font:11px/1.5 var(--mono);letter-spacing:.5px;text-align:center}' +
-      '.vp-sound{padding:22px;border:1px solid var(--line);background:var(--panel);min-width:0}.vp-sound .vp-sound-title{margin:14px 0 6px;color:var(--text);font-size:16px!important}.vp-sound p{color:var(--muted)!important;font:12px/1.6 var(--mono);margin:0 0 18px}.vp-sound-toggle{padding:12px 16px;min-height:44px;border:1px solid var(--v2-accent,#4c9af8);border-radius:3px;background:var(--panel);color:var(--text);font:700 12px var(--mono);cursor:pointer}.vp-sound-toggle[aria-pressed="true"]{background:#4c9af8;color:#081326}.vp-sound-toggle:hover{border-color:#91c4ff}.vp-sound-toggle:focus-visible{outline:2px solid var(--v2-accent,#4c9af8);outline-offset:3px}.vp-sound .vp-sound-status{font-size:11px;margin:14px 0}.vp-sound a{color:var(--v2-accent,#4c9af8);font:11px var(--mono)}.vp-sound-player[hidden]{display:none!important}.vp-sound-player{margin:0 0 16px}.vp-sound-player iframe{display:block;width:100%;height:203px;min-width:200px;min-height:200px;border:0;background:#000}' +
-      '@media(max-width:900px){.vp-game-layout{grid-template-columns:1fr}.vp-sound{width:100%;box-sizing:border-box}.vp-sound-player{max-width:480px}}' +
-      '@media(max-width:600px){.vp-game,.vp-sound{padding:16px}.vp-title-screen{border-width:3px}.vp-game-toolbar{font-size:9px;letter-spacing:0}.vp-sound-toggle{padding:10px;font-size:10px}}';
+    style.textContent = `
+.vp-game-layout{display:grid;gap:16px;max-width:680px;margin:24px auto 0}
+.vp-game{margin:0;padding:14px;border:1px solid var(--line);background:var(--panel)}
+.vp-game-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px;color:var(--muted);font:10px/1.5 var(--mono);letter-spacing:1px}
+.vp-title-screen{background:#1b2032;border:1px solid #40506d;box-shadow:0 0 0 4px #111827;overflow:hidden;text-align:center}
+.vp-title-screen .vp-wordmark{display:block;width:min(100%,360px);height:auto;margin:0 auto}
+.vp-version{display:grid;justify-items:center;gap:12px;margin-top:-12px;padding:0 12px 18px;color:#fff}
+.vp-version>span{font:900 clamp(18px,3vw,25px)/1.2 var(--mono);letter-spacing:5px;padding:8px 14px 8px 19px;color:#dcecff;background:#263a5b;border:2px solid #4c9af8;box-shadow:3px 3px 0 #080d1e;text-shadow:2px 2px #080d1e}
+.vp-version small{font:9px/1.4 var(--mono);letter-spacing:3px;color:#8da7cf}
+.vp-landscape{display:block;width:100%;height:150px;object-fit:fill;image-rendering:pixelated}
+.vp-coming{padding:14px 12px 16px;background:#050806;color:#f3f7e9;font:700 clamp(18px,3vw,22px)/1.2 var(--mono);letter-spacing:4px;text-shadow:2px 2px #3a4b42}
+.vp-coming span{display:block;margin-top:12px;font:9px/1.5 var(--mono);letter-spacing:1.5px;color:#77958e;text-shadow:none}
+.vp-game figcaption{margin-top:14px;color:var(--muted);font:10px/1.5 var(--mono);text-align:center}
+.vp-sound{padding:0 6px;min-width:0}.vp-sound .cmp-eyebrow,.vp-sound>.vp-sound-title,.vp-sound>p:not(.vp-sound-status){display:none}
+.vp-sound .vp-sound-status{color:var(--muted)!important;font:11px/1.5 var(--mono);margin:0 0 8px}
+.vp-sound-toggle{padding:10px 16px;min-height:42px;border:1px solid #4c9af8;border-radius:3px;background:#1b2a43;color:#dcecff;font:700 11px var(--mono);cursor:pointer;white-space:nowrap;letter-spacing:0}
+.vp-sound-toggle[aria-pressed="true"]{background:#4c9af8;color:#081326}.vp-sound-toggle:hover{border-color:#91c4ff}.vp-sound-toggle:focus-visible{outline:2px solid #91c4ff;outline-offset:3px}
+.vp-sound a{color:var(--v2-accent,#4c9af8);font:10px var(--mono)}
+.vp-sound-player[hidden]{display:none!important}.vp-sound-player{margin:12px 0;max-width:360px}.vp-sound-player iframe{display:block;width:100%;height:203px;min-width:200px;min-height:200px;border:0;background:#000}
+@media(max-width:600px){.vp-game{padding:12px}.vp-game-toolbar{font-size:8px;letter-spacing:0}.vp-sound-toggle{padding:10px;font-size:10px}.vp-version{margin-top:-4px}.vp-landscape{height:145px}.vp-coming span{font-size:8px;letter-spacing:.5px}}
+`;
     document.head.appendChild(style);
 
     if (location.hash === '#' + TAB) showTab(TAB, { push: false });
