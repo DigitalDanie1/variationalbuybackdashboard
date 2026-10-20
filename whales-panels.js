@@ -296,19 +296,27 @@
       usd((hi.value - lo.value)) + ' of airdrop at ' + esc(fdvLabel(fdv)) + ' FDV.</p>';
   }
 
+  var MIN_20K_HANDLES = ['systemicstrathl', 'izebel_eth', '0xdetweiler', 'taikimaeda2', 'shadowofintent3', 'derteil00', 'momentumkevin'];
+  function has20kFloor(w) { return MIN_20K_HANDLES.indexOf(w.handle.toLowerCase()) >= 0; }
+  function estimatedPoints(w, projection) {
+    return has20kFloor(w) ? Math.max(20000, projection.top100) : projection.top100;
+  }
+
   function pendingRow(w) {
     var evidence = w.pointsSource || w.post;
     var projection = distributionAt(Date.now());
-    var share = projection.top100 / projection.pool;
+    var points = estimatedPoints(w, projection);
+    var floor = has20kFloor(w);
+    var share = points / projection.pool;
     return '<li class="wh-row wh-pending">' +
       '<span class="wh-rank">≤100<small>예상치 · assumed</small></span>' +
       '<div class="wh-who">' + profileAvatar(w) +
       '<div><b>' + esc(profileFor(w).name || w.name) + '</b><a href="' + esc(w.profile) + '" target="_blank" rel="noopener noreferrer">@' + esc(w.handle) + '</a></div></div>' +
-      '<div class="wh-pts"><b>~' + int(projection.top100) + '</b><em>예상치 · Top 100 cutoff scenario</em><em>' + (share * 100).toFixed(3) + '% of projected points</em></div>' +
+      '<div class="wh-pts"><b>' + (floor ? '≥' : '~') + int(points) + '</b><em>예상치 · ' + (floor ? '20,000-point minimum scenario' : 'Top 100 cutoff scenario') + '</em><em>' + (share * 100).toFixed(3) + '% of projected points</em></div>' +
       '<div class="wh-val"><b>~' + esc(usd(share * AIRDROP_SHARE * fdv)) + '</b><em>예상치 · at ' + esc(fdvLabel(fdv)) + ' FDV</em></div>' +
       '<div class="wh-asof"><b>' + esc(dateLabel(projection.asOf)) + '</b><em>model week · not a disclosure</em>' +
       (evidence ? '<a href="' + esc(evidence) + '" target="_blank" rel="noopener noreferrer">context only ↗</a>' : '') + '</div>' +
-      '<div class="wh-said"><p>예상치: assumed to be at least Top 100; valued at the projected #100 cutoff. Actual balance and rank are unverified.' +
+      '<div class="wh-said"><p>' + (floor ? '예상치: user-specified minimum of 20,000 points; valued at the higher of that floor and the projected Top 100 cutoff.' : '예상치: assumed to be at least Top 100; valued at the projected #100 cutoff.') + ' Actual balance and rank are unverified.' +
       (w.pointsLabel ? ' Earlier indirect report: ' + esc(w.pointsLabel) + ' points; not used in this scenario.' : '') + '</p></div></li>';
   }
 
@@ -348,7 +356,7 @@
     var total = rs.reduce(function (a, r) { return a + r.w.points; }, 0);
     var projection = distributionAt(Date.now());
     var pool = projection.pool;
-    var estimatedTotal = WATCHLIST.length * projection.top100;
+    var estimatedTotal = WATCHLIST.reduce(function (sum, w) { return sum + estimatedPoints(w, projection); }, 0);
 
     var chips = FDVS.map(function (v) {
       return '<button type="button" data-wh-fdv="' + v + '"' + (v === fdv ? ' class="on" aria-pressed="true"' : ' aria-pressed="false"') + '>' +
@@ -358,18 +366,18 @@
     host.innerHTML =
       '<div class="cmp-heading"><span class="cmp-eyebrow">WHALES</span>' +
       '<h2>Who sits at the top of the points board</h2>' +
-      '<p>Publicly disclosed points and explicit scenarios. Dated cards are self-reported; cards older than two weeks are marked stale. Unverified accounts are assumed to be at least Top 100 and valued at the projected #100 cutoff, labeled 예상치 (estimate).</p></div>' +
+      '<p>Publicly disclosed points and explicit scenarios. Dated cards are self-reported; cards older than two weeks are marked stale. Unverified accounts use a Top 100 cutoff scenario, with a 20,000-point minimum for seven selected accounts. All assumptions are labeled 예상치 (estimate).</p></div>' +
       distributionReport() +
       '<div class="wh-readouts">' +
-        '<div><span>Accounts tracked</span><b>' + (rs.length + WATCHLIST.length) + '</b><em>' + rs.length + ' dated totals · ' + WATCHLIST.length + ' Top 100 estimates</em></div>' +
+        '<div><span>Accounts tracked</span><b>' + (rs.length + WATCHLIST.length) + '</b><em>' + rs.length + ' dated totals · ' + WATCHLIST.length + ' estimates (7 at 20k minimum)</em></div>' +
         '<div><span>Combined points · mixed / 예상치</span><b>~' + int(total + estimatedTotal) + '</b><em>' + int(total) + ' dated + ' + int(estimatedTotal) + ' estimated · ' + ((total + estimatedTotal) / pool * 100).toFixed(2) + '% of projected pool</em></div>' +
         '<div><span>All points issued, est.</span><b>' + (pool / 1e6).toFixed(2) + 'M</b><em>weekly distribution scenario</em></div>' +
       '</div>' +
       '<div class="tp-chips wh-chips"><span>Value at FDV</span>' + chips + '</div>' +
       '<ol class="wh-list">' + rs.map(function (r) { return row(r, top); }).join('') + WATCHLIST.map(pendingRow).join('') + '</ol>' +
       spread(rs) +
-      '<p class="wh-spread">Scenario assumption: all 18 unverified accounts are treated as at least Top 100 and valued at the #100 cutoff. This is not evidence of their actual rank or balance. The combined figure mixes dated disclosures with these estimates; related posts are context only.</p>' +
-      '<div class="tp-note"><b>How the value is worked out.</b> Dated cards: disclosed points ÷ the Points Calculator pool at the card date × 32% Genesis airdrop × selected FDV. 예상치 rows: projected Top 100 cutoff ÷ the projected distribution pool × 32% × selected FDV. Both models are estimates. Proportional growth keeps the estimated Top 100 share and its FDV value constant while points increase weekly.</div>';
+      '<p class="wh-spread">Scenario assumption: 11 unverified accounts use the projected Top 100 cutoff; seven selected accounts use a user-specified 20,000-point minimum (or the Top 100 cutoff if higher). This is not evidence of their actual rank or balance. The combined figure mixes dated disclosures with these estimates; related posts are context only.</p>' +
+      '<div class="tp-note"><b>How the value is worked out.</b> Dated cards: disclosed points ÷ the Points Calculator pool at the card date × 32% Genesis airdrop × selected FDV. 예상치 rows: scenario points ÷ the projected distribution pool × 32% × selected FDV. Both models are estimates. The 20,000-point minimum stays fixed until revised; its projected share and value change as the pool grows.</div>';
   }
 
   var STYLE =
