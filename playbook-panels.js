@@ -1295,6 +1295,11 @@
          The mark chips under the ladder now print exactly that, as data. */
       '<p>The playbook calls $1–2B its base case. This site’s own book multiple puts the listing at $2.81–4.12B — two bands above it, where the plan is cutting size rather than taking it.</p></section>' +
 
+      '<div class="pb-author" aria-label="Strategy framework by DeFi Maestro">' +
+        '<a class="pb-author-avatar" href="https://x.com/Defi_Maestro" target="_blank" rel="noopener noreferrer"><img src="assets/whales/defi_maestro.jpg" alt="DeFi Maestro profile" width="56" height="56" loading="lazy"></a>' +
+        '<div class="pb-author-copy"><span class="pb-eyebrow">STRATEGY FRAMEWORK BY</span><a class="pb-author-name" href="https://x.com/Defi_Maestro" target="_blank" rel="noopener noreferrer">Defi_Maestro ✺ <span>@Defi_Maestro ↗</span></a>' +
+        '<p>Based on his post-TGE entry framework. Position sizes and numeric execution defaults are this site’s modeling inputs.</p></div>' +
+        '<a class="pb-author-source" href="https://x.com/i/article/2098011524598276098" target="_blank" rel="noopener noreferrer">Original write-up ↗</a></div>' +
       '<div class="bw-head"><b>The Sizing Ladder</b><span><i>the five bands, and where every estimate this site holds lands on them</i></span></div>' +
       '<div class="pb-chips"><span>Listing FDV</span>' + fdvChips +
       '<label class="pb-inp">custom <input type="number" step="0.05" min="0" max="12" value="' +
@@ -1431,6 +1436,11 @@
      own; the deploy CSP allows style-src 'unsafe-inline', which covers a <style> node.
      Tokens are the shell's own, so light and dark both follow without a second palette. */
   var CSS = [
+    '.pb-author{display:flex;align-items:center;gap:14px;padding:16px 18px;margin:0 0 22px;border:1px solid var(--line);background:var(--panel);flex-wrap:wrap}',
+    '.pb-author-avatar{flex:0 0 56px}.pb-author-avatar img{display:block;width:56px;height:56px;object-fit:cover;border-radius:50%;border:1px solid var(--line)}',
+    '.pb-author-copy{flex:1;min-width:180px}.pb-author .pb-author-name{display:inline-block;margin-top:6px;color:var(--text)!important;font:800 15px/1.5 var(--sans);text-decoration:none}.pb-author-name span{margin-left:8px;color:var(--v2-accent,#4c9af8);font:700 11px var(--mono)}',
+    '.pb-author-copy p{margin:5px 0 0;color:var(--muted)!important;font:12px/1.6 var(--sans)}.pb-author-source{color:var(--v2-accent,#4c9af8)!important;font:700 11px/1.5 var(--mono);text-decoration:none}.pb-author a:hover{text-decoration:underline}.pb-author a:focus-visible{outline:2px solid var(--v2-accent,#4c9af8);outline-offset:4px}',
+    '@media(max-width:600px){.pb-author{padding:14px;gap:12px}.pb-author-source{margin-left:68px}.pb-author-name span{display:block;margin-left:0;margin-top:3px}}',
     '.plan-report{padding:0 0 34px}',
     '.pb-fill{font-style:normal;color:var(--v2-accent,#4c9af8);font-weight:800;cursor:help;padding-left:1px}',
     '.pb-eyebrow{display:block;color:var(--dim)!important;font:800 9px var(--mono);letter-spacing:1.5px;text-transform:uppercase}',
