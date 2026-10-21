@@ -404,7 +404,12 @@
     set: setMyPts
   };
 
-  function rankReport() {
+  /* ---------- 01 · Airdrop Map ----------
+     One section for what used to be three (sell pressure, distribution, your rank): one row
+     of controls, one distribution picture, and every figure read off the same FDV, sold
+     share and points. The old 3-band bar and the bubble comparison said what the 4-group
+     bars and the multiples below already say, so they are gone rather than repeated. */
+  function airdropMap() {
     var D = rankModel(), N = D.N;
     var P = Math.max(0, myPts);
     var R = rankFor(P, D);
@@ -435,7 +440,8 @@
     var legend = groups.map(function (g) {
       return '<div class="rk-lg ' + g.k + (g === mine ? ' me' : '') + '"><i></i><b>' + esc(g.name) +
         (g === mine ? ' <em>you</em>' : '') + '</b><span>' + topPct(g.acc, N) + ' of accounts → <strong>' +
-        g.pts.toFixed(1) + '%</strong> of points</span><small>~' + int(D.pool * g.pts / 100 / g.acc) + ' pts each</small></div>';
+        g.pts.toFixed(1) + '%</strong> of points</span><small>~' + int(D.pool * g.pts / 100 / g.acc) + ' pts each</small>' +
+        '<small class="rk-sell">sells ' + esc(usd(g.pts / 100 * AIRDROP_SHARE * fdv * sellFraction)) + ' at ' + int(sellFraction * 100) + '%</small></div>';
     }).join('');
     /* the same bands read cumulatively: what the top N hold between them */
     var cumLine = [10, 100, 1000, 10000].map(function (r) {
@@ -459,33 +465,58 @@
         (r === 1 ? '' : '≥' + int(ptsAtRank(r, D))) + '</small></span>';
     }).join('');
 
+    var allocationValue = AIRDROP_SHARE * fdv;
+    var fdvChips = FDVS.map(function (v) {
+      return '<button type="button" data-wh-fdv="' + v + '" aria-pressed="' + (v === fdv) + '"' + (v === fdv ? ' class="on"' : '') + '>' + fdvLabel(v) + '</button>';
+    }).join('');
+    var saleChips = [0.25, 0.5, 1].map(function (rate) {
+      return '<button type="button" data-wh-sell="' + rate + '" aria-pressed="' + (rate === sellFraction) + '"' + (rate === sellFraction ? ' class="on"' : '') + '>' + int(rate * 100) + '%</button>';
+    }).join('');
+    var dd = distributionAt(Date.now());
+    var source = window.__VDIST.source;
     var chips = PTS_CHIPS.map(function (v) {
       return '<button type="button" data-wh-pts="' + v + '" aria-pressed="' + (v === P) + '"' + (v === P ? ' class="on"' : '') + '>' + int(v) + '</button>';
     }).join('');
 
-    return '<article class="wh-rank" id="wh-rank" aria-labelledby="wh-rank-title">' +
-      '<span class="cmp-eyebrow">03 · YOUR RANK</span><h3 id="wh-rank-title">Where do your points sit?</h3>' +
-      '<div class="tp-chips wh-chips" role="group" aria-label="Your points"><span>Your points</span>' + chips +
-      '<label class="rk-inp">custom <input type="number" step="100" min="0" value="' + Math.round(P) + '" data-wh-pts-input aria-label="Your points"></label></div>' +
-      '<div class="rk-hero"><div><span class="cmp-eyebrow">' + int(P) + ' points</span>' +
+    return '<article class="wh-rank" aria-labelledby="wh-map-title">' +
+      '<span class="cmp-eyebrow">01 · AIRDROP MAP</span><h3 id="wh-map-title">32% of supply: who holds it, what it’s worth, where you sit</h3>' +
+      '<p class="wh-caption">' + (dd.pool / 1e6).toFixed(2) + 'M projected points · model week ' + dd.asOf + ' · +150,000 per week · next update ' + dd.next + ' (00:00 SGT).</p>' +
+      '<div class="wh-scenario-controls">' +
+        '<div class="tp-chips wh-chips" role="group" aria-label="FDV scenario"><span>FDV</span>' + fdvChips + '</div>' +
+        '<div class="tp-chips wh-chips" role="group" aria-label="Fraction of airdrop sold"><span>Airdrop sold</span>' + saleChips + '</div>' +
+        '<div class="tp-chips wh-chips" role="group" aria-label="Your points"><span>Your points</span>' + chips +
+        '<label class="rk-inp">custom <input type="number" step="100" min="0" value="' + Math.round(P) + '" data-wh-pts-input aria-label="Your points"></label></div>' +
+      '</div>' +
+      '<div class="wh-readouts wh-economic rk-four">' +
+        '<div><span>Total airdrop value</span><b>' + esc(usd(allocationValue)) + '</b><em>' + esc(fdvLabel(fdv)) + ' FDV × 32% of supply</em></div>' +
+        '<div><span>Potential sell pressure</span><b>' + esc(usd(allocationValue * sellFraction)) + '</b><em>' + int(sellFraction * 100) + '% of the airdrop sold</em></div>' +
+        '<div><span>Total supply sold</span><b>' + int(AIRDROP_SHARE * sellFraction * 100) + '%</b><em>32% allocation × ' + int(sellFraction * 100) + '% sold</em></div>' +
+        '<div><span>Your airdrop</span><b>' + esc(usd(value)) + '</b><em>' + int(P) + ' pts · $' + (AIRDROP_SHARE * fdv / D.pool).toFixed(2) + ' per point</em></div>' +
+      '</div>' +
+      '<div class="rk-hero" id="wh-rank"><div><span class="cmp-eyebrow">Where your ' + int(P) + ' points sit</span>' +
       '<h4>≈ rank ' + rankStr(R) + '.<br>Top ' + topPct(R, N) + ' of ~' + int(N) + ' accounts.</h4></div>' +
       '<b class="rk-big">' + share.toFixed(share < 0.01 ? 4 : 3) + '%<small>of all points</small></b></div>' +
       '<div class="rk-ruler" aria-label="Estimated rank on a log scale">' +
       '<div class="rk-track"><i style="left:' + lp(R).toFixed(2) + '%"><em>you · ' + rankStr(R) + '</em></i></div>' +
       '<div class="rk-ticks">' + ticks + '</div></div>' +
-      '<div class="wh-readouts rk-four">' +
+      '<div class="wh-readouts rk-three">' +
       '<div><span>Estimated rank</span><b>' + rankStr(R) + '</b><em>ahead of ~' + (100 - R / N * 100).toFixed(R / N < 0.01 ? 2 : 1) + '% of accounts</em></div>' +
       '<div><span>Accounts at or above you hold</span><b>' + above.toFixed(1) + '%</b><em>of all points, ~' + int(Math.max(R, 1)) + ' accounts</em></div>' +
       '<div><span>Next tier</span><b>' + (nextR ? '+' + int(nextNeed) : '—') + '</b><em>' + (nextR ? 'points to reach the top ' + int(nextR) : 'already in the top 10') + '</em></div>' +
-      '<div><span>Airdrop at ' + esc(fdvLabel(fdv)) + ' FDV</span><b>' + esc(usd(value)) + '</b><em>$' + (AIRDROP_SHARE * fdv / D.pool).toFixed(2) + ' per point · 32% ÷ ' + (D.pool / 1e6).toFixed(2) + 'M pts</em></div>' +
       '</div>' +
       '<div class="rk-bars"><div class="rk-brow"><span>Accounts</span><div class="rk-bar">' + bar('acc') + '</div></div>' +
       '<div class="rk-brow"><span>Points</span><div class="rk-bar">' + bar('pts') + '</div></div></div>' +
       '<div class="rk-cum">' + cumLine + '</div>' +
       '<div class="rk-legend">' + legend + '</div>' +
       '<div class="wh-readouts wh-economic rk-four">' + mults + '</div>' +
-      '<p class="wh-caption">Rank is interpolated between the <a class="wh-inline-source" href="' + esc(window.__VDIST.source) + '" target="_blank" rel="noopener noreferrer">yh_0x Week 42</a> cutoffs, scaled to this week’s projected ' +
-        (D.pool / 1e6).toFixed(2) + 'M-point pool (model week ' + D.asOf + '). A projection, not a leaderboard lookup: below rank 29,000 the source gives no cutoffs, so the tail is extrapolated. Airdrop value follows the FDV chips above.</p>' +
+      '<details class="wh-baseline"><summary>Top 2 / 5 / 10 / 50 / 100 / 150 — group size and sell pressure</summary>' + sellPressureReport() + '</details>' +
+      '<details class="wh-baseline"><summary>Full distribution &amp; rank cutoffs</summary><div class="wh-projection-grid"><div><h4>Non-overlapping rank bands</h4><table class="wh-projection-table"><thead><tr><th>Rank band</th><th>Airdrop share</th><th>Points</th></tr></thead><tbody>' +
+      RANK_BANDS.map(function (b) { return '<tr><td>' + b[0] + '</td><td>' + b[1].toFixed(1) + '%</td><td>' + int(dd.pool * b[1] / 100) + '</td></tr>'; }).join('') +
+      '</tbody></table></div><div><h4>Per-account cutoffs</h4><table class="wh-projection-table"><thead><tr><th>Rank</th><th>Points</th></tr></thead><tbody>' +
+      RANK_CUTOFFS.map(function (c) { return '<tr><td>Top ' + int(c[0]) + '</td><td>~' + int(c[1] * dd.scale) + '</td></tr>'; }).join('') +
+      '</tbody></table></div></div></details>' +
+      SOURCE_DETAILS(source) +
+      '<p class="wh-caption">Rank is interpolated between the <a class="wh-inline-source" href="' + esc(source) + '" target="_blank" rel="noopener noreferrer">yh_0x Week 42</a> cutoffs, scaled to this week’s projected pool. A projection, not a leaderboard lookup: below rank 29,000 the source gives no cutoffs, so the tail is extrapolated. Sell figures are nominal: the full Genesis allocation at the selected FDV; real proceeds depend on holders and liquidity.</p>' +
       '</article>';
   }
 
@@ -502,8 +533,7 @@
 
   function sellPressureReport() {
     var d = distributionAt(Date.now());
-    return '<p class="wh-top100-comparison"><b>Top 100 holds ~' + int(d.pool * 0.208) + ' points</b> out of ' + int(d.pool) + ' total (20.8%). Average: ~' + int(d.pool * 0.208 / 100) + ' per account; the #100 cutoff is ~' + int(d.top100) + '.</p>' +
-      '<div class="wh-sell-scroll"><table class="wh-projection-table wh-sell-table"><thead><tr><th scope="col">Cumulative rank</th><th scope="col">Group points</th><th scope="col">Cutoff / account</th><th scope="col">Airdrop share</th><th scope="col">Total supply</th><th scope="col">Sell ' + int(sellFraction * 100) + '% · ' + fdvLabel(fdv) + ' FDV</th></tr></thead><tbody>' +
+    return '<div class="wh-sell-scroll"><table class="wh-projection-table wh-sell-table"><thead><tr><th scope="col">Cumulative rank</th><th scope="col">Group points</th><th scope="col">Cutoff / account</th><th scope="col">Airdrop share</th><th scope="col">Total supply</th><th scope="col">Sell ' + int(sellFraction * 100) + '% · ' + fdvLabel(fdv) + ' FDV</th></tr></thead><tbody>' +
       sellPressureGroups().map(function (g, i) {
         var prefix = g.lowerBound ? '≥' : '~';
         return '<tr' + (g.rank === 100 ? ' class="wh-cutoff-selected"' : '') + '><th scope="row">Top ' + g.rank + (g.lowerBound ? '<small>lower bound</small>' : '') + '</th>' +
@@ -512,70 +542,6 @@
           '<td>' + prefix + usd(g.share * AIRDROP_SHARE * fdv * sellFraction) + '</td></tr>';
       }).join('') + '</tbody></table></div>' +
       '<p class="wh-caption">Group points are the combined holdings of all accounts in that rank group; cutoff is the minimum per-account balance at its boundary. Cumulative groups overlap; do not add rows. Bars use the same total-points scale. ≥ indicates an indicative lower bound.</p>';
-  }
-
-  function totalSellPressureReport() {
-    var allocationValue = AIRDROP_SHARE * fdv;
-    var chips = FDVS.map(function (v) {
-      return '<button type="button" data-wh-fdv="' + v + '" aria-pressed="' + (v === fdv) + '"' + (v === fdv ? ' class="on"' : '') + '>' + fdvLabel(v) + '</button>';
-    }).join('');
-    var saleChips = [0.25, 0.5, 1].map(function (rate) {
-      return '<button type="button" data-wh-sell="' + rate + '" aria-pressed="' + (rate === sellFraction) + '"' + (rate === sellFraction ? ' class="on"' : '') + '>' + int(rate * 100) + '%</button>';
-    }).join('');
-    return '<article class="wh-total-pressure" aria-labelledby="wh-total-title">' +
-      '<span class="cmp-eyebrow">01 · AIRDROP &amp; SELL PRESSURE</span><h3 id="wh-total-title">32% of supply. How much could be sold?</h3>' +
-      '<div class="wh-scenario-controls"><div class="tp-chips wh-chips" role="group" aria-label="FDV scenario"><span>FDV</span>' + chips + '</div>' +
-      '<div class="tp-chips wh-chips" role="group" aria-label="Fraction of airdrop sold"><span>Airdrop sold</span>' + saleChips + '</div></div>' +
-      '<div class="wh-readouts wh-economic"><div><span>Total airdrop value</span><b>' + usd(allocationValue) + '</b><em>' + fdvLabel(fdv) + ' FDV × 32% of supply</em></div>' +
-      '<div><span>Potential sell pressure</span><b>' + usd(allocationValue * sellFraction) + '</b><em>' + int(sellFraction * 100) + '% of the airdrop sold</em></div>' +
-      '<div><span>Total supply sold</span><b>' + int(AIRDROP_SHARE * sellFraction * 100) + '%</b><em>32% allocation × ' + int(sellFraction * 100) + '% sold</em></div></div>' +
-      '<p class="wh-caption">Nominal selling scenario at the selected FDV, assuming the full Genesis allocation is available. Actual proceeds and price impact depend on holders and liquidity.</p></article>';
-  }
-
-  function concentrationModel(d) {
-    var topShare = RANK_BANDS.slice(0, 3).reduce(function (sum, b) { return sum + b[1]; }, 0) / 100;
-    var nextShare = RANK_BANDS.slice(3, 6).reduce(function (sum, b) { return sum + b[1]; }, 0) / 100;
-    return { topShare: topShare, nextShare: nextShare, topPoints: d.pool * topShare, nextPoints: d.pool * nextShare,
-      equivalentAccounts: topShare / nextShare * 900,
-      perAccountMultiple: (topShare / 100) / (nextShare / 900),
-      circleDiameterRatio: Math.sqrt(topShare / nextShare),
-      top1000Share: topShare / (topShare + nextShare) };
-  }
-
-  function concentrationReport(d) {
-    var c = concentrationModel(d);
-    return '<figure class="wh-concentration" aria-labelledby="wh-concentration-title">' +
-      '<div class="wh-concentration-heading"><div><span class="cmp-eyebrow">THE CONCENTRATION GAP</span>' +
-      '<h4 id="wh-concentration-title">100 accounts.<br>The points of ~' + int(c.equivalentAccounts) + '.</h4></div>' +
-      '<b class="wh-concentration-multiple">' + c.perAccountMultiple.toFixed(2) + '×<small>points per account</small></b></div>' +
-      '<p class="wh-caption">Compared with the average account ranked 101–1,000. Circle area represents points held; the numbers inside are account counts.</p>' +
-      '<div class="wh-bubble-grid"><div class="wh-bubble-cohort"><div class="wh-bubble-stage"><div class="wh-point-bubble wh-top-bubble" style="width:' + (c.circleDiameterRatio * 100).toFixed(4) + '%"><b>100</b><span>accounts</span></div></div>' +
-      '<b class="wh-cohort-label">TOP 100</b><strong>~' + int(c.topPoints) + ' points</strong><span>' + (c.topShare * 100).toFixed(1) + '% of all points · ~' + int(c.topPoints / 100) + ' each</span></div>' +
-      '<div class="wh-bubble-cohort"><div class="wh-bubble-stage"><div class="wh-point-bubble wh-next-bubble"><b>900</b><span>accounts</span></div></div>' +
-      '<b class="wh-cohort-label">RANKS 101–1,000</b><strong>~' + int(c.nextPoints) + ' points</strong><span>' + (c.nextShare * 100).toFixed(1) + '% of all points · ~' + int(c.nextPoints / 900) + ' each</span></div></div>' +
-      '<figcaption>Within the Top 1,000, <b>10% of accounts hold ' + (c.top1000Share * 100).toFixed(1) + '% of the points.</b> The ~' + int(c.equivalentAccounts) + '-account comparison uses the next 900 accounts’ average, not ' + int(c.equivalentAccounts) + ' identified wallets. Based on the projected rank-band distribution.</figcaption></figure>';
-  }
-
-  function distributionReport() {
-    var source = 'https://x.com/yh_0x/status/2106449057933857025';
-    var d = distributionAt(Date.now());
-    return '<article class="wh-distribution" aria-labelledby="wh-distribution-title">' +
-      '<span class="cmp-eyebrow">02 · DISTRIBUTION</span><h3 id="wh-distribution-title">Where could the selling come from?</h3>' +
-      '<p class="wh-caption">' + (d.pool / 1e6).toFixed(2) + 'M projected points · model week ' + d.asOf + ' · +150,000 per week · next update ' + d.next + ' (00:00 SGT).</p>' +
-      concentrationReport(d) +
-      '<div class="wh-band-bar" role="img" aria-label="Airdrop distribution: Top 100 holds 20.8 percent, ranks 101 to 1000 hold 29.9 percent, ranks 1001 and below hold 49.3 percent"><span style="width:20.8%"></span><span style="width:29.9%"></span><span style="width:49.3%"></span></div>' +
-      '<div class="wh-band-legend"><span>Top 100 <b>20.8%</b></span><span>101–1,000 <b>29.9%</b></span><span>1,001+ <b>49.3%</b></span></div>' +
-      sellPressureReport() +
-      '<details class="wh-baseline"><summary>Full distribution &amp; rank cutoffs</summary><div class="wh-projection-grid"><div><h4>Non-overlapping rank bands</h4><table class="wh-projection-table"><thead><tr><th>Rank band</th><th>Airdrop share</th><th>Points</th></tr></thead><tbody>' +
-      RANK_BANDS.map(function (b) { return '<tr><td>' + b[0] + '</td><td>' + b[1].toFixed(1) + '%</td><td>' + int(d.pool * b[1] / 100) + '</td></tr>'; }).join('') +
-      '</tbody></table></div><div><h4>Per-account cutoffs</h4><table class="wh-projection-table"><thead><tr><th>Rank</th><th>Points</th></tr></thead><tbody>' +
-      RANK_CUTOFFS.map(function (c) { return '<tr><td>Top ' + int(c[0]) + '</td><td>~' + int(c[1] * d.scale) + '</td></tr>'; }).join('') +
-      '</tbody></table></div></div></details>' +
-      '<details class="wh-baseline"><summary>Source &amp; projection method</summary><p>Baseline: <a class="wh-inline-source" href="' + source + '" target="_blank" rel="noopener noreferrer">yh_0x · Week 42 analysis ↗</a>, posted Oct 4, 2026 (SGT). Community-sourced, unofficial figures: 9.44M points; 31,693 weekly earners.</p>' +
-      '<p>Pool = 9.44M + completed weeks × 150,000. Cutoffs grow proportionally; rank-band shares stay fixed. This is a projection, not a refreshed leaderboard. Group supply share = points share × 32%; nominal sale value = supply share × FDV × fraction sold.</p>' +
-      '<p>Top 10 / 50 / 100 cumulative shares are 6.1% / 14.8% / 20.8%. Other group totals are unavailable: Top 2 floor = 2 × 89,111 points; Top 5 floor = Top 2 floor + 3 × 52,500; Top 150 floor = Top 100 band share + 50 × 7,250 ÷ 9.44M. Rounded baseline figures make these indicative bounds.</p>' +
-      '<div class="wh-distribution-images"><figure><a href="assets/whales/yh-week42-1.jpg" target="_blank" rel="noopener noreferrer"><img src="assets/whales/yh-week42-1.jpg" alt="Original Week 42 points distribution" width="1080" height="1350" loading="lazy"></a><figcaption>Original rank-band shares</figcaption></figure>' +
-      '<figure><a href="assets/whales/yh-week42-2.jpg" target="_blank" rel="noopener noreferrer"><img src="assets/whales/yh-week42-2.jpg" alt="Original Week 42 rank cutoffs" width="1080" height="1350" loading="lazy"></a><figcaption>Original cutoffs</figcaption></figure></div></details></article>';
   }
 
   function sortedWhaleRows() {
@@ -634,6 +600,14 @@
     if (status) status.textContent = whaleSortStatus();
   }
 
+  function SOURCE_DETAILS(source) {
+    return '<details class="wh-baseline"><summary>Source &amp; projection method</summary><p>Baseline: <a class="wh-inline-source" href="' + source + '" target="_blank" rel="noopener noreferrer">yh_0x · Week 42 analysis ↗</a>, posted Oct 4, 2026 (SGT). Community-sourced, unofficial figures: 9.44M points; 31,693 weekly earners.</p>' +
+      '<p>Pool = 9.44M + completed weeks × 150,000. Cutoffs grow proportionally; rank-band shares stay fixed. This is a projection, not a refreshed leaderboard. Group supply share = points share × 32%; nominal sale value = supply share × FDV × fraction sold.</p>' +
+      '<p>Top 10 / 50 / 100 cumulative shares are 6.1% / 14.8% / 20.8%. Other group totals are unavailable: Top 2 floor = 2 × 89,111 points; Top 5 floor = Top 2 floor + 3 × 52,500; Top 150 floor = Top 100 band share + 50 × 7,250 ÷ 9.44M. Rounded baseline figures make these indicative bounds.</p>' +
+      '<div class="wh-distribution-images"><figure><a href="assets/whales/yh-week42-1.jpg" target="_blank" rel="noopener noreferrer"><img src="assets/whales/yh-week42-1.jpg" alt="Original Week 42 points distribution" width="1080" height="1350" loading="lazy"></a><figcaption>Original rank-band shares</figcaption></figure>' +
+      '<figure><a href="assets/whales/yh-week42-2.jpg" target="_blank" rel="noopener noreferrer"><img src="assets/whales/yh-week42-2.jpg" alt="Original Week 42 rank cutoffs" width="1080" height="1350" loading="lazy"></a><figcaption>Original cutoffs</figcaption></figure></div></details>';
+  }
+
   function render() {
     var host = document.querySelector('[data-tg="whales"]');
     if (!host) return;
@@ -649,11 +623,9 @@
     host.innerHTML =
       '<div class="cmp-heading"><span class="cmp-eyebrow">WHALES</span>' +
       '<h2>From FDV to airdrop sell pressure</h2>' +
-      '<p>Value the 32% Genesis allocation, size the potential selling, then see how the allocation is distributed across rank groups and tracked whales.</p></div>' +
-      totalSellPressureReport() +
-      distributionReport() +
-      rankReport() +
-      '<div class="cmp-heading"><span class="cmp-eyebrow">04 · TRACKED WHALES</span><h3>The people behind the points</h3>' +
+      '<p>Value the 32% Genesis allocation, size the selling, see who holds it and where your own points sit — then the tracked whales behind the points.</p></div>' +
+      airdropMap() +
+      '<div class="cmp-heading"><span class="cmp-eyebrow">02 · TRACKED WHALES</span><h3>The people behind the points</h3>' +
       '<p>' + (rs.length + WATCHLIST.length) + ' tracked accounts · ' + rs.length + ' dated disclosures · ' + WATCHLIST.length + ' scenario balances.</p></div>' +
       '<div class="wh-readouts wh-economic" aria-label="Tracked whale summary">' +
         '<div><span>Combined points</span><b>~' + int(combinedPoints) + '</b><em>' + int(total) + ' disclosed + ' + int(estimatedTotal) + ' scenario points</em></div>' +
@@ -685,7 +657,7 @@
     '.rk-track>i>em{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);white-space:nowrap;padding:3px 7px;border-radius:4px;background:var(--v2-accent,#4c9af8);color:#04101d;font:800 10px var(--mono);font-style:normal}' +
     '.rk-ticks{position:relative;height:30px;margin-top:8px}.rk-ticks>span{position:absolute;transform:translateX(-50%);text-align:center;white-space:nowrap}.rk-ticks>span:first-child{transform:none}.rk-ticks>span:last-child{transform:translateX(-100%);text-align:right}' +
     '.rk-ticks b{display:block;color:var(--muted);font:800 9.5px var(--mono)}.rk-ticks small{display:block;color:var(--dim,var(--muted));font:9px var(--mono)}' +
-    '.wh-readouts.rk-four{grid-template-columns:repeat(4,minmax(0,1fr))}' +
+    '.wh-readouts.rk-four{grid-template-columns:repeat(4,minmax(0,1fr))}.wh-readouts.rk-three{grid-template-columns:repeat(3,minmax(0,1fr))}.rk-sell{color:var(--v2-accent,#4c9af8)!important}.wh-rank .wh-scenario-controls{margin:16px 0 18px}.wh-rank>.wh-readouts{margin:0 0 20px}.wh-rank details.wh-baseline{margin-top:10px}' +
     '.rk-bars{display:grid;gap:6px;margin:6px 0 10px}.rk-brow{display:grid;grid-template-columns:70px minmax(0,1fr);align-items:center;gap:10px}.rk-brow>span{color:var(--muted);font:800 9px var(--mono);letter-spacing:.8px;text-transform:uppercase}' +
     '.rk-bar{display:flex;gap:2px;height:22px}.rk-bar>span{display:block;min-width:4px;border-radius:3px;opacity:.55}.rk-bar>span.me{opacity:1;box-shadow:0 0 0 2px var(--text)}' +
     '.wh-rank .g1{background:#2866bb}.wh-rank .g2{background:#665db3}.wh-rank .g3{background:#3f8f86}.wh-rank .g4{background:#7b8794}' +
@@ -694,7 +666,7 @@
     '.rk-lg>i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:7px;vertical-align:middle}.wh-rank .rk-lg{background:var(--panel)}.rk-lg.g1>i{background:#2866bb}.rk-lg.g2>i{background:#665db3}.rk-lg.g3>i{background:#3f8f86}.rk-lg.g4>i{background:#7b8794}' +
     '.rk-lg>b{color:var(--text);font:800 11px var(--mono)}.rk-lg>b em{margin-left:4px;padding:1px 5px;border-radius:3px;background:var(--v2-accent,#4c9af8);color:#04101d;font:800 9px var(--mono);font-style:normal}' +
     '.rk-lg>span{display:block;margin-top:6px;color:var(--muted);font:10.5px/1.5 var(--mono)}.rk-lg strong{color:var(--text)}.rk-lg>small{display:block;margin-top:2px;color:var(--dim,var(--muted));font:10px var(--mono)}' +
-    '@media(max-width:700px){.wh-rank{padding:16px}.rk-hero{flex-direction:column;align-items:flex-start;padding:16px 16px 0;margin:0 -16px}.rk-big{text-align:left;font-size:28px}.wh-readouts.rk-four,.rk-legend{grid-template-columns:repeat(2,minmax(0,1fr))}.rk-ticks small{display:none}.rk-ticks>span:nth-child(5){display:none}.rk-cum{margin-left:0}}' +
+    '@media(max-width:700px){.wh-rank{padding:16px}.rk-hero{flex-direction:column;align-items:flex-start;padding:16px 16px 0;margin:0 -16px}.rk-big{text-align:left;font-size:28px}.wh-readouts.rk-four,.wh-readouts.rk-three,.rk-legend{grid-template-columns:repeat(2,minmax(0,1fr))}.rk-ticks small{display:none}.rk-ticks>span:nth-child(5){display:none}.rk-cum{margin-left:0}}' +
     '.wh-distribution h3{margin:20px 0 10px;color:var(--text);font-size:22px}' +
     '.wh-distribution p{margin:10px 0 18px;color:var(--muted)!important;font-size:13px;line-height:1.7}' +
     '.wh-projection-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px;margin:24px 0}.wh-projection-grid h4{color:var(--text);margin:0 0 12px;font-size:14px}.wh-projection-table{width:100%;border-collapse:collapse;font:12px var(--mono);color:var(--text)}.wh-projection-table th,.wh-projection-table td{padding:10px 6px;text-align:right;border-bottom:1px solid var(--line)}.wh-projection-table th:first-child,.wh-projection-table td:first-child{text-align:left}.wh-projection-table th{color:var(--muted);font-size:10px}.wh-cutoff-selected{background:color-mix(in srgb,var(--v2-accent,#4c9af8) 15%,transparent);font-weight:800}.wh-baseline{margin-top:20px}.wh-baseline summary{cursor:pointer;color:var(--muted);font:12px var(--mono)}' +
@@ -760,40 +732,124 @@
   }
 
   var NEXT_TITLE = 'Next Farm by Varriors';
-  /* Perp DEX farms, in the order given. Logos are local (img-src 'self'): official X avatars,
-     RISEx's own site icon since it links no X account. ref: true means the link already
-     carries a referral code; the others link plain until one is supplied. Blurbs are read
-     from each project's own site; HelloTrade has none on record, so it shows none. */
+  /* Perp DEX farms, in the order given. Every fact below is dated and sourced; where a
+     source found nothing (no points program, no disclosed raise) the card says so rather
+     than filling it in. Logos are local (img-src 'self'). ref: the link carries a referral
+     code. stage: 0 = cash rewards / nothing yet, 1 = points live, 2 = token.
+
+     The value line is a scenario, not a forecast: total raised × a listing multiple × 25%
+     to users. The multiples are anchored on what happened: Lighter raised $68M and listed
+     at a $4B FDV (≈59×); Variational has raised $61.8M. */
+  var FARMS_ASOF = '2026-10-21';
+  var FARM_SHARE = 0.25;
+  var FARM_MULTS = [20, 40, 59];
+  var farmMult = 40;
   var FARMS_PERP = [
-    { k: 'truenorth', name: 'TrueNorth', logo: 'assets/farms/truenorth.jpg', x: 'get_truenorth', ref: true,
-      url: 'https://app.truenorth.xyz/ref/KOREAN',
-      what: 'Agentic brokerage: AI agents scan the market, set up trades and watch the portfolio.' },
-    { k: 'entropy', name: 'Entropy', logo: 'assets/farms/entropy.jpg', x: 'entropyIO', ref: false,
-      url: 'https://entropy.io/leaderboard?filter=7d',
-      what: 'Perps on private-market assets and other hard-to-access markets.' },
-    { k: 'risex', name: 'RISEx', logo: 'assets/farms/risex.png', x: null, ref: true,
+    { k: 'risex', name: 'RISEx', logo: 'assets/farms/risex.png', x: null, ref: true, accent: '#19d38a',
       url: 'https://www.rise.trade/invite/x04cfg1y',
-      what: 'Fully onchain orderbook perps on RISE, with yield on idle collateral.' },
-    { k: 'derpetual', name: 'Derpetual', logo: 'assets/farms/derpetual.jpg', x: 'derpetual', ref: false,
+      what: 'Fully onchain orderbook perps on RISE (Ethereum L2), with yield on idle collateral.',
+      status: ['gated', 'Mainnet live · invite-only'], stage: 1,
+      points: { start: '2026-07-28', label: 'Ignite S1', note: '200K points a week · ends by Q2 2027 · referrers +10%', weekly: 200000 },
+      raised: 7.2e6, raisedNote: 'Galaxy Ventures, Vitalik Buterin, EtherFi, Stani Kulechov',
+      bull: ['$3B volume before points even started', 'All RISE points go to RISEx users', 'Points live now: the only one of the five'],
+      src: [['Chainwire', 'https://chainwire.org/2026/07/24/risex-launches-ignite-season-1-points-program-following-3b-in-volume-during-the-early-access-phase/'], ['CoinDesk', 'https://www.coindesk.com/tech/2025/11/12/ethereum-layer-2-rise-unveils-risex-and-marketcore-to-build-global-on-chain-markets']] },
+    { k: 'entropy', name: 'Entropy', logo: 'assets/farms/entropy.jpg', x: 'entropyIO', ref: false, accent: '#b9c2cf',
+      url: 'https://entropy.io/leaderboard?filter=7d',
+      what: 'Perps on pre-IPO companies (Anthropic), stocks and commodities, deployed on Hyperliquid (HIP-3).',
+      status: ['live', 'Live since 2026-08-24'], stage: 0,
+      points: null, pointsNote: 'No points yet: fee rebates + referrals. A points multiplier was spotted in its backend (unconfirmed).',
+      raised: 14e6, raisedNote: 'Seed led by Ribbit Capital, plus a ~$40M HYPE stake',
+      bull: ['Only place to trade Anthropic’s valuation', 'Volume also counts on Hyperliquid', 'Buying new tickers (MOONSHOT, Oct 19)'],
+      src: [['Crypto Briefing', 'https://cryptobriefing.com/entropyio-pre-ipo-perps-hyperliquid/'], ['TokenPost', 'https://www.tokenpost.com/news/investing/35060']] },
+    { k: 'hellotrade', name: 'HelloTrade', logo: 'assets/farms/hellotrade.jpg', x: 'hellotradeapp', ref: false, accent: '#ff5a1f',
+      url: 'https://x.com/hellotradeapp',
+      what: 'Mobile app for leveraged stocks, ETFs, commodities and crypto, built on MegaETH.',
+      status: ['soon', 'Early access · waitlist'], stage: 0,
+      points: null, pointsNote: 'No points terms published yet.',
+      raised: 4.6e6, raisedNote: 'Seed led by Dragonfly (also led Variational’s Series A)',
+      bull: ['Founded by ex-BlackRock digital-asset leads', 'Round closed in under a week', 'Pre-launch: the earliest possible entry'],
+      src: [['GlobeNewswire', 'https://www.globenewswire.com/news-release/2025/11/21/3192551/0/en/HelloTrade-Founded-by-Former-BlackRock-Crypto-Leaders-Announces-Fundraise-to-Unlock-Global-Frictionless-Access-to-Global-Equities.html']] },
+    { k: 'truenorth', name: 'TrueNorth', logo: 'assets/farms/truenorth.jpg', x: 'get_truenorth', ref: true, accent: '#3b7bff',
+      url: 'https://app.truenorth.xyz/ref/KOREAN',
+      what: 'Agentic brokerage: AI agents scan the market, set up trades and watch the portfolio.',
+      status: ['live', 'App live'], stage: 0,
+      points: null, pointsNote: 'No points yet: TruthSayer rewards pay USDC for volume and referrals.',
+      raised: 3e6, raisedNote: 'Pre-seed led by CyberFund; Delphi Labs, GSR; LayerZero’s Bryan Pellegrino',
+      bull: ['Paid in USDC today, before any token', 'Running a Lighter trading comp with $LIT prizes', 'Smallest raise here: most room to re-rate'],
+      src: [['ZyCrypto', 'https://zycrypto.com/truenorth-secures-3m-to-develop-purpose-built-financial-ai/'], ['Coinlaunch', 'https://coinlaunch.space/projects/truenorth-ai/']] },
+    { k: 'derpetual', name: 'Derpetual', logo: 'assets/farms/derpetual.jpg', x: 'derpetual', ref: false, accent: '#8ff0b5',
       url: 'https://www.derpetual.com/',
-      what: 'Abstract futures: markets on measurable quantities beyond traditional assets.' },
-    { k: 'hellotrade', name: 'HelloTrade', logo: 'assets/farms/hellotrade.jpg', x: 'hellotradeapp', ref: false,
-      url: 'https://x.com/hellotradeapp', what: '' }
+      what: 'Abstract futures: leveraged markets on any number — indices, weather, events.',
+      status: ['live', 'Live on Solana via derp.trade'], stage: 0,
+      points: null, pointsNote: 'No points program found.',
+      raised: null, raisedNote: 'No raise disclosed',
+      bull: ['A new market type, not another perp clone', 'Launched April 2026: still early', 'Aiming for a CFTC licence'],
+      src: [['Founder post', 'https://x.com/antoni_kiszka/status/2046608631718658543'], ['CryptoTotem', 'https://cryptototem.com/derpetual/']] }
   ];
 
-  function farmCard(f) {
-    return '<article class="nf-farm">' +
-      '<a class="nf-farm-id" href="' + esc(f.url) + '" target="_blank" rel="noopener noreferrer">' +
-        '<img src="' + esc(f.logo) + '" alt="' + esc(f.name) + ' logo" width="56" height="56">' +
-        '<b>' + esc(f.name) + '</b></a>' +
-      (f.what ? '<p>' + esc(f.what) + '</p>' : '<p class="nf-farm-none"></p>') +
-      '<div class="nf-farm-links">' +
-        '<a class="nf-farm-go' + (f.ref ? ' ref' : '') + '" href="' + esc(f.url) + '" target="_blank" rel="noopener noreferrer">' +
-          (f.ref ? 'Join with referral ↗' : 'Open ↗') + '</a>' +
-        (f.x ? '<a class="nf-farm-x" href="https://x.com/' + esc(f.x) + '" target="_blank" rel="noopener noreferrer">@' + esc(f.x) + '</a>' : '') +
-      '</div></article>';
+  function farmUsd(v) {
+    if (v >= 1e9) return '$' + (v / 1e9).toFixed(2) + 'B';
+    if (v >= 1e6) return '$' + (v / 1e6).toFixed(v >= 1e8 ? 0 : 1) + 'M';
+    return '$' + Math.round(v / 1e3) + 'K';
+  }
+  function farmDays(from) {
+    return Math.max(0, Math.floor((Date.parse(FARMS_ASOF + 'T00:00:00Z') - Date.parse(from + 'T00:00:00Z')) / 864e5));
   }
 
+  function farmCard(f) {
+    var hedge = '<a class="nf-hedge" href="' + esc(f.url) + '" target="_blank" rel="noopener noreferrer">Hedge it with ' + esc(f.name) + ' ↗' +
+      (f.ref ? '<small>ref</small>' : '') + '</a>';
+    var pts;
+    if (f.points) {
+      var d = farmDays(f.points.start), weeks = Math.floor(d / 7) + 1;
+      pts = '<div class="nf-pts live"><span>Points</span><b>' + esc(f.points.label) + ' · day ' + d + '</b>' +
+        '<em>~' + (weeks * f.points.weekly / 1e6).toFixed(1) + 'M points out so far · ' + esc(f.points.note) + '</em></div>';
+    } else {
+      pts = '<div class="nf-pts"><span>Points</span><b>Not started</b><em>' + esc(f.pointsNote) + '</em></div>';
+    }
+    var pool = f.raised ? f.raised * farmMult * FARM_SHARE : null;
+    var maxPool = 14e6 * 59 * FARM_SHARE;
+    var val = pool
+      ? '<div class="nf-val"><span>If it lists at ' + farmMult + '× its raise</span><b>' + farmUsd(pool) + '</b>' +
+        '<i style="--w:' + Math.min(100, pool / maxPool * 100).toFixed(1) + '%"></i>' +
+        '<em>to users (25%) · FDV ' + farmUsd(f.raised * farmMult) + ' · raised ' + farmUsd(f.raised) + '</em></div>'
+      : '<div class="nf-val none"><span>Potential value</span><b>—</b><em>no raise disclosed, so no anchor to scale</em></div>';
+    if (pool && f.points) {
+      var seasonPts = f.points.weekly * 48;
+      val = val.replace('</em></div>', ' · ≈ $' + (pool / seasonPts * 1000).toFixed(0) + ' per 1K points over a ~48-week season</em></div>');
+    }
+    return '<article class="nf-farm" style="--acc:' + f.accent + '">' +
+      '<div class="nf-head"><a class="nf-farm-id" href="' + esc(f.url) + '" target="_blank" rel="noopener noreferrer">' +
+        '<img src="' + esc(f.logo) + '" alt="' + esc(f.name) + ' logo" width="60" height="60"></a>' +
+        '<div><b>' + esc(f.name) + '</b><span class="nf-st ' + f.status[0] + '"><i></i>' + esc(f.status[1]) + '</span></div></div>' +
+      '<p class="nf-what">' + esc(f.what) + '</p>' +
+      pts +
+      '<ul class="nf-bull">' + f.bull.map(function (b) { return '<li>' + esc(b) + '</li>'; }).join('') + '</ul>' +
+      '<div class="nf-raise"><span>Backing</span><b>' + (f.raised ? farmUsd(f.raised) : '—') + '</b><em>' + esc(f.raisedNote) + '</em></div>' +
+      val +
+      '<div class="nf-foot">' + hedge +
+        '<span class="nf-src">' + (f.x ? '<a href="https://x.com/' + esc(f.x) + '" target="_blank" rel="noopener noreferrer">@' + esc(f.x) + '</a>' : '') +
+        f.src.map(function (s) { return '<a href="' + esc(s[1]) + '" target="_blank" rel="noopener noreferrer">' + esc(s[0]) + '</a>'; }).join('') + '</span></div>' +
+      '</article>';
+  }
+
+  /* where each farm sits: earlier on the track = cheaper entry, less certainty */
+  function farmTrack() {
+    var stages = ['Cash rewards / nothing yet', 'Points live', 'Token'];
+    return '<div class="nf-track"><div class="nf-track-line">' +
+      stages.map(function (s, i) {
+        var here = FARMS_PERP.filter(function (f) { return f.stage === i; });
+        return '<div class="nf-stage"><span>' + esc(s) + '</span><div class="nf-stage-logos">' +
+          (here.length ? here.map(function (f) { return '<img src="' + esc(f.logo) + '" alt="' + esc(f.name) + '" title="' + esc(f.name) + '" width="34" height="34">'; }).join('') : '<em>none yet</em>') +
+          '</div></div>';
+      }).join('') + '</div><p>Earlier on the track = cheaper entry and less certainty. None of the five has a token yet.</p></div>';
+  }
+
+  function farmControls() {
+    return '<div class="nf-ctl"><span>Value scenario</span>' + FARM_MULTS.map(function (m) {
+      return '<button type="button" data-nf-mult="' + m + '"' + (m === farmMult ? ' class="on"' : '') + '>' + m + '× raise' + (m === 59 ? ' · Lighter' : '') + '</button>';
+    }).join('') + '<em>listing FDV = raise × multiple · 25% to users · Lighter raised $68M and listed at $4B (≈59×)</em></div>';
+  }
 
   function renderNext() {
     var host = document.querySelector('[data-tg="whales-next"]');
@@ -803,6 +859,8 @@
       '<div class="nf-categories" aria-label="Upcoming farming projects">' +
       '<section class="nf-category" aria-labelledby="nf-non-perp"><span class="nf-part">PART 01</span><h3 id="nf-non-perp">Non Perp DEX</h3><div class="nf-empty"><h4>Coming soon</h4></div></section>' +
       '<section class="nf-category" aria-labelledby="nf-perp"><span class="nf-part">PART 02</span><h3 id="nf-perp">Perp DEX</h3>' +
+      '<p class="nf-lede">Five perp venues worth farming while you hold VAR — and worth hedging it on. Facts as of ' + FARMS_ASOF + ', sourced on each card.</p>' +
+      farmTrack() + farmControls() +
       '<div class="nf-farms">' + FARMS_PERP.map(farmCard).join('') + '</div></section></div>';
   }
 
@@ -842,19 +900,36 @@
       '[data-open-tab="whales-next"]{height:auto!important;min-height:54px;white-space:normal!important;padding-top:10px!important;padding-bottom:10px!important}' +
       '[data-open-tab="whales-next"] strong,[data-open-tab="whales-next"] b{white-space:normal!important;line-height:1.4!important}' +
       '@media(max-width:1000px){[data-open-tab="whales-next"]{max-width:235px}}' +
-      '.nf-farms{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px;margin-top:16px}' +
-      '.nf-farm{display:flex;flex-direction:column;gap:12px;padding:18px;border:1px solid var(--line);background:var(--panel);min-width:0}' +
-      '.nf-farm:hover{border-color:var(--v2-accent,#4c9af8)}' +
-      '.nf-farm-id{display:flex;align-items:center;gap:12px;color:var(--text)!important;text-decoration:none}' +
-      '.nf-farm-id img{flex:0 0 56px;width:56px;height:56px;border-radius:14px;object-fit:cover;border:1px solid var(--line);background:var(--panel2,var(--panel))}' +
-      '.nf-farm-id b{font:800 17px/1.2 var(--sans);letter-spacing:-.2px}' +
-      '.nf-farm p{flex:1;margin:0;color:var(--muted)!important;font-size:12px;line-height:1.55}' +
-      '.nf-farm-links{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}' +
-      '.nf-farm-go{padding:7px 11px;border:1px solid var(--line);border-radius:4px;color:var(--text)!important;font:800 10.5px var(--mono);text-decoration:none}' +
-      '.nf-farm-go.ref{border-color:var(--v2-accent,#4c9af8);color:var(--v2-accent,#4c9af8)!important}' +
-      '.nf-farm-go:hover{background:var(--v2-accent,#4c9af8);border-color:var(--v2-accent,#4c9af8);color:#04101d!important}' +
-      '.nf-farm-x{color:var(--muted)!important;font:700 10.5px var(--mono);text-decoration:none}.nf-farm-x:hover{color:var(--text)!important}' +
-      '@media(max-width:600px){.nf-empty{padding:16px}.nf-farms{grid-template-columns:repeat(2,minmax(0,1fr))}.nf-farm{padding:14px}.nf-farm-id img{flex-basis:44px;width:44px;height:44px;border-radius:11px}}';
+      '.nf-lede{margin:6px 0 18px;color:var(--muted)!important;font-size:13px;line-height:1.6}' +
+      '.nf-track{margin:0 0 18px;padding:16px 18px;border:1px solid var(--line);background:var(--panel)}.nf-track p{margin:10px 0 0;color:var(--muted)!important;font-size:11.5px}' +
+      '.nf-track-line{position:relative;display:grid;grid-template-columns:2fr 1fr 1fr;gap:12px}.nf-track-line::before{content:"";position:absolute;left:0;right:0;top:9px;height:2px;background:linear-gradient(90deg,var(--line),#19d38a 55%,var(--v2-accent,#4c9af8))}' +
+      '.nf-stage{position:relative;padding-top:24px}.nf-stage::before{content:"";position:absolute;left:0;top:3px;width:14px;height:14px;border-radius:50%;background:var(--panel);border:2px solid var(--muted)}' +
+      '.nf-stage>span{display:block;color:var(--muted);font:800 9.5px var(--mono);letter-spacing:.8px;text-transform:uppercase}' +
+      '.nf-stage-logos{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}.nf-stage-logos img{width:34px;height:34px;border-radius:9px;border:1px solid var(--line);object-fit:cover}.nf-stage-logos em{color:var(--muted);font:11px var(--mono);font-style:normal}' +
+      '.nf-ctl{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin:0 0 16px}.nf-ctl>span{color:var(--muted);font:800 9.5px var(--mono);letter-spacing:.8px;text-transform:uppercase}' +
+      '.nf-ctl button{padding:6px 11px;border:1px solid var(--line);border-radius:4px;background:var(--panel);color:var(--muted);font:800 10.5px var(--mono);cursor:pointer}.nf-ctl button.on{background:var(--v2-accent,#4c9af8);border-color:var(--v2-accent,#4c9af8);color:#04101d}' +
+      '.nf-ctl em{flex-basis:100%;color:var(--muted);font:10.5px var(--mono);font-style:normal}' +
+      '.nf-farms{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}' +
+      '.nf-farm{position:relative;display:flex;flex-direction:column;gap:12px;padding:18px;border:1px solid var(--line);background:linear-gradient(160deg,color-mix(in srgb,var(--acc) 9%,var(--panel)),var(--panel) 45%);min-width:0;overflow:hidden;transition:transform .15s,border-color .15s}' +
+      '.nf-farm::before{content:"";position:absolute;inset:0 0 auto 0;height:3px;background:var(--acc)}.nf-farm:hover{transform:translateY(-2px);border-color:var(--acc)}' +
+      '.nf-head{display:flex;align-items:center;gap:14px;text-align:left}.nf-head>div{min-width:0}.nf-farm-id img{display:block;width:60px;height:60px;border-radius:16px;object-fit:cover;border:1px solid var(--line);box-shadow:0 6px 22px color-mix(in srgb,var(--acc) 35%,transparent)}' +
+      '.nf-head b{display:block;color:var(--text);font:800 20px/1.2 var(--sans);letter-spacing:-.3px}' +
+      '.nf-st{display:inline-flex;align-items:center;gap:6px;margin-top:5px;color:var(--muted);font:800 9.5px var(--mono);letter-spacing:.5px;text-transform:uppercase}.nf-st i{width:7px;height:7px;border-radius:50%;background:var(--muted)}' +
+      '.nf-st.live i{background:#2fb37e;box-shadow:0 0 0 3px color-mix(in srgb,#2fb37e 25%,transparent);animation:nfpulse 1.8s infinite}.nf-st.gated i{background:#d99a2b}.nf-st.soon i{background:#8a9bb0}' +
+      '@keyframes nfpulse{50%{box-shadow:0 0 0 6px transparent}}' +
+      '.nf-what{margin:0;color:var(--text)!important;font-size:12.5px;line-height:1.55}' +
+      '.nf-pts,.nf-raise,.nf-val{padding:10px 12px;border:1px solid var(--line);background:color-mix(in srgb,var(--panel) 70%,transparent)}' +
+      '.nf-pts span,.nf-raise span,.nf-val span{display:block;color:var(--muted);font:800 8.5px var(--mono);letter-spacing:.8px;text-transform:uppercase}' +
+      '.nf-pts b,.nf-raise b{display:block;margin:5px 0 3px;color:var(--text);font:800 15px var(--mono)}.nf-pts.live{border-color:#19d38a}.nf-pts.live b{color:#19d38a}' +
+      '.nf-pts em,.nf-raise em,.nf-val em{display:block;color:var(--muted);font-size:10.5px;line-height:1.5;font-style:normal}' +
+      '.nf-bull{list-style:none;margin:0;padding:0;display:grid;gap:5px}.nf-bull li{position:relative;padding-left:20px;color:var(--text);font-size:12px;line-height:1.45}.nf-bull li::before{content:"▲";position:absolute;left:0;top:1px;color:#2fb37e;font-size:10px}' +
+      '.nf-val b{display:block;margin:5px 0 6px;color:var(--acc);font:800 24px/1 var(--mono);letter-spacing:-.6px;filter:brightness(1.1)}.nf-val.none b{color:var(--muted)}' +
+      '.nf-val i{display:block;height:5px;margin:0 0 7px;border-radius:3px;background:color-mix(in srgb,var(--muted) 18%,transparent);position:relative;overflow:hidden}.nf-val i::after{content:"";position:absolute;inset:0 auto 0 0;width:var(--w);background:var(--acc)}' +
+      '.nf-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:auto;padding-top:4px}' +
+      '.nf-hedge{display:inline-flex;align-items:center;gap:7px;padding:9px 13px;border-radius:5px;background:var(--acc);color:#04101d!important;font:800 11px var(--mono);text-decoration:none}.nf-hedge:hover{filter:brightness(1.12)}' +
+      '.nf-hedge small{padding:1px 5px;border-radius:3px;background:rgba(0,0,0,.18);font:800 8.5px var(--mono);text-transform:uppercase}' +
+      '.nf-src{display:flex;gap:9px;flex-wrap:wrap}.nf-src a{color:var(--muted)!important;font:700 10px var(--mono);text-decoration:none}.nf-src a:hover{color:var(--text)!important}' +
+      '@media(max-width:600px){.nf-empty{padding:16px}.nf-farms{grid-template-columns:minmax(0,1fr)}.nf-farm{padding:15px}.nf-track-line{grid-template-columns:minmax(0,1fr)}.nf-track-line::before{display:none}}';
     document.head.appendChild(style);
   }
 
@@ -961,6 +1036,12 @@
       if (sale && [0.25, 0.5, 1].indexOf(+sale.dataset.whSell) >= 0) {
         sellFraction = +sale.dataset.whSell;
         render();
+        return;
+      }
+      var nm = e.target && e.target.closest && e.target.closest('[data-nf-mult]');
+      if (nm) {
+        farmMult = +nm.getAttribute('data-nf-mult');
+        renderNext();
         return;
       }
       var pt = e.target && e.target.closest && e.target.closest('[data-wh-pts]');
