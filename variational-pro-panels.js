@@ -178,7 +178,10 @@
     '.vps-power p{margin:0;color:#dbe6f7!important;font:12.5px/1.55 var(--sans,Arial,sans-serif)!important}.vps-pools{display:block;width:100%;max-width:300px;margin-top:14px}' +
     '.vps-nav{gap:12px 16px}.vps-btn{padding:8px 12px;border:1px solid #5d83b5;border-radius:2px;background:#1c304d;color:#e2edff;font:800 11px var(--mono);cursor:pointer;letter-spacing:1px}.vps-btn:hover{border-color:#acd0ff}' +
     '.vps-start{background:#4c9af8;border-color:#4c9af8;color:#081326;animation:vpsblink 1.4s steps(2) infinite}.vps-start:hover{animation:none}@keyframes vpsblink{50%{opacity:.55}}' +
-    '.vps-dots{display:flex;gap:7px}.vps-dots button{width:10px;height:10px;padding:0;border:1px solid #6695d2;background:transparent;cursor:pointer}.vps-dots button.on{background:#4c9af8;border-color:#4c9af8;box-shadow:0 0 10px #4c9af8}' +
+    '.vps-press{position:absolute;left:50%;bottom:15%;z-index:4;transform:translateX(-50%);display:inline-flex;align-items:center;gap:16px;padding:20px 44px;border:2px solid #68a8ff;border-radius:4px;background:#0a1220e6;color:#fff;font:900 clamp(22px,3vw,40px)/1 var(--mono);letter-spacing:.18em;cursor:pointer;white-space:nowrap;box-shadow:0 0 0 6px #4c9af81f,0 0 60px #4c9af866;text-shadow:0 0 18px #68a8ff;animation:vpsblink 1.1s steps(2) infinite}' +
+    '.vps-press span{color:#68a8ff;font-size:.8em}.vps-press:hover,.vps-press:focus-visible{animation:none;background:#4c9af8;color:#081326;text-shadow:none;transform:translateX(-50%) scale(1.04);outline:none}.vps-press:hover span,.vps-press:focus-visible span{color:#081326}' +
+    '@media(max-width:600px){.vps-press{bottom:12%;padding:14px 22px;gap:10px;font-size:18px;letter-spacing:.12em}}' +
+    '.vps-dots{display:flex;gap:7px}.vps-dots button{flex:none;width:10px;height:10px;min-width:0;min-height:0!important;padding:0;border:1px solid #6695d2;background:transparent;cursor:pointer}.vps-dots button.on{background:#4c9af8;border-color:#4c9af8;box-shadow:0 0 10px #4c9af8}' +
     '.vps-src{color:#6695d2!important;font:9px var(--mono);letter-spacing:1px;text-decoration:none}.vps-nav .vp-coming-index{margin-left:auto}' +
     '@media(max-width:900px){.vps-lanes{grid-template-columns:minmax(0,1fr)}.vps-vs{justify-self:center}.vps-grid3{grid-template-columns:minmax(0,1fr)}.vps-scr{padding:20px 18px 24px}}' +
     '@media(max-width:600px){.vps-nav{padding:14px 16px!important}.vps-src{display:none}.vps-lane li{grid-template-columns:20px minmax(0,1fr)}.vps-lane li em{grid-column:2;justify-self:start}}';
@@ -212,6 +215,8 @@
       '<div class="vp-hero-copy"><p class="vp-kicker">A NEW HORIZON</p><h2>BIGGER MARKETS.<br><em>BIGGER AMBITION.</em></h2>' +
       '<p class="vp-intro">For traders looking beyond the next trade.<br>The next chapter of Variational is on the horizon.</p></div>' +
       '<div class="vp-horizon" aria-hidden="true"><span class="vp-giant-pro">PRO</span><img class="vp-landscape" src="assets/pro/pro-version-title.svg?v=compact" width="512" height="296" alt=""></div>' +
+      /* the title screen's own way in: one big target in the middle, same action as the bar */
+      '<button type="button" class="vps-press" data-vps="next" aria-label="Press start: see how Variational Pro works"><span>▶</span> PRESS START</button>' +
       '</div>' + screens() + navBar() +
       '<figcaption>Variational Pro · The next chapter.</figcaption></figure>' +
       '<aside class="vp-sound" aria-label="Title screen soundtrack">' +
