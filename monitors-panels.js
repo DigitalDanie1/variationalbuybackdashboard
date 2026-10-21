@@ -448,6 +448,10 @@
       if (olpLive() != null) { render(); clearInterval(timer); }
     }, 1500);
     loadStats();
+    /* dashboard.js resolves the opening hash before this tab exists */
+    if (location.hash === '#monitors' && typeof showTab === 'function') {
+      try { showTab('monitors', { push: false }); } catch (_) {}
+    }
     /* the DeFiLlama daily history lands a few seconds after load */
     var mTries = 0;
     var mTimer = setInterval(function () {
