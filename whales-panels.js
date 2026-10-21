@@ -479,7 +479,7 @@
       return '<button type="button" data-wh-pts="' + v + '" aria-pressed="' + (v === P) + '"' + (v === P ? ' class="on"' : '') + '>' + int(v) + '</button>';
     }).join('');
 
-    return '<article class="wh-rank" aria-labelledby="wh-map-title">' +
+    return '<article class="wh-map" aria-labelledby="wh-map-title">' +
       '<span class="cmp-eyebrow">01 · AIRDROP MAP</span><h3 id="wh-map-title">32% of supply: who holds it, what it’s worth, where you sit</h3>' +
       '<p class="wh-caption">' + (dd.pool / 1e6).toFixed(2) + 'M projected points · model week ' + dd.asOf + ' · +150,000 per week · next update ' + dd.next + ' (00:00 SGT).</p>' +
       '<div class="wh-scenario-controls">' +
@@ -652,7 +652,7 @@
     '.wh-sell-pressure{border-top:1px solid var(--line);padding-top:22px;margin-top:24px}.wh-sell-pressure>h4{margin:0;color:var(--text);font:800 18px var(--sans)}.wh-sell-scroll{overflow-x:auto;margin:18px 0}.wh-sell-table{min-width:690px}.wh-sell-table tbody th{color:var(--text);font-size:12px;font-weight:700}.wh-sell-table small{display:block;margin-top:4px;color:var(--muted);font-size:9px;font-weight:400}.wh-sell-table td{white-space:nowrap}' +
     '.wh-economic>div{border-color:color-mix(in srgb,var(--v2-accent,#4c9af8) 40%,var(--line))}.wh-economic b{color:var(--v2-accent,#4c9af8)!important}' +
     '.wh-distribution{margin:0 0 28px;padding:22px;border:1px solid var(--line);background:var(--panel)}' +
-    '.wh-rank{margin:0 0 28px;padding:22px;border:1px solid var(--line);background:var(--panel)}.wh-rank h3{margin:12px 0 16px;color:var(--text);font-size:22px}.wh-rank .wh-chips{margin:0 0 20px}' +
+    '.wh-map{margin:0 0 28px;padding:22px;border:1px solid var(--line);background:var(--panel)}.wh-map h3{margin:12px 0 16px;color:var(--text);font-size:22px}.wh-map .wh-chips{margin:0 0 20px}' +
     '.rk-inp{display:inline-flex;align-items:center;gap:6px;color:var(--muted);font:700 10px var(--mono);letter-spacing:.5px;text-transform:uppercase}.rk-inp input{width:96px;padding:6px 8px;border:1px solid var(--line);border-radius:4px;background:var(--panel2,var(--panel));color:var(--text);font:700 12px var(--mono)}' +
     '.rk-hero{display:flex;justify-content:space-between;align-items:flex-end;gap:18px;padding:20px 22px 0;margin:0 -22px;border-top:1px solid var(--line)}.rk-hero h4{margin:8px 0 0;color:var(--text);font:800 clamp(22px,2.8vw,32px)/1.15 var(--sans);letter-spacing:-.8px}' +
     '.rk-bigs{display:flex;gap:28px;flex-shrink:0;align-items:flex-start}.rk-big.supply{color:var(--text)}.rk-big{flex-shrink:0;color:var(--v2-accent,#4c9af8);font:800 36px/1 var(--mono);text-align:right}.rk-big small{display:block;margin-top:8px;color:var(--muted);font:11px/1.4 var(--mono)}' +
@@ -661,16 +661,16 @@
     '.rk-track>i>em{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);white-space:nowrap;padding:3px 7px;border-radius:4px;background:var(--v2-accent,#4c9af8);color:#04101d;font:800 10px var(--mono);font-style:normal}' +
     '.rk-ticks{position:relative;height:30px;margin-top:8px}.rk-ticks>span{position:absolute;transform:translateX(-50%);text-align:center;white-space:nowrap}.rk-ticks>span:first-child{transform:none}.rk-ticks>span:last-child{transform:translateX(-100%);text-align:right}' +
     '.rk-ticks b{display:block;color:var(--muted);font:800 9.5px var(--mono)}.rk-ticks small{display:block;color:var(--dim,var(--muted));font:9px var(--mono)}' +
-    '.wh-readouts.rk-four{grid-template-columns:repeat(4,minmax(0,1fr))}.wh-readouts.rk-three{grid-template-columns:repeat(3,minmax(0,1fr))}.rk-sell{color:var(--v2-accent,#4c9af8)!important}.wh-rank .wh-scenario-controls{margin:16px 0 18px}.wh-rank>.wh-readouts{margin:0 0 20px}.wh-rank details.wh-baseline{margin-top:10px}' +
+    '.wh-readouts.rk-four{grid-template-columns:repeat(4,minmax(0,1fr))}.wh-readouts.rk-three{grid-template-columns:repeat(3,minmax(0,1fr))}.rk-sell{color:var(--v2-accent,#4c9af8)!important}.wh-map .wh-scenario-controls{margin:16px 0 18px}.wh-map>.wh-readouts{margin:0 0 20px}.wh-map details.wh-baseline{margin-top:10px}' +
     '.rk-bars{display:grid;gap:6px;margin:6px 0 10px}.rk-brow{display:grid;grid-template-columns:70px minmax(0,1fr);align-items:center;gap:10px}.rk-brow>span{color:var(--muted);font:800 9px var(--mono);letter-spacing:.8px;text-transform:uppercase}' +
     '.rk-bar{display:flex;gap:2px;height:22px}.rk-bar>span{display:block;min-width:4px;border-radius:3px;opacity:.55}.rk-bar>span.me{opacity:1;box-shadow:0 0 0 2px var(--text)}' +
-    '.wh-rank .g1{background:#2866bb}.wh-rank .g2{background:#665db3}.wh-rank .g3{background:#3f8f86}.wh-rank .g4{background:#7b8794}' +
+    '.wh-map .g1{background:#2866bb}.wh-map .g2{background:#665db3}.wh-map .g3{background:#3f8f86}.wh-map .g4{background:#7b8794}' +
     '.rk-cum{display:flex;flex-wrap:wrap;gap:6px 22px;margin:4px 0 0 80px;color:var(--muted);font:11px/1.5 var(--mono)}.rk-cum b{margin-left:5px;color:var(--text)}' +
     '.rk-legend{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:14px 0 16px}.rk-lg{padding:10px 12px;border:1px solid var(--line);border-radius:4px;background:var(--panel);min-width:0}.rk-lg.me{border-color:var(--text)}' +
-    '.rk-lg>i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:7px;vertical-align:middle}.wh-rank .rk-lg{background:var(--panel)}.rk-lg.g1>i{background:#2866bb}.rk-lg.g2>i{background:#665db3}.rk-lg.g3>i{background:#3f8f86}.rk-lg.g4>i{background:#7b8794}' +
+    '.rk-lg>i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:7px;vertical-align:middle}.wh-map .rk-lg{background:var(--panel)}.rk-lg.g1>i{background:#2866bb}.rk-lg.g2>i{background:#665db3}.rk-lg.g3>i{background:#3f8f86}.rk-lg.g4>i{background:#7b8794}' +
     '.rk-lg>b{color:var(--text);font:800 11px var(--mono)}.rk-lg>b em{margin-left:4px;padding:1px 5px;border-radius:3px;background:var(--v2-accent,#4c9af8);color:#04101d;font:800 9px var(--mono);font-style:normal}' +
     '.rk-lg>span{display:block;margin-top:6px;color:var(--muted);font:10.5px/1.5 var(--mono)}.rk-lg strong{color:var(--text)}.rk-lg>small{display:block;margin-top:2px;color:var(--dim,var(--muted));font:10px var(--mono)}' +
-    '@media(max-width:700px){.wh-rank{padding:16px}.rk-hero{flex-direction:column;align-items:flex-start;padding:16px 16px 0;margin:0 -16px}.rk-big{text-align:left;font-size:28px}.rk-bigs{gap:20px;flex-wrap:wrap}.wh-readouts.rk-four,.wh-readouts.rk-three,.rk-legend{grid-template-columns:repeat(2,minmax(0,1fr))}.rk-ticks small{display:none}.rk-ticks>span:nth-child(5){display:none}.rk-cum{margin-left:0}}' +
+    '@media(max-width:700px){.wh-map{padding:16px}.rk-hero{flex-direction:column;align-items:flex-start;padding:16px 16px 0;margin:0 -16px}.rk-big{text-align:left;font-size:28px}.rk-bigs{gap:20px;flex-wrap:wrap}.wh-readouts.rk-four,.wh-readouts.rk-three,.rk-legend{grid-template-columns:repeat(2,minmax(0,1fr))}.rk-ticks small{display:none}.rk-ticks>span:nth-child(5){display:none}.rk-cum{margin-left:0}}' +
     '.wh-distribution h3{margin:20px 0 10px;color:var(--text);font-size:22px}' +
     '.wh-distribution p{margin:10px 0 18px;color:var(--muted)!important;font-size:13px;line-height:1.7}' +
     '.wh-projection-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px;margin:24px 0}.wh-projection-grid h4{color:var(--text);margin:0 0 12px;font-size:14px}.wh-projection-table{width:100%;border-collapse:collapse;font:12px var(--mono);color:var(--text)}.wh-projection-table th,.wh-projection-table td{padding:10px 6px;text-align:right;border-bottom:1px solid var(--line)}.wh-projection-table th:first-child,.wh-projection-table td:first-child{text-align:left}.wh-projection-table th{color:var(--muted);font-size:10px}.wh-cutoff-selected{background:color-mix(in srgb,var(--v2-accent,#4c9af8) 15%,transparent);font-weight:800}.wh-baseline{margin-top:20px}.wh-baseline summary{cursor:pointer;color:var(--muted);font:12px var(--mono)}' +
@@ -718,8 +718,8 @@
     '.wh-pending .wh-said p{margin:0;color:var(--muted)!important;font-size:12px;line-height:1.6;overflow-wrap:anywhere}' +
     '@media (max-width:860px){' +
       '.wh-readouts{grid-template-columns:1fr}' +
-      '.wh-row{grid-template-columns:44px minmax(0,1fr) minmax(0,1fr);gap:10px 14px;align-items:start}' +
-      '.wh-rank{font-size:22px;grid-column:1;grid-row:1}' +
+      '.wh-row{grid-template-columns:62px minmax(0,1fr) minmax(0,1fr);gap:10px 12px;align-items:start}' +
+      '.wh-rank{font-size:20px;letter-spacing:-1.5px;grid-column:1;grid-row:1;min-width:0}.wh-rank small{white-space:normal;letter-spacing:0;font-size:8.5px}' +
       '.wh-who{grid-column:2/-1}' +
       '.wh-pts{grid-column:2/-1}' +
       '.wh-val{grid-column:2}' +
@@ -801,15 +801,26 @@
     return Math.max(0, Math.floor((Date.now() - Date.parse(from + 'T00:00:00Z')) / 864e5));
   }
 
-  /* Variational KOLs farming this venue: { handle, post } — post is the tweet that shows it,
-     and the avatar links there when given. Avatars come from assets/whales/profiles.json;
-     a handle without one shows its initials. Empty list = no row at all. */
+  /* Variational KOLs farming this venue. One entry per person:
+       { name, x: 'handle', tg: 'username', post: 'https://x.com/…' (optional proof),
+         xImg / tgImg: local photo paths (optional) }
+     The X photo falls back to assets/whales/profiles.json; a missing photo shows initials.
+     Each face links to its own account (X or Telegram); the name links to the proof post
+     when there is one. Empty list = no row at all. */
+  function kolFace(img, label, href, cls) {
+    var inner = img ? '<img src="' + esc(img) + '" alt="" width="34" height="34">' : '<i>' + esc(label.slice(0, 2).toUpperCase()) + '</i>';
+    return '<a class="nf-face ' + cls + '" href="' + esc(href) + '" target="_blank" rel="noopener noreferrer" title="' + esc(label) + '">' + inner + '<u>' + (cls === 'x' ? '𝕏' : 'TG') + '</u></a>';
+  }
   function farmKols(f) {
     if (!f.kols || !f.kols.length) return '';
     return '<div class="nf-kols"><span>Variational KOLs farming it</span><div>' + f.kols.map(function (kk) {
-      var pr = PROFILES[kk.handle.toLowerCase()] || {};
-      var face = pr.avatar ? '<img src="' + esc(pr.avatar) + '" alt="" width="34" height="34">' : '<i>' + esc(kk.handle.slice(0, 2).toUpperCase()) + '</i>';
-      return '<a href="' + esc(kk.post || 'https://x.com/' + kk.handle) + '" target="_blank" rel="noopener noreferrer" title="@' + esc(kk.handle) + '">' + face + '<em>@' + esc(kk.handle) + '</em></a>';
+      var pr = kk.x ? (PROFILES[kk.x.toLowerCase()] || {}) : {};
+      var name = kk.name || pr.name || kk.x || kk.tg;
+      var faces = (kk.x ? kolFace(kk.xImg || pr.avatar, '@' + kk.x, 'https://x.com/' + kk.x, 'x') : '') +
+        (kk.tg ? kolFace(kk.tgImg, 't.me/' + kk.tg, 'https://t.me/' + kk.tg, 'tg') : '');
+      var nm = kk.post ? '<a href="' + esc(kk.post) + '" target="_blank" rel="noopener noreferrer">' + esc(name) + ' ↗</a>' : esc(name);
+      return '<div class="nf-kol"><span class="nf-faces">' + faces + '</span><span class="nf-kol-n"><b>' + nm + '</b>' +
+        '<small>' + (kk.x ? '@' + esc(kk.x) : '') + (kk.x && kk.tg ? ' · ' : '') + (kk.tg ? 'TG ' + esc(kk.tg) : '') + '</small></span></div>';
     }).join('') + '</div></div>';
   }
 
@@ -835,7 +846,10 @@
       var seasonPts = f.points.weekly * 48;
       val = val.replace('</em></div>', ' · ≈ $' + (pool / seasonPts * 1000).toFixed(0) + ' per 1K points over a ~48-week season</em></div>');
     }
-    return '<article class="nf-farm" style="--acc:' + f.accent + '">' +
+    var kolText = (f.kols || []).map(function (kk) { return [kk.name, kk.x, kk.tg].join(' '); }).join(' ');
+    return '<article class="nf-farm" style="--acc:' + f.accent + '" data-nf-name="' + esc(f.name.toLowerCase()) + '"' +
+      ' data-nf-text="' + esc((f.name + ' ' + kolText).toLowerCase()) + '" data-nf-kols="' + ((f.kols || []).length) + '"' +
+      ' data-nf-stage="' + (f.points ? 'live' : 'pre') + '" data-nf-cat="' + (f.cat || 'perp') + '">' +
       '<div class="nf-head"><a class="nf-farm-id" href="' + esc(f.url) + '" target="_blank" rel="noopener noreferrer">' +
         '<img src="' + esc(f.logo) + '" alt="' + esc(f.name) + ' logo" width="60" height="60"></a>' +
         '<div><b>' + esc(f.name) + '</b><span class="nf-st ' + f.status[0] + '"><i></i>' + esc(f.status[1]) + '</span></div></div>' +
@@ -869,17 +883,71 @@
     }).join('') + '<em>listing FDV = raise × multiple · 25% to users · Lighter raised $68M and listed at $4B (≈59×)</em></div>';
   }
 
+  /* ---------- search, sort, filter ----------
+     Works on the rendered cards in place (show/hide and reorder), so typing in the search
+     box never re-renders the page and never loses focus. Search matches the project name
+     and every KOL's name, X handle and Telegram handle on its card. */
+  var nf = { q: '', sort: 'default', pts: 'all', cat: 'all' };
+  var NF_GROUPS = [
+    ['sort', 'Sort', [['default', 'Featured'], ['name', 'Project A–Z'], ['kols', 'Most KOLs']]],
+    ['pts', 'Points', [['all', 'All'], ['pre', 'Pre-points'], ['live', 'Points live']]],
+    ['cat', 'Type', [['all', 'All'], ['perp', 'Perp DEX'], ['non', 'Non-perp']]]
+  ];
+  function nfToolbar() {
+    return '<div class="nf-bar"><label class="nf-search"><span aria-hidden="true">⌕</span>' +
+      '<input type="search" data-nf-q placeholder="Search a project or a KOL (@handle)" aria-label="Search projects and KOLs" value="' + esc(nf.q) + '"></label>' +
+      NF_GROUPS.map(function (g) {
+        return '<div class="nf-seg" role="group" aria-label="' + g[1] + '"><span>' + g[1] + '</span>' + g[2].map(function (o) {
+          return '<button type="button" data-nf-set="' + g[0] + ':' + o[0] + '" aria-pressed="' + (nf[g[0]] === o[0]) + '"' + (nf[g[0]] === o[0] ? ' class="on"' : '') + '>' + o[1] + '</button>';
+        }).join('') + '</div>';
+      }).join('') + '<em class="nf-count" data-nf-count></em></div>';
+  }
+  function applyNf() {
+    var host = document.querySelector('[data-tg="whales-next"]');
+    if (!host) return;
+    var q = nf.q.trim().toLowerCase().replace(/^@/, '');
+    var shown = 0, total = 0;
+    host.querySelectorAll('.nf-farms').forEach(function (grid) {
+      var cards = [].slice.call(grid.querySelectorAll('.nf-farm'));
+      cards.forEach(function (c, i) {
+        if (!c.dataset.nfOrder) c.dataset.nfOrder = i;
+        var ok = (!q || c.dataset.nfText.indexOf(q) >= 0) &&
+          (nf.pts === 'all' || c.dataset.nfStage === nf.pts) &&
+          (nf.cat === 'all' || c.dataset.nfCat === nf.cat);
+        c.hidden = !ok;
+        total++; if (ok) shown++;
+      });
+      cards.sort(function (a, b) {
+        if (nf.sort === 'name') return a.dataset.nfName < b.dataset.nfName ? -1 : 1;
+        if (nf.sort === 'kols') return (+b.dataset.nfKols - +a.dataset.nfKols) || (+a.dataset.nfOrder - +b.dataset.nfOrder);
+        return +a.dataset.nfOrder - +b.dataset.nfOrder;
+      }).forEach(function (c) { grid.appendChild(c); });
+    });
+    /* a section the type filter excludes disappears; one the search empties says so */
+    host.querySelectorAll('.nf-category').forEach(function (sec) {
+      var cat = sec.getAttribute('data-nf-section');
+      sec.hidden = nf.cat !== 'all' && cat !== nf.cat;
+      var grid = sec.querySelector('.nf-farms'), none = sec.querySelector('.nf-none');
+      if (grid && none) none.hidden = !!grid.querySelector('.nf-farm:not([hidden])');
+    });
+    var cnt = host.querySelector('[data-nf-count]');
+    if (cnt) cnt.textContent = shown + ' of ' + total + ' projects';
+  }
+
   function renderNext() {
     var host = document.querySelector('[data-tg="whales-next"]');
     if (!host) return;
     host.innerHTML = '<div class="cmp-heading"><span class="cmp-eyebrow">POST-TGE · NEXT FARMS</span>' +
       '<h2>' + NEXT_TITLE + '</h2><p>Farming projects, with Varriors’ picks and reasons to farm.</p></div>' +
+      nfToolbar() +
       '<div class="nf-categories" aria-label="Upcoming farming projects">' +
-      '<section class="nf-category" aria-labelledby="nf-non-perp"><span class="nf-part">PART 01</span><h3 id="nf-non-perp">Non Perp DEX</h3><div class="nf-empty"><h4>Coming soon</h4></div></section>' +
-      '<section class="nf-category" aria-labelledby="nf-perp"><span class="nf-part">PART 02</span><h3 id="nf-perp">Perp DEX</h3>' +
+      '<section class="nf-category" data-nf-section="non" aria-labelledby="nf-non-perp"><span class="nf-part">PART 01</span><h3 id="nf-non-perp">Non Perp DEX</h3><div class="nf-empty"><h4>Coming soon</h4></div></section>' +
+      '<section class="nf-category" data-nf-section="perp" aria-labelledby="nf-perp"><span class="nf-part">PART 02</span><h3 id="nf-perp">Perp DEX</h3>' +
       '<p class="nf-lede">Five perp venues worth farming while you hold VAR — and worth hedging it on. Facts as of ' + FARMS_ASOF + ', sourced on each card.</p>' +
       farmTrack() + farmControls() +
-      '<div class="nf-farms">' + FARMS_PERP.map(farmCard).join('') + '</div></section></div>';
+      '<div class="nf-farms">' + FARMS_PERP.map(farmCard).join('') + '</div>' +
+      '<div class="nf-none" hidden>No project or KOL matches that. Clear the search or the filters.</div></section></div>';
+    applyNf();
   }
 
   function mountNext() {
@@ -918,6 +986,13 @@
       '[data-open-tab="whales-next"]{height:auto!important;min-height:54px;white-space:normal!important;padding-top:10px!important;padding-bottom:10px!important}' +
       '[data-open-tab="whales-next"] strong,[data-open-tab="whales-next"] b{white-space:normal!important;line-height:1.4!important}' +
       '@media(max-width:1000px){[data-open-tab="whales-next"]{max-width:235px}}' +
+      '.nf-bar{position:sticky;top:0;z-index:5;display:flex;flex-wrap:wrap;align-items:center;gap:10px 18px;margin:18px 0 6px;padding:12px 14px;border:1px solid var(--line);background:color-mix(in srgb,var(--panel) 94%,transparent);backdrop-filter:blur(8px)}' +
+      '.nf-search{display:flex;align-items:center;gap:8px;flex:1 1 280px;min-width:0;padding:0 12px;border:1px solid var(--line);border-radius:6px;background:var(--panel2,var(--panel))}.nf-search:focus-within{border-color:var(--v2-accent,#4c9af8)}' +
+      '.nf-search span{color:var(--muted);font-size:16px}.nf-search input{flex:1;min-width:0;height:38px;border:0;background:transparent;color:var(--text);font:600 13px var(--sans);outline:none}' +
+      '.nf-seg{display:flex;align-items:center;gap:4px;flex-wrap:wrap}.nf-seg>span{margin-right:4px;color:var(--muted);font:800 9px var(--mono);letter-spacing:.8px;text-transform:uppercase}' +
+      '.nf-seg button{padding:6px 10px;border:1px solid var(--line);border-radius:4px;background:var(--panel);color:var(--muted);font:700 10.5px var(--mono);cursor:pointer}.nf-seg button:hover{color:var(--text)}.nf-seg button.on{background:var(--v2-accent,#4c9af8);border-color:var(--v2-accent,#4c9af8);color:#04101d}' +
+      '.nf-count{margin-left:auto;color:var(--muted);font:700 10.5px var(--mono);font-style:normal}' +
+      '.nf-none{margin-top:14px;padding:18px;border:1px dashed var(--line);color:var(--muted);font:12px var(--mono)}.nf-farm[hidden],.nf-category[hidden],.nf-none[hidden]{display:none!important}' +
       '.nf-lede{margin:6px 0 18px;color:var(--muted)!important;font-size:13px;line-height:1.6}' +
       '.nf-track{margin:0 0 18px;padding:16px 18px;border:1px solid var(--line);background:var(--panel)}.nf-track p{margin:10px 0 0;color:var(--muted)!important;font-size:11.5px}' +
       '.nf-track-line{position:relative;display:grid;grid-template-columns:2fr 1fr 1fr;gap:12px}.nf-track-line::before{content:"";position:absolute;left:0;right:0;top:9px;height:2px;background:linear-gradient(90deg,var(--line),#19d38a 55%,var(--v2-accent,#4c9af8))}' +
@@ -947,10 +1022,13 @@
       '.nf-hedge{display:inline-flex;align-items:center;gap:7px;padding:9px 13px;border-radius:5px;background:var(--acc);color:#04101d!important;font:800 11px var(--mono);text-decoration:none}.nf-hedge:hover{filter:brightness(1.12)}' +
       '.nf-hedge small{padding:1px 5px;border-radius:3px;background:rgba(0,0,0,.18);font:800 8.5px var(--mono);text-transform:uppercase}' +
       '.nf-src{display:flex;gap:9px;flex-wrap:wrap}.nf-src a{color:var(--muted)!important;font:700 10px var(--mono);text-decoration:none}.nf-src a:hover{color:var(--text)!important}' +
-      '.nf-kols>span{display:block;margin:0 0 7px;color:var(--muted);font:800 8.5px var(--mono);letter-spacing:.8px;text-transform:uppercase}.nf-kols>div{display:flex;flex-wrap:wrap;gap:6px}' +
-      '.nf-kols a{display:inline-flex;align-items:center;gap:6px;padding:3px 9px 3px 3px;border:1px solid var(--line);border-radius:20px;text-decoration:none}.nf-kols a:hover{border-color:var(--acc)}' +
-      '.nf-kols img,.nf-kols i{width:26px;height:26px;border-radius:50%;object-fit:cover}.nf-kols i{display:flex;align-items:center;justify-content:center;background:var(--panel2,var(--panel));color:var(--muted);font:800 9px var(--mono);font-style:normal}' +
-      '.nf-kols em{color:var(--text);font:700 10.5px var(--mono);font-style:normal}' +
+      '.nf-kols>span{display:block;margin:0 0 7px;color:var(--muted);font:800 8.5px var(--mono);letter-spacing:.8px;text-transform:uppercase}.nf-kols>div{display:grid;gap:6px}' +
+      '.nf-kol{display:flex;align-items:center;gap:10px;padding:6px 8px;border:1px solid var(--line);border-radius:6px;background:color-mix(in srgb,var(--panel) 70%,transparent)}' +
+      '.nf-faces{display:flex;flex:none}.nf-face{position:relative;display:block;width:34px;height:34px;border-radius:50%;border:2px solid var(--panel);text-decoration:none}.nf-face+.nf-face{margin-left:-10px}' +
+      '.nf-face img,.nf-face i{display:flex;width:100%;height:100%;border-radius:50%;object-fit:cover;align-items:center;justify-content:center;background:var(--panel2,var(--panel));color:var(--muted);font:800 10px var(--mono);font-style:normal}' +
+      '.nf-face u{position:absolute;right:-4px;bottom:-4px;min-width:15px;height:15px;padding:0 2px;border-radius:8px;display:flex;align-items:center;justify-content:center;font:900 7.5px var(--mono);text-decoration:none;color:#fff;background:#111}.nf-face.tg u{background:#2aabee}' +
+      '.nf-face:hover{z-index:1;transform:translateY(-2px)}' +
+      '.nf-kol-n{min-width:0}.nf-kol-n b,.nf-kol-n b a{display:block;color:var(--text)!important;font:800 12px var(--sans);text-decoration:none}.nf-kol-n small{display:block;color:var(--muted);font:10px var(--mono);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}' +
       '@media(max-width:600px){.nf-empty{padding:16px}.nf-farms{grid-template-columns:minmax(0,1fr)}.nf-farm{padding:15px}.nf-track-line{grid-template-columns:minmax(0,1fr)}.nf-track-line::before{display:none}}';
     document.head.appendChild(style);
   }
@@ -1060,6 +1138,18 @@
         render();
         return;
       }
+      var ns = e.target && e.target.closest && e.target.closest('[data-nf-set]');
+      if (ns) {
+        var kv = ns.getAttribute('data-nf-set').split(':');
+        nf[kv[0]] = kv[1];
+        ns.parentNode.querySelectorAll('[data-nf-set]').forEach(function (b) {
+          var on = b === ns;
+          b.classList.toggle('on', on);
+          b.setAttribute('aria-pressed', String(on));
+        });
+        applyNf();
+        return;
+      }
       var nm = e.target && e.target.closest && e.target.closest('[data-nf-mult]');
       if (nm) {
         farmMult = +nm.getAttribute('data-nf-mult');
@@ -1076,6 +1166,11 @@
       if (!b) return;
       fdv = +b.getAttribute('data-wh-fdv');
       render();
+    });
+    document.addEventListener('input', function (e) {
+      if (!e.target || !e.target.matches || !e.target.matches('[data-nf-q]')) return;
+      nf.q = e.target.value;
+      applyNf();
     });
     document.addEventListener('change', function (e) {
       if (e.target && e.target.matches && e.target.matches('[data-wh-pts-input]')) {
