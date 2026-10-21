@@ -749,7 +749,14 @@
   var FARM_MULTS = [20, 40, 59];
   var farmMult = 40;
   var FARMS_PERP = [
-    { k: 'risex', name: 'RISEx', logo: 'assets/farms/risex.png', x: null, ref: true, accent: '#19d38a', kols: [],
+    { k: 'risex', name: 'RISEx', logo: 'assets/farms/risex.png', x: null, ref: true, accent: '#19d38a', kols: [
+        { x: 'onchainmonk', asOf: '2026-10-21', note: '17K pts · rank #26', post: 'https://x.com/onchainmonk/status/2112781448755454077' },
+        { x: 'yh_0x', asOf: '2026-10-20', note: 'VAR + RISEx points, delta-neutral', post: 'https://x.com/yh_0x/status/2112571121824600114' },
+        { x: 'Ryuzaki_SEI', asOf: '2026-10-20', note: 'weekly points strategy posts', post: 'https://x.com/Ryuzaki_SEI/status/2112594348068245880' },
+        { x: 'corgil', asOf: '2026-08-02', note: '“RiseX too!”', post: 'https://x.com/corgil/status/2083915466167267572' },
+        { x: 'lynn000333', asOf: '2026-07-27', note: 'points-value breakdown', post: 'https://x.com/lynn000333/status/2081557611191902550' },
+        { x: 'linenmito', asOf: '2026-04-29', note: 'Founding Trader · less active since', post: 'https://x.com/linenmito/status/2049454803940487280' }
+      ],
       url: 'https://www.rise.trade/invite/x04cfg1y',
       what: 'Fully onchain orderbook perps on RISE (Ethereum L2), with yield on idle collateral.',
       status: ['gated', 'Mainnet live · invite-only'], stage: 1,
@@ -757,7 +764,11 @@
       raised: 7.2e6, raisedNote: 'Galaxy Ventures, Vitalik Buterin, EtherFi, Stani Kulechov',
       bull: ['$3B volume before points even started', 'All RISE points go to RISEx users', 'Points live now: the only one of the five'],
       src: [['Chainwire', 'https://chainwire.org/2026/07/24/risex-launches-ignite-season-1-points-program-following-3b-in-volume-during-the-early-access-phase/'], ['CoinDesk', 'https://www.coindesk.com/tech/2025/11/12/ethereum-layer-2-rise-unveils-risex-and-marketcore-to-build-global-on-chain-markets']] },
-    { k: 'entropy', name: 'Entropy', logo: 'assets/farms/entropy.jpg', x: 'entropyIO', ref: false, accent: '#b9c2cf', kols: [],
+    { k: 'entropy', name: 'Entropy', logo: 'assets/farms/entropy.jpg', x: 'entropyIO', ref: false, accent: '#b9c2cf', kols: [
+        { x: 'punk2498_', asOf: '2026-09-22', note: '“engage heavily — it’s underfarmed”', post: 'https://x.com/punk2498_/status/2102438480249057447' },
+        { x: 'Ryuzaki_SEI', asOf: '2026-08-27', note: 'full Entropy guide', post: 'https://x.com/Ryuzaki_SEI/status/2092825224681267275' },
+        { x: 'lynn000333', asOf: '2026-08-26', note: 'shared it, bullish on the track', post: 'https://x.com/lynn000333/status/2092420400789835920' }
+      ],
       url: 'https://entropy.io/leaderboard?filter=7d',
       what: 'Perps on pre-IPO companies (Anthropic), stocks and commodities, deployed on Hyperliquid (HIP-3).',
       status: ['live', 'Live since 2026-08-24'], stage: 0,
@@ -773,7 +784,11 @@
       raised: 4.6e6, raisedNote: 'Seed led by Dragonfly (also led Variational’s Series A)',
       bull: ['Founded by ex-BlackRock digital-asset leads', 'Round closed in under a week', 'Pre-launch: the earliest possible entry'],
       src: [['GlobeNewswire', 'https://www.globenewswire.com/news-release/2025/11/21/3192551/0/en/HelloTrade-Founded-by-Former-BlackRock-Crypto-Leaders-Announces-Fundraise-to-Unlock-Global-Frictionless-Access-to-Global-Equities.html']] },
-    { k: 'truenorth', name: 'TrueNorth', logo: 'assets/farms/truenorth.jpg', x: 'get_truenorth', ref: true, accent: '#3b7bff', kols: [],
+    { k: 'truenorth', name: 'TrueNorth', logo: 'assets/farms/truenorth.jpg', x: 'get_truenorth', ref: true, accent: '#3b7bff', kols: [
+        { x: 'yh_0x', asOf: '2026-10-17', note: '“my go-to terminal”', post: 'https://x.com/yh_0x/status/2111535624683737445' },
+        { x: 'corgil', asOf: '2026-08-02', note: 'farming TrueNorth points', post: 'https://x.com/corgil/status/2083908861044396327' },
+        { x: 'ElNachoCrypto', asOf: '2026-07-30', note: '“real conviction” pick', post: 'https://x.com/ElNachoCrypto/status/2082729806580396068' }
+      ],
       url: 'https://app.truenorth.xyz/ref/KOREAN',
       what: 'Agentic brokerage: AI agents scan the market, set up trades and watch the portfolio.',
       status: ['live', 'App live'], stage: 0,
@@ -781,7 +796,9 @@
       raised: 3e6, raisedNote: 'Pre-seed led by CyberFund; Delphi Labs, GSR; LayerZero’s Bryan Pellegrino',
       bull: ['Paid in USDC today, before any token', 'Running a Lighter trading comp with $LIT prizes', 'Smallest raise here: most room to re-rate'],
       src: [['ZyCrypto', 'https://zycrypto.com/truenorth-secures-3m-to-develop-purpose-built-financial-ai/'], ['Coinlaunch', 'https://coinlaunch.space/projects/truenorth-ai/']] },
-    { k: 'derpetual', name: 'Derpetual', logo: 'assets/farms/derpetual.jpg', x: 'derpetual', ref: false, accent: '#8ff0b5', kols: [],
+    { k: 'derpetual', name: 'Derpetual', logo: 'assets/farms/derpetual.jpg', x: 'derpetual', ref: false, accent: '#8ff0b5', kols: [
+        { x: 'whitesocks256', asOf: '2026-10-19', note: '“one of the first in”', post: 'https://x.com/whitesocks256/status/2112195491652136969' }
+      ],
       url: 'https://www.derpetual.com/',
       what: 'Abstract futures: leveraged markets on any number — indices, weather, events.',
       status: ['live', 'Live on Solana via derp.trade'], stage: 0,
@@ -813,14 +830,15 @@
   }
   function farmKols(f) {
     if (!f.kols || !f.kols.length) return '';
-    return '<div class="nf-kols"><span>Variational KOLs farming it</span><div>' + f.kols.map(function (kk) {
+    return '<div class="nf-kols"><span>' + f.kols.length + ' tracked whale' + (f.kols.length === 1 ? '' : 's') + ' farming it</span><div>' + f.kols.map(function (kk) {
       var pr = kk.x ? (PROFILES[kk.x.toLowerCase()] || {}) : {};
       var name = kk.name || pr.name || kk.x || kk.tg;
       var faces = (kk.x ? kolFace(kk.xImg || pr.avatar, '@' + kk.x, 'https://x.com/' + kk.x, 'x') : '') +
         (kk.tg ? kolFace(kk.tgImg, 't.me/' + kk.tg, 'https://t.me/' + kk.tg, 'tg') : '');
       var nm = kk.post ? '<a href="' + esc(kk.post) + '" target="_blank" rel="noopener noreferrer">' + esc(name) + ' ↗</a>' : esc(name);
       return '<div class="nf-kol"><span class="nf-faces">' + faces + '</span><span class="nf-kol-n"><b>' + nm + '</b>' +
-        '<small>' + (kk.x ? '@' + esc(kk.x) : '') + (kk.x && kk.tg ? ' · ' : '') + (kk.tg ? 'TG ' + esc(kk.tg) : '') + '</small></span></div>';
+        '<small>' + (kk.x ? '@' + esc(kk.x) : '') + (kk.x && kk.tg ? ' · ' : '') + (kk.tg ? 'TG ' + esc(kk.tg) : '') + '</small>' +
+        (kk.note || kk.asOf ? '<small class="nf-kol-note">' + (kk.asOf ? esc(dateLabel(kk.asOf)) + ' · ' : '') + esc(kk.note || '') + '</small>' : '') + '</span></div>';
     }).join('') + '</div></div>';
   }
 
@@ -934,12 +952,45 @@
     if (cnt) cnt.textContent = shown + ' of ' + total + ' projects';
   }
 
+  /* Who farms what: every KOL on any card, one row each, a dot per project they farm.
+     Built from the cards' own kols lists, so the matrix and the cards cannot disagree.
+     Each dot links to the post that shows it. */
+  function kolMatrix() {
+    var people = {};
+    FARMS_PERP.forEach(function (f) {
+      (f.kols || []).forEach(function (kk) {
+        var id = (kk.x || kk.tg).toLowerCase();
+        (people[id] = people[id] || { kk: kk, farms: {} }).farms[f.k] = kk;
+      });
+    });
+    var rows = Object.keys(people).map(function (id) { return people[id]; });
+    if (!rows.length) return '';
+    rows.sort(function (a, b) {
+      return Object.keys(b.farms).length - Object.keys(a.farms).length || (a.kk.x || '').toLowerCase().localeCompare((b.kk.x || '').toLowerCase());
+    });
+    var head = '<tr><th>KOL</th>' + FARMS_PERP.map(function (f) {
+      return '<th title="' + esc(f.name) + '"><img src="' + esc(f.logo) + '" alt="' + esc(f.name) + '" width="26" height="26"><span>' + esc(f.name) + '</span></th>';
+    }).join('') + '<th>Farms</th></tr>';
+    var body = rows.map(function (r) {
+      var pr = r.kk.x ? (PROFILES[r.kk.x.toLowerCase()] || {}) : {};
+      var face = pr.avatar ? '<img src="' + esc(pr.avatar) + '" alt="" width="28" height="28">' : '<i>' + esc((r.kk.x || r.kk.tg).slice(0, 2).toUpperCase()) + '</i>';
+      return '<tr><td class="nf-mx-who"><a href="https://x.com/' + esc(r.kk.x) + '" target="_blank" rel="noopener noreferrer">' + face +
+        '<span><b>' + esc(pr.name || r.kk.x) + '</b><small>@' + esc(r.kk.x) + '</small></span></a></td>' +
+        FARMS_PERP.map(function (f) {
+          var hit = r.farms[f.k];
+          return '<td>' + (hit ? '<a class="nf-dot" style="--acc:' + f.accent + '" href="' + esc(hit.post) + '" target="_blank" rel="noopener noreferrer" title="' + esc(f.name + ' · ' + (hit.note || '') + ' · ' + hit.asOf) + '"></a>' : '<span class="nf-nodot"></span>') + '</td>';
+        }).join('') + '<td class="nf-mx-n">' + Object.keys(r.farms).length + '</td></tr>';
+    }).join('');
+    return '<section class="nf-mx"><div class="nf-mx-h"><b>Who’s farming what</b><span>Tracked whales from the Whales tab whose own posts show them on these farms · each dot opens the post</span></div>' +
+      '<div class="nf-mx-wrap"><table><thead>' + head + '</thead><tbody>' + body + '</tbody></table></div></section>';
+  }
+
   function renderNext() {
     var host = document.querySelector('[data-tg="whales-next"]');
     if (!host) return;
     host.innerHTML = '<div class="cmp-heading"><span class="cmp-eyebrow">POST-TGE · NEXT FARMS</span>' +
       '<h2>' + NEXT_TITLE + '</h2><p>Farming projects, with Varriors’ picks and reasons to farm.</p></div>' +
-      nfToolbar() +
+      nfToolbar() + kolMatrix() +
       '<div class="nf-categories" aria-label="Upcoming farming projects">' +
       '<section class="nf-category" data-nf-section="non" aria-labelledby="nf-non-perp"><span class="nf-part">PART 01</span><h3 id="nf-non-perp">Non Perp DEX</h3><div class="nf-empty"><h4>Coming soon</h4></div></section>' +
       '<section class="nf-category" data-nf-section="perp" aria-labelledby="nf-perp"><span class="nf-part">PART 02</span><h3 id="nf-perp">Perp DEX</h3>' +
@@ -993,6 +1044,16 @@
       '.nf-seg button{padding:6px 10px;border:1px solid var(--line);border-radius:4px;background:var(--panel);color:var(--muted);font:700 10.5px var(--mono);cursor:pointer}.nf-seg button:hover{color:var(--text)}.nf-seg button.on{background:var(--v2-accent,#4c9af8);border-color:var(--v2-accent,#4c9af8);color:#04101d}' +
       '.nf-count{margin-left:auto;color:var(--muted);font:700 10.5px var(--mono);font-style:normal}' +
       '.nf-none{margin-top:14px;padding:18px;border:1px dashed var(--line);color:var(--muted);font:12px var(--mono)}.nf-farm[hidden],.nf-category[hidden],.nf-none[hidden]{display:none!important}' +
+      '.nf-kol-n small.nf-kol-note{white-space:normal;color:var(--text);opacity:.75}' +
+      '.nf-mx{margin:14px 0 6px;padding:16px 18px;border:1px solid var(--line);background:var(--panel)}.nf-mx-h b{display:block;color:var(--text);font:800 17px var(--sans)}.nf-mx-h span{display:block;margin:3px 0 12px;color:var(--muted);font-size:11.5px}' +
+      '.nf-mx-wrap{overflow-x:auto}.nf-mx table{width:100%;min-width:560px;border-collapse:collapse}' +
+      '.nf-mx th{padding:6px 8px 10px;border-bottom:1px solid var(--line);color:var(--muted);font:800 9px var(--mono);letter-spacing:.6px;text-transform:uppercase;text-align:center;vertical-align:bottom}.nf-mx th:first-child{text-align:left}' +
+      '.nf-mx th img{display:block;margin:0 auto 5px;width:26px;height:26px;border-radius:7px;object-fit:cover}' +
+      '.nf-mx td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:center}.nf-mx tr:hover td{background:color-mix(in srgb,var(--v2-accent,#4c9af8) 5%,transparent)}' +
+      '.nf-mx-who a{display:flex;align-items:center;gap:9px;text-decoration:none;text-align:left}.nf-mx-who img,.nf-mx-who i{width:28px;height:28px;border-radius:50%;object-fit:cover;flex:none;display:flex;align-items:center;justify-content:center;background:var(--panel2,var(--panel));color:var(--muted);font:800 9px var(--mono);font-style:normal}' +
+      '.nf-mx-who b{display:block;color:var(--text);font:700 12px var(--sans)}.nf-mx-who small{display:block;color:var(--muted);font:10px var(--mono)}' +
+      '.nf-dot{display:inline-block;width:16px;height:16px;border-radius:50%;background:var(--acc);box-shadow:0 0 0 3px color-mix(in srgb,var(--acc) 25%,transparent)}.nf-dot:hover{transform:scale(1.2)}.nf-nodot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--line)}' +
+      '.nf-mx-n{color:var(--text);font:800 13px var(--mono)}' +
       '.nf-lede{margin:6px 0 18px;color:var(--muted)!important;font-size:13px;line-height:1.6}' +
       '.nf-track{margin:0 0 18px;padding:16px 18px;border:1px solid var(--line);background:var(--panel)}.nf-track p{margin:10px 0 0;color:var(--muted)!important;font-size:11.5px}' +
       '.nf-track-line{position:relative;display:grid;grid-template-columns:2fr 1fr 1fr;gap:12px}.nf-track-line::before{content:"";position:absolute;left:0;right:0;top:9px;height:2px;background:linear-gradient(90deg,var(--line),#19d38a 55%,var(--v2-accent,#4c9af8))}' +
