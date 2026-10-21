@@ -1,0 +1,52 @@
+{
+  "retrieved": "2026-10-21",
+  "metric": "outstanding OTC notional, USD millions",
+  "global": {
+    "period": "2025-12-31",
+    "value": 844577771.49,
+    "prior_year": 699476336.946,
+    "source": "https://stats.bis.org/api/v1/data/BIS,WS_OTC_DERIV2,1.0/H.A.A.A.5J.A.5J.A.TO1.TO1.A.A.3.C?startPeriod=2024&endPeriod=2025"
+  },
+  "bank_period": "2026-06-30",
+  "bank_source": "https://www.occ.gov/publications-and-resources/publications/quarterly-report-on-bank-trading-and-derivatives-activities/files/pub-derivatives-quarterly-qtr2-2026.pdf#page=20",
+  "bank_components_order": [
+    "OTC forwards",
+    "OTC swaps",
+    "OTC options",
+    "credit derivatives (OCC OTC category)"
+  ],
+  "peers": {
+    "PNC": [
+      38143,
+      629136,
+      60487,
+      14716
+    ],
+    "State Street": [
+      3286077,
+      57086,
+      14363,
+      0
+    ],
+    "Wells Fargo": [
+      3134875,
+      10254240,
+      2571379,
+      169616
+    ],
+    "JPMorgan Chase Bank NA": [
+      13810328,
+      35180344,
+      11568333,
+      1649556
+    ]
+  },
+  "assumed_share_percent": [
+    0.01,
+    0.1,
+    0.5,
+    1
+  ],
+  "formula": "global.notionalMillions * share_percent / 100",
+  "interpretation": "Scale illustration, not forecast or current addressable market. Protocol-supported notional vs bank books; dates/netting/consolidation differ. No revenue, valuation, risk or capital equivalence."
+}

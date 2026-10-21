@@ -6,20 +6,51 @@
 
   // Product descriptions follow the official About Pro documentation.
   var DOCS = 'https://docs.variational.io/pro/about-pro';
-  var SCREENS = ['Overview', 'Market context', 'Workflow comparison', 'Execution workflow', 'Risk & controls'];
+  var SCREENS = ['Overview', 'Market context', 'Workflow comparison', 'Execution workflow', 'Risk & controls', 'Institutional scale'];
+
+  // BIS values are USD millions. OCC Table 13 reports USD millions as of June 30, 2026.
+  // Peer OTC = forwards + swaps + OTC options + credit derivatives; exchange-traded and spot FX excluded.
+  var MARKET = {
+    notionalMillions: 844577771.490,
+    period: '31 DEC 2025',
+    bis: 'https://data.bis.org/topics/OTC_DER/BIS,WS_OTC_DERIV2,1.0/H.A.A.A.5J.A.5J.A.TO1.TO1.A.A.3.C',
+    occ: 'https://www.occ.gov/publications-and-resources/publications/quarterly-report-on-bank-trading-and-derivatives-activities/files/pub-derivatives-quarterly-qtr2-2026.pdf#page=20',
+    peers: [
+      { name: 'PNC Bank N.A.', components: [38143,629136,60487,14716] },
+      { name: 'State Street Bank & Trust Co.', components: [3286077,57086,14363,0] },
+      { name: 'Wells Fargo Bank N.A.', components: [3134875,10254240,2571379,169616] },
+      { name: 'JPMorgan Chase Bank N.A.', components: [13810328,35180344,11568333,1649556] }
+    ]
+  };
+  function trillions(m) { return '$' + (m / 1000000).toFixed(2) + 'T'; }
+  function peerTotal(p) { return p.components.reduce(function (a,b) { return a+b; },0); }
+  function scaleScreen() {
+    var shares = [0.01,0.1,0.5,1], selected = 0.1;
+    return slide(5, 'INSTITUTIONAL SCALE', 'A fractional share.<br><em>Institutional notional scale.</em>',
+      'What if Variational supported a fraction of the global OTC outstanding notional?',
+      '<div class="vps-share-controls" role="group" aria-label="Hypothetical global notional share">' + shares.map(function (v) { return '<button type="button" data-vps-share="' + v + '" aria-pressed="' + (v===selected) + '">' + v + '%</button>'; }).join('') + '</div>' +
+      '<div class="vps-scale-result"><div><span>HYPOTHETICAL VARIATIONAL NOTIONAL</span><strong data-vps-notional>' + trillions(MARKET.notionalMillions * selected / 100) + '</strong></div><p data-vps-scale-summary aria-live="polite"></p></div>' +
+      '<div class="vps-scale-chart" role="group" aria-label="Outstanding OTC notional, common linear scale in trillions of US dollars"><div class="vps-scale-axis"><span>USD TRILLIONS</span><span>0 — 65T · LINEAR SCALE</span></div><div class="vps-scale-row is-scenario"><span>Variational <small>HYPOTHETICAL</small></span><div><i data-vps-scale-bar></i></div><b data-vps-scale-value></b></div>' +
+      MARKET.peers.map(function (p) { var v=peerTotal(p); return '<div class="vps-scale-row"><span>' + p.name + '</span><div><i style="width:' + (v/65000000*100).toFixed(4) + '%"></i></div><b>' + trillions(v) + '</b></div>'; }).join('') + '</div>' +
+      '<div class="vps-scale-context"><p><b>Scale reference, not bank equivalence.</b> Protocol-supported notional is compared with bank OTC books. Reporting dates, netting and consolidation differ; this does not imply equal revenue, capital, risk or valuation.</p><p><b>Long-term scenario, not a forecast.</b> The global denominator includes traditional asset classes beyond Pro’s documented crypto focus. Adoption, regulation, product coverage and liquidity determine what is reachable.</p></div>' +
+      '<div class="vps-data-sources"><a href="' + MARKET.bis + '" target="_blank" rel="noopener">BIS · global OTC · Dec 2025 ↗</a><a href="' + MARKET.occ + '" target="_blank" rel="noopener">OCC · bank OTC · Jun 2026 · Table 13 ↗</a><span>Formula: global notional × selected share. Bank OTC = forwards + swaps + OTC options + credit.</span></div>',
+      'Illustrative outstanding-notional scenarios. Not annual trading volume, revenue, TVL or a valuation estimate.');
+  }
 
   function slide(n, eyebrow, title, lead, content, foot) {
     return '<article class="vps-scr" data-scr="' + n + '" hidden aria-labelledby="vps-title-' + n + '">' +
       '<header class="vps-heading"><span>VARIATIONAL PRO <i>/</i> ' + eyebrow + '</span>' +
       '<h3 id="vps-title-' + n + '">' + title + '</h3><p>' + lead + '</p></header>' +
-      '<div class="vps-body">' + content + '</div><footer class="vps-foot"><span>' + foot + '</span><b>0' + n + ' / 04</b></footer></article>';
+      '<div class="vps-body">' + content + '</div><footer class="vps-foot"><span>' + foot + '</span><b>0' + n + ' / 05</b></footer></article>';
   }
   function screens() {
-    return slide(1, 'THE MARKET', 'Institutional markets.<br><em>Configurable derivatives.</em>',
-      'OTC derivatives for advanced and institutional traders.',
-      '<div class="vps-market"><span class="vps-market-word">OTC</span><div><span class="vps-mini">THE ARENA</span><h4>Beyond standard<br>exchange products.</h4><p>Configurable derivatives.<br>Negotiated terms. Block trades.</p></div></div>' +
-      '<div class="vps-audience"><span>Advanced traders</span><span>Institutional desks</span><span>Market makers</span></div>',
-      'A market built around the trade you need.') +
+    return slide(1, 'MARKET SCALE', 'A global market.<br><em>Measured in hundreds of trillions.</em>',
+      'OTC derivatives are core infrastructure for institutional risk transfer.',
+      '<div class="vps-market-size"><span>GLOBAL OTC DERIVATIVES · NOTIONAL OUTSTANDING</span><strong>$' + (MARKET.notionalMillions/1000000).toFixed(1) + '<small>TRILLION</small></strong><div><span>31 DEC 2025</span><span>+20.7% YEAR ON YEAR</span></div></div>' +
+      '<div class="vps-market-scenarios">' + [0.01,0.1,1].map(function(v) { return '<div><span>' + v + '% OF GLOBAL NOTIONAL</span><b>' + (v===0.01 ? '$' + (MARKET.notionalMillions*v/100/1000).toFixed(1) + 'B' : trillions(MARKET.notionalMillions*v/100)) + '</b><p>Hypothetical supported notional</p></div>'; }).join('') + '</div>' +
+      '<div class="vps-scale-context"><p><b>Global context.</b> Interest rate, FX, equity, commodity and credit derivatives. This broad benchmark is not Pro’s current addressable market.</p><p><b>Variational’s entry point.</b> Configurable crypto OTC derivatives for advanced and institutional traders. Capturing traditional markets would require a broader product and regulatory footprint.</p></div>' +
+      '<div class="vps-data-sources"><a href="' + MARKET.bis + '" target="_blank" rel="noopener">Source: BIS · global OTC notional ↗</a><span>Notional is the contract reference amount; it is not capital invested, market value or revenue.</span></div>',
+      'BIS semiannual data, end-2025. Shares are illustrative assumptions, not forecasts. See Institutional scale for bank comparisons.') +
     slide(2, 'THE SHIFT', 'OTC execution.<br><em>A consolidated workflow.</em>',
       'An altcoin option, from the first request to ongoing margin management.',
       '<div class="vps-lifecycle"><div class="vps-lifecycle-head"><span>THE TRADE LIFECYCLE</span><div><span>MANUAL OTC EXAMPLE</span><strong>12 <small>steps</small></strong></div><div class="is-pro"><span>WITH VARIATIONAL PRO</span><strong>6 <small>steps</small></strong></div></div>' +
@@ -41,7 +72,7 @@
       '<section class="vps-control-row"><div class="vps-control-name"><span>02 / OPERATIONS</span><h4>Lifecycle management</h4></div><div><span class="vps-control-mobile">OTC FRICTION</span><p>Manual collateral checks, funding settlements and margin calls create operational dependencies.</p></div><div class="vps-control-design"><span class="vps-control-mobile">PROTOCOL DESIGN</span><h4>Rules-based trade administration</h4><p>Following clearing, the protocol tracks margin, settles applicable funding and handles liquidations.</p></div></section>' +
       '<section class="vps-control-row"><div class="vps-control-name"><span>03 / COLLATERAL</span><h4>Counterparty exposure</h4></div><div><span class="vps-control-mobile">OTC FRICTION</span><p>Collateral transferred directly to a dealer can introduce credit exposure and asymmetric margin arrangements.</p></div><div class="vps-control-design"><span class="vps-control-mobile">PROTOCOL DESIGN</span><h4>Bilateral settlement pools</h4><p>Both parties deposit collateral on-chain. Assets are segregated by pool, with agreed margin and liquidation parameters.</p></div></section></div>' +
       '<aside class="vps-risk-note"><span>RISK CONSIDERATIONS</span><p>These controls do not eliminate risk. Smart-contract, market, liquidity and counterparty risks remain; outcomes depend on collateral adequacy and the agreed trade parameters.</p></aside>',
-      'Design overview based on official Pro documentation. Pro is not live yet.');
+      'Design overview based on official Pro documentation. Pro is not live yet.') + scaleScreen();
   }
 
   function navBar() {
@@ -52,7 +83,7 @@
         return '<button type="button" data-vps-go="' + i + '" aria-label="' + n + '"' + (i ? '' : ' class="on"') + '></button>';
       }).join('') + '</span>' +
       '<a class="vps-src" href="' + DOCS + '" target="_blank" rel="noopener noreferrer">docs ↗</a>' +
-      '<span class="vp-coming-index" data-vps-index>01 / 05</span>' +
+      '<span class="vp-coming-index" data-vps-index>01 / 06</span>' +
       '<button type="button" class="vps-btn vps-start" data-vps="next" aria-label="Next screen">EXPLORE PRO →</button></div>';
   }
 
@@ -71,6 +102,20 @@
       section.querySelectorAll('[data-vps-go]').forEach(function (d, k) { d.setAttribute('aria-current', k === cur ? 'step' : 'false'); });
       section.scrollIntoView({ block: 'start', behavior: 'instant' });
     }
+    function updateScale(share) {
+      var amount = MARKET.notionalMillions * share / 100;
+      section.querySelector('[data-vps-notional]').textContent = trillions(amount);
+      section.querySelector('[data-vps-scale-value]').textContent = trillions(amount);
+      section.querySelector('[data-vps-scale-bar]').style.width = (amount / 65000000 * 100) + '%';
+      var pnc = amount / peerTotal(MARKET.peers[0]), jpm = amount / peerTotal(MARKET.peers[3]) * 100;
+      section.querySelector('[data-vps-scale-summary]').textContent = share + '% of the global benchmark = ' + pnc.toFixed(2) + '× PNC’s OTC book; ' + (amount / peerTotal(MARKET.peers[2]) * 100).toFixed(1) + '% of Wells Fargo Bank’s and ' + jpm.toFixed(1) + '% of JPMorgan Chase Bank’s OTC book.';
+      section.querySelectorAll('[data-vps-share]').forEach(function (b) { b.setAttribute('aria-pressed', +b.dataset.vpsShare === share ? 'true' : 'false'); });
+    }
+    updateScale(0.1);
+    section.addEventListener('click', function (e) {
+      var shareButton = e.target.closest && e.target.closest('[data-vps-share]');
+      if (shareButton) updateScale(+shareButton.dataset.vpsShare);
+    });
     section.addEventListener('click', function (e) {
       var b = e.target.closest && e.target.closest('[data-vps],[data-vps-go]');
       if (!b) return;
@@ -118,6 +163,9 @@ body.v2-dashboard .vps-body h4{font:600 22px/1.3 var(--sans,Arial,sans-serif)!im
 /* Institutional presentation: restrained typography and explicit control descriptions. */
 body.v2-dashboard .vps-heading h3{font-size:clamp(30px,3.2vw,46px)!important;line-height:1.12!important;letter-spacing:-.035em!important}.vps-heading h3 em{color:#a4bfdf}.vps-scr{background:#0b111c;border-color:#334052}.vps-body{justify-content:flex-start}.vps-heading>span{color:#9caec5}.vps-controls{border:1px solid #354358;background:#0d1623}.vps-controls-head,.vps-control-row{display:grid;grid-template-columns:minmax(0,.75fr) minmax(0,1fr) minmax(0,1.25fr)}.vps-controls-head{background:#131f30}.vps-controls-head>span{padding:17px 22px;font:9px/1.6 var(--mono);letter-spacing:1px;color:#b4c3d7}.vps-controls-head>span+span{border-left:1px solid #354358}.vps-control-row{border-top:1px solid #354358}.vps-control-row>div{padding:26px 22px;min-width:0}.vps-control-row>div+div{border-left:1px solid #354358}.vps-control-name>span{font:8px/1.6 var(--mono);letter-spacing:.7px;color:#9fb4ce}body.v2-dashboard .vps-control-name h4{font-size:18px!important;line-height:1.4!important;margin:12px 0 0!important}body.v2-dashboard .vps-control-design h4{font-size:16px!important;line-height:1.45!important;margin:0 0 10px!important;color:#dbe7f6!important}.vps-control-row p{font-size:13px!important;line-height:1.75!important;color:#b0bfd2!important}.vps-control-design{background:#132033}.vps-control-mobile{display:none}.vps-risk-note{display:grid;grid-template-columns:160px 1fr;gap:24px;padding:20px 22px;border-left:2px solid #8297b1;background:#101a28}.vps-risk-note>span{font:9px/1.7 var(--mono);letter-spacing:1px;color:#b6c5d8}.vps-risk-note>p{font-size:12px!important;line-height:1.7!important;color:#b5c2d4!important}.vps-scr[data-scr="4"]{gap:28px}.vps-request-ticket,.vps-maker-list .is-selected{background:#16253a;border-color:#6687b0}.vps-execution-label{color:#b2c4dc}.vps-settlement,.vps-managed{background:#132328;border-color:#5f7e85}.vps-settlement>b,.vps-managed li{color:#dcebed}.vps-settlement>span,.vps-managed .vps-execution-label,.vps-managed li>span{color:#a7c8cc}body.v2-dashboard .vps-managed h4{color:#dcebed!important}.vps-btn{letter-spacing:.5px}.vps-foot{color:#94a6bd}.vps-execution>li>p,.vps-heading>p{color:#b3c0d2!important}
 @media(max-width:760px){.vps-controls-head{display:none}.vps-control-row{grid-template-columns:1fr}.vps-control-row>div{padding:20px}.vps-control-row>div+div{border-left:0;border-top:1px solid #2b394b}.vps-control-name{background:#131f30}.vps-control-mobile{display:block;font:8px/1.6 var(--mono);letter-spacing:1px;color:#9fb4ce;margin-bottom:12px}.vps-risk-note{grid-template-columns:1fr;gap:12px;padding:20px}.vp-caption p{white-space:normal;text-align:center}.vp-caption>span{display:none}}
+
+.vps-market-size{padding:30px;border:1px solid #435776;background:#101e30}.vps-market-size>span,.vps-market-size>div,.vps-market-scenarios>div>span{font:9px/1.7 var(--mono);letter-spacing:1px;color:#afc4df}.vps-market-size>strong{display:flex;align-items:baseline;flex-wrap:wrap;gap:20px;margin:20px 0;font:600 clamp(64px,7.5vw,112px)/1 var(--sans,Arial,sans-serif);letter-spacing:-.05em;color:#e3efff}.vps-market-size small{font:11px var(--mono);letter-spacing:2px}.vps-market-size>div{display:flex;flex-wrap:wrap;gap:20px}.vps-market-scenarios{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border:1px solid #354358}.vps-market-scenarios>div{padding:24px}.vps-market-scenarios>div+div{border-left:1px solid #354358}.vps-market-scenarios b{display:block;margin:14px 0;font:600 36px/1.1 var(--sans,Arial,sans-serif);letter-spacing:-1px;color:#dceaff}.vps-market-scenarios p{font-size:11px!important}.vps-scale-context{display:grid;grid-template-columns:1fr 1fr;gap:26px}.vps-scale-context p{font-size:12px!important;line-height:1.7!important}.vps-scale-context b{color:#dce7f6;font-weight:600}.vps-data-sources{display:flex;flex-wrap:wrap;gap:12px 24px;font:9px/1.7 var(--mono);color:#9baec8}.vps-data-sources a{color:#b7d2f7!important;text-decoration:underline;text-underline-offset:4px}.vps-data-sources>span{flex-basis:100%}.vps-share-controls{display:flex;flex-wrap:wrap;gap:8px}.vps-share-controls button{padding:12px 22px;border:1px solid #4d6482;border-radius:2px;background:#101b2b;color:#c5d6ed;font:12px var(--mono);cursor:pointer}.vps-share-controls button[aria-pressed="true"]{background:#28486d;border-color:#9bbfe9;color:#fff}.vps-share-controls button:focus-visible{outline:2px solid #b4d5ff;outline-offset:3px}.vps-scale-result{display:grid;grid-template-columns:1fr 1fr;gap:28px;align-items:center;border-top:1px solid #354358;border-bottom:1px solid #354358;padding:24px 0}.vps-scale-result span{font:9px/1.7 var(--mono);letter-spacing:1px;color:#afc4df}.vps-scale-result strong{display:block;margin-top:12px;font:600 60px/1 var(--sans,Arial,sans-serif);letter-spacing:-.05em;color:#d6e8ff}.vps-scale-result p{font-size:14px!important;color:#ccdaec!important}.vps-scale-axis{display:flex;justify-content:space-between;gap:12px;margin-bottom:18px;font:8px/1.6 var(--mono);letter-spacing:.5px;color:#9aaecb}.vps-scale-row{display:grid;grid-template-columns:210px minmax(0,1fr) 72px;gap:16px;align-items:center;padding:12px 0}.vps-scale-row>span{font:12px/1.5 var(--sans,Arial,sans-serif);color:#c5d2e5}.vps-scale-row small{display:block;font:8px/1.7 var(--mono);color:#9abbe4}.vps-scale-row>div{height:14px;background:#162135;border-right:1px solid #405472}.vps-scale-row i{display:block;min-width:0;height:100%;background:#637e9e}.vps-scale-row b{font:11px var(--mono);text-align:right;color:#cad8eb;white-space:nowrap}.vps-scale-row.is-scenario i{background:#a2c9ff}.vps-scale-row.is-scenario>span,.vps-scale-row.is-scenario b{color:#c4deff}
+@media(max-width:760px){.vps-market-size{padding:24px 20px}.vps-market-size>strong{font-size:66px}.vps-market-scenarios{grid-template-columns:1fr}.vps-market-scenarios>div+div{border-left:0;border-top:1px solid #354358}.vps-market-scenarios>div{padding:20px}.vps-scale-context,.vps-scale-result{grid-template-columns:1fr;gap:18px}.vps-scale-result strong{font-size:52px}.vps-scale-row{grid-template-columns:1fr 66px;gap:8px}.vps-scale-row>span{grid-column:1/-1}.vps-share-controls button{padding:12px 16px}.vps-scale-axis{font-size:7px}.vps-data-sources{font-size:8px}}
 `;
   function injectVpsStyle() {
     if (document.getElementById('vps-style')) return;
