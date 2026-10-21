@@ -4,108 +4,37 @@
   var TAB = 'variational-pro';
   var TITLE = 'Variational Pro';
 
-  /* ---------- what Pro is, inside the title screen ----------
-     The explainer lives in the game frame itself: the title is screen 0 and four more
-     screens follow, stepped with the bar at the bottom (◀ ▶, dots, or the arrow keys).
-     No intro copy: each screen is one picture with the fewest words that carry it.
-     Built from Variational's "About Pro" docs, paraphrased. The frame is always dark, so
-     colours here are fixed rather than theme tokens. */
+  // Product descriptions follow the official About Pro documentation.
   var DOCS = 'https://docs.variational.io/pro/about-pro';
-  var TAGS = { chat: 'Chat', legal: 'Legal', money: 'Money', manual: 'Manual', risk: 'Risk', auto: 'Auto' };
-  var OLD = [
-    ['Fund wants an altcoin option', ''],
-    ['Deribit doesn’t list it → DM a desk on Telegram', 'chat'],
-    ['ISDA + KYC first; other desks say no', 'legal'],
-    ['One desk left: describe the structure in chat', 'chat'],
-    ['Desk prices it in a spreadsheet', 'manual'],
-    ['Quote and terms come back', 'chat'],
-    ['Haggle on price and terms', 'chat'],
-    ['Email confirm → legal + ops review', 'legal'],
-    ['Test transfer to the desk', 'money'],
-    ['Send collateral straight to the desk', 'risk'],
-    ['Trade cleared', ''],
-    ['Margin checked “every so often”; desk never posts back', 'risk']
-  ];
-  var PRO = [
-    ['Fund wants an altcoin option', ''],
-    ['Build an RFQ — UI or API', 'auto'],
-    ['Every market maker sees it and quotes', 'auto'],
-    ['Compare price, margin terms, counterparty', ''],
-    ['Accept → both deposit into an on-chain pool', 'auto'],
-    ['Cleared. Margin, funding, liquidations run themselves', 'auto']
-  ];
-  var SCREENS = ['Title', 'The same trade', 'One RFQ', 'Bosses beaten', 'Power-ups'];
+  var SCREENS = ['Title', 'The market', 'The shift', 'Trade flow', 'Settlement'];
 
-  function lane(steps, cls, title, foot) {
-    return '<div class="vps-lane ' + cls + '"><div class="vps-lane-h"><b>' + title + '</b>' +
-      '<strong>' + steps.length + '<small>steps</small></strong></div><ol>' +
-      steps.map(function (s, i) {
-        return '<li' + (s[1] ? ' class="t-' + s[1] + '"' : '') + '><i>' + (i + 1) + '</i><p>' + s[0] + '</p>' +
-          (s[1] ? '<em>' + TAGS[s[1]] + '</em>' : '') + '</li>';
-      }).join('') + '</ol><div class="vps-lane-f">' + foot + '</div></div>';
+  function slide(n, eyebrow, title, lead, content, foot) {
+    return '<article class="vps-scr" data-scr="' + n + '" hidden aria-labelledby="vps-title-' + n + '">' +
+      '<header class="vps-heading"><span>VARIATIONAL PRO <i>/</i> ' + eyebrow + '</span>' +
+      '<h3 id="vps-title-' + n + '">' + title + '</h3><p>' + lead + '</p></header>' +
+      '<div class="vps-body">' + content + '</div><footer class="vps-foot"><span>' + foot + '</span><b>0' + n + ' / 04</b></footer></article>';
   }
-
-  /* RFQ → quotes → one accepted → both sides into one pool → the protocol runs the trade */
-  function flowSvg() {
-    var mm = [['Market maker A', '$412'], ['Market maker B', '$405'], ['Market maker C', '$419']];
-    var s = '<svg class="vps-flow" viewBox="0 0 960 360" role="img" aria-label="A fund sends one RFQ, three market makers quote, the fund accepts market maker B, both deposit into an on-chain settlement pool, and the protocol tracks margin, settles funding and liquidates">' +
-      '<defs><marker id="vps-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#8da7cb"/></marker></defs>';
-    s += '<rect x="10" y="115" width="170" height="80" rx="8" class="n taker"/>' +
-      '<text x="95" y="149" class="t">Hedge fund</text><text x="95" y="171" class="s">sends one RFQ</text>';
-    mm.forEach(function (m, i) {
-      var y = 20 + i * 100, on = i === 1;
-      s += '<path d="M180 155 C 230 155, 230 ' + (y + 35) + ', 285 ' + (y + 35) + '" class="e" marker-end="url(#vps-ar)"/>' +
-        '<rect x="290" y="' + y + '" width="190" height="70" rx="8" class="n mm' + (on ? ' on' : '') + '"/>' +
-        '<text x="385" y="' + (y + 30) + '" class="t">' + m[0] + '</text>' +
-        '<text x="385" y="' + (y + 52) + '" class="s' + (on ? ' hi' : '') + '">quotes ' + m[1] + (on ? ' · accepted' : '') + '</text>';
-    });
-    s += '<path d="M480 155 L 585 155" class="e on" marker-end="url(#vps-ar)"/>' +
-      '<path d="M95 195 C 95 350, 675 350, 675 214" class="e on" marker-end="url(#vps-ar)"/>' +
-      '<text x="385" y="346" class="s">both deposit collateral into the pool</text>' +
-      '<rect x="590" y="100" width="170" height="110" rx="10" class="n pool"/>' +
-      '<text x="675" y="140" class="t">Settlement pool</text><text x="675" y="162" class="s">on-chain escrow</text>' +
-      '<text x="675" y="182" class="s">fund ↔ MM B only</text>';
-    ['Tracks margin', 'Settles funding', 'Auto-liquidates'].forEach(function (t, i) {
-      var y = 60 + i * 70;
-      s += '<path d="M760 155 C 790 155, 790 ' + (y + 25) + ', 815 ' + (y + 25) + '" class="e auto" marker-end="url(#vps-ar)"/>' +
-        '<rect x="820" y="' + y + '" width="135" height="50" rx="8" class="n auto"/>' +
-        '<text x="887" y="' + (y + 30) + '" class="s strong">' + t + '</text>';
-    });
-    return s + '</svg>';
-  }
-
   function screens() {
-    var bosses = [
-      ['Few players', 'KYC and manual quoting keep most desks and funds out', 'One RFQ reaches every market maker at once'],
-      ['Human error', 'Margin, collateral and liquidations done by hand', 'The protocol runs all three'],
-      ['Counterparty risk', 'Collateral sits with the desk — the FTX lesson', 'Both sides post on-chain, isolated per pair']
-    ].map(function (b, i) {
-      return '<div class="vps-boss"><span class="vps-hp"><i></i></span><b>BOSS ' + (i + 1) + ' · ' + b[0] + '</b>' +
-        '<p class="was">' + b[1] + '</p><p class="ko">K.O. → ' + b[2] + '</p></div>';
-    }).join('');
-    var pools = '<svg class="vps-pools" viewBox="0 0 300 110" aria-hidden="true">' +
-      [['Fund', 'MM A', 6], ['Fund', 'MM B', 62]].map(function (r) {
-        return '<rect x="4" y="' + r[2] + '" width="70" height="40" rx="6" class="n taker"/><text x="39" y="' + (r[2] + 25) + '" class="s">' + r[0] + '</text>' +
-          '<rect x="112" y="' + r[2] + '" width="76" height="40" rx="6" class="n pool"/><text x="150" y="' + (r[2] + 25) + '" class="s">pool</text>' +
-          '<rect x="226" y="' + r[2] + '" width="70" height="40" rx="6" class="n mm"/><text x="261" y="' + (r[2] + 25) + '" class="s">' + r[1] + '</text>' +
-          '<line x1="74" y1="' + (r[2] + 20) + '" x2="112" y2="' + (r[2] + 20) + '" class="e on"/><line x1="188" y1="' + (r[2] + 20) + '" x2="226" y2="' + (r[2] + 20) + '" class="e on"/>';
-      }).join('') + '</svg>';
-    var powers = [
-      ['★', 'RFQ', 'Ask for any structure; makers compete with quotes. Answer others’ RFQs too.', ''],
-      ['◆', 'Bilateral', 'Peer-to-peer, one settlement pool per pair. Nothing mixes between pools.', pools],
-      ['✚', 'Custom terms', 'Whitelist who quotes you, margin per pool, auto-liquidation and penalty.', '']
-    ].map(function (p) {
-      return '<div class="vps-power"><span>' + p[0] + '</span><b>' + p[1] + '</b><p>' + p[2] + '</p>' + p[3] + '</div>';
-    }).join('');
-    return '<div class="vps-scr" data-scr="1" hidden><div class="vps-head"><span>STAGE 1</span><b>The same altcoin option trade</b></div>' +
-        '<div class="vps-lanes">' + lane(OLD, 'old', 'Today', '1 desk · lawyers · wires · your collateral at their desk') +
-        '<div class="vps-vs">VS</div>' + lane(PRO, 'pro', 'On Pro', 'every desk quotes · 1 person or a bot · collateral on-chain') + '</div></div>' +
-      '<div class="vps-scr" data-scr="2" hidden><div class="vps-head"><span>STAGE 2</span><b>One RFQ, then the protocol takes over</b></div>' +
-        '<div class="vps-flowwrap">' + flowSvg() + '</div></div>' +
-      '<div class="vps-scr" data-scr="3" hidden><div class="vps-head"><span>STAGE 3</span><b>What it knocks out</b></div>' +
-        '<div class="vps-grid3">' + bosses + '</div></div>' +
-      '<div class="vps-scr" data-scr="4" hidden><div class="vps-head"><span>STAGE 4</span><b>What every Pro trade gets</b></div>' +
-        '<div class="vps-grid3">' + powers + '</div></div>';
+    return slide(1, 'THE MARKET', 'Built for a different<br><em>scale of trading.</em>',
+      'OTC derivatives for advanced and institutional traders.',
+      '<div class="vps-market"><span class="vps-market-word">OTC</span><div><span class="vps-mini">THE ARENA</span><h4>Beyond standard<br>exchange products.</h4><p>Configurable derivatives.<br>Negotiated terms. Block trades.</p></div></div>' +
+      '<div class="vps-audience"><span>Advanced traders</span><span>Institutional desks</span><span>Market makers</span></div>',
+      'A market built around the trade you need.') +
+    slide(2, 'THE SHIFT', 'Less coordination.<br><em>More execution.</em>',
+      'The same example trade, with a different operating model.',
+      '<div class="vps-compare"><div class="vps-comparison"><span class="vps-mini">MANUAL OTC EXAMPLE</span><div class="vps-count">12<small>steps</small></div><h4>A chain of handoffs.</h4><p>Chats, quoting, legal review,<br>transfers and manual margin checks.</p></div>' +
+      '<div class="vps-comparison is-pro"><span class="vps-mini">WITH PRO</span><div class="vps-count">6<small>steps</small></div><h4>One connected workflow.</h4><p>Request a trade, compare quotes,<br>deposit collateral and clear on-chain.</p></div></div>',
+      'Illustrative workflow in Variational’s documentation; step counts are not a speed benchmark.') +
+    slide(3, 'TRADE FLOW', 'Request. Compare.<br><em>Settle.</em>',
+      'One request for quote connects the trade to competing liquidity.',
+      '<ol class="vps-flow-steps"><li><span>01</span><h4>Define the trade</h4><p>Specify the asset,<br>structure and terms.</p></li><li><span>02</span><h4>Receive quotes</h4><p>Market makers respond<br>through the UI or API.</p></li><li><span>03</span><h4>Choose an offer</h4><p>Compare price, margin<br>and counterparty.</p></li><li><span>04</span><h4>Fund &amp; clear</h4><p>Both sides deposit<br>into a settlement pool.</p></li></ol>' +
+      '<div class="vps-protocol"><span>AFTER CLEARING</span><p>Protocol-managed margin, funding and liquidations.</p></div>',
+      'Request quotes from the market or a chosen set of counterparties.') +
+    slide(4, 'SETTLEMENT', 'Terms agreed.<br><em>On-chain collateral.</em>',
+      'Bilateral trades, with settlement pools for each counterparty pair.',
+      '<div class="vps-pool-map"><div class="vps-pool-line"><span>Your desk</span><div><b>Pool A</b><small>Positions + collateral</small></div><span>Maker A</span></div><div class="vps-pool-line"><span>Your desk</span><div><b>Pool B</b><small>Positions + collateral</small></div><span>Maker B</span></div></div>' +
+      '<div class="vps-principles"><div><b>Separate pools</b><p>Assets are not commingled<br>between pools.</p></div><div><b>Custom terms</b><p>Agree on margin and<br>liquidation parameters.</p></div><div><b>Ongoing management</b><p>The protocol monitors<br>and manages the trade.</p></div></div>',
+      'Product design per official documentation. Pro is not live yet.');
   }
 
   function navBar() {
@@ -131,7 +60,9 @@
       section.querySelectorAll('[data-vps-go]').forEach(function (d, k) { d.classList.toggle('on', k === cur); });
       label.textContent = cur ? SCREENS[cur].toUpperCase() : 'COMING SOON';
       index.textContent = ('0' + (cur + 1)).slice(-2) + ' / 0' + scrs.length;
-      next.textContent = cur ? (cur === scrs.length - 1 ? 'TITLE ↺' : 'NEXT ▶') : 'PRESS START ▶';
+      next.textContent = cur ? (cur === scrs.length - 1 ? 'TITLE ↺' : 'NEXT →') : 'PRESS START ▶';
+      section.querySelectorAll('[data-vps-go]').forEach(function (d, k) { d.setAttribute('aria-current', k === cur ? 'step' : 'false'); });
+      section.scrollIntoView({ block: 'start', behavior: 'instant' });
     }
     section.addEventListener('click', function (e) {
       var b = e.target.closest && e.target.closest('[data-vps],[data-vps-go]');
@@ -141,49 +72,36 @@
     });
     document.addEventListener('keydown', function (e) {
       if (section.classList.contains('tg-hide') || /INPUT|TEXTAREA|SELECT/.test((e.target && e.target.tagName) || '')) return;
-      if (e.key === 'ArrowRight') go(cur + 1);
-      else if (e.key === 'ArrowLeft') go(cur - 1);
+      if (e.key === 'ArrowRight') { e.preventDefault(); go(cur + 1); }
+      else if (e.key === 'ArrowLeft') { e.preventDefault(); go(cur - 1); }
     });
   }
 
-  var VPS_CSS =
-    '.vp-title-screen[hidden],.vps-scr[hidden]{display:none!important}' +
-    '.vps-scr{position:relative;isolation:isolate;display:flex;flex-direction:column;gap:18px;min-height:660px;min-height:max(660px,calc(100svh - 245px));padding:26px 34px 30px;background:radial-gradient(ellipse at 90% 65%,#224677 0,transparent 58%),linear-gradient(135deg,#1b2032 30%,#101d34 100%);color:#fff;overflow:hidden}' +
-    '.vps-scr:after{content:"";position:absolute;inset:0;z-index:-1;opacity:.1;background-image:linear-gradient(#8bacda 1px,transparent 1px),linear-gradient(90deg,#8bacda 1px,transparent 1px);background-size:64px 64px}' +
-    '.vps-head span{display:block;color:#83b7ff;font:800 10px var(--mono);letter-spacing:4px}.vps-head b{display:block;margin-top:6px;font:900 clamp(22px,2.8vw,34px)/1.05 var(--sans,Arial,sans-serif);letter-spacing:-.04em;text-transform:uppercase}' +
-    '.vps-lanes{display:grid;grid-template-columns:minmax(0,1.15fr) auto minmax(0,1fr);gap:14px;align-items:start}' +
-    '.vps-vs{align-self:center;color:#68a8ff;font:900 26px var(--sans,Arial,sans-serif);text-shadow:0 0 24px #4c9af8aa}' +
-    '.vps-lane{border:1px solid #344767;background:#0a1220cc}.vps-lane.pro{border-color:#4c9af8;box-shadow:0 0 40px #4c9af822}' +
-    '.vps-lane-h{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid #344767}.vps-lane-h b{font:800 16px var(--sans,Arial,sans-serif)}' +
-    '.vps-lane-h strong{color:#ff5d7a;font:900 30px/1 var(--mono);text-align:right}.vps-lane.pro .vps-lane-h strong{color:#68a8ff}.vps-lane-h small{display:block;color:#8da7cb;font:700 8px var(--mono);letter-spacing:1px;text-transform:uppercase}' +
-    '.vps-lane ol{list-style:none;margin:0;padding:6px 0}.vps-lane li{display:grid;grid-template-columns:22px minmax(0,1fr) auto;gap:9px;align-items:center;padding:4px 14px}' +
-    '.vps-lane li i{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:1px solid #4a5f82;color:#8da7cb;font:800 9px var(--mono);font-style:normal}' +
-    '.vps-lane li p{margin:0;color:#dbe6f7!important;font:12px/1.35 var(--sans,Arial,sans-serif)!important}' +
-    '.vps-lane li em{padding:1px 6px;border-radius:3px;border:1px solid currentColor;font:800 8px var(--mono);font-style:normal;letter-spacing:.5px;text-transform:uppercase}' +
-    '.vps-lane .t-chat em{color:#5aa9e6}.vps-lane .t-legal em{color:#b08cf0}.vps-lane .t-manual em{color:#e0a43a}.vps-lane .t-money em{color:#9fb1c8}.vps-lane .t-risk em{color:#ff5d7a}.vps-lane .t-auto em{color:#3fd69a}' +
-    '.vps-lane li.t-risk i{border-color:#ff5d7a;color:#ff5d7a}.vps-lane.pro li i{border-color:#4c9af8;color:#68a8ff}' +
-    '.vps-lane-f{padding:9px 16px;border-top:1px solid #344767;color:#8da7cb;font:10px/1.5 var(--mono)}.vps-lane.pro .vps-lane-f{color:#dbe6f7}' +
-    '.vps-flowwrap{flex:1;display:flex;align-items:center;overflow-x:auto}.vps-flow{display:block;width:100%;min-width:640px;height:auto}' +
-    '.vps-flow .n,.vps-pools .n{fill:#0a1220;stroke:#4a5f82;stroke-width:1.5}.vps-flow .n.taker,.vps-pools .n.taker{stroke:#9fb1c8}.vps-flow .n.mm.on{stroke:#4c9af8;stroke-width:2.5;filter:drop-shadow(0 0 10px #4c9af877)}' +
-    '.vps-flow .n.pool,.vps-pools .n.pool{stroke:#3fd69a;stroke-width:2.5;fill:#0f2a26}.vps-flow .n.auto{stroke:#3fd69a;stroke-dasharray:4 3}' +
-    '.vps-flow .t{fill:#fff;font:800 15px var(--sans,Arial,sans-serif);text-anchor:middle}.vps-flow .s,.vps-pools .s{fill:#8da7cb;font:600 11.5px var(--mono);text-anchor:middle}.vps-flow .s.hi{fill:#68a8ff}.vps-flow .s.strong{fill:#fff;font-weight:800}' +
-    '.vps-flow .e,.vps-pools .e{fill:none;stroke:#8da7cb;stroke-width:1.5;opacity:.6}.vps-flow .e.on,.vps-pools .e.on{stroke:#4c9af8;opacity:1;stroke-width:2}.vps-flow .e.auto{stroke:#3fd69a;opacity:.9}' +
-    '.vps-grid3{flex:1;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;align-content:center}' +
-    '.vps-boss,.vps-power{padding:18px;border:1px solid #344767;background:#0a1220cc;min-width:0}' +
-    '.vps-hp{display:block;height:8px;margin:0 0 14px;border:1px solid #ff5d7a;background:#2a1220}.vps-hp i{display:block;width:0;height:100%;background:#ff5d7a}' +
-    '.vps-boss b,.vps-power b{display:block;margin:0 0 12px;font:800 14px var(--mono);letter-spacing:.5px;text-transform:uppercase}' +
-    '.vps-boss p{margin:0;font:12.5px/1.5 var(--sans,Arial,sans-serif)!important}.vps-boss p.was{color:#8da7cb!important;text-decoration:line-through;text-decoration-color:#ff5d7a99;margin-bottom:12px}.vps-boss p.ko{color:#3fd69a!important;font-weight:700!important}' +
-    '.vps-power span{display:inline-flex;align-items:center;justify-content:center;width:42px;height:42px;margin-bottom:12px;border-radius:10px;background:#4c9af8;color:#081326;font:900 20px var(--sans,Arial,sans-serif);box-shadow:0 0 24px #4c9af866}' +
-    '.vps-power p{margin:0;color:#dbe6f7!important;font:12.5px/1.55 var(--sans,Arial,sans-serif)!important}.vps-pools{display:block;width:100%;max-width:300px;margin-top:14px}' +
-    '.vps-nav{gap:12px 16px}.vps-btn{padding:8px 12px;border:1px solid #5d83b5;border-radius:2px;background:#1c304d;color:#e2edff;font:800 11px var(--mono);cursor:pointer;letter-spacing:1px}.vps-btn:hover{border-color:#acd0ff}' +
-    '.vps-start{background:#4c9af8;border-color:#4c9af8;color:#081326;animation:vpsblink 1.4s steps(2) infinite}.vps-start:hover{animation:none}@keyframes vpsblink{50%{opacity:.55}}' +
-    '.vps-press{position:absolute;left:50%;bottom:15%;z-index:4;transform:translateX(-50%);display:inline-flex;align-items:center;gap:16px;padding:20px 44px;border:2px solid #68a8ff;border-radius:4px;background:#0a1220e6;color:#fff;font:900 clamp(22px,3vw,40px)/1 var(--mono);letter-spacing:.18em;cursor:pointer;white-space:nowrap;box-shadow:0 0 0 6px #4c9af81f,0 0 60px #4c9af866;text-shadow:0 0 18px #68a8ff;animation:vpsblink 1.1s steps(2) infinite}' +
-    '.vps-press span{color:#68a8ff;font-size:.8em}.vps-press:hover,.vps-press:focus-visible{animation:none;background:#4c9af8;color:#081326;text-shadow:none;transform:translateX(-50%) scale(1.04);outline:none}.vps-press:hover span,.vps-press:focus-visible span{color:#081326}' +
-    '@media(max-width:600px){.vps-press{bottom:12%;padding:14px 22px;gap:10px;font-size:18px;letter-spacing:.12em}}' +
-    '.vps-dots{display:flex;gap:7px}.vps-dots button{flex:none;width:10px;height:10px;min-width:0;min-height:0!important;padding:0;border:1px solid #6695d2;background:transparent;cursor:pointer}.vps-dots button.on{background:#4c9af8;border-color:#4c9af8;box-shadow:0 0 10px #4c9af8}' +
-    '.vps-src{color:#6695d2!important;font:9px var(--mono);letter-spacing:1px;text-decoration:none}.vps-nav .vp-coming-index{margin-left:auto}' +
-    '@media(max-width:900px){.vps-lanes{grid-template-columns:minmax(0,1fr)}.vps-vs{justify-self:center}.vps-grid3{grid-template-columns:minmax(0,1fr)}.vps-scr{padding:20px 18px 24px}}' +
-    '@media(max-width:600px){.vps-nav{padding:14px 16px!important}.vps-src{display:none}.vps-lane li{grid-template-columns:20px minmax(0,1fr)}.vps-lane li em{grid-column:2;justify-self:start}}';
+  var VPS_CSS = `
+.vp-title-screen[hidden],.vps-scr[hidden]{display:none!important}
+.tsec[data-tg="variational-pro"]{scroll-margin-top:105px}
+.vps-scr{box-sizing:border-box;display:flex;flex-direction:column;gap:38px;min-height:680px;padding:42px;background:radial-gradient(ellipse at 100% 100%,#17345c55,transparent 65%),#080e1b;color:#fff;border:1px solid #273953}
+.vps-heading{display:block!important;text-align:left!important;padding:0!important;border:0!important;background:none!important}.vps-heading>span{font:9px/1.5 var(--mono);letter-spacing:2px;color:#a3badb}.vps-heading i{font-style:normal;margin:0 12px;color:#4c9af8}
+body.v2-dashboard .vps-heading h3{font:700 clamp(32px,4.2vw,62px)/1.06 var(--sans,Arial,sans-serif)!important;letter-spacing:-.045em!important;color:#f4f7ff!important;margin:24px 0 18px!important}.vps-heading h3 em{font-style:normal;color:#7db4ff}
+.vps-heading>p{font:14px/1.65 var(--sans,Arial,sans-serif)!important;color:#9dafc9!important;margin:0!important;max-width:640px}
+.vps-body{display:flex;flex-direction:column;justify-content:center;gap:24px;flex:1;min-width:0}
+.vps-mini{font:9px/1.5 var(--mono);letter-spacing:2px;color:#8ba9cf}
+body.v2-dashboard .vps-body h4{font:600 22px/1.3 var(--sans,Arial,sans-serif)!important;color:#e3edfc!important;margin:12px 0!important;letter-spacing:-.025em}
+.vps-body p{font:13px/1.7 var(--sans,Arial,sans-serif)!important;color:#9dafc9!important;margin:0!important}
+.vps-market{display:grid;grid-template-columns:1fr 1fr;align-items:center;gap:36px;padding-bottom:22px}.vps-market-word{font:800 clamp(80px,12vw,170px)/1 var(--sans,Arial,sans-serif);letter-spacing:-.07em;color:#79b0ff}.vps-market>div{border-left:1px solid #2e4666;padding-left:34px}
+.vps-audience{display:flex;flex-wrap:wrap;gap:12px}.vps-audience span{padding:12px 18px;border:1px solid #2a4261;border-radius:2px;font:11px/1.5 var(--mono);color:#bfd3ed}
+.vps-compare{display:grid;grid-template-columns:1fr 1fr;gap:20px}.vps-comparison{padding:26px;border:1px solid #273a53;background:#0c1422}.vps-comparison.is-pro{border-color:#477dbd;background:#142b48}.vps-count{display:flex;align-items:baseline;gap:14px;margin:22px 0;font:600 84px/1 var(--sans,Arial,sans-serif);letter-spacing:-.06em;color:#61738d}.is-pro .vps-count{color:#8abdff}.vps-count small{font:11px var(--mono);letter-spacing:0;color:#8ca4c5}
+.vps-flow-steps{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));list-style:none;padding:0;margin:0;border:1px solid #2a4261}.vps-flow-steps li{padding:24px 18px;position:relative}.vps-flow-steps li+li{border-left:1px solid #2a4261}.vps-flow-steps li>span{font:12px/1 var(--mono);color:#69a7fc}.vps-flow-steps li:last-child{background:#142b48}body.v2-dashboard .vps-flow-steps h4{font-size:17px!important;margin:24px 0 10px!important}.vps-flow-steps p{font-size:12px!important}.vps-protocol{display:flex;align-items:center;gap:22px;padding:20px 0;border-bottom:1px solid #273a53}.vps-protocol>span{font:9px/1.5 var(--mono);letter-spacing:1px;color:#79b0ff;white-space:nowrap}
+.vps-pool-map{display:grid;gap:16px}.vps-pool-line{display:grid;grid-template-columns:1fr 1.5fr 1fr;align-items:center;gap:34px}.vps-pool-line>span{text-align:center;padding:18px 8px;border:1px solid #273a53;font:12px var(--sans,Arial,sans-serif);color:#bdcde4}.vps-pool-line>div{position:relative;text-align:center;padding:18px 10px;border:1px solid #568fdb;background:#142b48}.vps-pool-line>div:before,.vps-pool-line>div:after{content:"";position:absolute;top:50%;width:35px;height:1px;background:#568fdb}.vps-pool-line>div:before{right:100%}.vps-pool-line>div:after{left:100%}.vps-pool-line b{font:600 14px var(--sans,Arial,sans-serif);color:#deebff}.vps-pool-line small{display:block;margin-top:6px;font:10px var(--mono);color:#8ba9cf}
+.vps-principles{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;padding-top:12px}.vps-principles b{display:block;font:600 13px var(--sans,Arial,sans-serif);color:#deebff;margin-bottom:8px}.vps-principles p{font-size:12px!important}
+.vps-foot{display:flex;align-items:flex-end;justify-content:space-between;gap:25px;padding-top:20px;border-top:1px solid #263850;color:#667d9d;font:10px/1.6 var(--mono)}.vps-foot b{font-weight:400;color:#90aacd;white-space:nowrap}
+.vps-nav{gap:12px 16px}.vps-btn{padding:10px 14px;border:1px solid #3e5d84;border-radius:2px;background:#13243a;color:#dceaff;font:600 10px var(--mono);cursor:pointer;letter-spacing:1px}.vps-btn:hover{border-color:#acd0ff}.vps-start{background:#355f94;border-color:#497ebd;color:#fff}
+.vps-press{display:inline-flex;align-items:center;gap:16px;padding:20px 36px;border:1px solid #68a8ff;border-radius:2px;background:#0e1d32;color:#fff;font:700 22px/1 var(--mono);letter-spacing:.16em;cursor:pointer}.vps-press span{color:#68a8ff}.vps-press:hover{background:#254e80}
+.vps-dots{display:flex;gap:8px}.vps-dots button{flex:none;width:9px;height:9px;min-width:0;min-height:0!important;padding:0;border:1px solid #6695d2;background:transparent;cursor:pointer}.vps-dots button.on{background:#78b2ff;border-color:#78b2ff}
+.vps-src{color:#6695d2!important;font:9px var(--mono);letter-spacing:1px;text-decoration:none}.vps-nav .vp-coming-index{margin-left:auto}
+@media(max-width:1000px){.vps-scr{padding:30px;gap:28px}.vps-flow-steps{grid-template-columns:1fr 1fr}.vps-flow-steps li:nth-child(3){border-left:0}.vps-flow-steps li:nth-child(n+3){border-top:1px solid #2a4261}.vps-market{gap:24px}.vps-market>div{padding-left:24px}}
+@media(max-width:600px){.vps-scr{padding:25px 20px;min-height:630px;gap:28px}.vps-heading>span{font-size:7px;letter-spacing:1px}.vps-heading i{margin:0 5px}body.v2-dashboard .vps-heading h3{font-size:32px!important;margin-top:22px!important}.vps-heading>p{font-size:12px!important}.vps-market{grid-template-columns:1fr;gap:18px}.vps-market-word{font-size:110px}.vps-market>div{padding:18px 0 0;border-left:0;border-top:1px solid #2e4666}.vps-audience{gap:8px}.vps-audience span{font-size:9px;padding:9px 12px}.vps-compare{grid-template-columns:1fr;gap:12px}.vps-comparison{padding:20px}.vps-count{font-size:66px;margin:18px 0}.vps-flow-steps{grid-template-columns:1fr}.vps-flow-steps li+li{border-left:0;border-top:1px solid #2a4261}.vps-flow-steps li{padding:20px}body.v2-dashboard .vps-flow-steps h4{margin-top:14px!important}.vps-protocol{align-items:flex-start;flex-direction:column;gap:10px}.vps-pool-line{gap:12px;grid-template-columns:1fr 1.4fr 1fr}.vps-pool-line>span{font-size:10px;padding:18px 4px}.vps-pool-line>div{padding:16px 4px}.vps-pool-line>div:before,.vps-pool-line>div:after{width:13px}.vps-pool-line b{font-size:11px}.vps-pool-line small{display:none}.vps-principles{grid-template-columns:1fr;gap:20px}.vps-foot{font-size:8px;gap:14px}.vps-nav{padding:16px!important}.vps-src{display:none}.vps-nav .vp-coming-label{font-size:8px}.vps-press{font-size:16px;padding:16px 20px}}
+`;
   function injectVpsStyle() {
     if (document.getElementById('vps-style')) return;
     var st = document.createElement('style');
