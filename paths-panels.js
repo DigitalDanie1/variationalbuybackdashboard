@@ -20,11 +20,13 @@
 
   var LISTINGS = {
     hype: { label: 'HYPE', who: 'Hyperliquid', tge: '2024-11-29', open: 3.20, supply: 952.31e6,
-      fdv: 3.05e9, accent: '#4fd6c3',
+      fdv: 3.05e9, accent: '#4fd6c3', logo: 'logo-hyperliquid.png',
+      founder: { name: 'Jeff Yan', role: 'Co-founder & CEO', handle: 'chameleon_jeff', img: 'assets/founders/jeff-yan.jpg', initials: 'JY' },
       shape: '+901% within 22 days of listing, then a deep retrace',
       note: 'First print on listing day $3.20 × total supply 952.31M' },
     lit: { label: 'LIT', who: 'Lighter', tge: '2025-12-22', open: 3.9955, supply: 1e9,
-      fdv: 4.00e9, accent: '#b98cff',
+      fdv: 4.00e9, accent: '#b98cff', logo: 'lighter-logo.png',
+      founder: { name: 'Vladimir Novakovski', role: 'Founder & CEO', handle: 'vnovakovski', img: 'assets/founders/vladimir-novakovski.jpg', initials: 'VN' },
       shape: 'Top right at listing, −80% to the bottom, back to listing price 8 months later',
       note: 'First listing candle open $4.00 × total supply 1B · first close $3.89' }
   };
@@ -885,8 +887,14 @@
 
     var listings = ['hype', 'lit'].map(function (k) {
       var L = LISTINGS[k];
+      var F = L.founder;
+      /* the face sits on its initials: if the photo is missing the initials show through */
       return '<article class="tp-listing ' + k + '">' +
+        '<div class="tp-id"><img class="tp-logo" src="' + esc(L.logo) + '" alt="' + esc(L.who) + ' logo" width="40" height="40">' +
         '<span class="tp-tag">' + esc(L.label) + ' · ' + esc(L.who) + '</span>' +
+        '<a class="tp-founder" href="https://x.com/' + esc(F.handle) + '" target="_blank" rel="noopener noreferrer">' +
+        '<span class="tp-face"><i>' + esc(F.initials) + '</i><img src="' + esc(F.img) + '" alt="' + esc(F.name) + '" width="44" height="44"></span>' +
+        '<span class="tp-fname"><strong>' + esc(F.name) + '</strong><small>' + esc(F.role) + ' · @' + esc(F.handle) + '</small></span></a></div>' +
         '<b>' + bigUsd(L.fdv) + '</b><em><i>FDV at listing</i> · ' + esc(L.tge) + '</em>' +
         '<p>' + esc(L.shape) + '</p><small>' + esc(L.note) + '</small></article>';
     }).join('');
@@ -969,6 +977,11 @@
       '<div class="tp-caveat"><b>What would change this call</b>' +
       '<p>Token allocation, lockup schedule and day-one float are not published yet. All three move the listing-price side directly, and the split above has to be recomputed once they are known. The macro side is a snapshot and drifts with the market. Nothing here is a price target.</p></div>';
 
+    /* CSP has script-src-attr 'none', so a missing photo is dropped here rather than by onerror */
+    host.querySelectorAll('.tp-face img').forEach(function (img) {
+      img.addEventListener('error', function () { img.remove(); });
+      if (img.complete && !img.naturalWidth) img.remove();
+    });
     host.querySelectorAll('.tp-chips button').forEach(function (b) {
       b.addEventListener('click', function () {
         if (b.dataset.zoom) state.zoom = b.dataset.zoom;

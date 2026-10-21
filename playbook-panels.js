@@ -117,6 +117,48 @@
   ];
   var REV_ASOF = '2026-09-05';
 
+  /* ---------- the holder's side: Henrik's TGE playbook ----------
+     The playbook above is a buyer's. This one is an airdrop holder's: what to sell into
+     listing day, by FDV. Quotes and market reads are Henrik's as written on 2026-09-17;
+     anything this site computes on top (per-point value, the reader's rank) uses the same
+     32% airdrop and the same points distribution as the Points and Whales tabs. */
+  var HK = {
+    asOf: '2026-09-17',
+    url: 'https://x.com/Henrik_on_HL/status/2100614542053019776',
+    bands: [
+      { k: 'hold',  max: 1.5e9,    range: 'At or below $1.5B', label: 'Sell nothing',
+        quote: 'I’ll probably sell nothing.', lo: 0, hi: 0,
+        why: 'Real demand for DEX exposure beyond HYPE and LIT; he keeps the exposure even through weeks under $1B.' },
+      { k: 'basis', max: 2.5e9,    range: '$1.5B – $2.5B',      label: 'Cover the cost basis',
+        quote: '…sell enough of my allocation to cover my trading losses/cost basis.', basis: true,
+        why: 'Takes the farming cost off the table and keeps most of the upside.' },
+      { k: 'part',  max: 3.0e9,    range: '$2.5B – $3B',        label: 'Sell 30–50%',
+        quote: 'I’ll probably sell 30-50% of my allocation and keep the rest.', lo: .3, hi: .5,
+        why: 'Locks in a real chunk while keeping half or more for the re-rating.' },
+      { k: 'moon',  max: Infinity, range: 'Above $3B',          label: 'Sell 90%, keep a moon bag',
+        quote: '…sell 90% of my allocation and keep the rest as a moon bag.', lo: .9, hi: .9,
+        why: 'Then watch the post-TGE metrics and buy back if the fundamentals justify it.' }
+    ],
+    /* what the market was pricing when he wrote it; $/pt reads are converted to FDV here */
+    reads: [
+      { label: 'His floor read',   v: 0.8e9,  note: '“should not open below $800M”' },
+      { label: 'OTC fill $20/pt',  pt: 20,    note: '$100K filled · VariationalOTC' },
+      { label: 'OTC ask $24/pt',   pt: 24,    note: 'not filled at the time' },
+      { label: 'Polymarket ≥$1B',  v: 1.0e9,  note: '61% odds' },
+      { label: 'Pascal OTC',       v: 1.7e9,  note: 'predicted FDV' },
+      { label: 'Polymarket ≥$2B',  v: 2.0e9,  note: '24% odds' }
+    ],
+    vsLighter: [
+      ['Annualised earnings', '~$65M', '~$47.5M net revenue, last four weeks of bi-weekly reports'],
+      ['TVL', '~$700M', '~$220M, incl. ~$8M treasury'],
+      ['FDV', '~$4.3B (ATH ~$5.5B)', 'not listed'],
+      ['Raised', '$68M', '$60M · Dragonfly, Coinbase Ventures, Bain'],
+      ['Holder base', 'paper hands already out', '~110K recipients still to redistribute']
+    ],
+    airdrop: 0.32
+  };
+  var PTS_CHIPS = [1000, 5000, 10000, 11462, 25000, 50000];
+
   var FDV_CHIPS = [
     { v: 0.94e9, label: '$0.94B' }, { v: 1.5e9, label: '$1.5B' }, { v: 2.81e9, label: '$2.81B' },
     { v: 3.0e9,  label: '$3.0B'  }, { v: 4.12e9, label: '$4.12B' }, { v: 5.0e9, label: '$5.0B' },
@@ -150,12 +192,23 @@
 
   var state = {
     /* A round placeholder, not a position — the reader sets their own size in The Entry. */
-    fdv: 2.81e9, size: 100e3, lev: null, days: null, sizePct: null, path: 'both'
+    fdv: 2.81e9, size: 100e3, lev: null, days: null, sizePct: null, path: 'both',
+    /* the holder's side: the reader's own points and farming cost */
+    pts: 10000, cost: 0,
+    /* which written plan is on screen: the buyer's entry or the holder's exit */
+    view: 'maestro'
   };
   try {
     var saved = JSON.parse(localStorage.getItem(STORE) || '{}');
     Object.keys(saved).forEach(function (k) { if (k in state) state[k] = saved[k]; });
   } catch (_) {}
+  if (state.view !== 'henrik') state.view = 'maestro';
+  try { var myPts = Number(localStorage.getItem('varMyPointsV1')); if (myPts > 0) state.pts = myPts; } catch (_) {}
+  function setPts(v) {
+    state.pts = v;
+    if (window.__VRANK) window.__VRANK.set(v);
+    else try { localStorage.setItem('varMyPointsV1', String(v)); } catch (_) {}
+  }
   function save() { try { localStorage.setItem(STORE, JSON.stringify(state)); } catch (_) {} }
 
   /* ---------- formatting ---------- */
@@ -878,6 +931,145 @@
     return { svg: s + '</svg>', sims: sims, n: n };
   }
 
+  /* ---------- the holder's side ----------
+     Where a reader's points rank is the Whales tab's job (window.__VRANK); this side only
+     needs the pool, for per-point value. */
+  function num(v) { return Math.round(v).toLocaleString('en-US'); }
+  function hkBand(fdv) {
+    for (var i = 0; i < HK.bands.length; i++) if (fdv <= HK.bands[i].max) return HK.bands[i];
+    return HK.bands[HK.bands.length - 1];
+  }
+  function hkPool() { var V = window.__VDIST; return V ? V.at(Date.now()).pool : PE.pool; }
+  function perPoint(fdv) { return fdv * HK.airdrop / hkPool(); }
+  /* What the band sells, in dollars, on a given allocation. The cost-basis band sells
+     exactly the reader's own farming cost, capped at the whole allocation. */
+  function hkSell(band, value) {
+    if (band.basis) {
+      var s = Math.min(state.cost || 0, value);
+      return { lo: s, hi: s };
+    }
+    return { lo: value * band.lo, hi: value * band.hi };
+  }
+
+  function holderBlock() {
+    var P = Math.max(0, state.pts || 0);
+    var hb = hkBand(state.fdv);
+    var ppt = perPoint(state.fdv);
+    var value = P * ppt;
+    var sell = hkSell(hb, value);
+    var sellStr = sell.lo === sell.hi ? usdExact(sell.lo) : usdExact(sell.lo) + '–' + usdExact(sell.hi);
+    var keepStr = sell.lo === sell.hi ? usdExact(value - sell.lo) : usdExact(value - sell.hi) + '–' + usdExact(value - sell.lo);
+
+    var ptsChips = PTS_CHIPS.map(function (v) {
+      return '<button type="button" data-pts="' + v + '"' + (v === P ? ' class="on"' : '') + '>' +
+        (v === 11462 ? 'Henrik · 11,462' : num(v)) + '</button>';
+    }).join('');
+
+    /* ---- where you sit: one line here, the full breakdown on the Whales tab ---- */
+    var standing = '';
+    if (window.__VRANK) {
+      var rk = window.__VRANK.at(P);
+      standing = '<div class="hk-rank"><div><span class="pb-eyebrow">Where your points sit</span>' +
+        '<b>' + num(P) + ' points ≈ rank ' + rk.rankStr + ' · top ' + rk.top + ' of ~' + num(rk.N) + ' accounts</b>' +
+        '<small>' + rk.share.toFixed(rk.share < 0.01 ? 4 : 3) + '% of all points. Henrik’s own read: the top 1,000 (~1.4% of wallets) hold ~50%, the top 10 ~6.3%, the largest wallet ~1.15%.</small></div>' +
+        '<button type="button" data-go-tab="whales" data-go-anchor="wh-rank">Full rank breakdown in Whales →</button></div>';
+    }
+
+    /* ---- the sell ladder ---- */
+    var rows = HK.bands.map(function (b, i) {
+      var lo = i === 0 ? 0 : HK.bands[i - 1].max;
+      var mid = b.max === Infinity ? 4.0e9 : (lo + b.max) / 2;
+      var on = b === hb;
+      var s = b.basis ? 'cost basis' : b.lo === b.hi ? Math.round(b.lo * 100) + '%' : Math.round(b.lo * 100) + '–' + Math.round(b.hi * 100) + '%';
+      return '<tr class="pb-row' + (on ? ' on' : '') + '" data-hkfdv="' + mid + '">' +
+        '<td class="pb-rng"><b>' + esc(b.range) + '</b><small>' + esc(b.label) + '</small></td>' +
+        '<td class="pb-quote">“' + esc(b.quote) + '”<small class="hk-why">' + esc(b.why) + '</small></td>' +
+        '<td class="pb-n"><b>' + s + '</b></td>' +
+        '<td class="pb-n"><b>' + (i === 0 ? '≤ $' + perPoint(b.max).toFixed(0) : '$' + perPoint(lo).toFixed(0) + (b.max === Infinity ? '+' : '–$' + perPoint(b.max).toFixed(0))) +
+        '</b><small>per point</small></td></tr>';
+    }).join('');
+
+    var reads = HK.reads.map(function (r) {
+      var v = r.v || r.pt * hkPool() / HK.airdrop;
+      return '<button type="button" class="pb-mark est" data-fdv="' + v + '"><i></i><span>' + esc(r.label) + '</span>' +
+        '<b>' + usdB(v) + '</b><em>' + esc(r.note) + ' → ' + esc(hkBand(v).label) + '</em></button>';
+    }).join('');
+
+    var vsRows = HK.vsLighter.map(function (r) {
+      return '<tr><td class="pb-rng"><b>' + esc(r[0]) + '</b></td><td class="pb-quote">' + esc(r[1]) +
+        '</td><td class="pb-quote">' + esc(r[2]) + '</td></tr>';
+    }).join('');
+
+    return '<div class="hk" id="holder-playbook">' +
+      '<div class="cmp-heading hk-head"><span class="cmp-eyebrow">THE HOLDER’S SIDE</span>' +
+      '<h2>What an airdrop holder sells into listing day</h2>' +
+      '<p>The other side of the buyer’s order book: Henrik’s written TGE plan for his own allocation, on the same FDV needle. Put in your points to see where you sit and what his ladder would do with them.</p></div>' +
+      '<div class="pb-author" aria-label="Holder playbook by Henrik">' +
+        '<a class="pb-author-avatar" href="https://x.com/Henrik_on_HL" target="_blank" rel="noopener noreferrer"><img src="assets/whales/henrik_on_hl.jpg" alt="Henrik profile" width="56" height="56" loading="lazy"></a>' +
+        '<div class="pb-author-copy"><span class="pb-eyebrow">HOLDER PLAYBOOK BY</span><a class="pb-author-name" href="https://x.com/Henrik_on_HL" target="_blank" rel="noopener noreferrer">Henrik <span>@Henrik_on_HL ↗</span></a>' +
+        '<p>From “My Variational Playbook: $VAR”, ' + HK.asOf + '. Bands and sell shares are his; rank, per-point value and dollars are this site’s.</p></div>' +
+        '<a class="pb-author-source" href="' + HK.url + '" target="_blank" rel="noopener noreferrer">Original write-up ↗</a></div>' +
+
+      '<div class="pb-chips"><span>Your points</span>' + ptsChips +
+      '<label class="pb-inp">custom <input type="number" step="100" min="0" value="' + Math.round(P) + '" data-pts-input></label></div>' +
+      standing +
+
+      '<div class="bw-head"><b>Henrik’s Sell Ladder</b><span><i>four FDV bands, one instruction each — the lit row is where the needle sits</i></span></div>' +
+      '<div class="pb-tablewrap"><table class="pb-table hk-table"><thead><tr>' +
+      '<th>Listing FDV</th><th>In his words</th><th>Sells</th><th>Your points are worth</th>' +
+      '</tr></thead><tbody>' + rows + '</tbody></table></div>' +
+      '<div class="pb-chips"><span>Listing FDV</span>' + FDV_CHIPS.map(function (c) {
+        return '<button type="button" data-fdv="' + c.v + '"' + (Math.abs(c.v - state.fdv) < 1e6 ? ' class="on"' : '') + '>' + esc(c.label) + '</button>';
+      }).join('') +
+      '<span class="pb-sep">Farming cost</span><label class="pb-inp">$<input type="number" step="500" min="0" value="' +
+      Math.round(state.cost || 0) + '" data-cost-input></label></div>' +
+      '<div class="pb-group hk-sell"><div class="pb-gcol"><span class="pb-glabel">At ' + usdB(state.fdv) + ' · ' + esc(hb.label) + '</span>' +
+      '<div class="pb-readout">' +
+      '<div class="pb-ro"><span>Your allocation</span><strong>' + usdExact(value) + '</strong><small>' + num(P) + ' pts × $' + ppt.toFixed(2) + '</small></div>' +
+      '<div class="pb-ro' + (sell.hi > 0 ? ' risk' : '') + '"><span>His ladder sells</span><strong>' + sellStr + '</strong><small>' +
+        (hb.basis ? (state.cost ? 'your farming cost, capped at the allocation' : 'enter your farming cost to size this')
+                  : (hb.lo === hb.hi ? Math.round(hb.lo * 100) + '%' : Math.round(hb.lo * 100) + '–' + Math.round(hb.hi * 100) + '%') + ' of the allocation') + '</small></div>' +
+      '<div class="pb-ro"><span>Keeps</span><strong>' + keepStr + '</strong><small>' +
+        (hb.k === 'moon' ? 'the moon bag' : 'exposure carried past listing') + '</small></div>' +
+      '</div></div></div>' +
+
+      '<div class="bw-head"><b>What the Market Was Pricing</b><span><i>the reads he started from, ' + HK.asOf + ' — click one to move the needle</i></span></div>' +
+      '<div class="pb-marks">' + reads + '</div>' +
+      '<div class="pb-note pb-marks-note">OTC per-point fills are converted to FDV here as $/pt × ' + (hkPool() / 1e6).toFixed(2) + 'M points ÷ 32%. Henrik reads the same $20 fill as an ~$800M floor; the gap is the points pool and float each assumes. OTC liquidity is thin and collateralised up front — the best read available, not a price.</div>' +
+
+      '<div class="bw-head"><b>His Lighter Yardstick</b><span><i>his figures as written — the comparison he prices VAR against</i></span></div>' +
+      '<div class="pb-tablewrap"><table class="pb-table hk-vs"><thead><tr><th></th><th>Lighter</th><th>Variational</th></tr></thead><tbody>' +
+      vsRows + '</tbody></table></div>' +
+      '<div class="pb-note">At Lighter’s FDV he puts one point at ~$125, and at the ~$3B Lighter could be sold at TGE, ~$80. On this site’s pool those read $' +
+      perPoint(4.3e9).toFixed(0) + ' and $' + perPoint(3e9).toFixed(0) + '. His caveat: Lighter’s day-one sellers are already gone; VAR still has to move ~110K recipients — many of them farmers who lost money trading for points — into holders who want the exposure, and that can take months.</div>' +
+
+      '<div class="hk-rank hk-mon"><div><span class="pb-eyebrow">After TGE, the questions change</span>' +
+      '<b>Volume, OI, revenue, retention, product — tracked pre- vs post-TGE</b>' +
+      '<small>His five buy-back questions now run as live numbers on the Monitors tab, so the fundamentals can be read against their pre-TGE baseline rather than asked once.</small></div>' +
+      '<button type="button" data-go-tab="monitors" data-go-anchor="post-tge-stats">Open Post-TGE Stats →</button></div>' +
+      '<div class="pb-caveat"><b>His bigger picture</b><p>Hyperliquid stays his highest-conviction bet; Variational is earlier, carries more execution and valuation risk, and offers more asymmetry from a lower starting valuation. SWAPs may be a bridge to fully onchain liquidity rather than the end state. He sees $3–5B FDV as plausible at some point, just not in a straight line. His plan, not advice; as of ' + HK.asOf + '.</p></div>' +
+      '</div>';
+  }
+
+  /* ---------- the two playbooks, as tabs ----------
+     Both read the same FDV needle, so each card states what its plan does at the current
+     FDV — the switch itself is the comparison. */
+  function viewSwitch() {
+    var tabs = [
+      { k: 'maestro', n: '01 · Buyer · post-TGE entry', who: 'DeFi Maestro', img: 'assets/whales/defi_maestro.jpg',
+        what: 'What to buy after listing, how fast, and on what leverage.', now: plan().band.label },
+      { k: 'henrik', n: '02 · Holder · listing-day exit', who: 'Henrik', img: 'assets/whales/henrik_on_hl.jpg',
+        what: 'What to sell from the airdrop, and where your points rank.', now: hkBand(state.fdv).label }
+    ];
+    return '<div class="pb-switch" role="tablist" aria-label="Choose a playbook">' + tabs.map(function (t) {
+      var on = state.view === t.k;
+      return '<button type="button" role="tab" aria-selected="' + on + '" class="pb-sw' + (on ? ' on' : '') +
+        '" data-view="' + t.k + '"><img src="' + t.img + '" alt="" width="44" height="44" loading="lazy">' +
+        '<span class="pb-sw-n">' + esc(t.n) + '</span><b>' + esc(t.who) + '</b><small>' + esc(t.what) + '</small>' +
+        '<em>At ' + usdB(state.fdv) + ' · ' + esc(t.now) + '</em></button>';
+    }).join('') + '</div>';
+  }
+
   /* ---------- render ---------- */
   function render() {
     var host = document.querySelector('[data-tg="plan"]');
@@ -1269,8 +1461,10 @@
     host.innerHTML =
       '<div class="cmp-heading"><span class="cmp-eyebrow">POST-TGE PLAYBOOK</span>' +
       '<h2>What happens once $VAR actually lists</h2>' +
-      '<p>Two Paths reads the odds and stops there. This is the other half: a written plan, turned into the sizes, durations and leverage it implies, and run against what the two comparable listings actually did. Sizes are a share of whatever size you bring, not a position — this is a reference, not advice and not a forecast.</p></div>' +
+      '<p>Two Paths reads the odds and stops there. This is the other half: two written plans for the same listing — a buyer’s entry and a holder’s exit — on one FDV needle, so the valuation you set carries across both. A reference, not advice and not a forecast.</p></div>' +
+      viewSwitch() +
 
+      '<div class="pb-view" data-pane="maestro"' + (state.view === 'maestro' ? '' : ' hidden') + '>' +
       '<section class="pb-verdict">' +
       '<span class="pb-eyebrow">At ' + usdB(state.fdv) + ' the plan says</span>' +
       '<h3>' + esc(b.label) + '</h3>' +
@@ -1287,6 +1481,7 @@
       /* The three figures used to be repeated as tiles here. They are already the lit row of
          the band table and the lit chips in The Entry — three copies of 60% / 30d / 1.5× on
          one page, and the sentence above states them anyway. */
+      '<p class="hk-line"><button type="button" data-view="henrik">Holder side · Henrik →</button> ' + esc(hkBand(state.fdv).label) + ' at this FDV.</p>' +
       '</section>' +
 
       '<section class="pb-tension"><span class="pb-eyebrow">Worth noticing</span>' +
@@ -1393,7 +1588,12 @@
       '<div class="pb-sigs">' + monitors + '</div>' +
 
       '<div class="pb-caveat"><b>What is still unknown</b>' +
-      '<p>Total supply, day-one float, the unlock schedule and the listing date are all unannounced, and every one of them moves the FDV this whole ladder is indexed on. So does whether a VAR perp exists and is liquid at listing, whether public OLP is live, and whether VAR is accepted as collateral — steps 2, 3 and 4 of the playbook each assume one of those. The two anchors for Lighter’s own TGE differ by 47% and this site currently carries both. Nothing here is a price target, and none of it is advice. As of ' + ASOF + '.</p></div>';
+      '<p>Total supply, day-one float, the unlock schedule and the listing date are all unannounced, and every one of them moves the FDV this whole ladder is indexed on. So does whether a VAR perp exists and is liquid at listing, whether public OLP is live, and whether VAR is accepted as collateral — steps 2, 3 and 4 of the playbook each assume one of those. The two anchors for Lighter’s own TGE differ by 47% and this site currently carries both. Nothing here is a price target, and none of it is advice. As of ' + ASOF + '.</p></div>' +
+      '</div>' +
+
+      '<div class="pb-view" data-pane="henrik"' + (state.view === 'henrik' ? '' : ' hidden') + '>' +
+      holderBlock() +
+      '</div>';
 
     /* ---------- events ---------- */
     host.querySelectorAll('.pb-chips button,.pb-marks button,.pb-act,tr[data-lev],tr.pb-perow').forEach(function (el) {
@@ -1403,6 +1603,7 @@
         else if (d.sizepct) state.sizePct = Number(d.sizepct);
         else if (d.size) state.size = Number(d.size);
         else if ('reset' in d) { state.lev = state.days = state.sizePct = null; }
+        else if (d.pts) setPts(Number(d.pts));
         /* not else-if: a posture card carries both, and setting one without the other would
            land the reader on a pair that was never the one the card measured. */
         else { if (d.lev) state.lev = Number(d.lev); if (d.days) state.days = Number(d.days); }
@@ -1413,6 +1614,44 @@
     if (fi) fi.addEventListener('change', function () {
       var v = Number(fi.value);
       if (isFinite(v) && v > 0) { state.fdv = v * 1e9; state.lev = state.days = state.sizePct = null; save(); render(); }
+    });
+    var hp = host.querySelector('[data-pts-input]');
+    if (hp) hp.addEventListener('change', function () {
+      var v = Number(hp.value);
+      if (isFinite(v) && v >= 0) { setPts(v); save(); render(); }
+    });
+    var hc = host.querySelector('[data-cost-input]');
+    if (hc) hc.addEventListener('change', function () {
+      var v = Number(hc.value);
+      if (isFinite(v) && v >= 0) { state.cost = v; save(); render(); }
+    });
+    host.querySelectorAll('tr[data-hkfdv]').forEach(function (tr) {
+      tr.addEventListener('click', function () {
+        state.fdv = Number(tr.dataset.hkfdv);
+        state.lev = state.days = state.sizePct = null;
+        save(); render();
+      });
+    });
+    host.querySelectorAll('[data-go-tab]').forEach(function (el) {
+      el.addEventListener('click', function () {
+        if (typeof showTab === 'function') try { showTab(el.dataset.goTab); } catch (_) {}
+        setTimeout(function () {
+          var a = document.getElementById(el.dataset.goAnchor);
+          if (a) a.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 80);
+      });
+    });
+    host.querySelectorAll('[data-view]').forEach(function (el) {
+      el.addEventListener('click', function () {
+        var v = el.dataset.view;
+        if (v === state.view) return;
+        var fromLine = !el.closest('.pb-switch');
+        state.view = v; save(); render();
+        if (fromLine) {
+          var sw = host.querySelector('.pb-switch');
+          if (sw) sw.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
     });
     var si = host.querySelector('[data-size-input]');
     if (si) si.addEventListener('change', function () {
@@ -1689,6 +1928,38 @@
     '.pb-peband{display:inline-block;padding:2px 7px;border:1px solid var(--line);',
     'color:var(--text);font:800 10px var(--mono);letter-spacing:.3px;white-space:nowrap}',
     '.pb-pecav{margin-top:2px}',
+    /* ---------- the holder's side ---------- */
+    '.pb-verdict p.hk-line{margin-top:10px;font:700 11px var(--mono);letter-spacing:.3px}',
+    '.hk-line button{padding:0;border:0;background:none;color:#8f80d9;font:inherit;letter-spacing:inherit;cursor:pointer}.hk-line button:hover{text-decoration:underline}',
+    '.pb-view[hidden]{display:none!important}',
+    '.pb-switch{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:0 0 22px}',
+    '.pb-sw{display:grid;grid-template-columns:44px minmax(0,1fr);gap:3px 14px;align-items:center;padding:15px 18px;border:1px solid var(--line);border-radius:6px;background:var(--panel);color:var(--text);text-align:left;font:inherit;cursor:pointer;transition:border-color .15s}',
+    '.pb-sw img{grid-row:1/5;align-self:start;width:44px;height:44px;border-radius:50%;border:1px solid var(--line);object-fit:cover}',
+    '.pb-sw-n{color:var(--dim)!important;font:800 9px var(--mono);letter-spacing:1.2px;text-transform:uppercase}',
+    '.pb-sw>b{color:var(--text);font:800 17px/1.25 var(--sans);letter-spacing:-.2px}',
+    '.pb-sw>small{color:var(--muted)!important;font:11.5px/1.5 var(--sans)}',
+    '.pb-sw>em{margin-top:5px;color:var(--muted)!important;font:700 10.5px var(--mono);font-style:normal}',
+    '.pb-sw:hover{border-color:var(--muted)}',
+    '.pb-sw.on{border-color:var(--v2-accent,#4c9af8);box-shadow:inset 0 3px 0 var(--v2-accent,#4c9af8);background:color-mix(in srgb,var(--v2-accent,#4c9af8) 6%,var(--panel))}',
+    '.pb-sw.on[data-view=henrik]{border-color:#8f80d9;box-shadow:inset 0 3px 0 #8f80d9;background:color-mix(in srgb,#8f80d9 7%,var(--panel))}',
+    '.pb-sw.on>em{color:var(--text)!important}',
+    /* the shell styles any [role=tab].on as a filled pill; these cards keep their own look */
+    '.pb-switch>.pb-sw.on{background:color-mix(in srgb,var(--v2-accent,#4c9af8) 8%,var(--panel))!important;color:var(--text)!important}',
+    '.pb-switch>.pb-sw.on[data-view=henrik]{background:color-mix(in srgb,#8f80d9 9%,var(--panel))!important}',
+    '.pb-sw:focus-visible{outline:2px solid var(--v2-accent,#4c9af8);outline-offset:3px}',
+    '@media(max-width:600px){.pb-switch{gap:8px}.pb-sw{grid-template-columns:minmax(0,1fr);padding:12px}.pb-sw img{display:none}.pb-sw>small{display:none}.pb-sw>b{font-size:15px}}',
+    '.hk{margin:0 0 8px}',
+    '.hk-head{margin-bottom:18px}',
+    '.hk-why{display:block;margin-top:5px;color:var(--dim)!important;font-size:11px}',
+    '.hk-table td.pb-n small{display:block;margin:3px 0 0}',
+    '.hk-vs td{text-align:left}.hk-vs td.pb-quote{min-width:180px}',
+    '.hk-sell{grid-template-columns:minmax(0,1fr)!important}.hk-sell .pb-readout{grid-template-columns:repeat(3,minmax(0,1fr))!important}',
+    '@media(max-width:860px){.hk-sell .pb-readout{grid-template-columns:minmax(0,1fr)!important}}',
+    '.hk-rank{display:flex;align-items:center;justify-content:space-between;gap:16px;margin:6px 0 26px;padding:16px 18px;border:1px solid var(--line);border-left:3px solid #8f80d9;background:color-mix(in srgb,#8f80d9 5%,var(--panel));flex-wrap:wrap}',
+    '.hk-rank>div{flex:1;min-width:220px}.hk-rank b{display:block;margin:7px 0 4px;color:var(--text);font:800 17px/1.35 var(--sans);letter-spacing:-.2px}.hk-rank small{color:var(--muted)!important;font-size:11.5px;line-height:1.6}',
+    '.hk-rank button{padding:9px 14px;border:1px solid var(--v2-accent,#4c9af8);border-radius:4px;background:transparent;color:var(--v2-accent,#4c9af8);font:800 11px var(--mono);cursor:pointer;white-space:nowrap}.hk-rank button:hover{background:var(--v2-accent,#4c9af8);color:#04101d}',
+    '.hk-mon{border-left-color:var(--v2-accent,#4c9af8);background:var(--panel)}',
+    '@media(max-width:600px){.hk-rank button{white-space:normal}}',
     '.pb-readout{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin:2px 0 14px}',
     '.pb-ro{padding:13px 15px;border:1px solid var(--line);background:var(--panel);min-width:0}',
     '.pb-ro>span{display:block;color:var(--muted)!important;font:800 9px var(--mono);letter-spacing:.8px;text-transform:uppercase}',
@@ -1957,7 +2228,7 @@
       if (typeof SECTION_COPY !== 'undefined') SECTION_COPY.plan = {
         eyebrow: 'Execution',
         title: 'Post-TGE Playbook',
-        description: 'The written post-TGE plan turned into sizes, durations and leverage, and run against what HYPE and Lighter actually did after listing.',
+        description: 'Two written plans on one FDV needle: a buyer’s post-TGE entry, run against what HYPE and Lighter did after listing, and a holder’s listing-day sell ladder with your points placed on the distribution.',
         chip: 'the plan'
       };
     } catch (_) {}
@@ -1971,6 +2242,13 @@
     if (location.hash === '#plan' && typeof showTab === 'function') {
       try { showTab('plan', { push: false }); } catch (_) {}
     }
+    /* whales-panels.js loads after this file and publishes the points distribution the
+       holder block reads; DOMContentLoaded fires once every deferred script has run. */
+    if (!window.__VDIST) document.addEventListener('DOMContentLoaded', function () { if (window.__VDIST) render(); });
+    /* the Whales tab edits the same points value */
+    document.addEventListener('var:points', function (e) {
+      if (e.detail !== state.pts) { state.pts = e.detail; save(); render(); }
+    });
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
