@@ -6,7 +6,7 @@
 
   // Product descriptions follow the official About Pro documentation.
   var DOCS = 'https://docs.variational.io/pro/about-pro';
-  var SCREENS = ['Title', 'The market', 'The shift', 'Trade flow', 'Settlement'];
+  var SCREENS = ['Overview', 'Market context', 'Workflow comparison', 'Execution workflow', 'Risk & controls'];
 
   function slide(n, eyebrow, title, lead, content, foot) {
     return '<article class="vps-scr" data-scr="' + n + '" hidden aria-labelledby="vps-title-' + n + '">' +
@@ -15,42 +15,45 @@
       '<div class="vps-body">' + content + '</div><footer class="vps-foot"><span>' + foot + '</span><b>0' + n + ' / 04</b></footer></article>';
   }
   function screens() {
-    return slide(1, 'THE MARKET', 'Built for a different<br><em>scale of trading.</em>',
+    return slide(1, 'THE MARKET', 'Institutional markets.<br><em>Configurable derivatives.</em>',
       'OTC derivatives for advanced and institutional traders.',
       '<div class="vps-market"><span class="vps-market-word">OTC</span><div><span class="vps-mini">THE ARENA</span><h4>Beyond standard<br>exchange products.</h4><p>Configurable derivatives.<br>Negotiated terms. Block trades.</p></div></div>' +
       '<div class="vps-audience"><span>Advanced traders</span><span>Institutional desks</span><span>Market makers</span></div>',
       'A market built around the trade you need.') +
-    slide(2, 'THE SHIFT', 'Same trade.<br><em>A simpler path.</em>',
+    slide(2, 'THE SHIFT', 'OTC execution.<br><em>A consolidated workflow.</em>',
       'An altcoin option, from the first request to ongoing margin management.',
       '<div class="vps-lifecycle"><div class="vps-lifecycle-head"><span>THE TRADE LIFECYCLE</span><div><span>MANUAL OTC EXAMPLE</span><strong>12 <small>steps</small></strong></div><div class="is-pro"><span>WITH VARIATIONAL PRO</span><strong>6 <small>steps</small></strong></div></div>' +
       '<div class="vps-lifecycle-row"><div class="vps-phase"><span>01</span><h4>Request</h4></div><div class="vps-before"><h4>Find a desk. Start a chat.</h4><p>Arrange onboarding and legal agreements, then describe the structure over Telegram.</p><span class="vps-step-ref">EXAMPLE STEPS 1–4</span></div><div class="vps-after"><span class="vps-benefit">ONE REQUEST</span><h4>Define the trade in an RFQ.</h4><p>Specify the structure in Pro. Request quotes from the market or selected makers.</p><span class="vps-step-ref">EXAMPLE STEPS 1–2</span></div></div>' +
       '<div class="vps-lifecycle-row"><div class="vps-phase"><span>02</span><h4>Compare</h4></div><div class="vps-before"><h4>Negotiate with one desk.</h4><p>Wait for pricing, debate terms, then exchange confirmations for legal and operations review.</p><span class="vps-step-ref">EXAMPLE STEPS 5–8</span></div><div class="vps-after"><span class="vps-benefit">COMPETING QUOTES</span><h4>Choose the offer that fits.</h4><p>Compare maker quotes by price, margin requirements and counterparty.</p><span class="vps-step-ref">EXAMPLE STEPS 3–4</span></div></div>' +
       '<div class="vps-lifecycle-row"><div class="vps-phase"><span>03</span><h4>Settle &amp; manage</h4></div><div class="vps-before"><h4>Send collateral. Check manually.</h4><p>Transfer collateral to the desk and rely on periodic margin checks and manual calls.</p><span class="vps-step-ref">EXAMPLE STEPS 9–12</span></div><div class="vps-after"><span class="vps-benefit">ON-CHAIN SETTLEMENT</span><h4>Both sides fund a settlement pool.</h4><p>After deposits are verified, clearing, margin tracking and liquidations run through the protocol.</p><span class="vps-step-ref">EXAMPLE STEPS 5–6</span></div></div></div>',
       'Illustrative 12-step / 6-step example from the official docs. Not a speed benchmark. Pro is not live yet.') +
-    slide(3, 'TRADE FLOW', 'One request.<br><em>A connected trade lifecycle.</em>',
+    slide(3, 'TRADE FLOW', 'From price discovery<br><em>to on-chain clearing.</em>',
       'You choose the quote. Both sides fund the pool. The protocol manages the cleared trade.',
-      '<ol class="vps-execution" aria-label="Trade execution workflow"><li class="vps-execution-request"><span class="vps-execution-label">01 / REQUEST</span><h4>Define your trade.</h4><div class="vps-request-ticket"><span>YOUR DESK</span><b>One RFQ</b><p>Asset · structure · terms</p></div><p>Send to the market or a selected set of counterparties.</p></li>' +
-      '<li class="vps-execution-quotes"><span class="vps-execution-label">02 / COMPARE &amp; CHOOSE</span><h4>Let makers compete.</h4><ul class="vps-maker-list"><li><span>Market maker A</span><small>Quote received</small></li><li class="is-selected"><span>Market maker B</span><small>Selected ✓</small></li><li><span>Market maker C</span><small>Quote received</small></li></ul><p>You compare price, margin terms and counterparty before accepting.</p></li>' +
-      '<li class="vps-execution-pool"><span class="vps-execution-label">03 / FUND &amp; CLEAR</span><h4>Fund from both sides.</h4><div class="vps-pool-funders"><span>Your desk</span><span>Selected maker</span></div><div class="vps-settlement"><span>↓ &nbsp; BOTH DEPOSIT COLLATERAL &nbsp; ↓</span><b>Settlement pool</b><small>On-chain · bilateral</small></div><p>The trade clears once both deposits are verified.</p></li></ol>' +
-      '<div class="vps-managed"><div><span class="vps-execution-label">04 / AFTER CLEARING</span><h4>The protocol takes over.</h4><p>Ongoing management under the agreed trade terms.</p></div><ul><li><span aria-hidden="true">✓</span> Tracks margin</li><li><span aria-hidden="true">✓</span> Settles funding, if applicable</li><li><span aria-hidden="true">✓</span> Handles liquidations</li></ul></div>',
+      '<ol class="vps-execution" aria-label="Trade execution workflow"><li class="vps-execution-request"><span class="vps-execution-label">01 / REQUEST</span><h4>Specify the trade.</h4><div class="vps-request-ticket"><span>YOUR DESK</span><b>One RFQ</b><p>Asset · structure · terms</p></div><p>Send to the market or a selected set of counterparties.</p></li>' +
+      '<li class="vps-execution-quotes"><span class="vps-execution-label">02 / COMPARE &amp; CHOOSE</span><h4>Evaluate competing quotes.</h4><ul class="vps-maker-list"><li><span>Market maker A</span><small>Quote received</small></li><li class="is-selected"><span>Market maker B</span><small>Selected ✓</small></li><li><span>Market maker C</span><small>Quote received</small></li></ul><p>You compare price, margin terms and counterparty before accepting.</p></li>' +
+      '<li class="vps-execution-pool"><span class="vps-execution-label">03 / FUND &amp; CLEAR</span><h4>Post bilateral collateral.</h4><div class="vps-pool-funders"><span>Your desk</span><span>Selected maker</span></div><div class="vps-settlement"><span>↓ &nbsp; BOTH DEPOSIT COLLATERAL &nbsp; ↓</span><b>Settlement pool</b><small>On-chain · bilateral</small></div><p>The trade clears once both deposits are verified.</p></li></ol>' +
+      '<div class="vps-managed"><div><span class="vps-execution-label">04 / AFTER CLEARING</span><h4>Protocol-managed lifecycle.</h4><p>Ongoing management under the agreed trade terms.</p></div><ul><li><span aria-hidden="true">✓</span> Tracks margin</li><li><span aria-hidden="true">✓</span> Settles funding, if applicable</li><li><span aria-hidden="true">✓</span> Handles liquidations</li></ul></div>',
       'Illustrative maker selection; no live quotes shown. Product design per official docs. Pro is not live yet.') +
-    slide(4, 'SETTLEMENT', 'Terms agreed.<br><em>On-chain collateral.</em>',
-      'Bilateral trades, with settlement pools for each counterparty pair.',
-      '<div class="vps-pool-map"><div class="vps-pool-line"><span>Your desk</span><div><b>Pool A</b><small>Positions + collateral</small></div><span>Maker A</span></div><div class="vps-pool-line"><span>Your desk</span><div><b>Pool B</b><small>Positions + collateral</small></div><span>Maker B</span></div></div>' +
-      '<div class="vps-principles"><div><b>Separate pools</b><p>Assets are not commingled<br>between pools.</p></div><div><b>Custom terms</b><p>Agree on margin and<br>liquidation parameters.</p></div><div><b>Ongoing management</b><p>The protocol monitors<br>and manages the trade.</p></div></div>',
-      'Product design per official documentation. Pro is not live yet.');
+    slide(4, 'RISK & CONTROLS', 'Execution controls.<br><em>Collateral discipline.</em>',
+      'A structured framework for price discovery, trade operations and bilateral collateral.',
+      '<div class="vps-controls"><div class="vps-controls-head"><span>CONTROL AREA</span><span>TRADITIONAL OTC FRICTION</span><span>PROTOCOL DESIGN</span></div>' +
+      '<section class="vps-control-row"><div class="vps-control-name"><span>01 / MARKET STRUCTURE</span><h4>Liquidity access</h4></div><div><span class="vps-control-mobile">OTC FRICTION</span><p>Manual onboarding and fragmented quoting can restrict the set of available counterparties.</p></div><div class="vps-control-design"><span class="vps-control-mobile">PROTOCOL DESIGN</span><h4>Competitive RFQ distribution</h4><p>Request competing quotes from multiple market makers, or restrict requests to selected counterparties.</p></div></section>' +
+      '<section class="vps-control-row"><div class="vps-control-name"><span>02 / OPERATIONS</span><h4>Lifecycle management</h4></div><div><span class="vps-control-mobile">OTC FRICTION</span><p>Manual collateral checks, funding settlements and margin calls create operational dependencies.</p></div><div class="vps-control-design"><span class="vps-control-mobile">PROTOCOL DESIGN</span><h4>Rules-based trade administration</h4><p>Following clearing, the protocol tracks margin, settles applicable funding and handles liquidations.</p></div></section>' +
+      '<section class="vps-control-row"><div class="vps-control-name"><span>03 / COLLATERAL</span><h4>Counterparty exposure</h4></div><div><span class="vps-control-mobile">OTC FRICTION</span><p>Collateral transferred directly to a dealer can introduce credit exposure and asymmetric margin arrangements.</p></div><div class="vps-control-design"><span class="vps-control-mobile">PROTOCOL DESIGN</span><h4>Bilateral settlement pools</h4><p>Both parties deposit collateral on-chain. Assets are segregated by pool, with agreed margin and liquidation parameters.</p></div></section></div>' +
+      '<aside class="vps-risk-note"><span>RISK CONSIDERATIONS</span><p>These controls do not eliminate risk. Smart-contract, market, liquidity and counterparty risks remain; outcomes depend on collateral adequacy and the agreed trade parameters.</p></aside>',
+      'Design overview based on official Pro documentation. Pro is not live yet.');
   }
 
   function navBar() {
     return '<div class="vp-coming vps-nav">' +
       '<button type="button" class="vps-btn" data-vps="prev" aria-label="Previous screen">◀</button>' +
-      '<span class="vp-coming-label" data-vps-label>COMING SOON</span>' +
+      '<span class="vp-coming-label" data-vps-label>PRODUCT OVERVIEW</span>' +
       '<span class="vps-dots">' + SCREENS.map(function (n, i) {
         return '<button type="button" data-vps-go="' + i + '" aria-label="' + n + '"' + (i ? '' : ' class="on"') + '></button>';
       }).join('') + '</span>' +
       '<a class="vps-src" href="' + DOCS + '" target="_blank" rel="noopener noreferrer">docs ↗</a>' +
       '<span class="vp-coming-index" data-vps-index>01 / 05</span>' +
-      '<button type="button" class="vps-btn vps-start" data-vps="next" aria-label="Next screen">PRESS START ▶</button></div>';
+      '<button type="button" class="vps-btn vps-start" data-vps="next" aria-label="Next screen">EXPLORE PRO →</button></div>';
   }
 
   function wireScreens(section) {
@@ -62,9 +65,9 @@
       cur = (i + scrs.length) % scrs.length;
       scrs.forEach(function (el, k) { el.hidden = k !== cur; });
       section.querySelectorAll('[data-vps-go]').forEach(function (d, k) { d.classList.toggle('on', k === cur); });
-      label.textContent = cur ? SCREENS[cur].toUpperCase() : 'COMING SOON';
+      label.textContent = cur ? SCREENS[cur].toUpperCase() : 'PRODUCT OVERVIEW';
       index.textContent = ('0' + (cur + 1)).slice(-2) + ' / 0' + scrs.length;
-      next.textContent = cur ? (cur === scrs.length - 1 ? 'TITLE ↺' : 'NEXT →') : 'PRESS START ▶';
+      next.textContent = cur ? (cur === scrs.length - 1 ? 'OVERVIEW ↺' : 'NEXT →') : 'EXPLORE PRO →';
       section.querySelectorAll('[data-vps-go]').forEach(function (d, k) { d.setAttribute('aria-current', k === cur ? 'step' : 'false'); });
       section.scrollIntoView({ block: 'start', behavior: 'instant' });
     }
@@ -111,6 +114,10 @@ body.v2-dashboard .vps-body h4{font:600 22px/1.3 var(--sans,Arial,sans-serif)!im
 .vps-src{color:#6695d2!important;font:9px var(--mono);letter-spacing:1px;text-decoration:none}.vps-nav .vp-coming-index{margin-left:auto}
 @media(max-width:1000px){.vps-scr{padding:30px;gap:28px}.vps-flow-steps{grid-template-columns:1fr 1fr}.vps-flow-steps li:nth-child(3){border-left:0}.vps-flow-steps li:nth-child(n+3){border-top:1px solid #2a4261}.vps-market{gap:24px}.vps-market>div{padding-left:24px}}
 @media(max-width:600px){.vps-scr{padding:25px 20px;min-height:630px;gap:28px}.vps-heading>span{font-size:7px;letter-spacing:1px}.vps-heading i{margin:0 5px}body.v2-dashboard .vps-heading h3{font-size:32px!important;margin-top:22px!important}.vps-heading>p{font-size:12px!important}.vps-market{grid-template-columns:1fr;gap:18px}.vps-market-word{font-size:110px}.vps-market>div{padding:18px 0 0;border-left:0;border-top:1px solid #2e4666}.vps-audience{gap:8px}.vps-audience span{font-size:9px;padding:9px 12px}.vps-compare{grid-template-columns:1fr;gap:12px}.vps-comparison{padding:20px}.vps-count{font-size:66px;margin:18px 0}.vps-flow-steps{grid-template-columns:1fr}.vps-flow-steps li+li{border-left:0;border-top:1px solid #2a4261}.vps-flow-steps li{padding:20px}body.v2-dashboard .vps-flow-steps h4{margin-top:14px!important}.vps-protocol{align-items:flex-start;flex-direction:column;gap:10px}.vps-pool-line{gap:12px;grid-template-columns:1fr 1.4fr 1fr}.vps-pool-line>span{font-size:10px;padding:18px 4px}.vps-pool-line>div{padding:16px 4px}.vps-pool-line>div:before,.vps-pool-line>div:after{width:13px}.vps-pool-line b{font-size:11px}.vps-pool-line small{display:none}.vps-principles{grid-template-columns:1fr;gap:20px}.vps-foot{font-size:8px;gap:14px}.vps-nav{padding:16px!important}.vps-src{display:none}.vps-nav .vp-coming-label{font-size:8px}.vps-press{font-size:16px;padding:16px 20px}}
+
+/* Institutional presentation: restrained typography and explicit control descriptions. */
+body.v2-dashboard .vps-heading h3{font-size:clamp(30px,3.2vw,46px)!important;line-height:1.12!important;letter-spacing:-.035em!important}.vps-heading h3 em{color:#a4bfdf}.vps-scr{background:#0b111c;border-color:#334052}.vps-body{justify-content:flex-start}.vps-heading>span{color:#9caec5}.vps-controls{border:1px solid #354358;background:#0d1623}.vps-controls-head,.vps-control-row{display:grid;grid-template-columns:minmax(0,.75fr) minmax(0,1fr) minmax(0,1.25fr)}.vps-controls-head{background:#131f30}.vps-controls-head>span{padding:17px 22px;font:9px/1.6 var(--mono);letter-spacing:1px;color:#b4c3d7}.vps-controls-head>span+span{border-left:1px solid #354358}.vps-control-row{border-top:1px solid #354358}.vps-control-row>div{padding:26px 22px;min-width:0}.vps-control-row>div+div{border-left:1px solid #354358}.vps-control-name>span{font:8px/1.6 var(--mono);letter-spacing:.7px;color:#9fb4ce}body.v2-dashboard .vps-control-name h4{font-size:18px!important;line-height:1.4!important;margin:12px 0 0!important}body.v2-dashboard .vps-control-design h4{font-size:16px!important;line-height:1.45!important;margin:0 0 10px!important;color:#dbe7f6!important}.vps-control-row p{font-size:13px!important;line-height:1.75!important;color:#b0bfd2!important}.vps-control-design{background:#132033}.vps-control-mobile{display:none}.vps-risk-note{display:grid;grid-template-columns:160px 1fr;gap:24px;padding:20px 22px;border-left:2px solid #8297b1;background:#101a28}.vps-risk-note>span{font:9px/1.7 var(--mono);letter-spacing:1px;color:#b6c5d8}.vps-risk-note>p{font-size:12px!important;line-height:1.7!important;color:#b5c2d4!important}.vps-scr[data-scr="4"]{gap:28px}.vps-request-ticket,.vps-maker-list .is-selected{background:#16253a;border-color:#6687b0}.vps-execution-label{color:#b2c4dc}.vps-settlement,.vps-managed{background:#132328;border-color:#5f7e85}.vps-settlement>b,.vps-managed li{color:#dcebed}.vps-settlement>span,.vps-managed .vps-execution-label,.vps-managed li>span{color:#a7c8cc}body.v2-dashboard .vps-managed h4{color:#dcebed!important}.vps-btn{letter-spacing:.5px}.vps-foot{color:#94a6bd}.vps-execution>li>p,.vps-heading>p{color:#b3c0d2!important}
+@media(max-width:760px){.vps-controls-head{display:none}.vps-control-row{grid-template-columns:1fr}.vps-control-row>div{padding:20px}.vps-control-row>div+div{border-left:0;border-top:1px solid #2b394b}.vps-control-name{background:#131f30}.vps-control-mobile{display:block;font:8px/1.6 var(--mono);letter-spacing:1px;color:#9fb4ce;margin-bottom:12px}.vps-risk-note{grid-template-columns:1fr;gap:12px;padding:20px}.vp-caption p{white-space:normal;text-align:center}.vp-caption>span{display:none}}
 `;
   function injectVpsStyle() {
     if (document.getElementById('vps-style')) return;
@@ -136,11 +143,11 @@ body.v2-dashboard .vps-body h4{font:600 22px/1.3 var(--sans,Arial,sans-serif)!im
     section.className = 'tsec tg-hide';
     section.setAttribute('data-tg', TAB);
     section.innerHTML = '<div class="vp-reveal vp-title-screen">' +
-      '<div class="vp-topline"><span>VARIATIONAL</span><span>THE NEXT CHAPTER</span></div>' +
+      '<div class="vp-topline"><span>VARIATIONAL</span><span>INSTITUTIONAL OTC DERIVATIVES</span></div>' +
       '<div class="vp-atmosphere" aria-hidden="true"><div class="vp-orbit"></div><div class="vp-horizon"></div></div>' +
       '<div class="vp-identity"><div class="vp-brand"><span class="vp-mark"><svg viewBox="320 450 1360 960" aria-hidden="true"><defs><filter id="vp-mark-color" color-interpolation-filters="sRGB"><feColorMatrix type="matrix" values="0 0 0 0 .298 0 0 0 0 .608 0 0 0 0 .973 0 0 2 0 -.3"/></filter></defs><image href="variational-logo.png" width="2000" height="2000" filter="url(#vp-mark-color)"/></svg></span><span>Variational</span></div>' +
-      '<h2 class="vp-pro">PRO</h2><div class="vp-caption"><span></span><p>A bigger arena awaits.</p><span></span></div><button class="vps-press" type="button" data-vps="next">PRESS START <span>▶</span></button></div>' +
-      '<div class="vp-bottom"><span class="vp-status"><i></i> COMING SOON</span><p>Something bigger is on the horizon.</p><span class="vp-edition">A NEW ERA / PRO</span></div></div>' + screens() + navBar();
+      '<h2 class="vp-pro">PRO</h2><div class="vp-caption"><span></span><p>Configurable execution. On-chain settlement.</p><span></span></div><button class="vps-press" type="button" data-vps="next">EXPLORE PRO <span>→</span></button></div>' +
+      '<div class="vp-bottom"><span class="vp-status"><i></i> COMING SOON</span><p>Infrastructure for advanced derivatives trading.</p><span class="vp-edition">PRODUCT OVERVIEW</span></div></div>' + screens() + navBar();
     main.appendChild(section);
     wireScreens(section);
 
