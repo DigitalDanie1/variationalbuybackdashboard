@@ -5,175 +5,193 @@
   var TITLE = 'Variational Pro';
   var MUSIC_VIDEO = 'SFHW_Tl5P24';
 
-  /* ---------- what Pro is, as pictures ----------
-     Built from Variational's own "About Pro" docs, paraphrased. The core of it is one
-     comparison — the same altcoin option trade booked the way desks do it today and the
-     way Pro does it — so the steps are kept side by side and tagged by what each one costs:
-     a chat thread, legal work, a manual money movement, or risk left with one side. */
+  /* ---------- what Pro is, inside the title screen ----------
+     The explainer lives in the game frame itself: the title is screen 0 and four more
+     screens follow, stepped with the bar at the bottom (◀ ▶, dots, or the arrow keys).
+     No intro copy: each screen is one picture with the fewest words that carry it.
+     Built from Variational's "About Pro" docs, paraphrased. The frame is always dark, so
+     colours here are fixed rather than theme tokens. */
   var DOCS = 'https://docs.variational.io/pro/about-pro';
-  var TAGS = { chat: 'Chat', legal: 'Legal', money: 'Money', manual: 'Manual', risk: 'Risk', auto: 'Automatic' };
+  var TAGS = { chat: 'Chat', legal: 'Legal', money: 'Money', manual: 'Manual', risk: 'Risk', auto: 'Auto' };
   var OLD = [
     ['Fund wants an altcoin option', ''],
-    ['Deribit doesn’t list it, so they DM a desk on Telegram', 'chat'],
-    ['ISDA + KYC first; other desks said no or never replied', 'legal'],
-    ['One desk left: describe the structure in the chat', 'chat'],
-    ['The desk prices it, often in a spreadsheet', 'manual'],
+    ['Deribit doesn’t list it → DM a desk on Telegram', 'chat'],
+    ['ISDA + KYC first; other desks say no', 'legal'],
+    ['One desk left: describe the structure in chat', 'chat'],
+    ['Desk prices it in a spreadsheet', 'manual'],
     ['Quote and terms come back', 'chat'],
     ['Haggle on price and terms', 'chat'],
-    ['Email trade confirm, reviewed by legal and ops', 'legal'],
+    ['Email confirm → legal + ops review', 'legal'],
     ['Test transfer to the desk', 'money'],
     ['Send collateral straight to the desk', 'risk'],
     ['Trade cleared', ''],
-    ['Margin checked “every so often”; calls by Telegram; the desk never posts back', 'risk']
+    ['Margin checked “every so often”; desk never posts back', 'risk']
   ];
   var PRO = [
     ['Fund wants an altcoin option', ''],
-    ['Build an RFQ in the Pro UI or over the API', 'auto'],
-    ['Every market maker sees it and quotes — or only the ones you pick', 'auto'],
-    ['Compare quotes: price, margin terms, counterparty', ''],
-    ['Accept one; both sides deposit into an on-chain settlement pool', 'auto'],
-    ['Deposits verified → cleared. Margin, funding and liquidations run themselves', 'auto']
+    ['Build an RFQ — UI or API', 'auto'],
+    ['Every market maker sees it and quotes', 'auto'],
+    ['Compare price, margin terms, counterparty', ''],
+    ['Accept → both deposit into an on-chain pool', 'auto'],
+    ['Cleared. Margin, funding, liquidations run themselves', 'auto']
   ];
+  var SCREENS = ['Title', 'The same trade', 'One RFQ', 'Bosses beaten', 'Power-ups'];
 
-  function lane(steps, cls, title, sub, foot) {
-    return '<div class="vpx-lane ' + cls + '"><header><b>' + title + '</b><span>' + sub + '</span>' +
-      '<strong>' + steps.length + '<small>steps</small></strong></header><ol>' +
+  function lane(steps, cls, title, foot) {
+    return '<div class="vps-lane ' + cls + '"><div class="vps-lane-h"><b>' + title + '</b>' +
+      '<strong>' + steps.length + '<small>steps</small></strong></div><ol>' +
       steps.map(function (s, i) {
         return '<li' + (s[1] ? ' class="t-' + s[1] + '"' : '') + '><i>' + (i + 1) + '</i><p>' + s[0] + '</p>' +
           (s[1] ? '<em>' + TAGS[s[1]] + '</em>' : '') + '</li>';
-      }).join('') + '</ol><footer>' + foot + '</footer></div>';
+      }).join('') + '</ol><div class="vps-lane-f">' + foot + '</div></div>';
   }
 
   /* RFQ → quotes → one accepted → both sides into one pool → the protocol runs the trade */
   function flowSvg() {
     var mm = [['Market maker A', '$412'], ['Market maker B', '$405'], ['Market maker C', '$419']];
-    var s = '<svg class="vpx-flow" viewBox="0 0 960 360" role="img" aria-label="A fund sends one RFQ, three market makers quote, the fund accepts market maker B, both deposit into an on-chain settlement pool, and the protocol tracks margin, settles funding and liquidates">' +
-      '<defs><marker id="vpx-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="vpx-arh"/></marker></defs>';
-    /* fund, level with the accepted quote */
-    s += '<rect x="10" y="115" width="170" height="80" rx="8" class="vpx-node taker"/>' +
-      '<text x="95" y="149" class="vpx-t">Hedge fund</text><text x="95" y="171" class="vpx-s">sends one RFQ</text>';
+    var s = '<svg class="vps-flow" viewBox="0 0 960 360" role="img" aria-label="A fund sends one RFQ, three market makers quote, the fund accepts market maker B, both deposit into an on-chain settlement pool, and the protocol tracks margin, settles funding and liquidates">' +
+      '<defs><marker id="vps-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#8da7cb"/></marker></defs>';
+    s += '<rect x="10" y="115" width="170" height="80" rx="8" class="n taker"/>' +
+      '<text x="95" y="149" class="t">Hedge fund</text><text x="95" y="171" class="s">sends one RFQ</text>';
     mm.forEach(function (m, i) {
       var y = 20 + i * 100, on = i === 1;
-      s += '<path d="M180 155 C 230 155, 230 ' + (y + 35) + ', 285 ' + (y + 35) + '" class="vpx-edge" marker-end="url(#vpx-ar)"/>' +
-        '<rect x="290" y="' + y + '" width="190" height="70" rx="8" class="vpx-node mm' + (on ? ' on' : '') + '"/>' +
-        '<text x="385" y="' + (y + 30) + '" class="vpx-t">' + m[0] + '</text>' +
-        '<text x="385" y="' + (y + 52) + '" class="vpx-s">quotes ' + m[1] + (on ? ' · accepted' : '') + '</text>';
+      s += '<path d="M180 155 C 230 155, 230 ' + (y + 35) + ', 285 ' + (y + 35) + '" class="e" marker-end="url(#vps-ar)"/>' +
+        '<rect x="290" y="' + y + '" width="190" height="70" rx="8" class="n mm' + (on ? ' on' : '') + '"/>' +
+        '<text x="385" y="' + (y + 30) + '" class="t">' + m[0] + '</text>' +
+        '<text x="385" y="' + (y + 52) + '" class="s' + (on ? ' hi' : '') + '">quotes ' + m[1] + (on ? ' · accepted' : '') + '</text>';
     });
-    /* both sides into the pool: the fund's leg runs under every quote box */
-    s += '<path d="M480 155 L 585 155" class="vpx-edge on" marker-end="url(#vpx-ar)"/>' +
-      '<path d="M95 195 C 95 350, 675 350, 675 214" class="vpx-edge on" marker-end="url(#vpx-ar)"/>' +
-      '<text x="385" y="346" class="vpx-s">both deposit collateral into the pool</text>' +
-      '<rect x="590" y="100" width="170" height="110" rx="10" class="vpx-node pool"/>' +
-      '<text x="675" y="140" class="vpx-t">Settlement pool</text><text x="675" y="162" class="vpx-s">on-chain escrow</text>' +
-      '<text x="675" y="182" class="vpx-s">fund ↔ MM B only</text>';
-    /* what the protocol then runs by itself */
+    s += '<path d="M480 155 L 585 155" class="e on" marker-end="url(#vps-ar)"/>' +
+      '<path d="M95 195 C 95 350, 675 350, 675 214" class="e on" marker-end="url(#vps-ar)"/>' +
+      '<text x="385" y="346" class="s">both deposit collateral into the pool</text>' +
+      '<rect x="590" y="100" width="170" height="110" rx="10" class="n pool"/>' +
+      '<text x="675" y="140" class="t">Settlement pool</text><text x="675" y="162" class="s">on-chain escrow</text>' +
+      '<text x="675" y="182" class="s">fund ↔ MM B only</text>';
     ['Tracks margin', 'Settles funding', 'Auto-liquidates'].forEach(function (t, i) {
       var y = 60 + i * 70;
-      s += '<path d="M760 155 C 790 155, 790 ' + (y + 25) + ', 815 ' + (y + 25) + '" class="vpx-edge auto" marker-end="url(#vpx-ar)"/>' +
-        '<rect x="820" y="' + y + '" width="135" height="50" rx="8" class="vpx-node auto"/>' +
-        '<text x="887" y="' + (y + 30) + '" class="vpx-s strong">' + t + '</text>';
+      s += '<path d="M760 155 C 790 155, 790 ' + (y + 25) + ', 815 ' + (y + 25) + '" class="e auto" marker-end="url(#vps-ar)"/>' +
+        '<rect x="820" y="' + y + '" width="135" height="50" rx="8" class="n auto"/>' +
+        '<text x="887" y="' + (y + 30) + '" class="s strong">' + t + '</text>';
     });
     return s + '</svg>';
   }
 
-  function explainer() {
-    var problems = [
-      ['Few players', 'Onboarding, KYC and manual quoting keep most market makers and funds out.', 'One RFQ reaches every market maker on Pro at once, so quotes compete.'],
-      ['Human error', 'Margin checks, collateral moves and liquidations are done by hand.', 'The protocol tracks margin, funding and liquidations itself.'],
-      ['Counterparty risk', 'Collateral sits with the desk, checked rarely and one-way — the assumption that failed with FTX.', 'Both sides post into an on-chain pool with set rules, isolated per counterparty pair.']
-    ].map(function (p) {
-      return '<article class="vpx-prob"><b>' + p[0] + '</b><p class="was"><span>Today</span>' + p[1] + '</p><p class="now"><span>On Pro</span>' + p[2] + '</p></article>';
+  function screens() {
+    var bosses = [
+      ['Few players', 'KYC and manual quoting keep most desks and funds out', 'One RFQ reaches every market maker at once'],
+      ['Human error', 'Margin, collateral and liquidations done by hand', 'The protocol runs all three'],
+      ['Counterparty risk', 'Collateral sits with the desk — the FTX lesson', 'Both sides post on-chain, isolated per pair']
+    ].map(function (b, i) {
+      return '<div class="vps-boss"><span class="vps-hp"><i></i></span><b>BOSS ' + (i + 1) + ' · ' + b[0] + '</b>' +
+        '<p class="was">' + b[1] + '</p><p class="ko">K.O. → ' + b[2] + '</p></div>';
     }).join('');
-
-    /* two pairs, two pools: positions and collateral never mix between them */
-    var pools = '<svg class="vpx-pools" viewBox="0 0 300 120" aria-hidden="true">' +
-      [['Fund', 'MM A', 10], ['Fund', 'MM B', 66]].map(function (r) {
-        return '<rect x="6" y="' + r[2] + '" width="70" height="40" rx="6" class="vpx-node taker"/><text x="41" y="' + (r[2] + 25) + '" class="vpx-s">' + r[0] + '</text>' +
-          '<rect x="112" y="' + r[2] + '" width="76" height="40" rx="6" class="vpx-node pool"/><text x="150" y="' + (r[2] + 25) + '" class="vpx-s">pool</text>' +
-          '<rect x="224" y="' + r[2] + '" width="70" height="40" rx="6" class="vpx-node mm"/><text x="259" y="' + (r[2] + 25) + '" class="vpx-s">' + r[1] + '</text>' +
-          '<line x1="76" y1="' + (r[2] + 20) + '" x2="112" y2="' + (r[2] + 20) + '" class="vpx-edge on"/><line x1="188" y1="' + (r[2] + 20) + '" x2="224" y2="' + (r[2] + 20) + '" class="vpx-edge on"/>';
+    var pools = '<svg class="vps-pools" viewBox="0 0 300 110" aria-hidden="true">' +
+      [['Fund', 'MM A', 6], ['Fund', 'MM B', 62]].map(function (r) {
+        return '<rect x="4" y="' + r[2] + '" width="70" height="40" rx="6" class="n taker"/><text x="39" y="' + (r[2] + 25) + '" class="s">' + r[0] + '</text>' +
+          '<rect x="112" y="' + r[2] + '" width="76" height="40" rx="6" class="n pool"/><text x="150" y="' + (r[2] + 25) + '" class="s">pool</text>' +
+          '<rect x="226" y="' + r[2] + '" width="70" height="40" rx="6" class="n mm"/><text x="261" y="' + (r[2] + 25) + '" class="s">' + r[1] + '</text>' +
+          '<line x1="74" y1="' + (r[2] + 20) + '" x2="112" y2="' + (r[2] + 20) + '" class="e on"/><line x1="188" y1="' + (r[2] + 20) + '" x2="226" y2="' + (r[2] + 20) + '" class="e on"/>';
       }).join('') + '</svg>';
-
-    var features = [
-      ['RFQ-based', 'Ask for a market or structure; liquidity providers answer with quotes and you take the best. You can also answer other people’s RFQs.', ''],
-      ['Bilateral', 'Every trade is peer-to-peer and booked in a settlement pool between exactly two parties. Nothing is shared between pools, so one counterparty’s problem stays in its pool.', pools],
-      ['Fully customizable', 'Terms are agreed inside the quote: whitelist who may quote you, set margin per pool, choose auto-liquidation and a liquidation penalty.', '']
-    ].map(function (f) {
-      return '<article class="vpx-feat"><b>' + f[0] + '</b><p>' + f[1] + '</p>' + f[2] + '</article>';
+    var powers = [
+      ['★', 'RFQ', 'Ask for any structure; makers compete with quotes. Answer others’ RFQs too.', ''],
+      ['◆', 'Bilateral', 'Peer-to-peer, one settlement pool per pair. Nothing mixes between pools.', pools],
+      ['✚', 'Custom terms', 'Whitelist who quotes you, margin per pool, auto-liquidation and penalty.', '']
+    ].map(function (p) {
+      return '<div class="vps-power"><span>' + p[0] + '</span><b>' + p[1] + '</b><p>' + p[2] + '</p>' + p[3] + '</div>';
     }).join('');
-
-    return '<div class="vpx">' +
-      '<div class="cmp-heading"><span class="cmp-eyebrow">WHAT IS VARIATIONAL PRO</span>' +
-      '<h2>An OTC derivatives desk, rebuilt on-chain</h2>' +
-      '<p>Pro is the institutional side of Variational: request quotes on options, non-linear structures and block trades on almost any token, take the best one, and let the protocol handle clearing and settlement on-chain.</p></div>' +
-      '<div class="vpx-facts">' +
-        '<div><span>For</span><b>Advanced &amp; institutional traders</b></div>' +
-        '<div><span>Trades</span><b>OTC derivatives on any token: options, custom structures, blocks</b></div>' +
-        '<div><span>How</span><b>RFQ → competing quotes → on-chain settlement pool</b></div>' +
-      '</div>' +
-
-      '<div class="bw-head"><b>The Same Trade, Two Ways</b><span><i>a fund booking an altcoin option today, and on Pro</i></span></div>' +
-      '<div class="vpx-lanes">' +
-        lane(OLD, 'old', 'Today', 'Telegram, lawyers, wires', 'One desk’s quote · ops and legal teams · collateral left with the desk') +
-        lane(PRO, 'pro', 'On Variational Pro', 'one screen or one API client', 'Competing quotes · one person or a bot · collateral on-chain, both sides') +
-      '</div>' +
-      '<div class="vpx-key"><span class="t-chat">Chat</span><span class="t-legal">Legal</span><span class="t-manual">Manual</span><span class="t-money">Money</span><span class="t-risk">Risk</span><span class="t-auto">Automatic</span></div>' +
-
-      '<div class="bw-head"><b>How A Pro Trade Moves</b><span><i>from one RFQ to a trade the protocol runs by itself</i></span></div>' +
-      '<div class="vpx-flowwrap">' + flowSvg() + '</div>' +
-
-      '<div class="bw-head"><b>What It Removes</b><span><i>the three costs of booking OTC by hand</i></span></div>' +
-      '<div class="vpx-probs">' + problems + '</div>' +
-
-      '<div class="bw-head"><b>How It Works</b><span><i>the three properties every Pro trade has</i></span></div>' +
-      '<div class="vpx-feats">' + features + '</div>' +
-
-      '<div class="tp-note"><b>Why it exists.</b> A large share of crypto derivatives volume trades OTC, and most of it is still booked by hand over chat. Venues like Deribit and tools like Paradigm cover basic options on the majors; anything more custom, or on an altcoin, falls back to the manual route. Source: <a href="' + DOCS + '" target="_blank" rel="noopener noreferrer">Variational docs · About Pro ↗</a>. Pro is not live yet.</div>' +
-      '</div>';
+    return '<div class="vps-scr" data-scr="1" hidden><div class="vps-head"><span>STAGE 1</span><b>The same altcoin option trade</b></div>' +
+        '<div class="vps-lanes">' + lane(OLD, 'old', 'Today', '1 desk · lawyers · wires · your collateral at their desk') +
+        '<div class="vps-vs">VS</div>' + lane(PRO, 'pro', 'On Pro', 'every desk quotes · 1 person or a bot · collateral on-chain') + '</div></div>' +
+      '<div class="vps-scr" data-scr="2" hidden><div class="vps-head"><span>STAGE 2</span><b>One RFQ, then the protocol takes over</b></div>' +
+        '<div class="vps-flowwrap">' + flowSvg() + '</div></div>' +
+      '<div class="vps-scr" data-scr="3" hidden><div class="vps-head"><span>STAGE 3</span><b>What it knocks out</b></div>' +
+        '<div class="vps-grid3">' + bosses + '</div></div>' +
+      '<div class="vps-scr" data-scr="4" hidden><div class="vps-head"><span>STAGE 4</span><b>What every Pro trade gets</b></div>' +
+        '<div class="vps-grid3">' + powers + '</div></div>';
   }
 
-  var VPX_CSS =
-    '.vpx{max-width:1180px;margin:40px auto 34px}.vpx .tp-note a{color:var(--v2-accent,#4c9af8)}' +
-    '.vpx-facts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:0 0 30px}' +
-    '.vpx-facts>div{padding:14px 16px;border:1px solid var(--line);background:var(--panel)}' +
-    '.vpx-facts span{display:block;color:var(--muted);font:800 9px var(--mono);letter-spacing:1px;text-transform:uppercase}.vpx-facts b{display:block;margin-top:7px;color:var(--text);font:700 14px/1.45 var(--sans)}' +
-    '.vpx-lanes{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:14px;margin:0 0 10px;align-items:start}' +
-    '.vpx-lane{border:1px solid var(--line);background:var(--panel)}.vpx-lane.pro{border-color:var(--v2-accent,#4c9af8)}' +
-    '.vpx-lane header{display:grid;grid-template-columns:1fr auto;gap:2px 12px;padding:16px 18px;border-bottom:1px solid var(--line)}' +
-    '.vpx-lane header b{color:var(--text);font:800 17px var(--sans)}.vpx-lane header span{grid-row:2;color:var(--muted);font:11px var(--mono)}' +
-    '.vpx-lane header strong{grid-row:1/3;grid-column:2;align-self:center;color:#e2546f;font:800 34px/1 var(--mono);text-align:right}.vpx-lane.pro header strong{color:var(--v2-accent,#4c9af8)}' +
-    '.vpx-lane header strong small{display:block;margin-top:4px;color:var(--muted);font:700 9px var(--mono);letter-spacing:1px;text-transform:uppercase}' +
-    '.vpx-lane ol{list-style:none;margin:0;padding:8px 0}.vpx-lane li{display:grid;grid-template-columns:26px minmax(0,1fr) auto;gap:10px;align-items:center;padding:7px 18px}' +
-    '.vpx-lane li i{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:1px solid var(--line);color:var(--muted);font:800 10px var(--mono);font-style:normal}' +
-    '.vpx-lane li p{margin:0;color:var(--text);font-size:12.5px;line-height:1.45}' +
-    '.vpx-lane li em,.vpx-key span{padding:2px 7px;border-radius:3px;font:800 8.5px var(--mono);font-style:normal;letter-spacing:.6px;text-transform:uppercase;white-space:nowrap;border:1px solid currentColor}' +
-    '.t-chat em,.vpx-key .t-chat{color:#5aa9e6}.t-legal em,.vpx-key .t-legal{color:#b08cf0}.t-manual em,.vpx-key .t-manual{color:#d99a2b}.t-money em,.vpx-key .t-money{color:#8a9bb0}.t-risk em,.vpx-key .t-risk{color:#e2546f}.t-auto em,.vpx-key .t-auto{color:#2fb37e}' +
-    '.vpx-lane li.t-risk i{border-color:#e2546f;color:#e2546f}.vpx-lane.pro li i{border-color:var(--v2-accent,#4c9af8);color:var(--v2-accent,#4c9af8)}' +
-    '.vpx-lane footer{padding:12px 18px;border-top:1px solid var(--line);color:var(--muted);font:11px/1.5 var(--mono)}.vpx-lane.pro footer{color:var(--text)}' +
-    '.vpx-key{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 30px}' +
-    '.vpx-flowwrap{padding:18px;border:1px solid var(--line);background:var(--panel);margin:0 0 30px;overflow-x:auto}.vpx-flow{display:block;width:100%;min-width:640px;height:auto}' +
-    '.vpx-node{fill:var(--panel2,var(--panel));stroke:var(--line);stroke-width:1.5}.vpx-node.taker{stroke:#8a9bb0}.vpx-node.mm.on{stroke:var(--v2-accent,#4c9af8);stroke-width:2.5}' +
-    '.vpx-node.pool{stroke:#2fb37e;stroke-width:2.5;fill:color-mix(in srgb,#2fb37e 10%,var(--panel))}.vpx-node.auto{stroke:#2fb37e;stroke-dasharray:4 3}' +
-    '.vpx-t{fill:var(--text);font:800 15px var(--sans);text-anchor:middle}.vpx-s{fill:var(--muted);font:600 11.5px var(--mono);text-anchor:middle}.vpx-s.strong{fill:var(--text);font-weight:800}' +
-    '.vpx-edge{fill:none;stroke:var(--muted);stroke-width:1.5;opacity:.6}.vpx-edge.on{stroke:var(--v2-accent,#4c9af8);opacity:1;stroke-width:2}.vpx-edge.auto{stroke:#2fb37e;opacity:.9}.vpx-arh{fill:var(--muted)}' +
-    '.vpx-probs,.vpx-feats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:0 0 30px}' +
-    '.vpx-prob,.vpx-feat{padding:16px 18px;border:1px solid var(--line);background:var(--panel);min-width:0}' +
-    '.vpx-prob>b,.vpx-feat>b{display:block;margin:0 0 10px;color:var(--text);font:800 15px var(--sans)}' +
-    '.vpx-prob p{margin:0;font-size:12.5px;line-height:1.55}.vpx-prob p span{display:block;margin-bottom:3px;font:800 9px var(--mono);letter-spacing:1px;text-transform:uppercase}' +
-    '.vpx-prob p.was{color:var(--muted);padding-bottom:10px;border-bottom:1px dashed var(--line);margin-bottom:10px}.vpx-prob p.was span{color:#e2546f}.vpx-prob p.now{color:var(--text)}.vpx-prob p.now span{color:#2fb37e}' +
-    '.vpx-feat p{margin:0;color:var(--muted);font-size:12.5px;line-height:1.6}.vpx-pools{display:block;width:100%;max-width:300px;margin-top:14px}' +
-    '@media(max-width:900px){.vpx-lanes,.vpx-probs,.vpx-feats,.vpx-facts{grid-template-columns:minmax(0,1fr)}}' +
-    '@media(max-width:520px){.vpx-lane li{grid-template-columns:24px minmax(0,1fr);padding:7px 14px}.vpx-lane li em{grid-column:2;justify-self:start}.vpx-flowwrap{padding:10px}}';
-  function injectVpxStyle() {
-    if (document.getElementById('vpx-style')) return;
+  function navBar() {
+    return '<div class="vp-coming vps-nav">' +
+      '<button type="button" class="vps-btn" data-vps="prev" aria-label="Previous screen">◀</button>' +
+      '<span class="vp-coming-label" data-vps-label>COMING SOON</span>' +
+      '<span class="vps-dots">' + SCREENS.map(function (n, i) {
+        return '<button type="button" data-vps-go="' + i + '" aria-label="' + n + '"' + (i ? '' : ' class="on"') + '></button>';
+      }).join('') + '</span>' +
+      '<a class="vps-src" href="' + DOCS + '" target="_blank" rel="noopener noreferrer">docs ↗</a>' +
+      '<span class="vp-coming-index" data-vps-index>01 / 05</span>' +
+      '<button type="button" class="vps-btn vps-start" data-vps="next" aria-label="Next screen">PRESS START ▶</button></div>';
+  }
+
+  function wireScreens(section) {
+    var cur = 0;
+    var scrs = [section.querySelector('.vp-title-screen')].concat([].slice.call(section.querySelectorAll('.vps-scr')));
+    var label = section.querySelector('[data-vps-label]'), index = section.querySelector('[data-vps-index]');
+    var next = section.querySelector('.vps-start');
+    function go(i) {
+      cur = (i + scrs.length) % scrs.length;
+      scrs.forEach(function (el, k) { el.hidden = k !== cur; });
+      section.querySelectorAll('[data-vps-go]').forEach(function (d, k) { d.classList.toggle('on', k === cur); });
+      label.textContent = cur ? SCREENS[cur].toUpperCase() : 'COMING SOON';
+      index.textContent = ('0' + (cur + 1)).slice(-2) + ' / 0' + scrs.length;
+      next.textContent = cur ? (cur === scrs.length - 1 ? 'TITLE ↺' : 'NEXT ▶') : 'PRESS START ▶';
+    }
+    section.addEventListener('click', function (e) {
+      var b = e.target.closest && e.target.closest('[data-vps],[data-vps-go]');
+      if (!b) return;
+      if (b.hasAttribute('data-vps-go')) go(+b.getAttribute('data-vps-go'));
+      else go(cur + (b.getAttribute('data-vps') === 'next' ? 1 : -1));
+    });
+    document.addEventListener('keydown', function (e) {
+      if (section.classList.contains('tg-hide') || /INPUT|TEXTAREA|SELECT/.test((e.target && e.target.tagName) || '')) return;
+      if (e.key === 'ArrowRight') go(cur + 1);
+      else if (e.key === 'ArrowLeft') go(cur - 1);
+    });
+  }
+
+  var VPS_CSS =
+    '.vp-title-screen[hidden],.vps-scr[hidden]{display:none!important}' +
+    '.vps-scr{position:relative;isolation:isolate;display:flex;flex-direction:column;gap:18px;min-height:660px;min-height:max(660px,calc(100svh - 245px));padding:26px 34px 30px;background:radial-gradient(ellipse at 90% 65%,#224677 0,transparent 58%),linear-gradient(135deg,#1b2032 30%,#101d34 100%);color:#fff;overflow:hidden}' +
+    '.vps-scr:after{content:"";position:absolute;inset:0;z-index:-1;opacity:.1;background-image:linear-gradient(#8bacda 1px,transparent 1px),linear-gradient(90deg,#8bacda 1px,transparent 1px);background-size:64px 64px}' +
+    '.vps-head span{display:block;color:#83b7ff;font:800 10px var(--mono);letter-spacing:4px}.vps-head b{display:block;margin-top:6px;font:900 clamp(22px,2.8vw,34px)/1.05 var(--sans,Arial,sans-serif);letter-spacing:-.04em;text-transform:uppercase}' +
+    '.vps-lanes{display:grid;grid-template-columns:minmax(0,1.15fr) auto minmax(0,1fr);gap:14px;align-items:start}' +
+    '.vps-vs{align-self:center;color:#68a8ff;font:900 26px var(--sans,Arial,sans-serif);text-shadow:0 0 24px #4c9af8aa}' +
+    '.vps-lane{border:1px solid #344767;background:#0a1220cc}.vps-lane.pro{border-color:#4c9af8;box-shadow:0 0 40px #4c9af822}' +
+    '.vps-lane-h{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid #344767}.vps-lane-h b{font:800 16px var(--sans,Arial,sans-serif)}' +
+    '.vps-lane-h strong{color:#ff5d7a;font:900 30px/1 var(--mono);text-align:right}.vps-lane.pro .vps-lane-h strong{color:#68a8ff}.vps-lane-h small{display:block;color:#8da7cb;font:700 8px var(--mono);letter-spacing:1px;text-transform:uppercase}' +
+    '.vps-lane ol{list-style:none;margin:0;padding:6px 0}.vps-lane li{display:grid;grid-template-columns:22px minmax(0,1fr) auto;gap:9px;align-items:center;padding:4px 14px}' +
+    '.vps-lane li i{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:1px solid #4a5f82;color:#8da7cb;font:800 9px var(--mono);font-style:normal}' +
+    '.vps-lane li p{margin:0;color:#dbe6f7!important;font:12px/1.35 var(--sans,Arial,sans-serif)!important}' +
+    '.vps-lane li em{padding:1px 6px;border-radius:3px;border:1px solid currentColor;font:800 8px var(--mono);font-style:normal;letter-spacing:.5px;text-transform:uppercase}' +
+    '.vps-lane .t-chat em{color:#5aa9e6}.vps-lane .t-legal em{color:#b08cf0}.vps-lane .t-manual em{color:#e0a43a}.vps-lane .t-money em{color:#9fb1c8}.vps-lane .t-risk em{color:#ff5d7a}.vps-lane .t-auto em{color:#3fd69a}' +
+    '.vps-lane li.t-risk i{border-color:#ff5d7a;color:#ff5d7a}.vps-lane.pro li i{border-color:#4c9af8;color:#68a8ff}' +
+    '.vps-lane-f{padding:9px 16px;border-top:1px solid #344767;color:#8da7cb;font:10px/1.5 var(--mono)}.vps-lane.pro .vps-lane-f{color:#dbe6f7}' +
+    '.vps-flowwrap{flex:1;display:flex;align-items:center;overflow-x:auto}.vps-flow{display:block;width:100%;min-width:640px;height:auto}' +
+    '.vps-flow .n,.vps-pools .n{fill:#0a1220;stroke:#4a5f82;stroke-width:1.5}.vps-flow .n.taker,.vps-pools .n.taker{stroke:#9fb1c8}.vps-flow .n.mm.on{stroke:#4c9af8;stroke-width:2.5;filter:drop-shadow(0 0 10px #4c9af877)}' +
+    '.vps-flow .n.pool,.vps-pools .n.pool{stroke:#3fd69a;stroke-width:2.5;fill:#0f2a26}.vps-flow .n.auto{stroke:#3fd69a;stroke-dasharray:4 3}' +
+    '.vps-flow .t{fill:#fff;font:800 15px var(--sans,Arial,sans-serif);text-anchor:middle}.vps-flow .s,.vps-pools .s{fill:#8da7cb;font:600 11.5px var(--mono);text-anchor:middle}.vps-flow .s.hi{fill:#68a8ff}.vps-flow .s.strong{fill:#fff;font-weight:800}' +
+    '.vps-flow .e,.vps-pools .e{fill:none;stroke:#8da7cb;stroke-width:1.5;opacity:.6}.vps-flow .e.on,.vps-pools .e.on{stroke:#4c9af8;opacity:1;stroke-width:2}.vps-flow .e.auto{stroke:#3fd69a;opacity:.9}' +
+    '.vps-grid3{flex:1;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;align-content:center}' +
+    '.vps-boss,.vps-power{padding:18px;border:1px solid #344767;background:#0a1220cc;min-width:0}' +
+    '.vps-hp{display:block;height:8px;margin:0 0 14px;border:1px solid #ff5d7a;background:#2a1220}.vps-hp i{display:block;width:0;height:100%;background:#ff5d7a}' +
+    '.vps-boss b,.vps-power b{display:block;margin:0 0 12px;font:800 14px var(--mono);letter-spacing:.5px;text-transform:uppercase}' +
+    '.vps-boss p{margin:0;font:12.5px/1.5 var(--sans,Arial,sans-serif)!important}.vps-boss p.was{color:#8da7cb!important;text-decoration:line-through;text-decoration-color:#ff5d7a99;margin-bottom:12px}.vps-boss p.ko{color:#3fd69a!important;font-weight:700!important}' +
+    '.vps-power span{display:inline-flex;align-items:center;justify-content:center;width:42px;height:42px;margin-bottom:12px;border-radius:10px;background:#4c9af8;color:#081326;font:900 20px var(--sans,Arial,sans-serif);box-shadow:0 0 24px #4c9af866}' +
+    '.vps-power p{margin:0;color:#dbe6f7!important;font:12.5px/1.55 var(--sans,Arial,sans-serif)!important}.vps-pools{display:block;width:100%;max-width:300px;margin-top:14px}' +
+    '.vps-nav{gap:12px 16px}.vps-btn{padding:8px 12px;border:1px solid #5d83b5;border-radius:2px;background:#1c304d;color:#e2edff;font:800 11px var(--mono);cursor:pointer;letter-spacing:1px}.vps-btn:hover{border-color:#acd0ff}' +
+    '.vps-start{background:#4c9af8;border-color:#4c9af8;color:#081326;animation:vpsblink 1.4s steps(2) infinite}.vps-start:hover{animation:none}@keyframes vpsblink{50%{opacity:.55}}' +
+    '.vps-dots{display:flex;gap:7px}.vps-dots button{width:10px;height:10px;padding:0;border:1px solid #6695d2;background:transparent;cursor:pointer}.vps-dots button.on{background:#4c9af8;border-color:#4c9af8;box-shadow:0 0 10px #4c9af8}' +
+    '.vps-src{color:#6695d2!important;font:9px var(--mono);letter-spacing:1px;text-decoration:none}.vps-nav .vp-coming-index{margin-left:auto}' +
+    '@media(max-width:900px){.vps-lanes{grid-template-columns:minmax(0,1fr)}.vps-vs{justify-self:center}.vps-grid3{grid-template-columns:minmax(0,1fr)}.vps-scr{padding:20px 18px 24px}}' +
+    '@media(max-width:600px){.vps-nav{padding:14px 16px!important}.vps-src{display:none}.vps-lane li{grid-template-columns:20px minmax(0,1fr)}.vps-lane li em{grid-column:2;justify-self:start}}';
+  function injectVpsStyle() {
+    if (document.getElementById('vps-style')) return;
     var st = document.createElement('style');
-    st.id = 'vpx-style';
-    st.textContent = VPX_CSS;
+    st.id = 'vps-style';
+    st.textContent = VPS_CSS;
     document.head.appendChild(st);
   }
 
   function boot() {
-    injectVpxStyle();
+    injectVpsStyle();
     var main = document.getElementById('main');
     var tabs = document.getElementById('tabs');
     if (!main || !tabs || document.getElementById('tab-' + TAB)) return;
@@ -194,13 +212,14 @@
       '<div class="vp-hero-copy"><p class="vp-kicker">A NEW HORIZON</p><h2>BIGGER MARKETS.<br><em>BIGGER AMBITION.</em></h2>' +
       '<p class="vp-intro">For traders looking beyond the next trade.<br>The next chapter of Variational is on the horizon.</p></div>' +
       '<div class="vp-horizon" aria-hidden="true"><span class="vp-giant-pro">PRO</span><img class="vp-landscape" src="assets/pro/pro-version-title.svg?v=compact" width="512" height="296" alt=""></div>' +
-      '<div class="vp-coming"><span class="vp-coming-label">COMING SOON</span><span class="vp-coming-note">SOMETHING BIGGER IS TAKING SHAPE.</span><span class="vp-coming-index">01 / A NEW ERA</span></div></div>' +
+      '</div>' + screens() + navBar() +
       '<figcaption>Variational Pro · The next chapter.</figcaption></figure>' +
       '<aside class="vp-sound" aria-label="Title screen soundtrack">' +
       '<p class="vp-sound-status" role="status" aria-live="polite">Press play to start the title theme.</p>' +
       '<div class="vp-sound-player" hidden></div>' +
-      '<a href="https://www.youtube.com/watch?v=' + MUSIC_VIDEO + '" target="_blank" rel="noopener noreferrer">Pokémon Gold &amp; Silver · Title Screen ↗</a></aside></div>' + explainer();
+      '<a href="https://www.youtube.com/watch?v=' + MUSIC_VIDEO + '" target="_blank" rel="noopener noreferrer">Pokémon Gold &amp; Silver · Title Screen ↗</a></aside></div>';
     main.appendChild(section);
+    wireScreens(section);
 
     var soundToggle = section.querySelector('.vp-sound-toggle');
     var soundPlayer = section.querySelector('.vp-sound-player');
