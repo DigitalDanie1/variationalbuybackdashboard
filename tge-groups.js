@@ -19,9 +19,29 @@
    any panel that mounts a rail button after this runs would undo the grouping.
 
    The deploy target runs script-src 'self', so this is an external file, and style-src
-   allows 'unsafe-inline', which is what lets it inject its own <style>. */
+   allows 'unsafe-inline', which is what lets it inject its own <style>.
+
+   ALPHA MODE lives here too, because this is the one file that already touches every rail row
+   and runs after every panel file has mounted its buttons. Two Post-TGE tabs are still being
+   built; for the public they stay in the navigation (the numbering and the roadmap read
+   better with them than without) but are locked, and the owner opens them with a private
+   link. It is a visibility gate on a static site, not access control: the sections are in the
+   page source either way, so nothing confidential belongs in them. */
 (function () {
   'use strict';
+
+  /* Switch for the whole lock. Set to true to open the locked tabs to everyone: every piece of lock
+     UI and the owner's ALPHA badge go away, and nothing else in this file changes. */
+  var ALPHA_PUBLIC = false;
+  /* The tabs that are locked, by tab id. Ids, not positions, so renumbering cannot move the
+     lock onto a different row. */
+  var ALPHA_TABS = ['whales-next'];
+  var ALPHA_FLAG = 'varAlphaOwnerV1';
+  /* SHA-256 of the owner key — never the key itself. ?alpha=<key> is hashed in the browser
+     and compared to this, so the source can be read without being able to open the tabs. */
+  var ALPHA_HASH = '7a708aff652c680746aa3993fb1e83ae9eb6ae32da0395b32b48ca35b7ea6aae';
+  var ALPHA_MSG = 'ALPHA MODE \u2014 I\u2019m still building this. Opening to everyone soon.';
+  var ALPHA_SUB = 'Building now \u00b7 opening soon';
 
   var KEY = 'variationalTgeView';
 
@@ -73,7 +93,27 @@
   function noteTab() {
     var t = (location.hash || '').replace('#', '');
     var g = groupOf(t);
-    if (g) lastTab[g] = t;
+    if (g && !isLocked(t)) lastTab[g] = t;
+  }
+
+  /* ---------- ALPHA MODE state ----------
+     Three states, one question per call site. Public: nothing is special. Locked: the default
+     for every visitor. Owner: the flag is set in this browser, the tabs work, and a small
+     badge stays so the owner can tell the public still sees them locked. */
+  var owner = false;
+  try { owner = localStorage.getItem(ALPHA_FLAG) === '1'; } catch (_) {}
+  function locked() { return !ALPHA_PUBLIC && !owner; }
+  function isLocked(tab) { return locked() && ALPHA_TABS.indexOf(tab) >= 0; }
+  function alphaState(tab) {
+    if (ALPHA_PUBLIC || ALPHA_TABS.indexOf(tab) < 0) return '';
+    return owner ? 'owner' : 'locked';
+  }
+  /* Where a locked deep link lands: the first Post-TGE tab that is open and really exists. */
+  function fallbackTab() {
+    var post = GROUPS.filter(function (x) { return x.k === 'post'; })[0];
+    return (post && post.tabs.filter(function (t) {
+      return !isLocked(t) && document.getElementById('tab-' + t);
+    })[0]) || 'points';
   }
 
   function esc(t) {
@@ -160,7 +200,8 @@
         var sp = b.querySelector('span');
         if (sp) sp.textContent = num;
         var name = b.querySelector('strong') || b.querySelector('b');
-        if (name) b.setAttribute('aria-label', num + ' ' + name.textContent);
+        if (name) b.setAttribute('aria-label', num + ' ' + name.textContent +
+          (alphaState(t) === 'locked' ? ' (alpha mode, locked)' : ''));
       });
     });
   }
@@ -198,9 +239,52 @@
     rail.dataset.tgeView = mode;
   }
 
-  function apply() { RAILS.forEach(function (sel) {
-    document.querySelectorAll(sel).forEach(applyRail);
-  }); }
+  /* ---------- ALPHA row state ----------
+     The row is edited in place, not replaced: it keeps the listeners dashboard.js attached.
+     What this file takes from it (title, sub-line text) is remembered on the element so that
+     unlocking without a reload puts it back exactly as it was. The badge and the lock glyph
+     are CSS pseudo-elements, not DOM text, because app-inline.js reads the <strong> text for
+     the page heading and the translation harvester would pick up a stray string. */
+  function alphaRow(b) {
+    var st = alphaState(b.getAttribute('data-open-tab')), sub = b.querySelector('small');
+    b.classList.toggle('alpha-locked', st === 'locked');
+    b.classList.toggle('alpha-owner', st === 'owner');
+    if (st === 'locked') {
+      b.setAttribute('aria-disabled', 'true');
+      b.setAttribute('tabindex', '-1');
+      b.classList.remove('on');
+      /* the native tooltip would stack on top of ours */
+      if (b.hasAttribute('title')) { b.dataset.alphaTitle = b.getAttribute('title'); b.removeAttribute('title'); }
+      if (!sub) {
+        sub = document.createElement('small');
+        sub.className = 'alpha-sub';
+        b.appendChild(sub);
+      } else if (b.dataset.alphaSmall === undefined) {
+        b.dataset.alphaSmall = sub.textContent;
+      }
+      sub.textContent = ALPHA_SUB;
+    } else {
+      if (b.getAttribute('aria-disabled') === 'true') b.removeAttribute('aria-disabled');
+      if (b.getAttribute('tabindex') === '-1') b.removeAttribute('tabindex');
+      if (b.dataset.alphaTitle !== undefined) { b.setAttribute('title', b.dataset.alphaTitle); delete b.dataset.alphaTitle; }
+      if (sub && sub.classList.contains('alpha-sub')) sub.parentNode.removeChild(sub);
+      else if (sub && b.dataset.alphaSmall !== undefined) sub.textContent = b.dataset.alphaSmall;
+      delete b.dataset.alphaSmall;
+    }
+  }
+
+  function apply() {
+    RAILS.forEach(function (sel) {
+      document.querySelectorAll(sel).forEach(function (rail) {
+        applyRail(rail);
+        ALPHA_TABS.forEach(function (t) {
+          rail.querySelectorAll('[data-open-tab="' + t + '"]').forEach(alphaRow);
+        });
+        renumber(rail);   /* the aria-label carries the lock */
+      });
+    });
+    document.documentElement.classList.toggle('alpha-lock', locked());
+  }
 
   /* Filtering to a group while a tab from the other group is open would leave the reader
      looking at a section the navigation no longer lists, so the first tab of the chosen
@@ -212,8 +296,11 @@
     var cur = (location.hash || '').replace('#', '');
     if (!cur || groupOf(cur) === mode) return;
     var g = GROUPS.filter(function (x) { return x.k === mode; })[0];
-    var want = lastTab[mode] && document.getElementById('tab-' + lastTab[mode]) ? lastTab[mode] : null;
-    var target = want || (g && g.tabs.filter(function (t) { return document.getElementById('tab-' + t); })[0]);
+    var want = lastTab[mode] && !isLocked(lastTab[mode]) && document.getElementById('tab-' + lastTab[mode])
+      ? lastTab[mode] : null;
+    var target = want || (g && g.tabs.filter(function (t) {
+      return !isLocked(t) && document.getElementById('tab-' + t);
+    })[0]);
     if (target && typeof showTab === 'function') { try { showTab(target); } catch (_) {} }
   }
 
@@ -228,9 +315,175 @@
      the Playbook while the nav still lists Pre-TGE. Following the hash instead of overriding
      it keeps the link authoritative and the navigation honest about where the reader is. */
   function followHash() {
+    var cur = (location.hash || '').replace('#', '');
+    if (isLocked(cur)) {
+      /* remembered so an owner key that arrives in the same URL can still open it */
+      pendingTab = cur;
+      leaveLocked(cur);
+    }
     noteTab();
     var g = groupOf((location.hash || '').replace('#', ''));
     if (g && g !== mode) setMode(g, { silent: true });
+  }
+
+  /* ---------- ALPHA MODE behaviour ----------
+     A locked tab has to be unreachable by every route that exists here, not just by the click
+     that is obvious. The routes are: the rail rows (listeners attached by app-inline.js), the
+     #tabs buttons (listener attached by dashboard.js), the arrow keys inside #tabs, a hash
+     in the URL, and any other script calling showTab(). The first three are stopped by
+     capture-phase listeners on document, which run before anything attached to the button
+     itself; the last two by redirecting where the tab would have opened. */
+  var pendingTab = null;      /* a locked tab the reader asked for, kept in case the owner key follows */
+  var toldOnce = false;       /* the deep-link redirect explains itself once, not on every hashchange */
+  var quietRedirect = false;  /* set while an ?alpha= key is being checked, so the owner sees no "locked" toast */
+  var tip = null, tipTimer = 0;
+
+  function tipEl() {
+    if (tip) return tip;
+    tip = document.createElement('div');
+    tip.className = 'alpha-tip';
+    tip.setAttribute('role', 'status');
+    tip.textContent = ALPHA_MSG;
+    document.body.appendChild(tip);
+    return tip;
+  }
+  function hideTip() {
+    clearTimeout(tipTimer);
+    if (tip) tip.classList.remove('show', 'toast');
+  }
+  /* Hover: a tooltip beside the row. Click / redirect: a toast at the bottom of the viewport,
+     because a tap has no hover and a redirect has no row to point at. */
+  function showTip(anchor, asToast) {
+    var t = tipEl();
+    clearTimeout(tipTimer);
+    t.classList.toggle('toast', !!asToast);
+    t.classList.add('show');
+    if (asToast || !anchor) {
+      t.style.left = t.style.top = '';
+      tipTimer = setTimeout(hideTip, 3800);
+      return;
+    }
+    var r = anchor.getBoundingClientRect(), w = t.offsetWidth, h = t.offsetHeight;
+    var left = r.right + 10, top = r.top + r.height / 2 - h / 2;
+    if (left + w > window.innerWidth - 8) {       /* collapsed strip, or no room on the right */
+      left = Math.max(8, Math.min(r.left, window.innerWidth - w - 8));
+      top = r.bottom + 8;
+      if (top + h > window.innerHeight - 8) top = r.top - h - 8;
+    }
+    t.style.left = Math.round(left) + 'px';
+    t.style.top = Math.round(Math.max(8, top)) + 'px';
+  }
+
+  function leaveLocked(from) {
+    var to = fallbackTab();
+    if (typeof showTab === 'function') { try { showTab(to); } catch (_) {} }
+    else location.hash = '#' + to;
+    if (!toldOnce && !quietRedirect) { toldOnce = true; showTip(null, true); }
+  }
+
+  /* Anything else that opens a tab by name — a link inside a panel, a hashchange handler in
+     dashboard.js — goes through showTab(), so a locked name is swapped for the fallback
+     there. Wrapped once; dashboard.js calls it by global name, so this takes effect for it. */
+  function guardShowTab() {
+    if (typeof window.showTab !== 'function' || window.showTab.alphaGuard) return;
+    var open = window.showTab;
+    var guarded = function (name, opts) {
+      if (isLocked(name)) {
+        pendingTab = name;
+        name = fallbackTab();
+        if (!quietRedirect) showTip(null, true);
+      }
+      return open.call(this, name, opts);
+    };
+    guarded.alphaGuard = true;
+    window.showTab = guarded;
+  }
+
+  function lockedTarget(e) {
+    var el = e.target && e.target.closest ? e.target.closest('[data-open-tab],#tabs [data-tab]') : null;
+    if (!el) return null;
+    return isLocked(el.getAttribute('data-open-tab') || el.getAttribute('data-tab')) ? el : null;
+  }
+
+  function guardEvents() {
+    document.addEventListener('click', function (e) {
+      var el = lockedTarget(e);
+      if (!el) return;
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      showTip(el, true);
+    }, true);
+    document.addEventListener('keydown', function (e) {
+      var el, bar, list, i, n;
+      if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
+        el = lockedTarget(e);
+        if (!el) return;
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        showTip(el, true);
+        return;
+      }
+      /* dashboard.js walks #tabs by arrow key over every child, which would step straight
+         onto a locked tab. Same walk, over the open ones only. */
+      if (['ArrowLeft', 'ArrowRight', 'Home', 'End'].indexOf(e.key) < 0 || !locked()) return;
+      bar = document.getElementById('tabs');
+      if (!bar || !e.target.closest || !e.target.closest('#tabs')) return;
+      list = [].slice.call(bar.children).filter(function (b) { return !isLocked(b.dataset.tab); });
+      if (!list.length) return;
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      n = list.length;
+      for (i = 0; i < n && !list[i].classList.contains('on'); i++);
+      i = e.key === 'Home' ? 0 : e.key === 'End' ? n - 1 : e.key === 'ArrowRight' ? (i + 1) % n : (i - 1 + n) % n;
+      list[i].focus();
+      if (typeof showTab === 'function') showTab(list[i].dataset.tab);
+    }, true);
+    /* mouseover / mouseout rather than mouseenter: one delegated pair covers rows that were
+       cloned in by other scripts, with no per-row listeners to attach and lose. */
+    document.addEventListener('mouseover', function (e) {
+      var el = lockedTarget(e);
+      if (el && el.hasAttribute('data-open-tab') && !(tip && tip.classList.contains('toast'))) showTip(el, false);
+    });
+    document.addEventListener('mouseout', function (e) {
+      if (lockedTarget(e) && tip && !tip.classList.contains('toast')) hideTip();
+    });
+  }
+
+  /* ---------- owner unlock ----------
+     ?alpha=<key> opens the tabs in this browser; ?alpha=off closes them again. The key is
+     stripped from the address bar straight away — right or wrong — so it is not left in
+     history, a screenshot or a shared link. */
+  function sha256hex(text) {
+    var c = window.crypto;
+    if (!c || !c.subtle || !window.TextEncoder) return Promise.resolve(null);   /* insecure context: stay locked */
+    return c.subtle.digest('SHA-256', new TextEncoder().encode(text)).then(function (buf) {
+      return [].map.call(new Uint8Array(buf), function (b) { return ('0' + b.toString(16)).slice(-2); }).join('');
+    });
+  }
+  function setOwner(on) {
+    owner = on;
+    try { if (on) localStorage.setItem(ALPHA_FLAG, '1'); else localStorage.removeItem(ALPHA_FLAG); } catch (_) {}
+    hideTip();
+    apply();
+    var cur = (location.hash || '').replace('#', '');
+    if (on && pendingTab && typeof showTab === 'function') { try { showTab(pendingTab); } catch (_) {} }
+    else if (!on && isLocked(cur)) leaveLocked(cur);
+    pendingTab = null;
+  }
+  function checkKey() {
+    var m = /[?&]alpha=([^&#]*)/.exec(location.search);
+    if (!m) return;
+    var val;
+    try { val = decodeURIComponent(m[1]); } catch (_) { val = m[1]; }
+    var rest = location.search.replace(/([?&])alpha=[^&#]*&?/, '$1').replace(/[?&]$/, '');
+    try { history.replaceState(history.state, '', location.pathname + rest + location.hash); } catch (_) {}
+    if (val === 'off') { setOwner(false); return; }
+    quietRedirect = true;
+    sha256hex(val).then(function (h) {
+      quietRedirect = false;
+      if (h === ALPHA_HASH) setOwner(true);
+      else if (pendingTab) { pendingTab = null; showTip(null, true); }
+    }, function () { quietRedirect = false; });
   }
 
   /* #tabs is the real source of tab state; reordering it keeps keyboard order and any saved
@@ -250,6 +503,90 @@
        filter has to say it outright, or setting .hidden changes the property and nothing on
        screen — which is exactly what it did. */
     '[data-open-tab][hidden],.tge-ghead[hidden]{display:none!important}',
+
+    /* ---------- ALPHA MODE ----------
+       While locked the locked sections and their #tabs buttons are removed outright — the
+       rail rows are what stay, so the numbering and the roadmap still read in full. This is a
+       second line behind the click guards, not the first. */
+    ALPHA_TABS.map(function (t) {
+      return 'html.alpha-lock .tsec[data-tg="' + t + '"],html.alpha-lock #tab-' + t;
+    }).join(',') + '{display:none!important}',
+
+    /* The badge and the lock glyph are pseudo-elements on the name, so the name's text, the
+       aria-label and the page heading that reads it stay clean. The glyph is a mask over
+       currentColor, which lets one shape follow dim / hover / light theme. */
+    '.alpha-locked strong::before,.alpha-locked b::before{content:"";display:inline-block;',
+    'width:8px;height:10px;margin-right:5px;vertical-align:-1px;background:currentColor;',
+    '-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 8 10\'%3E',
+    '%3Cpath fill-rule=\'evenodd\' d=\'M1.5 4V3a2.5 2.5 0 0 1 5 0v1H8v6H0V4zm1.2 0h2.6V3a1.3 1.3 0 0 0-2.6 0z\'/%3E%3C/svg%3E") center/contain no-repeat;',
+    'mask:url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 8 10\'%3E',
+    '%3Cpath fill-rule=\'evenodd\' d=\'M1.5 4V3a2.5 2.5 0 0 1 5 0v1H8v6H0V4zm1.2 0h2.6V3a1.3 1.3 0 0 0-2.6 0z\'/%3E%3C/svg%3E") center/contain no-repeat}',
+    '.alpha-locked strong::after,.alpha-locked b::after,.alpha-owner strong::after,.alpha-owner b::after{',
+    'content:"ALPHA MODE";display:inline-block;margin-left:7px;padding:2px 4px 1px;',
+    'border:1px solid rgba(245,185,74,.55);border-radius:2px;background:rgba(245,185,74,.09);',
+    'color:#f5b94a;font:700 7px/1.3 var(--mono);letter-spacing:.7px;text-transform:uppercase;',
+    'vertical-align:1px;white-space:nowrap}',
+    '.alpha-owner strong::after,.alpha-owner b::after{content:"ALPHA"}',
+    'body.theme-light .alpha-locked strong::after,body.theme-light .alpha-locked b::after,',
+    'body.theme-light .alpha-owner strong::after,body.theme-light .alpha-owner b::after{',
+    'color:#8a5a00;border-color:rgba(176,112,0,.6);background:rgba(245,185,74,.2)}',
+
+    /* Dimmed by colour, not opacity: opacity would dim the badge with the name, and the badge
+       is the one part that has to stay readable. Hover and focus are put back to the resting
+       look so the row does not light up like something that will open. */
+    'body button.alpha-locked[data-open-tab]{cursor:not-allowed!important;color:var(--v2-faint,#6b7686)!important;',
+    'background:transparent!important;border-color:transparent!important}',
+    'button.alpha-locked[data-open-tab] strong,button.alpha-locked[data-open-tab] b,',
+    'button.alpha-locked[data-open-tab] span,button.alpha-locked[data-open-tab] small{color:var(--v2-faint,#6b7686)!important}',
+
+    /* Vertical rails give each row a fixed height with !important. A badge that wraps and a
+       locked row's second line both need more than that, so these rows take the height they
+       need; the number and name stay on the first line, the sub-line sits under the name.
+       Only from 1101px up — below that the rails are a strip of chips with no room for a
+       second line, and the sub-line is dropped there. */
+    '@media(min-width:1101px){',
+    /* Here the name becomes a small wrapping flex line so that, in a narrow rail, the badge
+       drops under the name flush left instead of dangling off the end of it with a stray
+       margin. Everywhere else the name stays inline text, which is what lets a long name
+       like Next Farm wrap naturally in the landing list. */
+    '.srv2-rail .alpha-locked>strong,.srv2-global-nav .alpha-locked>strong,',
+    '.srv2-rail .alpha-owner>strong,.srv2-global-nav .alpha-owner>strong{display:flex!important;',
+    'flex-wrap:wrap;align-items:center;column-gap:6px;row-gap:3px}',
+    '.srv2-rail .alpha-locked strong::before,.srv2-global-nav .alpha-locked strong::before{margin-right:0!important}',
+    '.srv2-rail .alpha-locked strong::after,.srv2-global-nav .alpha-locked strong::after,',
+    '.srv2-rail .alpha-owner strong::after,.srv2-global-nav .alpha-owner strong::after{margin-left:0!important}',
+    'body .srv2-rail button.alpha-locked[data-open-tab],body .srv2-global-nav button.alpha-locked[data-open-tab],',
+    'body .srv2-rail button.alpha-owner[data-open-tab],body .srv2-global-nav button.alpha-owner[data-open-tab]{',
+    'height:auto!important;min-height:48px!important;padding-top:7px!important;padding-bottom:7px!important;',
+    'grid-template-rows:auto auto;row-gap:2px}',
+    '.srv2-rail button.alpha-locked>span,.srv2-global-nav button.alpha-locked>span{grid-row:1;grid-column:1}',
+    '.srv2-rail button.alpha-locked>strong,.srv2-global-nav button.alpha-locked>strong{grid-row:1;grid-column:2;',
+    'white-space:normal;line-height:1.5}',
+    '.srv2-rail button.alpha-locked>small,.srv2-global-nav button.alpha-locked>small{grid-row:2;grid-column:2;',
+    'font-size:8.5px!important;line-height:1.3!important;font-family:var(--sans)!important;font-weight:600!important;',
+    'letter-spacing:0!important;white-space:normal}',
+    '}',
+    /* A chip stays on one line. Next Farm carries its own white-space:normal from whales-panels.js,
+       which would otherwise drop the badge onto a second line inside a 38px chip. */
+    '@media(max-width:1100px){.srv2-rail button.alpha-locked>small,.srv2-global-nav button.alpha-locked>small{display:none!important}',
+    '.srv2-rail .alpha-locked>strong,.srv2-global-nav .alpha-locked>strong,',
+    '.srv2-rail .alpha-owner>strong,.srv2-global-nav .alpha-owner>strong{white-space:nowrap!important}}',
+
+    /* Landing list: "OPEN →" would promise something the row cannot do. */
+    '.srv2-workspace-list button.alpha-locked::after{content:"LOCKED"!important;color:var(--v2-faint,#6b7686)!important}',
+    '.srv2-workspace-list button.alpha-locked:hover{padding-left:4px!important}',
+
+    /* Tooltip beside a row on hover; toast at the bottom on click or redirect. */
+    '.alpha-tip{position:fixed;z-index:2147483000;left:0;top:0;max-width:260px;padding:9px 11px;',
+    'border:1px solid var(--v2-line,#2a323d);border-left:2px solid #f5b94a;border-radius:2px;',
+    'background:var(--v2-bg,#0e1116);color:var(--v2-text,#e8edf4);box-shadow:0 8px 28px rgba(0,0,0,.38);',
+    'font:600 10.5px/1.45 var(--mono);letter-spacing:.2px;opacity:0;visibility:hidden;pointer-events:none;',
+    'transition:opacity .15s ease,visibility .15s}',
+    '.alpha-tip.show{opacity:1;visibility:visible}',
+    '.alpha-tip.toast{left:50%!important;top:auto!important;bottom:26px;transform:translateX(-50%);',
+    'width:max-content;max-width:min(380px,calc(100vw - 32px))}',
+    'body.theme-light .alpha-tip{box-shadow:0 8px 24px rgba(20,30,50,.16);border-left-color:#c98a12}',
+    '@media(prefers-reduced-motion:reduce){.alpha-tip{transition:none}}',
 
     /* ---------- the switch ----------
        Two labels on a hairline with a 2px accent rule sliding between them.
@@ -382,6 +719,8 @@
 
   function boot() {
     injectCss();
+    guardShowTab();
+    document.documentElement.classList.toggle('alpha-lock', locked());   /* before first paint of the rails */
     RAILS.forEach(function (sel) {
       document.querySelectorAll(sel).forEach(function (rail) {
         arrange(rail); headings(rail); switcher(rail); renumber(rail);
@@ -392,6 +731,8 @@
     apply();
     reconcileTab();
     window.addEventListener('hashchange', followHash);
+    guardEvents();
+    checkKey();
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
