@@ -760,6 +760,40 @@
   }
 
   var NEXT_TITLE = 'Next Farm by Varriors';
+  /* Perp DEX farms, in the order given. Logos are local (img-src 'self'): official X avatars,
+     RISEx's own site icon since it links no X account. ref: true means the link already
+     carries a referral code; the others link plain until one is supplied. Blurbs are read
+     from each project's own site; HelloTrade has none on record, so it shows none. */
+  var FARMS_PERP = [
+    { k: 'truenorth', name: 'TrueNorth', logo: 'assets/farms/truenorth.jpg', x: 'get_truenorth', ref: true,
+      url: 'https://app.truenorth.xyz/ref/KOREAN',
+      what: 'Agentic brokerage: AI agents scan the market, set up trades and watch the portfolio.' },
+    { k: 'entropy', name: 'Entropy', logo: 'assets/farms/entropy.jpg', x: 'entropyIO', ref: false,
+      url: 'https://entropy.io/leaderboard?filter=7d',
+      what: 'Perps on private-market assets and other hard-to-access markets.' },
+    { k: 'risex', name: 'RISEx', logo: 'assets/farms/risex.png', x: null, ref: true,
+      url: 'https://www.rise.trade/invite/x04cfg1y',
+      what: 'Fully onchain orderbook perps on RISE, with yield on idle collateral.' },
+    { k: 'derpetual', name: 'Derpetual', logo: 'assets/farms/derpetual.jpg', x: 'derpetual', ref: false,
+      url: 'https://www.derpetual.com/',
+      what: 'Abstract futures: markets on measurable quantities beyond traditional assets.' },
+    { k: 'hellotrade', name: 'HelloTrade', logo: 'assets/farms/hellotrade.jpg', x: 'hellotradeapp', ref: false,
+      url: 'https://x.com/hellotradeapp', what: '' }
+  ];
+
+  function farmCard(f) {
+    return '<article class="nf-farm">' +
+      '<a class="nf-farm-id" href="' + esc(f.url) + '" target="_blank" rel="noopener noreferrer">' +
+        '<img src="' + esc(f.logo) + '" alt="' + esc(f.name) + ' logo" width="56" height="56">' +
+        '<b>' + esc(f.name) + '</b></a>' +
+      (f.what ? '<p>' + esc(f.what) + '</p>' : '<p class="nf-farm-none"></p>') +
+      '<div class="nf-farm-links">' +
+        '<a class="nf-farm-go' + (f.ref ? ' ref' : '') + '" href="' + esc(f.url) + '" target="_blank" rel="noopener noreferrer">' +
+          (f.ref ? 'Join with referral ↗' : 'Open ↗') + '</a>' +
+        (f.x ? '<a class="nf-farm-x" href="https://x.com/' + esc(f.x) + '" target="_blank" rel="noopener noreferrer">@' + esc(f.x) + '</a>' : '') +
+      '</div></article>';
+  }
+
 
   function renderNext() {
     var host = document.querySelector('[data-tg="whales-next"]');
@@ -768,7 +802,8 @@
       '<h2>' + NEXT_TITLE + '</h2><p>Farming projects, with Varriors’ picks and reasons to farm.</p></div>' +
       '<div class="nf-categories" aria-label="Upcoming farming projects">' +
       '<section class="nf-category" aria-labelledby="nf-non-perp"><span class="nf-part">PART 01</span><h3 id="nf-non-perp">Non Perp DEX</h3><div class="nf-empty"><h4>Coming soon</h4></div></section>' +
-      '<section class="nf-category" aria-labelledby="nf-perp"><span class="nf-part">PART 02</span><h3 id="nf-perp">Perp DEX</h3><div class="nf-empty"><h4>Coming soon</h4></div></section></div>';
+      '<section class="nf-category" aria-labelledby="nf-perp"><span class="nf-part">PART 02</span><h3 id="nf-perp">Perp DEX</h3>' +
+      '<div class="nf-farms">' + FARMS_PERP.map(farmCard).join('') + '</div></section></div>';
   }
 
   function mountNext() {
@@ -807,7 +842,19 @@
       '[data-open-tab="whales-next"]{height:auto!important;min-height:54px;white-space:normal!important;padding-top:10px!important;padding-bottom:10px!important}' +
       '[data-open-tab="whales-next"] strong,[data-open-tab="whales-next"] b{white-space:normal!important;line-height:1.4!important}' +
       '@media(max-width:1000px){[data-open-tab="whales-next"]{max-width:235px}}' +
-      '@media(max-width:600px){.nf-empty{padding:16px}}';
+      '.nf-farms{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px;margin-top:16px}' +
+      '.nf-farm{display:flex;flex-direction:column;gap:12px;padding:18px;border:1px solid var(--line);background:var(--panel);min-width:0}' +
+      '.nf-farm:hover{border-color:var(--v2-accent,#4c9af8)}' +
+      '.nf-farm-id{display:flex;align-items:center;gap:12px;color:var(--text)!important;text-decoration:none}' +
+      '.nf-farm-id img{flex:0 0 56px;width:56px;height:56px;border-radius:14px;object-fit:cover;border:1px solid var(--line);background:var(--panel2,var(--panel))}' +
+      '.nf-farm-id b{font:800 17px/1.2 var(--sans);letter-spacing:-.2px}' +
+      '.nf-farm p{flex:1;margin:0;color:var(--muted)!important;font-size:12px;line-height:1.55}' +
+      '.nf-farm-links{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}' +
+      '.nf-farm-go{padding:7px 11px;border:1px solid var(--line);border-radius:4px;color:var(--text)!important;font:800 10.5px var(--mono);text-decoration:none}' +
+      '.nf-farm-go.ref{border-color:var(--v2-accent,#4c9af8);color:var(--v2-accent,#4c9af8)!important}' +
+      '.nf-farm-go:hover{background:var(--v2-accent,#4c9af8);border-color:var(--v2-accent,#4c9af8);color:#04101d!important}' +
+      '.nf-farm-x{color:var(--muted)!important;font:700 10.5px var(--mono);text-decoration:none}.nf-farm-x:hover{color:var(--text)!important}' +
+      '@media(max-width:600px){.nf-empty{padding:16px}.nf-farms{grid-template-columns:repeat(2,minmax(0,1fr))}.nf-farm{padding:14px}.nf-farm-id img{flex-basis:44px;width:44px;height:44px;border-radius:11px}}';
     document.head.appendChild(style);
   }
 
