@@ -321,6 +321,14 @@
 
   var RANK_BANDS = [['Top 10',6.1],['11–50',8.7],['51–100',6.0],['101–250',10.6],['251–500',9.2],['501–1,000',10.1],['1,001–2,000',11.1],['2,001–5,000',15.3],['5,001–10,000',10.9],['10,001–25,000',10.0],['25,001–74,000',2.0]];
   var RANK_CUTOFFS = [[2,89111],[5,52500],[10,35200],[50,13900],[100,9340],[150,7250],[500,2570],[1000,1430],[2000,770],[5000,290],[10000,150],[15000,70],[25000,22],[29000,15]];
+  /* The Playbook tab places a reader's own points on this same distribution, so it reads
+     the snapshot from here rather than carrying a second copy that could drift. tops = the
+     last rank in each RANK_BANDS row; 74,000 is the source's own last band edge. */
+  window.__VDIST = {
+    at: distributionAt, bands: RANK_BANDS, cutoffs: RANK_CUTOFFS, basePool: DISTRIBUTION_BASE_POOL,
+    tops: [10, 50, 100, 250, 500, 1000, 2000, 5000, 10000, 25000, 74000], accounts: 74000,
+    source: 'https://x.com/yh_0x/status/2106449057933857025'
+  };
 
   function sellPressureGroups() {
     return [
