@@ -155,13 +155,6 @@
       ['Raised', '$68M', '$60M · Dragonfly, Coinbase Ventures, Bain'],
       ['Holder base', 'paper hands already out', '~110K recipients still to redistribute']
     ],
-    questions: [
-      ['Volume', 'Can volume stay elevated without points?'],
-      ['Open interest', 'Can OI keep growing?'],
-      ['Revenue', 'Can revenue hold up? — his most important metric'],
-      ['Retention', 'Do traders stay once the incentive structure stops or changes?'],
-      ['Product', 'Does PRO deliver, and do arbitrage traders onboard once API is live?']
-    ],
     airdrop: 0.32
   };
   var PTS_CHIPS = [1000, 5000, 10000, 11462, 25000, 50000];
@@ -210,6 +203,12 @@
     Object.keys(saved).forEach(function (k) { if (k in state) state[k] = saved[k]; });
   } catch (_) {}
   if (state.view !== 'henrik') state.view = 'maestro';
+  try { var myPts = Number(localStorage.getItem('varMyPointsV1')); if (myPts > 0) state.pts = myPts; } catch (_) {}
+  function setPts(v) {
+    state.pts = v;
+    if (window.__VRANK) window.__VRANK.set(v);
+    else try { localStorage.setItem('varMyPointsV1', String(v)); } catch (_) {}
+  }
   function save() { try { localStorage.setItem(STORE, JSON.stringify(state)); } catch (_) {} }
 
   /* ---------- formatting ---------- */
@@ -932,67 +931,15 @@
     return { svg: s + '</svg>', sims: sims, n: n };
   }
 
-  /* ---------- the holder's side: where a reader's points sit ----------
-     Rank is read off the Whales tab's Week 42 cutoffs (scaled to this week's projected
-     pool), interpolated log-log between them; cumulative share off its rank bands. Both
-     are projections of a community snapshot, not a leaderboard lookup. */
-  function dist() {
-    var V = window.__VDIST;
-    if (!V) return null;
-    var d = V.at(Date.now());
-    var cut = V.cutoffs.map(function (c) { return [c[0], c[1] * d.scale]; });
-    cut.push([V.accounts, 1]);
-    var c0 = V.cutoffs[0][1], c1 = V.cutoffs[1][1];
-    var cum = [[2, 2 * c0 / V.basePool * 100], [5, (2 * c0 + 3 * c1) / V.basePool * 100]];
-    var run = 0;
-    V.bands.forEach(function (b, i) { run += b[1]; cum.push([V.tops[i], run]); });
-    return { pool: d.pool, asOf: d.asOf, N: V.accounts, cut: cut, cum: cum, source: V.source };
-  }
-  function rankFor(P, D) {
-    var c = D.cut;
-    if (P >= c[0][1]) return 2;
-    if (P <= c[c.length - 1][1]) return D.N;
-    for (var i = 0; i < c.length - 1; i++) {
-      if (P <= c[i][1] && P > c[i + 1][1]) {
-        var t = Math.log(c[i][1] / P) / Math.log(c[i][1] / c[i + 1][1]);
-        return Math.exp(Math.log(c[i][0]) + t * Math.log(c[i + 1][0] / c[i][0]));
-      }
-    }
-    return D.N;
-  }
-  function ptsAtRank(r, D) {
-    var c = D.cut;
-    if (r <= c[0][0]) return c[0][1];
-    for (var i = 0; i < c.length - 1; i++) {
-      if (r >= c[i][0] && r <= c[i + 1][0]) {
-        var t = Math.log(r / c[i][0]) / Math.log(c[i + 1][0] / c[i][0]);
-        return Math.exp(Math.log(c[i][1]) + t * Math.log(c[i + 1][1] / c[i][1]));
-      }
-    }
-    return 1;
-  }
-  function cumAt(r, D) {
-    var a = D.cum;
-    if (r <= a[0][0]) return a[0][1] * r / a[0][0];
-    for (var i = 0; i < a.length - 1; i++) {
-      if (r >= a[i][0] && r <= a[i + 1][0]) {
-        var t = Math.log(r / a[i][0]) / Math.log(a[i + 1][0] / a[i][0]);
-        return a[i][1] + t * (a[i + 1][1] - a[i][1]);
-      }
-    }
-    return 100;
-  }
+  /* ---------- the holder's side ----------
+     Where a reader's points rank is the Whales tab's job (window.__VRANK); this side only
+     needs the pool, for per-point value. */
   function num(v) { return Math.round(v).toLocaleString('en-US'); }
-  function rankStr(r) { return r <= 2 ? '#1–2' : '#' + num(r); }
-  function topPct(r, N) {
-    var v = r / N * 100;
-    return v < 0.01 ? '<0.01%' : v < 1 ? v.toFixed(2) + '%' : v < 10 ? v.toFixed(1) + '%' : v.toFixed(0) + '%';
-  }
   function hkBand(fdv) {
     for (var i = 0; i < HK.bands.length; i++) if (fdv <= HK.bands[i].max) return HK.bands[i];
     return HK.bands[HK.bands.length - 1];
   }
-  function hkPool() { var D = dist(); return D ? D.pool : PE.pool; }
+  function hkPool() { var V = window.__VDIST; return V ? V.at(Date.now()).pool : PE.pool; }
   function perPoint(fdv) { return fdv * HK.airdrop / hkPool(); }
   /* What the band sells, in dollars, on a given allocation. The cost-basis band sells
      exactly the reader's own farming cost, capped at the whole allocation. */
@@ -1005,7 +952,6 @@
   }
 
   function holderBlock() {
-    var D = dist();
     var P = Math.max(0, state.pts || 0);
     var hb = hkBand(state.fdv);
     var ppt = perPoint(state.fdv);
@@ -1019,82 +965,14 @@
         (v === 11462 ? 'Henrik · 11,462' : num(v)) + '</button>';
     }).join('');
 
-    /* ---- where you sit ---- */
+    /* ---- where you sit: one line here, the full breakdown on the Whales tab ---- */
     var standing = '';
-    if (D) {
-      var R = rankFor(P, D), N = D.N;
-      var share = P / D.pool * 100;
-      var above = cumAt(R, D);
-      var median = ptsAtRank(N / 2, D);
-      var steps = [10, 50, 100, 250, 500, 1000, 2000, 5000, 10000, 25000];
-      var nextR = null;
-      for (var si = steps.length - 1; si >= 0; si--) if (steps[si] < R - 0.5) { nextR = steps[si]; break; }
-      var nextNeed = nextR ? Math.max(0, ptsAtRank(nextR, D) - P) : 0;
-
-      var groups = [
-        { k: 'g1', name: 'Top 100',        acc: 100,       pts: cumAt(100, D),                     lo: 1,     hi: 100 },
-        { k: 'g2', name: '101 – 1,000',    acc: 900,       pts: cumAt(1000, D) - cumAt(100, D),     lo: 101,   hi: 1000 },
-        { k: 'g3', name: '1,001 – 10,000', acc: 9000,      pts: cumAt(10000, D) - cumAt(1000, D),   lo: 1001,  hi: 10000 },
-        { k: 'g4', name: '10,001 +',       acc: N - 10000, pts: 100 - cumAt(10000, D),              lo: 10001, hi: N }
-      ];
-      var mine = groups.filter(function (g) { return R >= g.lo - 0.5 && R <= g.hi + 0.5; })[0] || groups[3];
-      var per = function (g) { return g.pts / g.acc; };
-      var bar = function (field) {
-        return groups.map(function (g) {
-          var w = field === 'acc' ? g.acc / N * 100 : g.pts;
-          return '<span class="' + g.k + (g === mine ? ' me' : '') + '" style="width:' + w.toFixed(3) + '%" title="' +
-            esc(g.name) + ' · ' + (field === 'acc' ? topPct(g.acc, N) + ' of accounts' : g.pts.toFixed(1) + '% of points') + '"></span>';
-        }).join('');
-      };
-      var legend = groups.map(function (g) {
-        return '<div class="hk-lg ' + g.k + (g === mine ? ' me' : '') + '"><i></i><b>' + esc(g.name) +
-          (g === mine ? ' <em>you</em>' : '') + '</b><span>' + topPct(g.acc, N) + ' of accounts → <strong>' +
-          g.pts.toFixed(1) + '%</strong> of points</span><small>~' + num(D.pool * g.pts / 100 / g.acc) + ' pts each</small></div>';
-      }).join('');
-
-      var top1k = cumAt(1000, D), top10k = cumAt(10000, D);
-      var mults = [
-        { h: 'Top 100 vs 101–1,000', v: per(groups[0]) / per(groups[1]), s: 'points per account' },
-        { h: 'Top 1,000 vs everyone else', v: (top1k / 1000) / ((100 - top1k) / (N - 1000)), s: num(N - 1000) + ' accounts below' },
-        { h: 'Top 10,000 vs the rest', v: (top10k / 10000) / ((100 - top10k) / (N - 10000)), s: num(N - 10000) + ' accounts below' },
-        { h: 'You vs the median account', v: P / median, s: 'median ≈ ' + num(median) + ' pts (rank ' + num(N / 2) + ')' }
-      ].map(function (m) {
-        return '<div class="pb-ro"><span>' + esc(m.h) + '</span><strong>' +
-          (m.v >= 100 ? num(m.v) : m.v.toFixed(1)) + '×</strong><small>' + esc(m.s) + '</small></div>';
-      }).join('');
-
-      /* the rank ruler is log-scaled: on a linear one the top 1,000 is 1% of the width */
-      var lp = function (r) { return Math.log(Math.max(r, 1)) / Math.log(N) * 100; };
-      var ticks = [1, 10, 100, 1000, 10000, N].map(function (r) {
-        return '<span style="left:' + lp(r).toFixed(2) + '%"><b>' + (r === 1 ? '#1' : r === N ? '#' + num(N) : '#' + num(r)) +
-          '</b><small>' + (r === 1 ? '' : '≥' + num(ptsAtRank(r, D))) + '</small></span>';
-      }).join('');
-
-      standing =
-        '<div class="hk-stand">' +
-        '<div class="hk-hero"><div><span class="pb-eyebrow">Where your points sit</span>' +
-        '<h4>' + num(P) + ' points ≈ rank ' + rankStr(R) + '.<br>Top ' + topPct(R, N) + ' of ~' + num(N) + ' accounts.</h4></div>' +
-        '<b class="hk-big">' + share.toFixed(share < 0.01 ? 4 : 3) + '%<small>of all points</small></b></div>' +
-        '<div class="hk-ruler" aria-label="Estimated rank on a log scale">' +
-        '<div class="hk-track"><i style="left:' + lp(R).toFixed(2) + '%"><em>you · ' + rankStr(R) + '</em></i></div>' +
-        '<div class="hk-ticks">' + ticks + '</div></div>' +
-        '<div class="pb-readout hk-ro">' +
-        '<div class="pb-ro"><span>Estimated rank</span><strong>' + rankStr(R) + '</strong><small>ahead of ~' +
-          (100 - R / N * 100).toFixed(R / N < 0.01 ? 2 : 1) + '% of accounts</small></div>' +
-        '<div class="pb-ro"><span>Accounts at or above you hold</span><strong>' + above.toFixed(1) + '%</strong><small>of all points, ~' +
-          num(Math.max(R, 1)) + ' accounts</small></div>' +
-        '<div class="pb-ro"><span>Next tier</span><strong>' + (nextR ? '+' + num(nextNeed) : '—') + '</strong><small>' +
-          (nextR ? 'points to reach the top ' + num(nextR) : 'already in the top 10') + '</small></div>' +
-        '<div class="pb-ro"><span>Airdrop at ' + usdB(state.fdv) + '</span><strong>' + usdExact(value) + '</strong><small>$' +
-          ppt.toFixed(2) + ' per point · 32% ÷ ' + (D.pool / 1e6).toFixed(2) + 'M pts</small></div>' +
-        '</div>' +
-        '<div class="hk-bars"><div class="hk-brow"><span>Accounts</span><div class="hk-bar">' + bar('acc') + '</div></div>' +
-        '<div class="hk-brow"><span>Points</span><div class="hk-bar">' + bar('pts') + '</div></div></div>' +
-        '<div class="hk-legend">' + legend + '</div>' +
-        '<div class="pb-readout hk-mults">' + mults + '</div>' +
-        '<div class="pb-note">Rank is interpolated between the <a href="' + esc(D.source) + '" target="_blank" rel="noopener noreferrer">yh_0x Week 42</a> cutoffs, scaled to this week’s projected ' +
-          (D.pool / 1e6).toFixed(2) + 'M-point pool (model week ' + D.asOf + ') — the same snapshot the Whales tab uses. It is a projection, not a leaderboard lookup: below rank 29,000 the source gives no cutoffs, so the tail is extrapolated. Henrik’s own read from the same source: the top 1,000 (~1.4% of wallets) hold ~50% of points, the top 10 ~6.3%, the largest single wallet ~1.15% — less top-heavy than HYPE at genesis.</div>' +
-        '</div>';
+    if (window.__VRANK) {
+      var rk = window.__VRANK.at(P);
+      standing = '<div class="hk-rank"><div><span class="pb-eyebrow">Where your points sit</span>' +
+        '<b>' + num(P) + ' points ≈ rank ' + rk.rankStr + ' · top ' + rk.top + ' of ~' + num(rk.N) + ' accounts</b>' +
+        '<small>' + rk.share.toFixed(rk.share < 0.01 ? 4 : 3) + '% of all points. Henrik’s own read: the top 1,000 (~1.4% of wallets) hold ~50%, the top 10 ~6.3%, the largest wallet ~1.15%.</small></div>' +
+        '<button type="button" data-go-tab="whales" data-go-anchor="wh-rank">Full rank breakdown in Whales →</button></div>';
     }
 
     /* ---- the sell ladder ---- */
@@ -1120,11 +998,6 @@
     var vsRows = HK.vsLighter.map(function (r) {
       return '<tr><td class="pb-rng"><b>' + esc(r[0]) + '</b></td><td class="pb-quote">' + esc(r[1]) +
         '</td><td class="pb-quote">' + esc(r[2]) + '</td></tr>';
-    }).join('');
-
-    var qs = HK.questions.map(function (q, i) {
-      return '<li' + (q[0] === 'Revenue' ? ' class="key"' : '') + '><span>' + ('0' + (i + 1)).slice(-2) + '</span><b>' +
-        esc(q[0]) + '</b><p>' + esc(q[1]) + '</p></li>';
     }).join('');
 
     return '<div class="hk" id="holder-playbook">' +
@@ -1170,8 +1043,10 @@
       '<div class="pb-note">At Lighter’s FDV he puts one point at ~$125, and at the ~$3B Lighter could be sold at TGE, ~$80. On this site’s pool those read $' +
       perPoint(4.3e9).toFixed(0) + ' and $' + perPoint(3e9).toFixed(0) + '. His caveat: Lighter’s day-one sellers are already gone; VAR still has to move ~110K recipients — many of them farmers who lost money trading for points — into holders who want the exposure, and that can take months.</div>' +
 
-      '<div class="bw-head"><b>After TGE, the Questions Change</b><span><i>what decides whether to buy back</i></span></div>' +
-      '<ol class="hk-q">' + qs + '</ol>' +
+      '<div class="hk-rank hk-mon"><div><span class="pb-eyebrow">After TGE, the questions change</span>' +
+      '<b>Volume, OI, revenue, retention, product — tracked pre- vs post-TGE</b>' +
+      '<small>His five buy-back questions now run as live numbers on the Monitors tab, so the fundamentals can be read against their pre-TGE baseline rather than asked once.</small></div>' +
+      '<button type="button" data-go-tab="monitors" data-go-anchor="post-tge-stats">Open Post-TGE Stats →</button></div>' +
       '<div class="pb-caveat"><b>His bigger picture</b><p>Hyperliquid stays his highest-conviction bet; Variational is earlier, carries more execution and valuation risk, and offers more asymmetry from a lower starting valuation. SWAPs may be a bridge to fully onchain liquidity rather than the end state. He sees $3–5B FDV as plausible at some point, just not in a straight line. His plan, not advice; as of ' + HK.asOf + '.</p></div>' +
       '</div>';
   }
@@ -1728,7 +1603,7 @@
         else if (d.sizepct) state.sizePct = Number(d.sizepct);
         else if (d.size) state.size = Number(d.size);
         else if ('reset' in d) { state.lev = state.days = state.sizePct = null; }
-        else if (d.pts) state.pts = Number(d.pts);
+        else if (d.pts) setPts(Number(d.pts));
         /* not else-if: a posture card carries both, and setting one without the other would
            land the reader on a pair that was never the one the card measured. */
         else { if (d.lev) state.lev = Number(d.lev); if (d.days) state.days = Number(d.days); }
@@ -1743,7 +1618,7 @@
     var hp = host.querySelector('[data-pts-input]');
     if (hp) hp.addEventListener('change', function () {
       var v = Number(hp.value);
-      if (isFinite(v) && v >= 0) { state.pts = v; save(); render(); }
+      if (isFinite(v) && v >= 0) { setPts(v); save(); render(); }
     });
     var hc = host.querySelector('[data-cost-input]');
     if (hc) hc.addEventListener('change', function () {
@@ -1755,6 +1630,15 @@
         state.fdv = Number(tr.dataset.hkfdv);
         state.lev = state.days = state.sizePct = null;
         save(); render();
+      });
+    });
+    host.querySelectorAll('[data-go-tab]').forEach(function (el) {
+      el.addEventListener('click', function () {
+        if (typeof showTab === 'function') try { showTab(el.dataset.goTab); } catch (_) {}
+        setTimeout(function () {
+          var a = document.getElementById(el.dataset.goAnchor);
+          if (a) a.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 80);
       });
     });
     host.querySelectorAll('[data-view]').forEach(function (el) {
@@ -2066,50 +1950,16 @@
     '@media(max-width:600px){.pb-switch{gap:8px}.pb-sw{grid-template-columns:minmax(0,1fr);padding:12px}.pb-sw img{display:none}.pb-sw>small{display:none}.pb-sw>b{font-size:15px}}',
     '.hk{margin:0 0 8px}',
     '.hk-head{margin-bottom:18px}',
-    '.hk-stand{margin:6px 0 26px;padding:22px;border:1px solid var(--line);border-radius:6px;background:color-mix(in srgb,#8f80d9 5%,var(--panel))}',
-    '.hk-hero{display:flex;justify-content:space-between;align-items:flex-end;gap:18px;margin:0 0 18px}',
-    '.hk-hero h4{margin:10px 0 0;color:var(--text);font:800 clamp(22px,2.8vw,32px)/1.15 var(--sans);letter-spacing:-.8px}',
-    '.hk-big{flex-shrink:0;color:var(--v2-accent,#4c9af8);font:800 36px/1 var(--mono);text-align:right}',
-    '.hk-big small{display:block;margin-top:8px;color:var(--muted);font:11px/1.4 var(--mono)}',
-    '.hk-ruler{margin:34px 0 22px;padding:0 8px}',
-    '.hk-track{position:relative;height:8px;border-radius:4px;background:linear-gradient(90deg,#2866bb,#665db3 40%,#3f8f86 70%,var(--line))}',
-    '.hk-track>i{position:absolute;top:50%;width:16px;height:16px;margin:-8px 0 0 -8px;border-radius:50%;background:var(--text);border:3px solid var(--v2-bg,#0b0f14);box-shadow:0 0 0 2px var(--v2-accent,#4c9af8)}',
-    '.hk-track>i>em{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);white-space:nowrap;padding:3px 7px;border-radius:4px;background:var(--v2-accent,#4c9af8);color:#04101d;font:800 10px var(--mono);font-style:normal}',
-    '.hk-ticks{position:relative;height:30px;margin-top:8px}',
-    '.hk-ticks>span{position:absolute;transform:translateX(-50%);text-align:center;white-space:nowrap}',
-    '.hk-ticks>span:first-child{transform:none}.hk-ticks>span:last-child{transform:translateX(-100%);text-align:right}',
-    '.hk-ticks b{display:block;color:var(--muted);font:800 9.5px var(--mono)}.hk-ticks small{display:block;color:var(--dim);font:9px var(--mono)}',
-    '.hk-ro{grid-template-columns:repeat(4,minmax(0,1fr))!important}',
-    '.hk-bars{display:grid;gap:6px;margin:6px 0 10px}',
-    '.hk-brow{display:grid;grid-template-columns:70px minmax(0,1fr);align-items:center;gap:10px}',
-    '.hk-brow>span{color:var(--muted);font:800 9px var(--mono);letter-spacing:.8px;text-transform:uppercase}',
-    '.hk-bar{display:flex;gap:2px;height:22px}',
-    '.hk-bar>span{min-width:4px;border-radius:3px;opacity:.55}.hk-bar>span.me{opacity:1;box-shadow:0 0 0 2px var(--text)}',
-    '.hk .g1{background:#2866bb}.hk .g2{background:#665db3}.hk .g3{background:#3f8f86}.hk .g4{background:#7b8794}',
-    '.hk-bar>span.g1,.hk-bar>span.g2,.hk-bar>span.g3,.hk-bar>span.g4{display:block}',
-    '.hk-legend{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:12px 0 16px}',
-    '.hk-lg{padding:10px 12px;border:1px solid var(--line);border-radius:4px;background:var(--panel);min-width:0}',
-    '.hk-lg.me{border-color:var(--text)}',
-    '.hk-lg>i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:7px;vertical-align:middle}',
-    '.hk-lg.g1,.hk-lg.g2,.hk-lg.g3,.hk-lg.g4{background:var(--panel)}',
-    '.hk-lg.g1>i{background:#2866bb}.hk-lg.g2>i{background:#665db3}.hk-lg.g3>i{background:#3f8f86}.hk-lg.g4>i{background:#7b8794}',
-    '.hk-lg>b{color:var(--text);font:800 11px var(--mono)}.hk-lg>b em{margin-left:4px;padding:1px 5px;border-radius:3px;background:var(--v2-accent,#4c9af8);color:#04101d;font:800 9px var(--mono);font-style:normal}',
-    '.hk-lg>span{display:block;margin-top:6px;color:var(--muted);font:10.5px/1.5 var(--mono)}.hk-lg strong{color:var(--text)}',
-    '.hk-lg>small{display:block;margin-top:2px;color:var(--dim);font:10px var(--mono)}',
-    '.hk-mults{grid-template-columns:repeat(4,minmax(0,1fr))!important;margin-bottom:14px}',
-    '.hk-mults .pb-ro>strong{color:var(--v2-accent,#4c9af8)}',
-    '.hk-stand .pb-note{margin:0}.hk-stand .pb-note a{color:var(--v2-accent,#4c9af8)!important}',
     '.hk-why{display:block;margin-top:5px;color:var(--dim)!important;font-size:11px}',
     '.hk-table td.pb-n small{display:block;margin:3px 0 0}',
     '.hk-vs td{text-align:left}.hk-vs td.pb-quote{min-width:180px}',
     '.hk-sell{grid-template-columns:minmax(0,1fr)!important}.hk-sell .pb-readout{grid-template-columns:repeat(3,minmax(0,1fr))!important}',
-    '.hk-q{list-style:none;margin:0 0 18px;padding:0;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}',
-    '.hk-q li{padding:13px 14px;border:1px solid var(--line);background:var(--panel);min-width:0}',
-    '.hk-q li.key{border-color:var(--v2-accent,#4c9af8)}',
-    '.hk-q span{color:var(--dim);font:800 9px var(--mono)}.hk-q b{display:block;margin:6px 0 4px;color:var(--text);font:800 13px var(--sans)}',
-    '.hk-q p{margin:0;color:var(--muted)!important;font-size:11.5px;line-height:1.55}',
-    '@media(max-width:860px){.hk-ro,.hk-mults,.hk-legend{grid-template-columns:repeat(2,minmax(0,1fr))!important}.hk-q{grid-template-columns:repeat(2,minmax(0,1fr))}.hk-sell .pb-readout{grid-template-columns:minmax(0,1fr)!important}}',
-    '@media(max-width:600px){.hk-stand{padding:16px}.hk-hero{flex-direction:column;align-items:flex-start}.hk-big{text-align:left;font-size:28px}.hk-q{grid-template-columns:minmax(0,1fr)}.hk-ticks small{display:none}.hk-ticks>span:nth-child(5){display:none}}',
+    '@media(max-width:860px){.hk-sell .pb-readout{grid-template-columns:minmax(0,1fr)!important}}',
+    '.hk-rank{display:flex;align-items:center;justify-content:space-between;gap:16px;margin:6px 0 26px;padding:16px 18px;border:1px solid var(--line);border-left:3px solid #8f80d9;background:color-mix(in srgb,#8f80d9 5%,var(--panel));flex-wrap:wrap}',
+    '.hk-rank>div{flex:1;min-width:220px}.hk-rank b{display:block;margin:7px 0 4px;color:var(--text);font:800 17px/1.35 var(--sans);letter-spacing:-.2px}.hk-rank small{color:var(--muted)!important;font-size:11.5px;line-height:1.6}',
+    '.hk-rank button{padding:9px 14px;border:1px solid var(--v2-accent,#4c9af8);border-radius:4px;background:transparent;color:var(--v2-accent,#4c9af8);font:800 11px var(--mono);cursor:pointer;white-space:nowrap}.hk-rank button:hover{background:var(--v2-accent,#4c9af8);color:#04101d}',
+    '.hk-mon{border-left-color:var(--v2-accent,#4c9af8);background:var(--panel)}',
+    '@media(max-width:600px){.hk-rank button{white-space:normal}}',
     '.pb-readout{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin:2px 0 14px}',
     '.pb-ro{padding:13px 15px;border:1px solid var(--line);background:var(--panel);min-width:0}',
     '.pb-ro>span{display:block;color:var(--muted)!important;font:800 9px var(--mono);letter-spacing:.8px;text-transform:uppercase}',
@@ -2395,6 +2245,10 @@
     /* whales-panels.js loads after this file and publishes the points distribution the
        holder block reads; DOMContentLoaded fires once every deferred script has run. */
     if (!window.__VDIST) document.addEventListener('DOMContentLoaded', function () { if (window.__VDIST) render(); });
+    /* the Whales tab edits the same points value */
+    document.addEventListener('var:points', function (e) {
+      if (e.detail !== state.pts) { state.pts = e.detail; save(); render(); }
+    });
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);

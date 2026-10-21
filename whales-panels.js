@@ -324,11 +324,170 @@
   /* The Playbook tab places a reader's own points on this same distribution, so it reads
      the snapshot from here rather than carrying a second copy that could drift. tops = the
      last rank in each RANK_BANDS row; 74,000 is the source's own last band edge. */
+  var RANK_TOPS = [10, 50, 100, 250, 500, 1000, 2000, 5000, 10000, 25000, 74000];
+  var RANK_ACCOUNTS = 74000;
   window.__VDIST = {
     at: distributionAt, bands: RANK_BANDS, cutoffs: RANK_CUTOFFS, basePool: DISTRIBUTION_BASE_POOL,
-    tops: [10, 50, 100, 250, 500, 1000, 2000, 5000, 10000, 25000, 74000], accounts: 74000,
+    tops: RANK_TOPS, accounts: RANK_ACCOUNTS,
     source: 'https://x.com/yh_0x/status/2106449057933857025'
   };
+
+  /* ---------- where a reader's own points sit ----------
+     Rank is interpolated log-log between the Week 42 cutoffs, scaled to this week's
+     projected pool; cumulative share comes off the rank bands. A projection of a community
+     snapshot, not a leaderboard lookup. The Playbook tab reads the same answer through
+     window.__VRANK, and both tabs keep one saved points value, so the two cannot disagree. */
+  var PTS_KEY = 'varMyPointsV1';
+  var PTS_CHIPS = [1000, 5000, 10000, 25000, 50000];
+  var myPts = 10000;
+  try { var savedPts = Number(localStorage.getItem(PTS_KEY)); if (savedPts > 0) myPts = savedPts; } catch (_) {}
+  function setMyPts(v) {
+    myPts = v;
+    try { localStorage.setItem(PTS_KEY, String(v)); } catch (_) {}
+    try { document.dispatchEvent(new CustomEvent('var:points', { detail: v })); } catch (_) {}
+  }
+  function rankModel() {
+    var d = distributionAt(Date.now());
+    var cut = RANK_CUTOFFS.map(function (c) { return [c[0], c[1] * d.scale]; });
+    cut.push([RANK_ACCOUNTS, 1]);
+    var c0 = RANK_CUTOFFS[0][1], c1 = RANK_CUTOFFS[1][1];
+    var cum = [[2, 2 * c0 / DISTRIBUTION_BASE_POOL * 100], [5, (2 * c0 + 3 * c1) / DISTRIBUTION_BASE_POOL * 100]];
+    var run = 0;
+    RANK_BANDS.forEach(function (b, i) { run += b[1]; cum.push([RANK_TOPS[i], run]); });
+    return { pool: d.pool, asOf: d.asOf, N: RANK_ACCOUNTS, cut: cut, cum: cum };
+  }
+  function rankFor(P, D) {
+    var c = D.cut;
+    if (P >= c[0][1]) return 2;
+    if (P <= c[c.length - 1][1]) return D.N;
+    for (var i = 0; i < c.length - 1; i++) {
+      if (P <= c[i][1] && P > c[i + 1][1]) {
+        var t = Math.log(c[i][1] / P) / Math.log(c[i][1] / c[i + 1][1]);
+        return Math.exp(Math.log(c[i][0]) + t * Math.log(c[i + 1][0] / c[i][0]));
+      }
+    }
+    return D.N;
+  }
+  function ptsAtRank(r, D) {
+    var c = D.cut;
+    if (r <= c[0][0]) return c[0][1];
+    for (var i = 0; i < c.length - 1; i++) {
+      if (r >= c[i][0] && r <= c[i + 1][0]) {
+        var t = Math.log(r / c[i][0]) / Math.log(c[i + 1][0] / c[i][0]);
+        return Math.exp(Math.log(c[i][1]) + t * Math.log(c[i + 1][1] / c[i][1]));
+      }
+    }
+    return 1;
+  }
+  function cumAt(r, D) {
+    var a = D.cum;
+    if (r <= a[0][0]) return a[0][1] * r / a[0][0];
+    for (var i = 0; i < a.length - 1; i++) {
+      if (r >= a[i][0] && r <= a[i + 1][0]) {
+        var t = Math.log(r / a[i][0]) / Math.log(a[i + 1][0] / a[i][0]);
+        return a[i][1] + t * (a[i + 1][1] - a[i][1]);
+      }
+    }
+    return 100;
+  }
+  function rankStr(r) { return r <= 2 ? '#1–2' : '#' + int(r); }
+  function topPct(r, N) {
+    var v = r / N * 100;
+    return v < 0.01 ? '<0.01%' : v < 1 ? v.toFixed(2) + '%' : v < 10 ? v.toFixed(1) + '%' : v.toFixed(0) + '%';
+  }
+  window.__VRANK = {
+    at: function (P) {
+      var D = rankModel(), R = rankFor(P, D);
+      return { rank: R, rankStr: rankStr(R), top: topPct(R, D.N), N: D.N, share: P / D.pool * 100, pool: D.pool };
+    },
+    points: function () { return myPts; },
+    set: setMyPts
+  };
+
+  function rankReport() {
+    var D = rankModel(), N = D.N;
+    var P = Math.max(0, myPts);
+    var R = rankFor(P, D);
+    var share = P / D.pool * 100;
+    var above = cumAt(R, D);
+    var median = ptsAtRank(N / 2, D);
+    var value = P / D.pool * AIRDROP_SHARE * fdv;
+    var steps = [10, 50, 100, 250, 500, 1000, 2000, 5000, 10000, 25000];
+    var nextR = null;
+    for (var si = steps.length - 1; si >= 0; si--) if (steps[si] < R - 0.5) { nextR = steps[si]; break; }
+    var nextNeed = nextR ? Math.max(0, ptsAtRank(nextR, D) - P) : 0;
+
+    var groups = [
+      { k: 'g1', name: 'Top 100',        acc: 100,       pts: cumAt(100, D),                   lo: 1,     hi: 100 },
+      { k: 'g2', name: '101 – 1,000',    acc: 900,       pts: cumAt(1000, D) - cumAt(100, D),   lo: 101,   hi: 1000 },
+      { k: 'g3', name: '1,001 – 10,000', acc: 9000,      pts: cumAt(10000, D) - cumAt(1000, D), lo: 1001,  hi: 10000 },
+      { k: 'g4', name: '10,001 +',       acc: N - 10000, pts: 100 - cumAt(10000, D),            lo: 10001, hi: N }
+    ];
+    var mine = groups.filter(function (g) { return R >= g.lo - 0.5 && R <= g.hi + 0.5; })[0] || groups[3];
+    var per = function (g) { return g.pts / g.acc; };
+    var bar = function (field) {
+      return groups.map(function (g) {
+        var w = field === 'acc' ? g.acc / N * 100 : g.pts;
+        return '<span class="' + g.k + (g === mine ? ' me' : '') + '" style="width:' + w.toFixed(3) + '%" title="' +
+          esc(g.name) + ' · ' + (field === 'acc' ? topPct(g.acc, N) + ' of accounts' : g.pts.toFixed(1) + '% of points') + '"></span>';
+      }).join('');
+    };
+    var legend = groups.map(function (g) {
+      return '<div class="rk-lg ' + g.k + (g === mine ? ' me' : '') + '"><i></i><b>' + esc(g.name) +
+        (g === mine ? ' <em>you</em>' : '') + '</b><span>' + topPct(g.acc, N) + ' of accounts → <strong>' +
+        g.pts.toFixed(1) + '%</strong> of points</span><small>~' + int(D.pool * g.pts / 100 / g.acc) + ' pts each</small></div>';
+    }).join('');
+    /* the same bands read cumulatively: what the top N hold between them */
+    var cumLine = [10, 100, 1000, 10000].map(function (r) {
+      return '<span>Top ' + int(r) + ' <b>' + cumAt(r, D).toFixed(1) + '%</b></span>';
+    }).join('');
+
+    var top1k = cumAt(1000, D), top10k = cumAt(10000, D);
+    var mults = [
+      { h: 'Top 100 vs 101–1,000', v: per(groups[0]) / per(groups[1]), s: 'points per account' },
+      { h: 'Top 1,000 vs everyone else', v: (top1k / 1000) / ((100 - top1k) / (N - 1000)), s: int(N - 1000) + ' accounts below' },
+      { h: 'Top 10,000 vs the rest', v: (top10k / 10000) / ((100 - top10k) / (N - 10000)), s: int(N - 10000) + ' accounts below' },
+      { h: 'You vs the median account', v: P / median, s: 'median ≈ ' + int(median) + ' pts (rank ' + int(N / 2) + ')' }
+    ].map(function (m) {
+      return '<div><span>' + esc(m.h) + '</span><b>' + (m.v >= 100 ? int(m.v) : m.v.toFixed(1)) + '×</b><em>' + esc(m.s) + '</em></div>';
+    }).join('');
+
+    /* the rank ruler is log-scaled: on a linear one the top 1,000 is 1% of the width */
+    var lp = function (r) { return Math.log(Math.max(r, 1)) / Math.log(N) * 100; };
+    var ticks = [1, 10, 100, 1000, 10000, N].map(function (r) {
+      return '<span style="left:' + lp(r).toFixed(2) + '%"><b>#' + int(r) + '</b><small>' +
+        (r === 1 ? '' : '≥' + int(ptsAtRank(r, D))) + '</small></span>';
+    }).join('');
+
+    var chips = PTS_CHIPS.map(function (v) {
+      return '<button type="button" data-wh-pts="' + v + '" aria-pressed="' + (v === P) + '"' + (v === P ? ' class="on"' : '') + '>' + int(v) + '</button>';
+    }).join('');
+
+    return '<article class="wh-rank" id="wh-rank" aria-labelledby="wh-rank-title">' +
+      '<span class="cmp-eyebrow">03 · YOUR RANK</span><h3 id="wh-rank-title">Where do your points sit?</h3>' +
+      '<div class="tp-chips wh-chips" role="group" aria-label="Your points"><span>Your points</span>' + chips +
+      '<label class="rk-inp">custom <input type="number" step="100" min="0" value="' + Math.round(P) + '" data-wh-pts-input aria-label="Your points"></label></div>' +
+      '<div class="rk-hero"><div><span class="cmp-eyebrow">' + int(P) + ' points</span>' +
+      '<h4>≈ rank ' + rankStr(R) + '.<br>Top ' + topPct(R, N) + ' of ~' + int(N) + ' accounts.</h4></div>' +
+      '<b class="rk-big">' + share.toFixed(share < 0.01 ? 4 : 3) + '%<small>of all points</small></b></div>' +
+      '<div class="rk-ruler" aria-label="Estimated rank on a log scale">' +
+      '<div class="rk-track"><i style="left:' + lp(R).toFixed(2) + '%"><em>you · ' + rankStr(R) + '</em></i></div>' +
+      '<div class="rk-ticks">' + ticks + '</div></div>' +
+      '<div class="wh-readouts rk-four">' +
+      '<div><span>Estimated rank</span><b>' + rankStr(R) + '</b><em>ahead of ~' + (100 - R / N * 100).toFixed(R / N < 0.01 ? 2 : 1) + '% of accounts</em></div>' +
+      '<div><span>Accounts at or above you hold</span><b>' + above.toFixed(1) + '%</b><em>of all points, ~' + int(Math.max(R, 1)) + ' accounts</em></div>' +
+      '<div><span>Next tier</span><b>' + (nextR ? '+' + int(nextNeed) : '—') + '</b><em>' + (nextR ? 'points to reach the top ' + int(nextR) : 'already in the top 10') + '</em></div>' +
+      '<div><span>Airdrop at ' + esc(fdvLabel(fdv)) + ' FDV</span><b>' + esc(usd(value)) + '</b><em>$' + (AIRDROP_SHARE * fdv / D.pool).toFixed(2) + ' per point · 32% ÷ ' + (D.pool / 1e6).toFixed(2) + 'M pts</em></div>' +
+      '</div>' +
+      '<div class="rk-bars"><div class="rk-brow"><span>Accounts</span><div class="rk-bar">' + bar('acc') + '</div></div>' +
+      '<div class="rk-brow"><span>Points</span><div class="rk-bar">' + bar('pts') + '</div></div></div>' +
+      '<div class="rk-cum">' + cumLine + '</div>' +
+      '<div class="rk-legend">' + legend + '</div>' +
+      '<div class="wh-readouts wh-economic rk-four">' + mults + '</div>' +
+      '<p class="wh-caption">Rank is interpolated between the <a class="wh-inline-source" href="' + esc(window.__VDIST.source) + '" target="_blank" rel="noopener noreferrer">yh_0x Week 42</a> cutoffs, scaled to this week’s projected ' +
+        (D.pool / 1e6).toFixed(2) + 'M-point pool (model week ' + D.asOf + '). A projection, not a leaderboard lookup: below rank 29,000 the source gives no cutoffs, so the tail is extrapolated. Airdrop value follows the FDV chips above.</p>' +
+      '</article>';
+  }
 
   function sellPressureGroups() {
     return [
@@ -493,7 +652,8 @@
       '<p>Value the 32% Genesis allocation, size the potential selling, then see how the allocation is distributed across rank groups and tracked whales.</p></div>' +
       totalSellPressureReport() +
       distributionReport() +
-      '<div class="cmp-heading"><span class="cmp-eyebrow">03 · TRACKED WHALES</span><h3>The people behind the points</h3>' +
+      rankReport() +
+      '<div class="cmp-heading"><span class="cmp-eyebrow">04 · TRACKED WHALES</span><h3>The people behind the points</h3>' +
       '<p>' + (rs.length + WATCHLIST.length) + ' tracked accounts · ' + rs.length + ' dated disclosures · ' + WATCHLIST.length + ' scenario balances.</p></div>' +
       '<div class="wh-readouts wh-economic" aria-label="Tracked whale summary">' +
         '<div><span>Combined points</span><b>~' + int(combinedPoints) + '</b><em>' + int(total) + ' disclosed + ' + int(estimatedTotal) + ' scenario points</em></div>' +
@@ -516,6 +676,25 @@
     '.wh-sell-pressure{border-top:1px solid var(--line);padding-top:22px;margin-top:24px}.wh-sell-pressure>h4{margin:0;color:var(--text);font:800 18px var(--sans)}.wh-sell-scroll{overflow-x:auto;margin:18px 0}.wh-sell-table{min-width:690px}.wh-sell-table tbody th{color:var(--text);font-size:12px;font-weight:700}.wh-sell-table small{display:block;margin-top:4px;color:var(--muted);font-size:9px;font-weight:400}.wh-sell-table td{white-space:nowrap}' +
     '.wh-economic>div{border-color:color-mix(in srgb,var(--v2-accent,#4c9af8) 40%,var(--line))}.wh-economic b{color:var(--v2-accent,#4c9af8)!important}' +
     '.wh-distribution{margin:0 0 28px;padding:22px;border:1px solid var(--line);background:var(--panel)}' +
+    '.wh-rank{margin:0 0 28px;padding:22px;border:1px solid var(--line);background:var(--panel)}.wh-rank h3{margin:12px 0 16px;color:var(--text);font-size:22px}.wh-rank .wh-chips{margin:0 0 20px}' +
+    '.rk-inp{display:inline-flex;align-items:center;gap:6px;color:var(--muted);font:700 10px var(--mono);letter-spacing:.5px;text-transform:uppercase}.rk-inp input{width:96px;padding:6px 8px;border:1px solid var(--line);border-radius:4px;background:var(--panel2,var(--panel));color:var(--text);font:700 12px var(--mono)}' +
+    '.rk-hero{display:flex;justify-content:space-between;align-items:flex-end;gap:18px;padding:20px 22px 0;margin:0 -22px;border-top:1px solid var(--line)}.rk-hero h4{margin:8px 0 0;color:var(--text);font:800 clamp(22px,2.8vw,32px)/1.15 var(--sans);letter-spacing:-.8px}' +
+    '.rk-big{flex-shrink:0;color:var(--v2-accent,#4c9af8);font:800 36px/1 var(--mono);text-align:right}.rk-big small{display:block;margin-top:8px;color:var(--muted);font:11px/1.4 var(--mono)}' +
+    '.rk-ruler{margin:34px 0 22px;padding:0 8px}.rk-track{position:relative;height:8px;border-radius:4px;background:linear-gradient(90deg,#2866bb,#665db3 40%,#3f8f86 70%,var(--line))}' +
+    '.rk-track>i{position:absolute;top:50%;width:16px;height:16px;margin:-8px 0 0 -8px;border-radius:50%;background:var(--text);border:3px solid var(--v2-bg,#0b0f14);box-shadow:0 0 0 2px var(--v2-accent,#4c9af8)}' +
+    '.rk-track>i>em{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);white-space:nowrap;padding:3px 7px;border-radius:4px;background:var(--v2-accent,#4c9af8);color:#04101d;font:800 10px var(--mono);font-style:normal}' +
+    '.rk-ticks{position:relative;height:30px;margin-top:8px}.rk-ticks>span{position:absolute;transform:translateX(-50%);text-align:center;white-space:nowrap}.rk-ticks>span:first-child{transform:none}.rk-ticks>span:last-child{transform:translateX(-100%);text-align:right}' +
+    '.rk-ticks b{display:block;color:var(--muted);font:800 9.5px var(--mono)}.rk-ticks small{display:block;color:var(--dim,var(--muted));font:9px var(--mono)}' +
+    '.wh-readouts.rk-four{grid-template-columns:repeat(4,minmax(0,1fr))}' +
+    '.rk-bars{display:grid;gap:6px;margin:6px 0 10px}.rk-brow{display:grid;grid-template-columns:70px minmax(0,1fr);align-items:center;gap:10px}.rk-brow>span{color:var(--muted);font:800 9px var(--mono);letter-spacing:.8px;text-transform:uppercase}' +
+    '.rk-bar{display:flex;gap:2px;height:22px}.rk-bar>span{display:block;min-width:4px;border-radius:3px;opacity:.55}.rk-bar>span.me{opacity:1;box-shadow:0 0 0 2px var(--text)}' +
+    '.wh-rank .g1{background:#2866bb}.wh-rank .g2{background:#665db3}.wh-rank .g3{background:#3f8f86}.wh-rank .g4{background:#7b8794}' +
+    '.rk-cum{display:flex;flex-wrap:wrap;gap:6px 22px;margin:4px 0 0 80px;color:var(--muted);font:11px/1.5 var(--mono)}.rk-cum b{margin-left:5px;color:var(--text)}' +
+    '.rk-legend{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:14px 0 16px}.rk-lg{padding:10px 12px;border:1px solid var(--line);border-radius:4px;background:var(--panel);min-width:0}.rk-lg.me{border-color:var(--text)}' +
+    '.rk-lg>i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:7px;vertical-align:middle}.wh-rank .rk-lg{background:var(--panel)}.rk-lg.g1>i{background:#2866bb}.rk-lg.g2>i{background:#665db3}.rk-lg.g3>i{background:#3f8f86}.rk-lg.g4>i{background:#7b8794}' +
+    '.rk-lg>b{color:var(--text);font:800 11px var(--mono)}.rk-lg>b em{margin-left:4px;padding:1px 5px;border-radius:3px;background:var(--v2-accent,#4c9af8);color:#04101d;font:800 9px var(--mono);font-style:normal}' +
+    '.rk-lg>span{display:block;margin-top:6px;color:var(--muted);font:10.5px/1.5 var(--mono)}.rk-lg strong{color:var(--text)}.rk-lg>small{display:block;margin-top:2px;color:var(--dim,var(--muted));font:10px var(--mono)}' +
+    '@media(max-width:700px){.wh-rank{padding:16px}.rk-hero{flex-direction:column;align-items:flex-start;padding:16px 16px 0;margin:0 -16px}.rk-big{text-align:left;font-size:28px}.wh-readouts.rk-four,.rk-legend{grid-template-columns:repeat(2,minmax(0,1fr))}.rk-ticks small{display:none}.rk-ticks>span:nth-child(5){display:none}.rk-cum{margin-left:0}}' +
     '.wh-distribution h3{margin:20px 0 10px;color:var(--text);font-size:22px}' +
     '.wh-distribution p{margin:10px 0 18px;color:var(--muted)!important;font-size:13px;line-height:1.7}' +
     '.wh-projection-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px;margin:24px 0}.wh-projection-grid h4{color:var(--text);margin:0 0 12px;font-size:14px}.wh-projection-table{width:100%;border-collapse:collapse;font:12px var(--mono);color:var(--text)}.wh-projection-table th,.wh-projection-table td{padding:10px 6px;text-align:right;border-bottom:1px solid var(--line)}.wh-projection-table th:first-child,.wh-projection-table td:first-child{text-align:left}.wh-projection-table th{color:var(--muted);font-size:10px}.wh-cutoff-selected{background:color-mix(in srgb,var(--v2-accent,#4c9af8) 15%,transparent);font-weight:800}.wh-baseline{margin-top:20px}.wh-baseline summary{cursor:pointer;color:var(--muted);font:12px var(--mono)}' +
@@ -711,6 +890,10 @@
     mountNext();
     renderNext();
     loadProfiles();
+    /* the Playbook tab can change the same points value */
+    document.addEventListener('var:points', function (e) {
+      if (e.detail !== myPts) { myPts = e.detail; render(); }
+    });
     var renderedWeek = distributionAt(Date.now()).weeks;
     setInterval(function () {
       var week = distributionAt(Date.now()).weeks;
@@ -733,12 +916,23 @@
         render();
         return;
       }
+      var pt = e.target && e.target.closest && e.target.closest('[data-wh-pts]');
+      if (pt) {
+        setMyPts(+pt.getAttribute('data-wh-pts'));
+        render();
+        return;
+      }
       var b = e.target && e.target.closest && e.target.closest('[data-wh-fdv]');
       if (!b) return;
       fdv = +b.getAttribute('data-wh-fdv');
       render();
     });
     document.addEventListener('change', function (e) {
+      if (e.target && e.target.matches && e.target.matches('[data-wh-pts-input]')) {
+        var v = Number(e.target.value);
+        if (isFinite(v) && v >= 0) { setMyPts(v); render(); }
+        return;
+      }
       if (!e.target || !e.target.matches('[data-wh-sort]') || !Object.prototype.hasOwnProperty.call(WHALE_SORT_FIELDS, e.target.value)) return;
       whaleSort = e.target.value;
       whaleSortDirection = whaleSort === 'rank' || whaleSort === 'name' ? 'asc' : 'desc';
