@@ -749,7 +749,7 @@
   var FARM_MULTS = [20, 40, 59];
   var farmMult = 40;
   var FARMS_PERP = [
-    { k: 'risex', name: 'RISEx', logo: 'assets/farms/risex.png', x: null, ref: true, accent: '#19d38a', kols: [
+    { k: 'risex', mine: true, name: 'RISEx', logo: 'assets/farms/risex.png', x: null, ref: true, accent: '#19d38a', kols: [
         { x: 'onchainmonk', asOf: '2026-10-21', note: '17K pts · rank #26', post: 'https://x.com/onchainmonk/status/2112781448755454077' },
         { x: 'yh_0x', asOf: '2026-10-20', note: 'VAR + RISEx points, delta-neutral', post: 'https://x.com/yh_0x/status/2112571121824600114' },
         { x: 'Ryuzaki_SEI', asOf: '2026-10-20', note: 'weekly points strategy posts', post: 'https://x.com/Ryuzaki_SEI/status/2112594348068245880' },
@@ -764,6 +764,18 @@
       raised: 7.2e6, raisedNote: 'Galaxy Ventures, Vitalik Buterin, EtherFi, Stani Kulechov',
       bull: ['$3B volume before points even started', 'All RISE points go to RISEx users', 'Points live now: the only one of the five'],
       src: [['Chainwire', 'https://chainwire.org/2026/07/24/risex-launches-ignite-season-1-points-program-following-3b-in-volume-during-the-early-access-phase/'], ['CoinDesk', 'https://www.coindesk.com/tech/2025/11/12/ethereum-layer-2-rise-unveils-risex-and-marketcore-to-build-global-on-chain-markets']] },
+    { k: 'truenorth', mine: true, name: 'TrueNorth', logo: 'assets/farms/truenorth.jpg', x: 'get_truenorth', ref: true, accent: '#3b7bff', kols: [
+        { x: 'yh_0x', asOf: '2026-10-17', note: '“my go-to terminal”', post: 'https://x.com/yh_0x/status/2111535624683737445' },
+        { x: 'corgil', asOf: '2026-08-02', note: 'farming TrueNorth points', post: 'https://x.com/corgil/status/2083908861044396327' },
+        { x: 'ElNachoCrypto', asOf: '2026-07-30', note: '“real conviction” pick', post: 'https://x.com/ElNachoCrypto/status/2082729806580396068' }
+      ],
+      url: 'https://app.truenorth.xyz/ref/KOREAN',
+      what: 'Agentic brokerage: AI agents scan the market, set up trades and watch the portfolio.',
+      status: ['live', 'App live'], stage: 0,
+      points: null, pointsNote: 'No points yet: TruthSayer rewards pay USDC for volume and referrals.',
+      raised: 3e6, raisedNote: 'Pre-seed led by CyberFund; Delphi Labs, GSR; LayerZero’s Bryan Pellegrino',
+      bull: ['Paid in USDC today, before any token', 'Running a Lighter trading comp with $LIT prizes', 'Smallest raise here: most room to re-rate'],
+      src: [['ZyCrypto', 'https://zycrypto.com/truenorth-secures-3m-to-develop-purpose-built-financial-ai/'], ['Coinlaunch', 'https://coinlaunch.space/projects/truenorth-ai/']] },
     { k: 'entropy', name: 'Entropy', logo: 'assets/farms/entropy.jpg', x: 'entropyIO', ref: false, accent: '#b9c2cf', kols: [
         { x: 'punk2498_', asOf: '2026-09-22', note: '“engage heavily — it’s underfarmed”', post: 'https://x.com/punk2498_/status/2102438480249057447' },
         { x: 'Ryuzaki_SEI', asOf: '2026-08-27', note: 'full Entropy guide', post: 'https://x.com/Ryuzaki_SEI/status/2092825224681267275' },
@@ -784,18 +796,6 @@
       raised: 4.6e6, raisedNote: 'Seed led by Dragonfly (also led Variational’s Series A)',
       bull: ['Founded by ex-BlackRock digital-asset leads', 'Round closed in under a week', 'Pre-launch: the earliest possible entry'],
       src: [['GlobeNewswire', 'https://www.globenewswire.com/news-release/2025/11/21/3192551/0/en/HelloTrade-Founded-by-Former-BlackRock-Crypto-Leaders-Announces-Fundraise-to-Unlock-Global-Frictionless-Access-to-Global-Equities.html']] },
-    { k: 'truenorth', name: 'TrueNorth', logo: 'assets/farms/truenorth.jpg', x: 'get_truenorth', ref: true, accent: '#3b7bff', kols: [
-        { x: 'yh_0x', asOf: '2026-10-17', note: '“my go-to terminal”', post: 'https://x.com/yh_0x/status/2111535624683737445' },
-        { x: 'corgil', asOf: '2026-08-02', note: 'farming TrueNorth points', post: 'https://x.com/corgil/status/2083908861044396327' },
-        { x: 'ElNachoCrypto', asOf: '2026-07-30', note: '“real conviction” pick', post: 'https://x.com/ElNachoCrypto/status/2082729806580396068' }
-      ],
-      url: 'https://app.truenorth.xyz/ref/KOREAN',
-      what: 'Agentic brokerage: AI agents scan the market, set up trades and watch the portfolio.',
-      status: ['live', 'App live'], stage: 0,
-      points: null, pointsNote: 'No points yet: TruthSayer rewards pay USDC for volume and referrals.',
-      raised: 3e6, raisedNote: 'Pre-seed led by CyberFund; Delphi Labs, GSR; LayerZero’s Bryan Pellegrino',
-      bull: ['Paid in USDC today, before any token', 'Running a Lighter trading comp with $LIT prizes', 'Smallest raise here: most room to re-rate'],
-      src: [['ZyCrypto', 'https://zycrypto.com/truenorth-secures-3m-to-develop-purpose-built-financial-ai/'], ['Coinlaunch', 'https://coinlaunch.space/projects/truenorth-ai/']] },
     { k: 'derpetual', name: 'Derpetual', logo: 'assets/farms/derpetual.jpg', x: 'derpetual', ref: false, accent: '#8ff0b5', kols: [
         { x: 'whitesocks256', asOf: '2026-10-19', note: '“one of the first in”', post: 'https://x.com/whitesocks256/status/2112195491652136969' }
       ],
@@ -807,6 +807,32 @@
       bull: ['A new market type, not another perp clone', 'Launched April 2026: still early', 'Aiming for a CFTC licence'],
       src: [['Founder post', 'https://x.com/antoni_kiszka/status/2046608631718658543'], ['CryptoTotem', 'https://cryptototem.com/derpetual/']] }
   ];
+
+  /* The site owner's own farms lead the page: the hero, the first matrix row, a badge on
+     the card and the "Mine" filter all read the mine: true flag above. */
+  var ME = { name: 'KoreanDaniel', x: '0xdefidaniel' };
+  function myFarms() { return FARMS_PERP.filter(function (f) { return f.mine; }); }
+
+  function myHero() {
+    var mine = myFarms();
+    if (!mine.length) return '';
+    return '<section class="nf-me"><div class="nf-me-h"><span class="nf-me-av">KD</span><div><span class="nf-me-k">WHAT I’M FARMING</span>' +
+      '<b>' + mine.length + ' farms I’m on right now</b><a href="https://x.com/' + ME.x + '" target="_blank" rel="noopener noreferrer">@' + ME.x + ' ↗</a></div></div>' +
+      '<div class="nf-me-grid">' + mine.map(function (f) {
+        var faces = (f.kols || []).slice(0, 5).map(function (kk) {
+          var pr = PROFILES[(kk.x || '').toLowerCase()] || {};
+          return pr.avatar ? '<img src="' + esc(pr.avatar) + '" alt="@' + esc(kk.x) + '" title="@' + esc(kk.x) + '" width="26" height="26">' : '';
+        }).join('');
+        var n = (f.kols || []).length;
+        return '<article class="nf-me-card" style="--acc:' + f.accent + '">' +
+          '<div class="nf-me-top"><img class="nf-me-logo" src="' + esc(f.logo) + '" alt="' + esc(f.name) + ' logo" width="52" height="52">' +
+          '<div><b>' + esc(f.name) + '</b><span>' + esc(f.points ? f.points.label + ' · day ' + farmDays(f.points.start) : f.status[1]) + '</span></div></div>' +
+          '<p>' + esc(f.what) + '</p>' +
+          (n ? '<div class="nf-me-with"><span class="nf-me-faces">' + faces + '</span><em>+ ' + n + ' tracked whale' + (n === 1 ? '' : 's') + ' farming it too</em></div>' : '') +
+          '<a class="nf-hedge" href="' + esc(f.url) + '" target="_blank" rel="noopener noreferrer">Hedge it with ' + esc(f.name) + ' ↗' + (f.ref ? '<small>my ref</small>' : '') + '</a>' +
+          '</article>';
+      }).join('') + '</div></section>';
+  }
 
   function farmUsd(v) {
     if (v >= 1e9) return '$' + (v / 1e9).toFixed(2) + 'B';
@@ -865,12 +891,13 @@
       val = val.replace('</em></div>', ' · ≈ $' + (pool / seasonPts * 1000).toFixed(0) + ' per 1K points over a ~48-week season</em></div>');
     }
     var kolText = (f.kols || []).map(function (kk) { return [kk.name, kk.x, kk.tg].join(' '); }).join(' ');
-    return '<article class="nf-farm" style="--acc:' + f.accent + '" data-nf-name="' + esc(f.name.toLowerCase()) + '"' +
+    return '<article class="nf-farm' + (f.mine ? ' mine' : '') + '" style="--acc:' + f.accent + '" data-nf-mine="' + (f.mine ? 1 : 0) + '" data-nf-name="' + esc(f.name.toLowerCase()) + '"' +
       ' data-nf-text="' + esc((f.name + ' ' + kolText).toLowerCase()) + '" data-nf-kols="' + ((f.kols || []).length) + '"' +
       ' data-nf-stage="' + (f.points ? 'live' : 'pre') + '" data-nf-cat="' + (f.cat || 'perp') + '">' +
       '<div class="nf-head"><a class="nf-farm-id" href="' + esc(f.url) + '" target="_blank" rel="noopener noreferrer">' +
         '<img src="' + esc(f.logo) + '" alt="' + esc(f.name) + ' logo" width="60" height="60"></a>' +
-        '<div><b>' + esc(f.name) + '</b><span class="nf-st ' + f.status[0] + '"><i></i>' + esc(f.status[1]) + '</span></div></div>' +
+        '<div><b>' + esc(f.name) + '</b><span class="nf-st ' + f.status[0] + '"><i></i>' + esc(f.status[1]) + '</span>' +
+        (f.mine ? '<span class="nf-mine">★ I’m farming this</span>' : '') + '</div></div>' +
       '<p class="nf-what">' + esc(f.what) + '</p>' +
       pts +
       '<ul class="nf-bull">' + f.bull.map(function (b) { return '<li>' + esc(b) + '</li>'; }).join('') + '</ul>' +
@@ -905,8 +932,9 @@
      Works on the rendered cards in place (show/hide and reorder), so typing in the search
      box never re-renders the page and never loses focus. Search matches the project name
      and every KOL's name, X handle and Telegram handle on its card. */
-  var nf = { q: '', sort: 'default', pts: 'all', cat: 'all' };
+  var nf = { q: '', who: 'all', sort: 'default', pts: 'all', cat: 'all' };
   var NF_GROUPS = [
+    ['who', 'Show', [['all', 'All farms'], ['mine', '★ My farms']]],
     ['sort', 'Sort', [['default', 'Featured'], ['name', 'Project A–Z'], ['kols', 'Most KOLs']]],
     ['pts', 'Points', [['all', 'All'], ['pre', 'Pre-points'], ['live', 'Points live']]],
     ['cat', 'Type', [['all', 'All'], ['perp', 'Perp DEX'], ['non', 'Non-perp']]]
@@ -931,7 +959,8 @@
         if (!c.dataset.nfOrder) c.dataset.nfOrder = i;
         var ok = (!q || c.dataset.nfText.indexOf(q) >= 0) &&
           (nf.pts === 'all' || c.dataset.nfStage === nf.pts) &&
-          (nf.cat === 'all' || c.dataset.nfCat === nf.cat);
+          (nf.cat === 'all' || c.dataset.nfCat === nf.cat) &&
+          (nf.who === 'all' || c.dataset.nfMine === '1');
         c.hidden = !ok;
         total++; if (ok) shown++;
       });
@@ -971,7 +1000,12 @@
     var head = '<tr><th>KOL</th>' + FARMS_PERP.map(function (f) {
       return '<th title="' + esc(f.name) + '"><img src="' + esc(f.logo) + '" alt="' + esc(f.name) + '" width="26" height="26"><span>' + esc(f.name) + '</span></th>';
     }).join('') + '<th>Farms</th></tr>';
-    var body = rows.map(function (r) {
+    var meRow = '<tr class="nf-mx-me"><td class="nf-mx-who"><a href="https://x.com/' + ME.x + '" target="_blank" rel="noopener noreferrer"><i class="me">KD</i>' +
+      '<span><b>Me · ' + ME.name + '</b><small>@' + ME.x + '</small></span></a></td>' +
+      FARMS_PERP.map(function (f) {
+        return '<td>' + (f.mine ? '<a class="nf-dot" style="--acc:' + f.accent + '" href="' + esc(f.url) + '" target="_blank" rel="noopener noreferrer" title="' + esc(f.name) + ' · my farm"></a>' : '<span class="nf-nodot"></span>') + '</td>';
+      }).join('') + '<td class="nf-mx-n">' + myFarms().length + '</td></tr>';
+    var body = meRow + rows.map(function (r) {
       var pr = r.kk.x ? (PROFILES[r.kk.x.toLowerCase()] || {}) : {};
       var face = pr.avatar ? '<img src="' + esc(pr.avatar) + '" alt="" width="28" height="28">' : '<i>' + esc((r.kk.x || r.kk.tg).slice(0, 2).toUpperCase()) + '</i>';
       return '<tr><td class="nf-mx-who"><a href="https://x.com/' + esc(r.kk.x) + '" target="_blank" rel="noopener noreferrer">' + face +
@@ -990,7 +1024,7 @@
     if (!host) return;
     host.innerHTML = '<div class="cmp-heading"><span class="cmp-eyebrow">POST-TGE · NEXT FARMS</span>' +
       '<h2>' + NEXT_TITLE + '</h2><p>Farming projects, with Varriors’ picks and reasons to farm.</p></div>' +
-      nfToolbar() + kolMatrix() +
+      myHero() + nfToolbar() + kolMatrix() +
       '<div class="nf-categories" aria-label="Upcoming farming projects">' +
       '<section class="nf-category" data-nf-section="non" aria-labelledby="nf-non-perp"><span class="nf-part">PART 01</span><h3 id="nf-non-perp">Non Perp DEX</h3><div class="nf-empty"><h4>Coming soon</h4></div></section>' +
       '<section class="nf-category" data-nf-section="perp" aria-labelledby="nf-perp"><span class="nf-part">PART 02</span><h3 id="nf-perp">Perp DEX</h3>' +
@@ -1044,6 +1078,19 @@
       '.nf-seg button{padding:6px 10px;border:1px solid var(--line);border-radius:4px;background:var(--panel);color:var(--muted);font:700 10.5px var(--mono);cursor:pointer}.nf-seg button:hover{color:var(--text)}.nf-seg button.on{background:var(--v2-accent,#4c9af8);border-color:var(--v2-accent,#4c9af8);color:#04101d}' +
       '.nf-count{margin-left:auto;color:var(--muted);font:700 10.5px var(--mono);font-style:normal}' +
       '.nf-none{margin-top:14px;padding:18px;border:1px dashed var(--line);color:var(--muted);font:12px var(--mono)}.nf-farm[hidden],.nf-category[hidden],.nf-none[hidden]{display:none!important}' +
+      '.nf-me{position:relative;margin:18px 0 16px;padding:20px;border:1px solid var(--v2-accent,#4c9af8);background:radial-gradient(ellipse at 0 0,color-mix(in srgb,var(--v2-accent,#4c9af8) 16%,transparent),transparent 60%),var(--panel);box-shadow:0 0 50px color-mix(in srgb,var(--v2-accent,#4c9af8) 14%,transparent)}' +
+      '.nf-me-h{display:flex;align-items:center;gap:14px;margin:0 0 16px}.nf-me-av{flex:none;display:flex;align-items:center;justify-content:center;width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#4c9af8,#8f80d9);color:#fff;font:900 16px var(--mono);box-shadow:0 0 24px #4c9af866}' +
+      '.nf-me-k{display:block;color:var(--v2-accent,#4c9af8);font:800 10px var(--mono);letter-spacing:2.5px}.nf-me-h b{display:block;margin:4px 0 2px;color:var(--text);font:900 clamp(20px,2.4vw,28px)/1.1 var(--sans);letter-spacing:-.6px}.nf-me-h a{color:var(--muted)!important;font:700 11px var(--mono);text-decoration:none}' +
+      '.nf-me-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}' +
+      '.nf-me-card{display:flex;flex-direction:column;gap:12px;padding:18px;border:1px solid var(--acc);border-radius:6px;background:linear-gradient(150deg,color-mix(in srgb,var(--acc) 14%,var(--panel)),var(--panel) 60%)}' +
+      '.nf-me-top{display:flex;align-items:center;gap:14px}.nf-me-logo{width:52px;height:52px;border-radius:14px;object-fit:cover;box-shadow:0 6px 24px color-mix(in srgb,var(--acc) 45%,transparent)}' +
+      '.nf-me-top b{display:block;color:var(--text);font:900 22px/1.1 var(--sans)}.nf-me-top span{display:block;margin-top:4px;color:var(--acc);font:800 10px var(--mono);letter-spacing:.5px;text-transform:uppercase;filter:brightness(1.15)}' +
+      '.nf-me-card p{margin:0;color:var(--text)!important;font-size:12.5px;line-height:1.55}' +
+      '.nf-me-with{display:flex;align-items:center;gap:10px}.nf-me-faces{display:flex}.nf-me-faces img{width:26px;height:26px;border-radius:50%;border:2px solid var(--panel);object-fit:cover}.nf-me-faces img+img{margin-left:-8px}.nf-me-with em{color:var(--muted);font:700 10.5px var(--mono);font-style:normal}' +
+      '.nf-me-card .nf-hedge{align-self:flex-start;margin-top:auto;padding:11px 16px;font-size:12px}' +
+      '.nf-mine{display:inline-block;margin:6px 0 0 0;padding:2px 8px;border-radius:3px;background:var(--v2-accent,#4c9af8);color:#04101d;font:800 9.5px var(--mono);letter-spacing:.4px}' +
+      '.nf-farm.mine{border-color:var(--acc);box-shadow:0 0 0 1px var(--acc),0 10px 40px color-mix(in srgb,var(--acc) 18%,transparent)}' +
+      '.nf-mx-me td{background:color-mix(in srgb,var(--v2-accent,#4c9af8) 9%,transparent)}.nf-mx-who i.me{background:linear-gradient(135deg,#4c9af8,#8f80d9);color:#fff}' +
       '.nf-kol-n small.nf-kol-note{white-space:normal;color:var(--text);opacity:.75}' +
       '.nf-mx{margin:14px 0 6px;padding:16px 18px;border:1px solid var(--line);background:var(--panel)}.nf-mx-h b{display:block;color:var(--text);font:800 17px var(--sans)}.nf-mx-h span{display:block;margin:3px 0 12px;color:var(--muted);font-size:11.5px}' +
       '.nf-mx-wrap{overflow-x:auto}.nf-mx table{width:100%;min-width:560px;border-collapse:collapse}' +
