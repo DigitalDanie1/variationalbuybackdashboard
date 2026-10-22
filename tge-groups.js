@@ -35,7 +35,7 @@
   var ALPHA_PUBLIC = false;
   /* The tabs that are locked, by tab id. Ids, not positions, so renumbering cannot move the
      lock onto a different row. */
-  var ALPHA_TABS = ['whales-next'];
+  var ALPHA_TABS = [];
   var ALPHA_FLAG = 'varAlphaOwnerV1';
   /* SHA-256 of the owner key — never the key itself. ?alpha=<key> is hashed in the browser
      and compared to this, so the source can be read without being able to open the tabs. */
@@ -55,7 +55,7 @@
        about the listing, and it makes the group read as one sequence — how much do I get,
        what shape does it take, what do I do about it. */
     { k: 'post', label: 'Post-TGE', note: 'After the token lists',
-      tabs: ['points', 'paths', 'plan', 'monitors', 'whales', 'whales-next', 'variational-pro'] }
+      tabs: ['points', 'paths', 'plan', 'monitors', 'whales', 'variational-pro'] }
   ];
 
   /* Headings carry the same two strings as the switch and are capitalised in CSS, not in the

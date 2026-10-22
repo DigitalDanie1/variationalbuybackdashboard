@@ -1,0 +1,211 @@
+{
+  "period": "September 2026",
+  "sources": {
+    "adv": "https://www.cmegroup.com/daily_bulletin/monthly_volume/Web_ADV_Report_CMEG.pdf",
+    "oi": "https://www.cmegroup.com/daily_bulletin/monthly_volume/Web_OI_Report_CMEG.pdf",
+    "settlements": "https://www.cmegroup.com/market-data/daily-bulletin.html",
+    "specifications": "https://www.cmegroup.com/markets/products.html"
+  },
+  "observations": {
+    "SOFR": {
+      "adv": 4594097,
+      "oi": 13957666
+    },
+    "FED FUND": {
+      "adv": 618578,
+      "oi": 2645696
+    },
+    "E-MINI S&P500": {
+      "adv": 1839326,
+      "oi": 1894473
+    },
+    "E-MINI NASDAQ 100": {
+      "adv": 603753,
+      "oi": 273903
+    },
+    "10-YR NOTE": {
+      "adv": 2646717,
+      "oi": 5744864
+    },
+    "2-YR NOTE": {
+      "adv": 1250894,
+      "oi": 4452506
+    },
+    "5-YR NOTE": {
+      "adv": 1913161,
+      "oi": 6852530
+    },
+    "MICRO E-MINI NASDAQ 100": {
+      "adv": 2356348,
+      "oi": 137428
+    },
+    "CRUDE OIL PHY": {
+      "adv": 1313664,
+      "oi": 1930910
+    },
+    "COMEX GOLD": {
+      "adv": 204576,
+      "oi": 397291
+    },
+    "Ultra 10-Year Note": {
+      "adv": 777893,
+      "oi": 2563720
+    },
+    "30-YR BOND": {
+      "adv": 609453,
+      "oi": 1900691
+    },
+    "ULTRA T-BOND": {
+      "adv": 457843,
+      "oi": 2482748
+    },
+    "EURO FX": {
+      "adv": 317270,
+      "oi": 850622
+    },
+    "HEATING OIL PHY": {
+      "adv": 215414,
+      "oi": 237987
+    },
+    "MICRO E-MINI S&P500": {
+      "adv": 1069218,
+      "oi": 144903
+    },
+    "E-MINI RUSSELL 2000": {
+      "adv": 235197,
+      "oi": 425231
+    },
+    "RBOB PHY": {
+      "adv": 223546,
+      "oi": 349655
+    },
+    "JAPANESE YEN": {
+      "adv": 309876,
+      "oi": 362633
+    },
+    "E-mini ($5) Dow": {
+      "adv": 86984,
+      "oi": 89286
+    },
+    "NATURAL GAS PHY": {
+      "adv": 569681,
+      "oi": 1784155
+    },
+    "SOYBEAN": {
+      "adv": 289853,
+      "oi": 1095617
+    },
+    "MICRO GOLD": {
+      "adv": 377509,
+      "oi": 100473
+    },
+    "COMEX SILVER": {
+      "adv": 53808,
+      "oi": 106011
+    },
+    "BRITISH POUND": {
+      "adv": 133702,
+      "oi": 256768
+    },
+    "CORN": {
+      "adv": 461528,
+      "oi": 1877245
+    },
+    "COMEX COPPER": {
+      "adv": 64545,
+      "oi": 299330
+    },
+    "AUSTRALIAN DOLLAR": {
+      "adv": 134033,
+      "oi": 312667
+    },
+    "CANADIAN DOLLAR": {
+      "adv": 124728,
+      "oi": 349350
+    },
+    "SWISS FRANC": {
+      "adv": 49931,
+      "oi": 134863
+    },
+    "SOYBEAN MEAL": {
+      "adv": 213478,
+      "oi": 635021
+    },
+    "SOYBEAN OIL": {
+      "adv": 185351,
+      "oi": 548439
+    },
+    "CATTLE": {
+      "adv": 74737,
+      "oi": 295169
+    },
+    "FEEDER CATTLE": {
+      "adv": 25848,
+      "oi": 62455
+    },
+    "CHI WHEAT": {
+      "adv": 142002,
+      "oi": 495536
+    },
+    "SILVER": {
+      "adv": 71968,
+      "oi": 28979
+    },
+    "NEW ZEALND DOLLAR": {
+      "adv": 62640,
+      "oi": 116313
+    },
+    "MEXICAN PESO": {
+      "adv": 129929,
+      "oi": 281707
+    },
+    "MICRO MINI $5 DOW": {
+      "adv": 124224,
+      "oi": 21014
+    },
+    "NYMEX PLATINUM": {
+      "adv": 29830,
+      "oi": 64060
+    },
+    "10-YR Eris SOFR": {
+      "adv": 20886,
+      "oi": 199057
+    },
+    "HOGS": {
+      "adv": 75291,
+      "oi": 289509
+    },
+    "5-YR Eris SOFR": {
+      "adv": 18632,
+      "oi": 195572
+    },
+    "MICRO E-MINI RUSSELL 2000": {
+      "adv": 82347,
+      "oi": 54623
+    },
+    "BRAZIL REAL": {
+      "adv": 49958,
+      "oi": 151320
+    },
+    "COMEX E-Mini GOLD": {
+      "adv": 3193,
+      "oi": 8672
+    },
+    "COPPER": {
+      "adv": 14089,
+      "oi": 15330
+    },
+    "MINI SOYBEAN": {
+      "adv": 1587,
+      "oi": 25297
+    },
+    "OATS": {
+      "adv": 408,
+      "oi": 3627
+    },
+    "MINI CORN": {
+      "adv": 1318,
+      "oi": 13683
+    }
+  }
+}

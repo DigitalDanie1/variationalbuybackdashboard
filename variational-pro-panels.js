@@ -6,7 +6,7 @@
 
   // Product descriptions follow the official About Pro documentation.
   var DOCS = 'https://docs.variational.io/pro/about-pro';
-  var SCREENS = ['Overview', 'Product design', 'Market context', 'Workflow comparison', 'Execution workflow', 'Risk & controls', 'Institutional scale'];
+  var SCREENS = ['Overview', 'Product design', 'Market context', 'Workflow comparison', 'Execution workflow', 'Risk & controls', 'Institutional scale', 'Derivatives benchmarks', 'Margin & revenue'];
 
   // BIS values are USD millions. OCC Table 13 reports USD millions as of June 30, 2026.
   // Peer OTC = forwards + swaps + OTC options + credit derivatives; exchange-traded and spot FX excluded.
@@ -22,7 +22,7 @@
       { name: 'JPMorgan Chase Bank N.A.', components: [13810328,35180344,11568333,1649556] }
     ]
   };
-  function trillions(m) { return '$' + (m / 1000000).toFixed(2) + 'T'; }
+  function trillions(m) { return '$' + (m / 1000).toLocaleString('en-US', { maximumFractionDigits: 2 }) + 'B'; }
   function peerTotal(p) { return p.components.reduce(function (a,b) { return a+b; },0); }
   function scaleScreen() {
     var shares = [0.01,0.1,0.5,1], selected = 0.1;
@@ -30,18 +30,35 @@
       'What if Variational supported a fraction of the global OTC outstanding notional?',
       '<div class="vps-share-controls" role="group" aria-label="Hypothetical global notional share">' + shares.map(function (v) { return '<button type="button" data-vps-share="' + v + '" aria-pressed="' + (v===selected) + '">' + v + '%</button>'; }).join('') + '</div>' +
       '<div class="vps-scale-result"><div><span>HYPOTHETICAL VARIATIONAL NOTIONAL</span><strong data-vps-notional>' + trillions(MARKET.notionalMillions * selected / 100) + '</strong></div><p data-vps-scale-summary aria-live="polite"></p></div>' +
-      '<div class="vps-scale-chart" role="group" aria-label="Outstanding OTC notional, common linear scale in trillions of US dollars"><div class="vps-scale-axis"><span>USD TRILLIONS</span><span>0 — 65T · LINEAR SCALE</span></div><div class="vps-scale-row is-scenario"><span>Variational <small>HYPOTHETICAL</small></span><div><i data-vps-scale-bar></i></div><b data-vps-scale-value></b></div>' +
+      '<div class="vps-scale-chart" role="group" aria-label="Outstanding OTC notional, common linear scale in billions of US dollars"><div class="vps-scale-axis"><span>USD BILLIONS</span><span>0 — 65,000B · LINEAR SCALE</span></div><div class="vps-scale-row is-scenario"><span>Variational <small>HYPOTHETICAL</small></span><div><i data-vps-scale-bar></i></div><b data-vps-scale-value></b></div>' +
       MARKET.peers.map(function (p) { var v=peerTotal(p); return '<div class="vps-scale-row"><span>' + p.name + '</span><div><i style="width:' + (v/65000000*100).toFixed(4) + '%"></i></div><b>' + trillions(v) + '</b></div>'; }).join('') + '</div>' +
       '<div class="vps-scale-context"><p><b>Scale reference, not bank equivalence.</b> Protocol-supported notional is compared with bank OTC books. Reporting dates, netting and consolidation differ; this does not imply equal revenue, capital, risk or valuation.</p><p><b>Long-term scenario, not a forecast.</b> The global denominator includes traditional asset classes beyond Pro’s documented crypto focus. Adoption, regulation, product coverage and liquidity determine what is reachable.</p></div>' +
       '<div class="vps-data-sources"><a href="' + MARKET.bis + '" target="_blank" rel="noopener">BIS · global OTC · Dec 2025 ↗</a><a href="' + MARKET.occ + '" target="_blank" rel="noopener">OCC · bank OTC · Jun 2026 · Table 13 ↗</a><span>Formula: global notional × selected share. Bank OTC = forwards + swaps + OTC options + credit.</span></div>',
       'Independent scenario analysis using BIS/OCC data; not a Variational forecast or an official market-share target.');
   }
 
+  function benchmarksScreen() {
+    return slide(7, 'DERIVATIVES BENCHMARKS', 'Derivatives benchmarks.<em> USD billions.</em>',
+      '50 selected CME Group futures across rates, FX, equities and commodities. A scale reference for Variational’s longer-term opportunity.',
+      '<div class="vps-benchmark-toolbar"><label>Search<input type="search" aria-label="Search" data-vps-search placeholder="Contract, symbol or asset class"></label><label>Asset class<select aria-label="Asset class" data-vps-asset><option value="">All asset classes</option>' + ['Rates','FX','Equity index','Metals','Energy','Agriculture'].map(function (a) { return '<option>' + a + '</option>'; }).join('') + '</select></label><label>Display<select aria-label="Display" data-vps-unit><option value="usd">USD B · reference notional</option><option value="contracts">Original contract counts</option></select></label><label>Rank by<select aria-label="Rank by" data-vps-sort><option value="adv">Average daily volume</option><option value="oi">Open interest</option></select></label></div>' +
+      '<div class="vps-benchmark-period"><span>ADV: SEP 2026 · OI: 30 SEP 2026</span><span data-vps-row-count></span></div><div class="vps-benchmark-scroll" tabindex="0" aria-label="Scrollable derivatives benchmark table"><table class="vps-benchmark-table"><caption>Rank within the selected 50-contract universe. USD figures are reference-notional estimates, not observed dollar turnover.</caption><thead><tr><th scope="col">Rank</th><th scope="col">Contract / symbol</th><th scope="col">Asset class</th><th scope="col" data-vps-adv-heading>ADV (USD B)*</th><th scope="col" data-vps-oi-heading>OI (USD B)*</th><th scope="col">Model</th></tr></thead><tbody data-vps-benchmark-rows></tbody></table></div>' +
+      '<details class="vps-methodology"><summary>Sources, notional conversion and coverage</summary><p><b>*Reference notional.</b> September contract ADV / month-end OI × contract size × an explicitly selected 21 October 2026 CME settlement. Rates use contract principal or Treasury face value. The same reference price is applied across expiries. This is not actual daily dollar turnover, DV01 or delta-adjusted exposure.</p><p><b>Coverage:</b> 50 selected CME Group futures, not the global top 50. OTC, options, ICE and Eurex are excluded. FX rows are futures on currency pairs, not the entire OTC pair market. Traditional ADV uses exchange trading days; crypto’s 24-hour figures use calendar days.</p><p><a href="https://www.cmegroup.com/daily_bulletin/monthly_volume/Web_ADV_Report_CMEG.pdf" target="_blank" rel="noopener">CME monthly ADV ↗</a> · <a href="https://www.cmegroup.com/daily_bulletin/monthly_volume/Web_OI_Report_CMEG.pdf" target="_blank" rel="noopener">CME month-end OI ↗</a> · <a href="https://www.cmegroup.com/market-data/daily-bulletin.html" target="_blank" rel="noopener">CME reference settlements ↗</a> · <a href="pro-derivatives-data.json" target="_blank" rel="noopener">All inputs and conversions ↗</a></p></details>',
+      'Source observations: CME Group, September 2026. Reference marks: 21 October 2026. These are external benchmarks, not live Pro listings.');
+  }
+  function economicsScreen() {
+    return slide(8, 'MARGIN & REVENUE', 'Volume drives revenue.<br><em>Open interest drives collateral.</em>',
+      'An adjustable Variational opportunity model, based on a selected external market benchmark.',
+      '<div class="vps-economics-inputs"><label>Benchmark market<select aria-label="Benchmark market" data-vps-model-market></select></label><label>Assumed capture (%)<input aria-label="Assumed capture (%)" data-vps-model="share" type="number" min="0" max="100" step="0.01" value="0.1"></label><label>Initial margin per side (%)<input aria-label="Initial margin per side (%)" data-vps-model="margin" type="number" min="0" max="100" step="1" value="10"></label><label>Gross revenue capture (bps)<input aria-label="Gross revenue capture (bps)" data-vps-model="bps" type="number" min="0" max="1000" step="0.1" value="1"></label><label>Trading days / year<input aria-label="Trading days per year" data-vps-model="days" type="number" min="1" max="366" step="1" value="252"></label></div>' +
+      '<p class="vps-model-baseline" data-vps-model-baseline></p><div class="vps-economic-metrics" aria-live="polite"><div><span>CAPTURED ADV · USD B</span><b data-vps-economic="adv"></b><small>Benchmark ADV × capture rate</small></div><div><span>CAPTURED OI · USD B</span><b data-vps-economic="oi"></b><small>Benchmark OI × capture rate</small></div><div><span>INITIAL MARGIN / SIDE · USD B</span><b data-vps-economic="margin"></b><small>Captured OI × assumed margin rate</small></div><div><span>BOTH SIDES’ MARGIN · USD B</span><b data-vps-economic="bilateral"></b><small>Symmetric gross assumption: 2 × margin</small></div><div><span>GROSS DAILY REVENUE · USD B</span><b data-vps-economic="daily"></b><small>Captured ADV × assumed bps / 10,000</small></div><div><span>GROSS ANNUAL REVENUE · USD B</span><b data-vps-economic="annual"></b><small>Daily revenue × selected trading days</small></div></div>' +
+      '<div class="vps-model-assumptions"><b>Illustrative economics · Pro is not live</b><p>Capture share, margin and revenue bps are user assumptions, not documented Pro fee schedules, required margins or revenue guidance. Revenue is a gross fee-equivalent before costs or allocations; it is not net income, OLP spread earnings or token-holder distributions.</p><p>The margin model assumes equal initial-margin rates on both sides, without netting, offsets, variation margin, collateral haircuts or liquidation losses. Actual pool terms are negotiated and may be asymmetric. Reference notional is not a risk-equivalent measure.</p></div>',
+      'Scenario only. No measured Pro revenue or collateral is implied. Select a market in the benchmarks table to load its inputs here.');
+  }
+
   function slide(n, eyebrow, title, lead, content, foot) {
     return '<article class="vps-scr" data-scr="' + n + '" hidden aria-labelledby="vps-title-' + n + '">' +
       '<header class="vps-heading"><span>VARIATIONAL PRO <i>/</i> ' + eyebrow + '</span>' +
       '<h3 id="vps-title-' + n + '">' + title + '</h3><p>' + lead + '</p></header>' +
-      '<div class="vps-body">' + content + '</div><footer class="vps-foot"><span>' + foot + '</span><b>0' + (n === 6 ? 1 : n + 1) + ' / 06</b></footer></article>';
+      '<div class="vps-body">' + content + '</div><footer class="vps-foot"><span>' + foot + '</span><b>0' + (n === 6 ? 1 : n <= 5 ? n + 1 : n) + ' / 08</b></footer></article>';
   }
   function productScreen() {
     return slide(6, 'DOCUMENTED PRODUCT DESIGN', 'Configurable derivatives.<br><em>Bilateral by design.</em>',
@@ -55,20 +72,41 @@
   }
 
   function screens() {
-    return productScreen() + slide(1, 'MARKET SCALE', 'A global market.<br><em>Measured in hundreds of trillions.</em>',
+    return productScreen() + slide(1, 'MARKET SCALE', 'Institutional OTC markets.<br><em>Scale. Structure. Participants.</em>',
       'OTC derivatives are core infrastructure for institutional risk transfer.',
-      '<div class="vps-market-size"><span>GLOBAL OTC DERIVATIVES · NOTIONAL OUTSTANDING</span><strong>$' + (MARKET.notionalMillions/1000000).toFixed(1) + '<small>TRILLION</small></strong><div><span>31 DEC 2025</span><span>+20.7% YEAR ON YEAR</span></div></div>' +
+      '<div class="vps-market-size"><span>GLOBAL OTC DERIVATIVES · NOTIONAL OUTSTANDING</span><strong>$' + (MARKET.notionalMillions/1000).toLocaleString('en-US', { maximumFractionDigits: 0 }) + '<small>USD BILLIONS</small></strong><div><span>31 DEC 2025</span><span>+20.7% YEAR ON YEAR</span></div></div>' +
+      '<div class="vps-market-participants"><div class="vps-participants-title"><span class="vps-mini">HOW THE MARKET CONNECTS</span><h4>Three roles.<br>One trade lifecycle.</h4><p>Pro applies an RFQ model to configurable bilateral derivatives.</p></div><ol><li><span>01 / INSTITUTIONAL TAKER</span><b>Defines the exposure</b><p>Chooses the asset and structure, requests quotes and evaluates the offered terms.</p></li><li><span>02 / MARKET MAKER</span><b>Competes on price &amp; terms</b><p>Returns a bid or offer, agrees pool parameters and posts counterparty collateral.</p></li><li><span>03 / VARIATIONAL PROTOCOL</span><b>Administers the cleared trade</b><p>Records positions in the pool and manages margin, applicable funding and liquidations.</p></li></ol></div>' +
       '<div class="vps-market-scenarios">' + [0.01,0.1,1].map(function(v) { return '<div><span>' + v + '% OF GLOBAL NOTIONAL</span><b>' + (v===0.01 ? '$' + (MARKET.notionalMillions*v/100/1000).toFixed(1) + 'B' : trillions(MARKET.notionalMillions*v/100)) + '</b><p>Hypothetical supported notional</p></div>'; }).join('') + '</div>' +
       '<div class="vps-scale-context"><p><b>External market context.</b> Interest rate, FX, equity, commodity and credit derivatives. This broad benchmark is not Pro’s current addressable market.</p><p><b>Variational’s entry point.</b> Configurable crypto OTC derivatives for advanced and institutional traders. Capturing traditional markets would require a broader product and regulatory footprint.</p></div>' +
       '<div class="vps-data-sources"><a href="' + MARKET.bis + '" target="_blank" rel="noopener">Source: BIS · global OTC notional ↗</a><span>Notional is the contract reference amount; it is not capital invested, market value or revenue.</span></div>',
       'BIS semiannual data, end-2025. Shares are illustrative assumptions, not forecasts. Independent analysis; not a market-share target from the Pro documentation.') +
-    slide(2, 'THE SHIFT', 'OTC execution.<br><em>A consolidated workflow.</em>',
-      'An altcoin option, from the first request to ongoing margin management.',
-      '<div class="vps-lifecycle"><div class="vps-lifecycle-head"><span>THE TRADE LIFECYCLE</span><div><span>MANUAL OTC EXAMPLE</span><strong>12 <small>steps</small></strong></div><div class="is-pro"><span>WITH VARIATIONAL PRO</span><strong>6 <small>steps</small></strong></div></div>' +
-      '<div class="vps-lifecycle-row"><div class="vps-phase"><span>01</span><h4>Request</h4></div><div class="vps-before"><h4>Find a desk. Start a chat.</h4><p>Arrange onboarding and legal agreements, then describe the structure over Telegram.</p><span class="vps-step-ref">EXAMPLE STEPS 1–4</span></div><div class="vps-after"><span class="vps-benefit">ONE REQUEST</span><h4>Define the trade in an RFQ.</h4><p>Specify the structure in Pro. Request quotes from the market or selected makers.</p><span class="vps-step-ref">EXAMPLE STEPS 1–2</span></div></div>' +
-      '<div class="vps-lifecycle-row"><div class="vps-phase"><span>02</span><h4>Compare</h4></div><div class="vps-before"><h4>Negotiate with one desk.</h4><p>Wait for pricing, debate terms, then exchange confirmations for legal and operations review.</p><span class="vps-step-ref">EXAMPLE STEPS 5–8</span></div><div class="vps-after"><span class="vps-benefit">COMPETING QUOTES</span><h4>Choose the offer that fits.</h4><p>Compare maker quotes by price, margin requirements and counterparty.</p><span class="vps-step-ref">EXAMPLE STEPS 3–4</span></div></div>' +
-      '<div class="vps-lifecycle-row"><div class="vps-phase"><span>03</span><h4>Settle &amp; manage</h4></div><div class="vps-before"><h4>Send collateral. Check manually.</h4><p>Transfer collateral to the desk and rely on periodic margin checks and manual calls.</p><span class="vps-step-ref">EXAMPLE STEPS 9–12</span></div><div class="vps-after"><span class="vps-benefit">ON-CHAIN SETTLEMENT</span><h4>Both sides fund a settlement pool.</h4><p>After deposits are verified, clearing, margin tracking and liquidations run through the protocol.</p><span class="vps-step-ref">EXAMPLE STEPS 5–6</span></div></div></div>',
-      'Illustrative 12-step / 6-step example from the official docs. Not a speed benchmark. Pro is not live yet.') +
+    slide(2, 'WORKFLOW COMPARISON', 'The operational cost<br><em>of an OTC trade.</em>',
+      'The official Pro documentation illustrates a 12-step manual process and a six-step Pro workflow.',
+      '<div class="vps-legacy-columns"><section><div class="vps-legacy-title"><h4>Traditional OTC</h4><span>12 DOCUMENTED STEPS</span></div><ol class="vps-detailed-steps">' +
+      [
+        ['Investment mandate','The institution decides to trade an altcoin option.'],
+        ['Dealer sourcing','The desired altcoin is unavailable on an exchange; the team contacts a market-making desk over Telegram.'],
+        ['ISDA agreement &amp; KYC','Negotiate the ISDA derivatives agreement and complete know-your-customer onboarding. Other desks may reject the account or require additional forms.'],
+        ['Structure specification','With one available desk, describe the requested option structure in chat.'],
+        ['Dealer pricing','The desk calculates a quote, potentially using spreadsheets and manual infrastructure.'],
+        ['Quote &amp; initial terms','The desk sends pricing and proposed contractual terms.'],
+        ['Bilateral negotiation','Discuss price and terms until both parties agree.'],
+        ['Trade confirmation &amp; review','Exchange an email trade confirmation for review by legal and operations teams.'],
+        ['Test transfer','Operations sends a test transaction to the dealer’s wallet or bank account.'],
+        ['Collateral transfer','Send collateral directly to the dealer, introducing exposure to the dealer’s financial condition.'],
+        ['Trade clearing','The trade is marked as cleared.'],
+        ['Ongoing margin administration','Periodic manual checks and Telegram/email margin calls. The example describes one-way collateral posting.']
+      ].map(function (x) { return '<li><b>' + x[0] + '</b><p>' + x[1] + '</p></li>'; }).join('') + '</ol></section>' +
+      '<section class="vps-legacy-pro"><div class="vps-legacy-title"><h4>Variational Pro</h4><span>6 DOCUMENTED STEPS</span></div><ol class="vps-detailed-steps">' +
+      [
+        ['Investment mandate','Choose the altcoin option to trade.'],
+        ['Build the RFQ','Log into Pro and define the desired structure in the UI.'],
+        ['Competitive quotes','Eligible market makers receive the RFQ and can quote through the UI or API; the requester can select specific makers.'],
+        ['Select a counterparty','Evaluate price, margin terms and counterparty reputation, then accept a quote or decline to trade.'],
+        ['Bilateral collateral','Both counterparties are prompted to deposit into their on-chain escrow / settlement pool.'],
+        ['Clear &amp; administer','After verified deposits, clearing is recorded automatically. The protocol manages margin, applicable funding and liquidations.']
+      ].map(function (x) { return '<li><b>' + x[0] + '</b><p>' + x[1] + '</p></li>'; }).join('') + '</ol><div class="vps-legacy-note"><b>What changes</b><p>Competitive quoting, bilateral on-chain collateral and integrated lifecycle management.</p><p>The example does not establish that ISDA, KYC or other legal requirements are waived for every user.</p></div></section></div>',
+      'Source: About Pro · illustrative workflow, not a universal onboarding checklist or a measured speed benchmark.') +
     slide(3, 'TRADE FLOW', 'From price discovery<br><em>to on-chain clearing.</em>',
       'You choose the quote. Both sides fund the pool. The protocol manages the cleared trade.',
       '<ol class="vps-execution" aria-label="Trade execution workflow"><li class="vps-execution-request"><span class="vps-execution-label">01 / REQUEST</span><h4>Specify the trade.</h4><div class="vps-request-ticket"><span>YOUR DESK</span><b>One RFQ</b><p>Asset · structure · terms</p></div><p>Send to the market or a selected set of counterparties.</p></li>' +
@@ -84,7 +122,7 @@
       '<section class="vps-control-row"><div class="vps-control-name"><span>02 / OPERATIONS</span><h4>Lifecycle management</h4></div><div><span class="vps-control-mobile">OTC FRICTION</span><p>Manual collateral checks, funding settlements and margin calls create operational dependencies.</p></div><div class="vps-control-design"><span class="vps-control-mobile">PROTOCOL DESIGN</span><h4>Rules-based trade administration</h4><p>Following clearing, the protocol tracks margin, settles applicable funding and handles liquidations.</p></div></section>' +
       '<section class="vps-control-row"><div class="vps-control-name"><span>03 / COLLATERAL</span><h4>Counterparty exposure</h4></div><div><span class="vps-control-mobile">OTC FRICTION</span><p>Collateral transferred directly to a dealer can introduce credit exposure and asymmetric margin arrangements.</p></div><div class="vps-control-design"><span class="vps-control-mobile">PROTOCOL DESIGN</span><h4>Bilateral settlement pools</h4><p>Both counterparties post collateral to their agreed pool. Positions and assets are isolated across pools; margin and liquidation parameters are agreed in the quote.</p></div></section></div>' +
       '<aside class="vps-risk-note"><span>RISK CONSIDERATIONS</span><p>These controls do not eliminate risk. Smart-contract, market, liquidity and counterparty risks remain; outcomes depend on collateral adequacy and the agreed trade parameters.</p></aside>',
-      'Design overview based on official Pro documentation. Pro is not live yet.') + scaleScreen();
+      'Design overview based on official Pro documentation. Pro is not live yet.') + scaleScreen() + benchmarksScreen() + economicsScreen();
   }
 
   function navBar() {
@@ -95,7 +133,7 @@
         return '<button type="button" data-vps-go="' + i + '" aria-label="' + n + '"' + (i ? '' : ' class="on"') + '></button>';
       }).join('') + '</span>' +
       '<a class="vps-src" href="' + DOCS + '" target="_blank" rel="noopener noreferrer">docs ↗</a>' +
-      '<span class="vp-coming-index" data-vps-index>01 / 07</span>' +
+      '<span class="vp-coming-index" data-vps-index>01 / 09</span>' +
       '<button type="button" class="vps-btn vps-start" data-vps="next" aria-label="Next screen">EXPLORE PRO →</button></div>';
   }
 
@@ -124,6 +162,45 @@
       section.querySelectorAll('[data-vps-share]').forEach(function (b) { b.setAttribute('aria-pressed', +b.dataset.vpsShare === share ? 'true' : 'false'); });
     }
     updateScale(0.1);
+    var benchmarkData = (window.PRO_DERIVATIVES && window.PRO_DERIVATIVES.rows) || [];
+    var tableState = { query: '', asset: '', unit: 'usd', sort: 'adv' };
+    function moneyB(n) { var digits = n > 0 && n < 1 ? Math.min(10, Math.max(2, 2 - Math.floor(Math.log10(n)))) : 2; return '$' + n.toLocaleString('en-US', { minimumFractionDigits: digits, maximumFractionDigits: digits }) + 'B'; }
+    function safe(v) { return String(v).replace(/[&<>"']/g, function(c) { return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+    function renderBenchmarks() {
+      var list = benchmarkData.filter(function(r) { return (!tableState.asset || r.asset === tableState.asset) && (r.name+' '+r.symbol+' '+r.asset).toLowerCase().indexOf(tableState.query.toLowerCase()) >= 0; });
+      var field = tableState.sort + (tableState.unit === 'usd' ? 'B' : 'Contracts');
+      list.sort(function(a,b) { return b[field]-a[field]; });
+      section.querySelector('[data-vps-row-count]').textContent = list.length + ' / ' + benchmarkData.length + ' markets';
+      section.querySelector('[data-vps-adv-heading]').textContent = tableState.unit === 'usd' ? 'ADV (USD B)*' : 'ADV (contracts)';
+      section.querySelector('[data-vps-oi-heading]').textContent = tableState.unit === 'usd' ? 'OI (USD B)*' : 'OI (contracts)';
+      section.querySelector('[data-vps-benchmark-rows]').innerHTML = list.length ? list.map(function(r,i) { return '<tr><td>'+(i+1)+'</td><th scope="row">'+safe(r.name)+'<small>'+safe(r.symbol)+'</small></th><td>'+safe(r.asset)+'</td><td>'+ (tableState.unit === 'usd' ? moneyB(r.advB) : r.advContracts.toLocaleString('en-US')) +'</td><td>'+ (tableState.unit === 'usd' ? moneyB(r.oiB) : r.oiContracts.toLocaleString('en-US')) +'</td><td><button type="button" data-vps-load-market="'+safe(r.symbol)+'" aria-label="Model '+safe(r.name)+'">Use →</button></td></tr>'; }).join('') : '<tr><td colspan="6">No matching contracts. Change the search or asset filter.</td></tr>';
+    }
+    var marketSelect = section.querySelector('[data-vps-model-market]');
+    marketSelect.innerHTML = benchmarkData.map(function(r) {return '<option value="'+safe(r.symbol)+'">'+safe(r.name)+' ('+safe(r.symbol)+')</option>';}).join('');
+    function renderEconomics() {
+      var market = benchmarkData.filter(function(r){return r.symbol===marketSelect.value;})[0];
+      if (!market) return;
+      var inputs = {}; var valid = true;
+      section.querySelectorAll('[data-vps-model]').forEach(function(el) { var n=Number(el.value); if(el.value==='' || !Number.isFinite(n) || n<+el.min || n>+el.max){ valid=false;el.setAttribute('aria-invalid','true'); }else el.removeAttribute('aria-invalid'); inputs[el.dataset.vpsModel]=n; });
+      if (!valid) { section.querySelector('[data-vps-model-baseline]').textContent='Enter values within the stated input ranges to calculate this scenario.';section.querySelectorAll('[data-vps-economic]').forEach(function(el){el.textContent='—';});return; }
+      var adv=market.advB*inputs.share/100, oi=market.oiB*inputs.share/100, margin=oi*inputs.margin/100, daily=adv*inputs.bps/10000;
+      var values={adv:adv,oi:oi,margin:margin,bilateral:margin*2,daily:daily,annual:daily*inputs.days};
+      section.querySelector('[data-vps-model-baseline]').textContent=market.name+' reference benchmark: ADV '+moneyB(market.advB)+' / OI '+moneyB(market.oiB)+'. All outputs below are scenario estimates.';
+      Object.keys(values).forEach(function(k){section.querySelector('[data-vps-economic="'+k+'"]').textContent=moneyB(values[k]);});
+    }
+    section.addEventListener('input', function(e){
+      if (e.target.matches('[data-vps-search]')){tableState.query=e.target.value;renderBenchmarks();}
+      if(e.target.matches('[data-vps-model]'))renderEconomics();
+    });
+    section.addEventListener('change',function(e){
+      if(e.target.matches('[data-vps-asset]')){tableState.asset=e.target.value;renderBenchmarks();}
+      if(e.target.matches('[data-vps-unit]')){tableState.unit=e.target.value;renderBenchmarks();}
+      if(e.target.matches('[data-vps-sort]')){tableState.sort=e.target.value;renderBenchmarks();}
+      if(e.target.matches('[data-vps-model-market]'))renderEconomics();
+    });
+    section.addEventListener('click',function(e){var b=e.target.closest && e.target.closest('[data-vps-load-market]');if(b){marketSelect.value=b.dataset.vpsLoadMarket;renderEconomics();go(SCREENS.indexOf('Margin & revenue'));}});
+    renderBenchmarks(); renderEconomics();
+
     section.addEventListener('click', function (e) {
       var shareButton = e.target.closest && e.target.closest('[data-vps-share]');
       if (shareButton) updateScale(+shareButton.dataset.vpsShare);
@@ -181,6 +258,15 @@ body.v2-dashboard .vps-heading h3{font-size:clamp(30px,3.2vw,46px)!important;lin
 
 .vps-product-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border:1px solid #354358}.vps-product-grid>section{display:flex;flex-direction:column;gap:16px;padding:24px;min-width:0}.vps-product-grid>section+section{border-left:1px solid #354358}body.v2-dashboard .vps-product-grid h4{font-size:19px!important;line-height:1.4!important;margin:0!important}.vps-product-grid p{font-size:12px!important;line-height:1.75!important}.vps-product-grid a,.vps-protocol-detail a{margin-top:auto;font:9px/1.6 var(--mono);color:#b6d0f4!important;text-decoration:underline;text-underline-offset:4px}.vps-product-pools{display:grid;gap:20px;padding:26px;border:1px solid #354358;background:#101b2b}.vps-product-pools>p{font-size:12px!important}.vps-product-status{display:grid;grid-template-columns:160px 1fr;gap:24px;padding:20px 22px;border-left:2px solid #8ba4c2;background:#111b29}.vps-product-status>span{font:9px/1.6 var(--mono);letter-spacing:1px;color:#b4c7de}.vps-product-status p{font-size:12px!important}.vps-protocol-detail{display:flex;align-items:center;gap:24px;padding:18px 22px;background:#111d2c;border-left:2px solid #7893b4}.vps-protocol-detail p{font-size:12px!important;line-height:1.7!important}.vps-protocol-detail b{color:#d2e1f4}.vps-protocol-detail a{flex:none;max-width:150px;margin-top:0}.vps-scr[data-scr="6"]{gap:28px}
 @media(max-width:760px){.vps-product-grid{grid-template-columns:1fr}.vps-product-grid>section{padding:22px}.vps-product-grid>section+section{border-left:0;border-top:1px solid #354358}.vps-product-pools{padding:20px 14px}.vps-product-status{grid-template-columns:1fr;gap:12px}.vps-protocol-detail{flex-direction:column;align-items:flex-start;gap:12px}.vps-protocol-detail a{max-width:none}}
+
+.vps-market-participants{display:grid;grid-template-columns:minmax(180px,.7fr) minmax(0,2.3fr);border:1px solid #354358;background:#0f1928}.vps-participants-title{padding:24px;border-right:1px solid #354358}.vps-participants-title h4{font-size:21px!important}.vps-participants-title p{font-size:12px!important}.vps-market-participants ol{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));margin:0;padding:0;list-style:none}.vps-market-participants li{display:flex;flex-direction:column;gap:14px;padding:24px;min-width:0}.vps-market-participants li+li{border-left:1px solid #354358}.vps-market-participants li>span{font:8px/1.7 var(--mono);letter-spacing:.6px;color:#adc4df}.vps-market-participants li>b{font:600 16px/1.45 var(--sans,Arial,sans-serif);color:#d8e8fb}.vps-market-participants li>p{font-size:12px!important;line-height:1.75!important}.vps-scr[data-scr="1"]{gap:26px}.vps-scr[data-scr="1"] .vps-body{gap:20px}.vps-market-size{padding:24px 28px}.vps-market-size>strong{margin:16px 0;font-size:clamp(60px,6vw,88px)}
+@media(max-width:1000px){.vps-market-participants{grid-template-columns:1fr}.vps-participants-title{border-right:0;border-bottom:1px solid #354358}.vps-participants-title h4 br{display:none}.vps-market-participants li{padding:20px}}
+@media(max-width:760px){.vps-market-participants ol{grid-template-columns:1fr}.vps-market-participants li+li{border-left:0;border-top:1px solid #354358}.vps-market-size{padding:22px 20px}.vps-market-size>strong{font-size:60px}}
+
+.vps-legacy-columns{display:grid;grid-template-columns:1fr 1fr;border:1px solid #354358}.vps-legacy-columns>section{padding:24px}.vps-legacy-pro{border-left:1px solid #354358;background:#111f31}.vps-legacy-title{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;padding-bottom:20px;border-bottom:1px solid #354358}.vps-legacy-title h4{margin:0!important}.vps-legacy-title>span{font:9px var(--mono);color:#adc4df}.vps-detailed-steps{list-style:none;counter-reset:otc;padding:0;margin:0}.vps-detailed-steps li{position:relative;padding:18px 0 18px 36px;counter-increment:otc;border-bottom:1px solid #29384b}.vps-detailed-steps li:before{content:counter(otc,decimal-leading-zero);position:absolute;left:0;top:20px;font:10px var(--mono);color:#9abce8}.vps-detailed-steps b{font:600 14px/1.5 var(--sans,Arial,sans-serif);color:#deebfb}.vps-detailed-steps p{font-size:12px!important;line-height:1.75!important;margin-top:7px!important}.vps-legacy-note,.vps-model-assumptions{padding:22px;margin-top:24px;background:#172638;border-left:2px solid #89a8cc}.vps-legacy-note>b,.vps-model-assumptions>b{font:600 13px var(--sans,Arial,sans-serif);color:#d9e7fb}.vps-legacy-note p,.vps-model-assumptions p{font-size:12px!important;line-height:1.75!important;margin-top:12px!important}.vps-benchmark-toolbar,.vps-economics-inputs{display:flex;flex-wrap:wrap;gap:16px;padding:20px;border:1px solid #354358;background:#101c2c}.vps-benchmark-toolbar label,.vps-economics-inputs label{display:flex;flex:1;min-width:150px;flex-direction:column;gap:10px;font:10px/1.5 var(--mono);color:#b9cce4}.vps-benchmark-toolbar input,.vps-benchmark-toolbar select,.vps-economics-inputs input,.vps-economics-inputs select{box-sizing:border-box;width:100%;min-height:42px;padding:10px;border:1px solid #4d6481;border-radius:2px;background:#0b1320;color:#e2edfc;font:12px var(--sans,Arial,sans-serif);color-scheme:dark}.vps-benchmark-toolbar input:focus-visible,.vps-benchmark-toolbar select:focus-visible,.vps-economics-inputs input:focus-visible,.vps-economics-inputs select:focus-visible{outline:2px solid #9dc6fa;outline-offset:2px}.vps-economics-inputs input[aria-invalid="true"]{border-color:#ef9f9f}.vps-benchmark-period{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;font:9px var(--mono);color:#a4bbd8}.vps-benchmark-scroll{max-height:640px;overflow:auto;border:1px solid #354358;scrollbar-color:#506987 #111b29}.vps-benchmark-table{width:100%;border-collapse:separate;border-spacing:0;min-width:720px;font:12px/1.5 var(--sans,Arial,sans-serif);color:#d4e0f1}.vps-benchmark-table caption{text-align:left;padding:16px 18px;background:#111d2d;font-size:11px;color:#aebfd5}.vps-benchmark-table thead th{position:sticky;top:0;z-index:1;background:#1b2a3e;color:#bdd1ec;font:10px/1.5 var(--mono);white-space:nowrap}.vps-benchmark-table td,.vps-benchmark-table th{text-align:left;padding:14px 18px;border-bottom:1px solid #29384b}.vps-benchmark-table td:nth-child(4),.vps-benchmark-table td:nth-child(5){font-family:var(--mono);white-space:nowrap;text-align:right}.vps-benchmark-table th small{display:block;font:9px/1.6 var(--mono);color:#8fafda;margin-top:3px}.vps-benchmark-table tbody tr:hover{background:#16263d}.vps-benchmark-table button{padding:7px 10px;border:1px solid #47678c;background:#1a304b;color:#cce1ff;font:10px var(--mono);cursor:pointer;white-space:nowrap}.vps-methodology{border:1px solid #354358;padding:18px 22px}.vps-methodology summary{font:12px/1.6 var(--sans,Arial,sans-serif);color:#dce9fb;cursor:pointer}.vps-methodology p{font-size:12px!important;margin-top:16px!important}.vps-methodology a{color:#b6d1f7!important;text-decoration:underline}.vps-economic-metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border-top:1px solid #354358;border-left:1px solid #354358}.vps-economic-metrics>div{padding:24px;border-bottom:1px solid #354358;border-right:1px solid #354358;background:#101c2c;min-width:0}.vps-economic-metrics span{font:8px/1.7 var(--mono);letter-spacing:.5px;color:#b0c7e5}.vps-economic-metrics b{display:block;margin:16px 0;font:600 clamp(22px,2.5vw,36px)/1.2 var(--sans,Arial,sans-serif);letter-spacing:-.03em;color:#e2efff;overflow-wrap:anywhere}.vps-economic-metrics small{display:block;font:10px/1.6 var(--sans,Arial,sans-serif);color:#9db2cf}.vps-model-baseline{font-size:12px!important}.vps-scr[data-scr="7"],.vps-scr[data-scr="8"]{gap:26px}.vps-market-size>strong{font-size:clamp(48px,6vw,82px)}
+@media(max-width:760px){.vps-legacy-columns{grid-template-columns:1fr}.vps-legacy-pro{border-left:0;border-top:1px solid #354358}.vps-legacy-columns>section{padding:20px}.vps-economic-metrics{grid-template-columns:1fr 1fr}.vps-economic-metrics>div{padding:18px}.vps-benchmark-toolbar,.vps-economics-inputs{padding:16px}.vps-benchmark-toolbar label,.vps-economics-inputs label{min-width:130px}.vps-benchmark-scroll{max-height:560px}.vps-benchmark-table td,.vps-benchmark-table th{padding:12px}.vps-market-size>strong{font-size:50px}}@media(max-width:400px){.vps-economic-metrics{grid-template-columns:1fr}}
+
+.vps-scr[data-scr="7"]{padding:28px;gap:18px}.vps-scr[data-scr="7"] .vps-heading h3{font-size:32px!important;line-height:1.15!important;margin:14px 0 12px!important}.vps-scr[data-scr="7"] .vps-heading>p{font-size:12px!important;max-width:900px}.vps-scr[data-scr="7"] .vps-body{gap:16px}.vps-benchmark-toolbar{padding:16px;gap:14px}.vps-benchmark-table td,.vps-benchmark-table th{padding:11px 14px}.vps-benchmark-table caption{padding:12px 14px}@media(max-width:600px){.vps-scr[data-scr="7"]{padding:22px 18px}.vps-scr[data-scr="7"] .vps-heading h3{font-size:28px!important}}
 `;
   function injectVpsStyle() {
     if (document.getElementById('vps-style')) return;
@@ -223,7 +309,7 @@ body.v2-dashboard .vps-heading h3{font-size:clamp(30px,3.2vw,46px)!important;lin
     button.textContent = TITLE;
     tabs.appendChild(button);
 
-    document.querySelectorAll('[data-open-tab="whales-next"]').forEach(function (source) {
+    document.querySelectorAll('[data-open-tab="whales"]').forEach(function (source) {
       var next = source.cloneNode(true);
       next.setAttribute('data-open-tab', TAB);
       next.classList.remove('on');
