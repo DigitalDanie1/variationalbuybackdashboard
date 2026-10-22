@@ -22,6 +22,7 @@
   'use strict';
 
   var AIRDROP_SHARE = 0.32;   /* Genesis airdrop, same constant the calculator uses */
+  var TGE_FLOAT = 0.32;   /* circulating at TGE = the 32% Genesis airdrop (team/investors locked 12 mo) */
   var STALE_DAYS = 14;
   var PROFILES = {};
 
@@ -415,6 +416,7 @@
     var P = Math.max(0, myPts);
     var R = rankFor(P, D);
     var share = P / D.pool * 100;
+    var circ = share * AIRDROP_SHARE / TGE_FLOAT;   /* share of the float that is liquid at TGE */
     var above = cumAt(R, D);
     var median = ptsAtRank(N / 2, D);
     var value = P / D.pool * AIRDROP_SHARE * fdv;
@@ -499,13 +501,15 @@
       /* the airdrop is 32% of all $VAR, so a share of points is that share of 32% of supply */
       '<div class="rk-bigs"><b class="rk-big">' + share.toFixed(share < 0.01 ? 4 : 3) + '%<small>of all points</small></b>' +
       '<b class="rk-big supply">' + (share * AIRDROP_SHARE).toFixed(share * AIRDROP_SHARE < 0.01 ? 4 : 3) + '%<small>of total $VAR supply<br>' +
-        share.toFixed(share < 0.01 ? 4 : 3) + '% × 32% airdrop</small></b></div></div>' +
+        share.toFixed(share < 0.01 ? 4 : 3) + '% × 32% airdrop</small></b>' +
+      '<b class="rk-big circ">' + circ.toFixed(circ < 0.01 ? 4 : 3) + '%<small>of circulating $VAR at TGE<br>' +
+        (share * AIRDROP_SHARE).toFixed(share * AIRDROP_SHARE < 0.01 ? 4 : 3) + '% ÷ 32% float</small></b></div></div>' +
       '<div class="rk-ruler" aria-label="Estimated rank on a log scale">' +
       '<div class="rk-track"><i style="left:' + lp(R).toFixed(2) + '%"><em>you · ' + rankStr(R) + '</em></i></div>' +
       '<div class="rk-ticks">' + ticks + '</div></div>' +
       '<div class="wh-readouts rk-three">' +
       '<div><span>Estimated rank</span><b>' + rankStr(R) + '</b><em>ahead of ~' + (100 - R / N * 100).toFixed(R / N < 0.01 ? 2 : 1) + '% of accounts</em></div>' +
-      '<div><span>Accounts at or above you hold</span><b>' + above.toFixed(1) + '%</b><em>of all points, ~' + int(Math.max(R, 1)) + ' accounts</em></div>' +
+      '<div><span>Accounts at or above you hold</span><b>' + above.toFixed(1) + '%</b><em>of all points · ' + (above * AIRDROP_SHARE).toFixed(1) + '% of supply · ~' + int(Math.max(R, 1)) + ' accounts</em></div>' +
       '<div><span>Next tier</span><b>' + (nextR ? '+' + int(nextNeed) : '—') + '</b><em>' + (nextR ? 'points to reach the top ' + int(nextR) : 'already in the top 10') + '</em></div>' +
       '</div>' +
       '<div class="rk-bars"><div class="rk-brow"><span>Accounts</span><div class="rk-bar">' + bar('acc') + '</div></div>' +
@@ -655,7 +659,7 @@
     '.wh-map{margin:0 0 28px;padding:22px;border:1px solid var(--line);background:var(--panel)}.wh-map h3{margin:12px 0 16px;color:var(--text);font-size:22px}.wh-map .wh-chips{margin:0 0 20px}' +
     '.rk-inp{display:inline-flex;align-items:center;gap:6px;color:var(--muted);font:700 10px var(--mono);letter-spacing:.5px;text-transform:uppercase}.rk-inp input{width:96px;padding:6px 8px;border:1px solid var(--line);border-radius:4px;background:var(--panel2,var(--panel));color:var(--text);font:700 12px var(--mono)}' +
     '.rk-hero{display:flex;justify-content:space-between;align-items:flex-end;gap:18px;padding:20px 22px 0;margin:0 -22px;border-top:1px solid var(--line)}.rk-hero h4{margin:8px 0 0;color:var(--text);font:800 clamp(22px,2.8vw,32px)/1.15 var(--sans);letter-spacing:-.8px}' +
-    '.rk-bigs{display:flex;gap:28px;flex-shrink:0;align-items:flex-start}.rk-big.supply{color:var(--text)}.rk-big{flex-shrink:0;color:var(--v2-accent,#4c9af8);font:800 36px/1 var(--mono);text-align:right}.rk-big small{display:block;margin-top:8px;color:var(--muted);font:11px/1.4 var(--mono)}' +
+    '.rk-bigs{display:flex;gap:24px;flex-shrink:0;align-items:flex-start}.rk-big.supply{color:var(--text)}.rk-big.circ{color:var(--muted);opacity:.9}.rk-big{flex-shrink:0;color:var(--v2-accent,#4c9af8);font:800 32px/1 var(--mono);text-align:right}.rk-big small{display:block;margin-top:8px;color:var(--muted);font:11px/1.4 var(--mono)}' +
     '.rk-ruler{margin:34px 0 22px;padding:0 8px}.rk-track{position:relative;height:8px;border-radius:4px;background:linear-gradient(90deg,#2866bb,#665db3 40%,#3f8f86 70%,var(--line))}' +
     '.rk-track>i{position:absolute;top:50%;width:16px;height:16px;margin:-8px 0 0 -8px;border-radius:50%;background:var(--text);border:3px solid var(--v2-bg,#0b0f14);box-shadow:0 0 0 2px var(--v2-accent,#4c9af8)}' +
     '.rk-track>i>em{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);white-space:nowrap;padding:3px 7px;border-radius:4px;background:var(--v2-accent,#4c9af8);color:#04101d;font:800 10px var(--mono);font-style:normal}' +
@@ -670,7 +674,7 @@
     '.rk-lg>i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:7px;vertical-align:middle}.wh-map .rk-lg{background:var(--panel)}.rk-lg.g1>i{background:#2866bb}.rk-lg.g2>i{background:#665db3}.rk-lg.g3>i{background:#3f8f86}.rk-lg.g4>i{background:#7b8794}' +
     '.rk-lg>b{color:var(--text);font:800 11px var(--mono)}.rk-lg>b em{margin-left:4px;padding:1px 5px;border-radius:3px;background:var(--v2-accent,#4c9af8);color:#04101d;font:800 9px var(--mono);font-style:normal}' +
     '.rk-lg>span{display:block;margin-top:6px;color:var(--muted);font:10.5px/1.5 var(--mono)}.rk-lg strong{color:var(--text)}.rk-lg>small{display:block;margin-top:2px;color:var(--dim,var(--muted));font:10px var(--mono)}' +
-    '@media(max-width:700px){.wh-map{padding:16px}.rk-hero{flex-direction:column;align-items:flex-start;padding:16px 16px 0;margin:0 -16px}.rk-big{text-align:left;font-size:28px}.rk-bigs{gap:20px;flex-wrap:wrap}.wh-readouts.rk-four,.wh-readouts.rk-three,.rk-legend{grid-template-columns:repeat(2,minmax(0,1fr))}.rk-ticks small{display:none}.rk-ticks>span:nth-child(5){display:none}.rk-cum{margin-left:0}}' +
+    '@media(max-width:700px){.wh-map{padding:16px}.rk-hero{flex-direction:column;align-items:flex-start;padding:16px 16px 0;margin:0 -16px}.rk-big{text-align:left;font-size:24px}.rk-bigs{gap:16px 20px;flex-wrap:wrap}.wh-readouts.rk-four,.wh-readouts.rk-three,.rk-legend{grid-template-columns:repeat(2,minmax(0,1fr))}.rk-ticks small{display:none}.rk-ticks>span:nth-child(5){display:none}.rk-cum{margin-left:0}}' +
     '.wh-distribution h3{margin:20px 0 10px;color:var(--text);font-size:22px}' +
     '.wh-distribution p{margin:10px 0 18px;color:var(--muted)!important;font-size:13px;line-height:1.7}' +
     '.wh-projection-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px;margin:24px 0}.wh-projection-grid h4{color:var(--text);margin:0 0 12px;font-size:14px}.wh-projection-table{width:100%;border-collapse:collapse;font:12px var(--mono);color:var(--text)}.wh-projection-table th,.wh-projection-table td{padding:10px 6px;text-align:right;border-bottom:1px solid var(--line)}.wh-projection-table th:first-child,.wh-projection-table td:first-child{text-align:left}.wh-projection-table th{color:var(--muted);font-size:10px}.wh-cutoff-selected{background:color-mix(in srgb,var(--v2-accent,#4c9af8) 15%,transparent);font-weight:800}.wh-baseline{margin-top:20px}.wh-baseline summary{cursor:pointer;color:var(--muted);font:12px var(--mono)}' +

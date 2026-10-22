@@ -17,6 +17,12 @@
    those, and a missing entry is the correct way to leave a name alone. */
 window.__VDICT = {
   ko: {
+    "of all points": "전체 포인트 대비",
+    "of total $VAR supply": "$VAR 총공급량 대비",
+    "of circulating $VAR at TGE": "TGE 유통량 대비 ($VAR)",
+    "0.296% × 32% airdrop": "0.296% × 32% 에어드랍",
+    "0.296% ÷ 32% float": "0.296% ÷ 32% 유통량",
+    "of all points · 9.4% of supply · ~294 accounts": "전체 포인트 기준 · 공급량 대비 9.4% · ~294개 계정",
     "Annualised revenue": "연환산 매출",
     "$2.48M over 14 days, × 365 ÷ 14": "14일간 $2.48M, × 365 ÷ 14",
     /* ---- Tab 13 · comparables priced, and the time under water ---- */
@@ -2717,6 +2723,12 @@ window.__VDICT = {
     "Variational trails both peers on OI and modeled 30D fee pool. Monetization is not directly comparable.": "Variational이 OI와 모델 30일 수수료 풀에서 두 비교 대상보다 모두 뒤처집니다. 수익화는 직접 비교할 수 없습니다."
   },
   zh: {
+    "of all points": "占全部积分",
+    "of total $VAR supply": "占 $VAR 总供应量",
+    "of circulating $VAR at TGE": "TGE 流通量占比（$VAR）",
+    "0.296% × 32% airdrop": "0.296% × 32% 空投",
+    "0.296% ÷ 32% float": "0.296% ÷ 32% 流通量",
+    "of all points · 9.4% of supply · ~294 accounts": "占全部积分 · 占供应量 9.4% · ~294 个账户",
     "Annualised revenue": "年化收入",
     "$2.48M over 14 days, × 365 ÷ 14": "14 天 $2.48M，× 365 ÷ 14",
     /* ---- Tab 13 · comparables priced, and the time under water ---- */
