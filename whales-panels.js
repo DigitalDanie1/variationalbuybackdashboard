@@ -809,7 +809,7 @@
       raised: null, raisedNote: 'No raise disclosed',
       bull: ['A new market type, not another perp clone', 'Launched April 2026: still early', 'Aiming for a CFTC licence'],
       src: [['Founder post', 'https://x.com/antoni_kiszka/status/2046608631718658543'], ['CryptoTotem', 'https://cryptototem.com/derpetual/']] },
-    { k: 'silhouette', cat: 'non', name: 'Silhouette', logo: null, x: 'silhouette_ex', ref: false, accent: '#a6a2f7', kols: [],
+    { k: 'silhouette', cat: 'infra', name: 'Silhouette', logo: null, x: 'silhouette_ex', ref: false, accent: '#a6a2f7', kols: [],
       url: 'https://silhouette.exchange/', cta: 'Explore Silhouette',
       what: 'Block-trade RFQs across Hyperliquid spot, perps and tokenized assets.',
       status: ['live', 'Trading live'], stage: 0,
@@ -817,15 +817,15 @@
       raised: null, raisedNote: 'No funding amount confirmed in cited sources',
       bull: ['One request invites competing market-maker quotes', 'Execution settles on HyperCore or HyperEVM', 'Built for larger orders across several asset types'],
       src: [['Docs', 'https://docs.silhouette.exchange/about-silhouette']] },
-    { k: 'titan', cat: 'non', name: 'Titan Exchange', logo: null, x: 'TitanExchange_', ref: false, accent: '#d6a56b', kols: [],
+    { k: 'titan', name: 'Titan Exchange', logo: null, x: 'TitanExchange_', ref: false, accent: '#d6a56b', kols: [],
       url: 'https://testnet.titanx.cc/', cta: 'Explore Titan testnet',
       what: 'Privacy-focused trading venue on Canton Network, with an order book and private pools.',
-      status: ['gated', 'Testnet live'], stage: 0,
-      points: null, pointsLabel: 'Not confirmed', pointsNote: 'No public token or points allocation confirmed on the official site.',
+      status: ['gated', 'Testnet live'], stage: 1,
+      points: null, pointsLive: true, pointsLabel: 'Testnet points live', pointsNote: 'The official testnet shows a Points tab and weekly distributions; token allocation is unconfirmed.',
       raised: null, raisedNote: 'No funding amount confirmed in cited sources',
       bull: ['Canton-based privacy architecture', 'Anonymized central-limit order book', 'Official site links to a live testnet'],
-      src: [['Official site', 'https://titanx.cc/']] },
-    { k: 'hyperlink', cat: 'non', name: 'HyperLink', logo: null, x: 'hyperlink_xyz', ref: false, accent: '#79c7ef', kols: [],
+      src: [['Official testnet', 'https://testnet.titanx.cc/rewards'], ['Official site', 'https://titanx.cc/']] },
+    { k: 'hyperlink', cat: 'infra', name: 'HyperLink', logo: null, x: 'hyperlink_xyz', ref: false, accent: '#79c7ef', kols: [],
       url: 'https://hyperlink.xyz/', cta: 'Explore HyperLink',
       what: 'Prime brokerage and execution layer for traders on Hyperliquid.',
       status: ['live', 'Broker live'], stage: 0,
@@ -833,6 +833,15 @@
       raised: null, raisedNote: 'Public funding amount not verified in cited sources',
       bull: ['Routes into Hyperliquid liquidity', 'Pooled activity targets lower trading fees', 'Shared execution infrastructure reduces wallet-level visibility'],
       src: [['Official profile', 'https://www.linkedin.com/company/hyperlink-xyz'], ['GitHub', 'https://github.com/hyperlink-xyz']] },
+    { k: 'metric', cat: 'non', name: 'Metric', logo: null, x: 'metricxyz', ref: false, accent: '#d8e486', kols: [],
+      url: 'https://app.metric.xyz/', cta: 'Explore Metric',
+      what: 'Spot DEX for active pools that track reference prices across tokenized assets and crypto.',
+      status: ['live', 'Public DEX live'], stage: 0,
+      points: null, pointsLabel: 'Terms not announced', pointsNote: 'Referrals are live; the team says benefits will be detailed later. No token allocation announced.',
+      raised: null, raisedNote: 'No funding amount confirmed in cited sources',
+      stats: [{ label: 'Public-launch volume', value: '$1.2B+', note: 'First 5 days · Oct 21' }, { label: 'TVL', value: '$11M+', note: 'Oct 21' }],
+      bull: ['Live on Ethereum, BNB Chain and Robinhood Chain', 'Swap, provide liquidity or deploy an active pool', 'Onchain pools price against live reference markets'],
+      src: [['Official metrics', 'https://x.com/metricxyz/status/2112669610747068897'], ['Official site', 'https://metric.xyz/'], ['Docs', 'https://docs.metric.xyz/'], ['Referral update', 'https://x.com/metricxyz/status/2112922190349844551']] },
     { k: 'flint', name: 'Flint', logo: null, x: 'flint_trade_', ref: false, accent: '#f1ae72', kols: [],
       url: 'https://flint.trade/', cta: 'Explore Flint',
       what: 'Solana spot venue live today; a fully on-chain perp DEX is in development.',
@@ -917,7 +926,7 @@
       pts = '<div class="nf-pts live"><span>Points</span><b>' + esc(f.points.label) + ' · day ' + d + '</b>' +
         '<em>~' + (weeks * f.points.weekly / 1e6).toFixed(1) + 'M points out so far · ' + esc(f.points.note) + '</em></div>';
     } else {
-      pts = '<div class="nf-pts"><span>Points</span><b>' + esc(f.pointsLabel || 'Not started') + '</b><em>' + esc(f.pointsNote) + '</em></div>';
+      pts = '<div class="nf-pts' + (f.pointsLive ? ' live' : '') + '"><span>Points</span><b>' + esc(f.pointsLabel || 'Not started') + '</b><em>' + esc(f.pointsNote) + '</em></div>';
     }
     var pool = f.raised ? f.raised * farmMult * FARM_SHARE : null;
     var maxPool = 14e6 * 59 * FARM_SHARE;
@@ -933,12 +942,15 @@
     var kolText = (f.kols || []).map(function (kk) { return [kk.name, kk.x, kk.tg].join(' '); }).join(' ');
     return '<article class="nf-farm' + (f.mine ? ' mine' : '') + '" style="--acc:' + f.accent + '" data-nf-mine="' + (f.mine ? 1 : 0) + '" data-nf-name="' + esc(f.name.toLowerCase()) + '"' +
       ' data-nf-text="' + esc((f.name + ' ' + kolText).toLowerCase()) + '" data-nf-kols="' + ((f.kols || []).length) + '"' +
-      ' data-nf-stage="' + (f.points ? 'live' : 'pre') + '" data-nf-cat="' + (f.cat || 'perp') + '">' +
+      ' data-nf-stage="' + (f.points || f.pointsLive ? 'live' : 'pre') + '" data-nf-cat="' + (f.cat || 'perp') + '">' +
       '<div class="nf-head"><a class="nf-farm-id" href="' + esc(f.url) + '" target="_blank" rel="noopener noreferrer">' +
         farmLogo(f, 60) + '</a>' +
         '<div><b>' + esc(f.name) + '</b><span class="nf-st ' + f.status[0] + '"><i></i>' + esc(f.status[1]) + '</span>' +
         (f.mine ? '<span class="nf-mine">★ I’m farming this</span>' : '') + '</div></div>' +
       '<p class="nf-what">' + esc(f.what) + '</p>' +
+      (f.stats ? '<div class="nf-farm-stats">' + f.stats.map(function (s) {
+        return '<div><span>' + esc(s.label) + '</span><b>' + esc(s.value) + '</b><small>' + esc(s.note) + '</small></div>';
+      }).join('') + '</div>' : '') +
       pts +
       '<ul class="nf-bull">' + f.bull.map(function (b) { return '<li>' + esc(b) + '</li>'; }).join('') + '</ul>' +
       farmKols(f) +
@@ -977,7 +989,7 @@
     ['who', 'Show', [['all', 'All farms'], ['mine', '★ My farms']]],
     ['sort', 'Sort', [['default', 'Featured'], ['name', 'Project A–Z'], ['kols', 'Most KOLs']]],
     ['pts', 'Points', [['all', 'All'], ['pre', 'Pre-points'], ['live', 'Points live']]],
-    ['cat', 'Type', [['all', 'All'], ['perp', 'Perp venues'], ['non', 'Trading infrastructure']]]
+    ['cat', 'Type', [['all', 'All'], ['non', 'Non-perp DEX'], ['perp', 'Perp venues'], ['infra', 'Trading infrastructure']]]
   ];
   function nfToolbar() {
     return '<div class="nf-bar"><label class="nf-search"><span aria-hidden="true">⌕</span>' +
@@ -1063,20 +1075,24 @@
   function renderNext() {
     var host = document.querySelector('[data-tg="whales-next"]');
     if (!host) return;
-    var infra = FARMS_PERP.filter(function (f) { return f.cat === 'non'; });
+    var nonPerps = FARMS_PERP.filter(function (f) { return f.cat === 'non'; });
     var perps = FARMS_PERP.filter(function (f) { return (f.cat || 'perp') === 'perp'; });
+    var infra = FARMS_PERP.filter(function (f) { return f.cat === 'infra'; });
     host.innerHTML = '<div class="cmp-heading"><span class="cmp-eyebrow">POST-TGE · NEXT FARMS</span>' +
       '<h2>' + NEXT_TITLE + '</h2><p>Farming projects, with Varriors’ picks and reasons to farm.</p></div>' +
       myHero() + nfToolbar() + kolMatrix() +
       '<div class="nf-categories" aria-label="Upcoming farming projects">' +
-      '<section class="nf-category" data-nf-section="non" aria-labelledby="nf-non-perp"><span class="nf-part">PART 01</span><h3 id="nf-non-perp">Trading infrastructure</h3>' +
-      '<p class="nf-lede">Block trading, prime brokerage and private-market rails. Product access is separate from any unannounced rewards. Facts as of ' + FARMS_ASOF + '.</p>' +
-      '<div class="nf-farms">' + infra.map(farmCard).join('') + '</div><div class="nf-none" hidden>No project or KOL matches that. Clear the search or the filters.</div></section>' +
+      '<section class="nf-category" data-nf-section="non" aria-labelledby="nf-non-perp"><span class="nf-part">PART 01</span><h3 id="nf-non-perp">Non-perp DEX</h3>' +
+      '<p class="nf-lede">Spot and tokenized-asset venues. Snapshot metrics are dated on each card; points and token terms require a separate announcement.</p>' +
+      '<div class="nf-farms">' + nonPerps.map(farmCard).join('') + '</div><div class="nf-none" hidden>No project or KOL matches that. Clear the search or the filters.</div></section>' +
       '<section class="nf-category" data-nf-section="perp" aria-labelledby="nf-perp"><span class="nf-part">PART 02</span><h3 id="nf-perp">Perp venues</h3>' +
-      '<p class="nf-lede">' + perps.length + ' venues to track, including Flint’s live spot market and planned perp launch. Facts as of ' + FARMS_ASOF + ', sourced on each card.</p>' +
+      '<p class="nf-lede">' + perps.length + ' venues to track, including Titan’s testnet and Flint’s planned perp launch. Facts as of ' + FARMS_ASOF + ', sourced on each card.</p>' +
       farmTrack() + farmControls() +
       '<div class="nf-farms">' + perps.map(farmCard).join('') + '</div>' +
-      '<div class="nf-none" hidden>No project or KOL matches that. Clear the search or the filters.</div></section></div>';
+      '<div class="nf-none" hidden>No project or KOL matches that. Clear the search or the filters.</div></section>' +
+      '<section class="nf-category" data-nf-section="infra" aria-labelledby="nf-infra"><span class="nf-part">PART 03</span><h3 id="nf-infra">Trading infrastructure</h3>' +
+      '<p class="nf-lede">Block execution and prime brokerage around existing venues. Facts as of ' + FARMS_ASOF + '.</p>' +
+      '<div class="nf-farms">' + infra.map(farmCard).join('') + '</div><div class="nf-none" hidden>No project or KOL matches that. Clear the search or the filters.</div></section></div>';
     applyNf();
   }
 
@@ -1157,6 +1173,7 @@
       '.nf-ctl em{flex-basis:100%;color:var(--muted);font:10.5px var(--mono);font-style:normal}' +
       '.nf-farms{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}' +
       '.nf-farm{position:relative;display:flex;flex-direction:column;gap:12px;padding:18px;border:1px solid var(--line);background:linear-gradient(160deg,color-mix(in srgb,var(--acc) 9%,var(--panel)),var(--panel) 45%);min-width:0;overflow:hidden;transition:transform .15s,border-color .15s}' +
+      '.nf-category[data-nf-section="non"] .nf-farms{grid-template-columns:minmax(0,1fr)}.nf-category[data-nf-section="non"] .nf-farm{display:grid;grid-template-columns:minmax(0,1fr) minmax(280px,.9fr);grid-template-areas:"head stats" "what stats" "bull pts" "bull raise" "foot val";align-items:start;gap:12px 28px}.nf-category[data-nf-section="non"] .nf-head{grid-area:head}.nf-category[data-nf-section="non"] .nf-what{grid-area:what}.nf-category[data-nf-section="non"] .nf-farm-stats{grid-area:stats}.nf-category[data-nf-section="non"] .nf-pts{grid-area:pts}.nf-category[data-nf-section="non"] .nf-bull{grid-area:bull}.nf-category[data-nf-section="non"] .nf-raise{grid-area:raise}.nf-category[data-nf-section="non"] .nf-val{grid-area:val}.nf-category[data-nf-section="non"] .nf-foot{grid-area:foot}' +
       '.nf-farm::before{content:"";position:absolute;inset:0 0 auto 0;height:3px;background:var(--acc)}.nf-farm:hover{transform:translateY(-2px);border-color:var(--acc)}' +
       '.nf-head{display:flex;align-items:center;gap:14px;text-align:left}.nf-head>div{min-width:0}.nf-farm-id img{display:block;width:60px;height:60px;border-radius:16px;object-fit:cover;border:1px solid var(--line);box-shadow:0 6px 22px color-mix(in srgb,var(--acc) 35%,transparent)}' +
       '.nf-logo-placeholder{display:flex;flex:none;align-items:center;justify-content:center;border:1px solid var(--acc);border-radius:16px;background:color-mix(in srgb,var(--acc) 16%,var(--panel));color:var(--acc);font-family:var(--mono);font-weight:900;box-shadow:0 6px 22px color-mix(in srgb,var(--acc) 22%,transparent)}.nf-stage-logos .nf-logo-placeholder{border-radius:9px}' +
@@ -1165,6 +1182,7 @@
       '.nf-st.live i{background:#2fb37e;box-shadow:0 0 0 3px color-mix(in srgb,#2fb37e 25%,transparent);animation:nfpulse 1.8s infinite}.nf-st.gated i{background:#d99a2b}.nf-st.soon i{background:#8a9bb0}' +
       '@keyframes nfpulse{50%{box-shadow:0 0 0 6px transparent}}' +
       '.nf-what{margin:0;color:var(--text)!important;font-size:12.5px;line-height:1.55}' +
+      '.nf-farm-stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.nf-farm-stats>div{padding:12px;border:1px solid color-mix(in srgb,var(--acc) 45%,var(--line));background:color-mix(in srgb,var(--acc) 8%,var(--panel))}.nf-farm-stats span,.nf-farm-stats small{display:block;color:var(--muted);font:800 9px var(--mono);letter-spacing:.3px}.nf-farm-stats b{display:block;margin:5px 0;color:var(--acc);font:900 22px/1 var(--mono)}.nf-farm-stats small{font-weight:500;letter-spacing:0}' +
       '.nf-pts,.nf-raise,.nf-val{padding:10px 12px;border:1px solid var(--line);background:color-mix(in srgb,var(--panel) 70%,transparent)}' +
       '.nf-pts span,.nf-raise span,.nf-val span{display:block;color:var(--muted);font:800 8.5px var(--mono);letter-spacing:.8px;text-transform:uppercase}' +
       '.nf-pts b,.nf-raise b{display:block;margin:5px 0 3px;color:var(--text);font:800 15px var(--mono)}.nf-pts.live{border-color:#19d38a}.nf-pts.live b{color:#19d38a}' +
@@ -1183,6 +1201,7 @@
       '.nf-face u{position:absolute;right:-4px;bottom:-4px;min-width:15px;height:15px;padding:0 2px;border-radius:8px;display:flex;align-items:center;justify-content:center;font:900 7.5px var(--mono);text-decoration:none;color:#fff;background:#111}.nf-face.tg u{background:#2aabee}' +
       '.nf-face:hover{z-index:1;transform:translateY(-2px)}' +
       '.nf-kol-n{min-width:0}.nf-kol-n b,.nf-kol-n b a{display:block;color:var(--text)!important;font:800 12px var(--sans);text-decoration:none}.nf-kol-n small{display:block;color:var(--muted);font:10px var(--mono);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}' +
+      '@media(max-width:800px){.nf-category[data-nf-section="non"] .nf-farm{display:flex;flex-direction:column}.nf-category[data-nf-section="non"] .nf-farm>*{width:100%}}' +
       '@media(max-width:600px){.nf-empty{padding:16px}.nf-farms{grid-template-columns:minmax(0,1fr)}.nf-farm{padding:15px}.nf-track-line{grid-template-columns:minmax(0,1fr)}.nf-track-line::before{display:none}}';
     document.head.appendChild(style);
   }
