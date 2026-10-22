@@ -124,7 +124,7 @@
       '<span class="vps-dots">' + SCREENS.map(function (n, i) {
         return '<button type="button" data-vps-go="' + i + '" aria-label="' + n + '"' + (i ? '' : ' class="on"') + '></button>';
       }).join('') + '</span>' +
-      '<a class="vps-src" href="#derivatives">Top 50 derivatives ↗</a>' +
+      '<button type="button" class="vps-src vps-derivatives-link" data-vps-view="derivatives">Top 50 derivatives ↗</button>' +
       '<a class="vps-src" href="' + DOCS + '" target="_blank" rel="noopener noreferrer">docs ↗</a>' +
       '<span class="vp-coming-index" data-vps-index>01 / 08</span>' +
       '<button type="button" class="vps-btn vps-start" data-vps="next" aria-label="Next screen">EXPLORE PRO →</button></div>';
@@ -180,6 +180,7 @@
     document.addEventListener('var:pro-model-market', function(e) {
       var symbol = e.detail && e.detail.symbol;
       if (!benchmarkData.some(function(r) { return r.symbol === symbol; })) return;
+      document.dispatchEvent(new CustomEvent('var:pro-view', { detail: { view: 'overview' } }));
       marketSelect.value = symbol;
       renderEconomics();
       go(SCREENS.indexOf('Margin & revenue'));
@@ -197,7 +198,7 @@
       else go(cur + (b.getAttribute('data-vps') === 'next' ? 1 : -1));
     });
     document.addEventListener('keydown', function (e) {
-      if (section.classList.contains('tg-hide') || /INPUT|TEXTAREA|SELECT/.test((e.target && e.target.tagName) || '')) return;
+      if (section.classList.contains('tg-hide') || section.querySelector('[data-vps-overview-panel]').hidden || /INPUT|TEXTAREA|SELECT/.test((e.target && e.target.tagName) || '')) return;
       if (e.key === 'ArrowRight') { e.preventDefault(); go(cur + 1); }
       else if (e.key === 'ArrowLeft') { e.preventDefault(); go(cur - 1); }
     });
@@ -280,6 +281,34 @@ body.v2-dashboard .vps-heading h3{font-size:clamp(30px,3.2vw,46px)!important;lin
       '<div class="vp-identity"><div class="vp-brand"><span class="vp-mark"><svg viewBox="320 450 1360 960" aria-hidden="true"><defs><filter id="vp-mark-color" color-interpolation-filters="sRGB"><feColorMatrix type="matrix" values="0 0 0 0 .298 0 0 0 0 .608 0 0 0 0 .973 0 0 2 0 -.3"/></filter></defs><image href="variational-logo.png" width="2000" height="2000" filter="url(#vp-mark-color)"/></svg></span><span>Variational</span></div>' +
       '<h2 class="vp-pro">PRO</h2><div class="vp-caption"><span></span><p>Configurable execution. On-chain settlement.</p><span></span></div><button class="vps-press" type="button" data-vps="next">EXPLORE PRO <span>→</span></button></div>' +
       '<div class="vp-bottom"><span class="vp-status"><i></i> COMING SOON</span><p>Infrastructure for advanced derivatives trading.</p><span class="vp-edition">PRODUCT OVERVIEW</span></div></div>' + screens() + navBar();
+    var overviewPanel = document.createElement('div');
+    overviewPanel.setAttribute('data-vps-overview-panel', '');
+    while (section.firstChild) overviewPanel.appendChild(section.firstChild);
+    var viewNav = document.createElement('nav');
+    viewNav.className = 'vps-view-nav';
+    viewNav.setAttribute('aria-label', 'Variational Pro pages');
+    viewNav.innerHTML = '<button type="button" data-vps-view="overview" aria-current="page"><span>01</span> Pro overview</button>' +
+      '<button type="button" data-vps-view="derivatives" aria-current="false"><span>02</span> Top 50 derivatives</button>';
+    section.appendChild(viewNav);
+    section.appendChild(overviewPanel);
+    function setView(view) {
+      var derivativesPanel = section.querySelector('[data-vps-derivatives-panel]');
+      if (view === 'derivatives' && !derivativesPanel) return;
+      overviewPanel.hidden = view !== 'overview';
+      if (derivativesPanel) derivativesPanel.hidden = view !== 'derivatives';
+      viewNav.querySelectorAll('[data-vps-view]').forEach(function (button) {
+        button.setAttribute('aria-current', button.dataset.vpsView === view ? 'page' : 'false');
+      });
+      if (!section.classList.contains('tg-hide')) history.replaceState(null, '', view === 'derivatives' ? '#derivatives' : '#variational-pro');
+      section.scrollIntoView({ block: 'start', behavior: 'instant' });
+    }
+    section.addEventListener('click', function (e) {
+      var target = e.target.closest && e.target.closest('[data-vps-view]');
+      if (target) setView(target.dataset.vpsView);
+    });
+    document.addEventListener('var:pro-view', function (e) {
+      if (e.detail && e.detail.view) setView(e.detail.view);
+    });
     main.appendChild(section);
     wireScreens(section);
 
@@ -306,6 +335,7 @@ body.v2-dashboard .vps-heading h3{font-size:clamp(30px,3.2vw,46px)!important;lin
     var style = document.createElement('style');
     style.textContent = `
 .tsec[data-tg="variational-pro"]{padding-top:16px}
+.vps-view-nav{display:flex;flex-wrap:wrap;gap:0;margin-bottom:12px;border:1px solid #314561;background:#0a1422}.vps-view-nav button{display:flex;align-items:center;gap:12px;min-height:50px;padding:12px 20px;border:0;border-right:1px solid #314561;background:transparent;color:#9eb3d0;font:600 12px var(--sans,Arial,sans-serif);cursor:pointer}.vps-view-nav button span{font:10px var(--mono);color:#699de0}.vps-view-nav button[aria-current="page"]{background:#1b3c65;color:#e8f2ff;box-shadow:inset 0 -2px #77b3ff}.vps-view-nav button:focus-visible,.vps-derivatives-link:focus-visible{outline:2px solid #9dc6fa;outline-offset:2px}.vps-derivatives-link{padding:0;border:0;background:none;cursor:pointer}[data-vps-overview-panel][hidden],[data-vps-derivatives-panel][hidden]{display:none!important}@media(max-width:600px){.vps-view-nav button{min-height:44px;padding:10px 12px;font-size:10px;gap:7px}}
 .vp-reveal{position:relative;isolation:isolate;display:flex;flex-direction:column;min-height:680px;min-height:max(680px,calc(100svh - 170px));overflow:hidden;background:#080e1b;border:1px solid #273953;color:#fff}
 .vp-topline{position:relative;z-index:2;display:flex;align-items:center;justify-content:space-between;gap:20px;padding:24px 32px;border-bottom:1px solid #92baff18;color:#7f96b9;font:9px/1.5 var(--mono);letter-spacing:3px}
 .vp-topline>span:first-child{color:#b8c9e4;letter-spacing:4px}

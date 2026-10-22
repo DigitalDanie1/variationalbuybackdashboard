@@ -1,8 +1,6 @@
-/* Dedicated market reference page. Mount after Pro and before navigation grouping. */
+/* Nested Pro market reference page. Mount after Pro and before navigation grouping. */
 (function () {
   'use strict';
-  var TAB = 'derivatives';
-  var TITLE = 'Top 50 Derivatives';
   var data = window.PRO_DERIVATIVES;
   var state = { query: '', asset: '', unit: 'usd', sort: 'adv' };
 
@@ -34,7 +32,7 @@
       '<div class="vps-benchmark-period"><span>ADV: SEP 2026 · OI: 30 SEP 2026 · REFERENCE MARKS: 21 OCT 2026</span><span data-vd-count aria-live="polite"></span></div>' +
       '<div class="vps-benchmark-scroll" tabindex="0" aria-label="Scrollable top 50 derivatives table"><table class="vps-benchmark-table vd-table"><caption>Volume and OI ranks cover all 50 selected contracts and stay fixed when filtering. USD figures are reference-notional estimates, not observed dollar turnover.</caption>' +
       '<thead><tr><th scope="col">Vol. rank</th><th scope="col">OI rank</th><th scope="col">Contract / symbol</th><th scope="col">Asset class</th><th scope="col" data-vd-adv-heading>ADV (USD B)*</th><th scope="col" data-vd-oi-heading>OI (USD B)*</th><th scope="col">Variational scenario</th></tr></thead><tbody data-vd-rows></tbody></table></div>' +
-      '<div class="vd-pro-link"><div><b>Translate market scale into a Variational scenario.</b><p>Use any contract to model assumed market share, margin and gross revenue. These benchmarks are external markets, not live Pro listings.</p></div><a href="#variational-pro">Explore Variational Pro →</a></div>' +
+      '<div class="vd-pro-link"><div><b>Translate market scale into a Variational scenario.</b><p>Use any contract to model assumed market share, margin and gross revenue. These benchmarks are external markets, not live Pro listings.</p></div><button type="button" data-vd-overview>Explore Variational Pro →</button></div>' +
       '<details class="vps-methodology"><summary>Sources, notional conversion and coverage</summary>' +
       '<p><b>*Reference notional.</b> September contract ADV / month-end OI × contract size × an explicitly selected 21 October 2026 CME settlement. Rates use contract principal or Treasury face value. The same reference price is applied across expiries. This is not actual daily dollar turnover, DV01 or delta-adjusted exposure. Contract-count rankings are available in Display.</p>' +
       '<p><b>Coverage:</b> 50 selected CME Group futures, not the global top 50. OTC, options, ICE and Eurex are excluded. FX rows are futures on currency pairs, not the entire OTC pair market. Traditional ADV uses exchange trading days; crypto’s 24-hour figures use calendar days. Contract sizes and risk profiles differ, so rankings do not establish economic or risk equivalence.</p>' +
@@ -76,34 +74,33 @@
         showTab('variational-pro');
         document.dispatchEvent(new CustomEvent('var:pro-model-market', { detail:{ symbol:model.dataset.vdModel } }));
       }
+      if(e.target.closest('[data-vd-overview]')) document.dispatchEvent(new CustomEvent('var:pro-view', { detail:{ view:'overview' } }));
     });
     render();
   }
   function boot() {
-    var main=document.getElementById('main'), tabs=document.getElementById('tabs');
-    if(!main || !tabs || !data || !data.rows.length || document.getElementById('tab-'+TAB)) return;
-    VALID_TABS.push(TAB);
-    DEFAULT_TAB_ORDER.push(TAB);
-    SECTION_COPY[TAB]={eyebrow:'Market reference',title:TITLE,description:'Volume & open interest',chip:'USD billions'};
-    var section=document.createElement('section');
-    section.className='tsec tg-hide'; section.dataset.tg=TAB; section.innerHTML=page();
-    main.appendChild(section); wire(section);
-    var button=document.createElement('button');
-    button.id='tab-'+TAB; button.type='button'; button.setAttribute('role','tab'); button.setAttribute('aria-selected','false'); button.dataset.tab=TAB; button.textContent=TITLE; tabs.appendChild(button);
-    document.querySelectorAll('[data-open-tab="variational-pro"]').forEach(function(source) {
-      var next=source.cloneNode(true); next.dataset.openTab=TAB; next.classList.remove('on');
-      var title=next.querySelector('strong') || next.querySelector('b'); if(title) title.textContent=TITLE;
-      var small=next.querySelector('small'); if(small) small.textContent='Volume & open interest';
-      source.parentNode.insertBefore(next,source.nextSibling);
-    });
+    var pro=document.querySelector('[data-tg="variational-pro"]');
+    if(!pro || !data || !data.rows.length || pro.querySelector('[data-vps-derivatives-panel]')) return;
+    var section=document.createElement('div');
+    section.setAttribute('data-vps-derivatives-panel',''); section.hidden=true; section.innerHTML=page();
+    pro.appendChild(section); wire(section);
     var style=document.createElement('style'); style.textContent=CSS; document.head.appendChild(style);
-    if(location.hash==='#'+TAB) showTab(TAB,{push:false});
+    function followProHash() {
+      if(location.hash==='#derivatives') {
+        showTab('variational-pro',{push:false});
+        document.dispatchEvent(new CustomEvent('var:pro-view',{detail:{view:'derivatives'}}));
+      } else if(location.hash==='#variational-pro') {
+        document.dispatchEvent(new CustomEvent('var:pro-view',{detail:{view:'overview'}}));
+      }
+    }
+    followProHash();
+    window.addEventListener('hashchange',followProHash);
   }
   var CSS = `
 .vd-page{display:flex;flex-direction:column;gap:16px;padding:24px;border:1px solid #2d415c;background:radial-gradient(ellipse at 100% 0,#17345c40,transparent 55%),#080e1b;color:#e0eafa;min-width:0}
 .vd-heading{display:block!important;text-align:left!important;padding:0!important;margin:0!important;border:0!important;background:none!important}.vd-eyebrow{font:9px/1.5 var(--mono);letter-spacing:2px;color:#9eb7d8}body.v2-dashboard .vd-heading h2{font:650 clamp(30px,3.1vw,42px)/1.1 var(--sans,Arial,sans-serif)!important;letter-spacing:-.04em!important;color:#f2f6ff!important;margin:12px 0!important}.vd-heading h2 span{display:inline-block;margin-left:18px;font-size:.57em;letter-spacing:-.02em;color:#8dbbfa}.vd-heading>p{max-width:780px;font:13px/1.75 var(--sans,Arial,sans-serif)!important;color:#aebfd7!important;margin:0!important}.vd-coverage{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;margin-top:12px;font:10px/1.6 var(--mono);color:#a6b8d0}.vd-coverage b{font-size:8px;letter-spacing:1px;padding:6px 9px;border:1px solid #3d587b;background:#13243a;color:#c4d8f2}
 .vd-summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border:1px solid #344861;background:#101c2c}.vd-summary>div{padding:12px 14px;min-width:0}.vd-summary>div+div{border-left:1px solid #344861}.vd-summary span{font:9px/1.5 var(--mono);letter-spacing:.5px;color:#9eb9db}.vd-summary strong{display:block;font:600 clamp(24px,2.2vw,29px)/1.1 var(--sans,Arial,sans-serif);letter-spacing:-.03em;margin:7px 0;color:#e6f0ff;overflow-wrap:anywhere;font-variant-numeric:tabular-nums}.vd-summary strong small{font:12px var(--sans,Arial,sans-serif);letter-spacing:0;color:#a9bfdb}.vd-summary p{font:11px/1.7 var(--sans,Arial,sans-serif)!important;color:#9eb4d1!important;margin:0!important}.vd-table-top{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:14px}.vd-table-top>a,.vd-pro-link>a{font:11px/1.6 var(--mono);color:#bdd7ff;text-decoration:none}.vd-coverage>a{margin-left:auto;color:#bdd7ff;text-decoration:none}.vd-page .vps-benchmark-toolbar label,.vd-rank-control{min-width:140px}.vd-rank-control{display:flex;flex:1;flex-direction:column;gap:10px;font:10px/1.5 var(--mono);color:#b9cce4}.vd-rank-tabs{display:flex;box-sizing:border-box;min-height:42px;gap:4px;padding:4px;border:1px solid #3c5270;background:#0d1726}.vd-rank-tabs button{padding:6px 9px;font:600 11px var(--sans,Arial,sans-serif);border:1px solid transparent;color:#a9bdd7;background:transparent;cursor:pointer}.vd-rank-tabs button[aria-pressed="true"]{background:#24466f;border-color:#5f8bc4;color:#f0f6ff}.vd-page button:focus-visible,.vd-page a:focus-visible,.vd-page .vps-benchmark-scroll:focus-visible{outline:2px solid #9dc6fa;outline-offset:3px}
-.vd-page .vps-benchmark-toolbar{margin:0;padding:16px}.vd-page .vps-benchmark-scroll{max-height:740px;min-width:0}.vd-table{min-width:840px;font-variant-numeric:tabular-nums}.vd-table td:nth-child(4){font-family:var(--sans,Arial,sans-serif);text-align:left;white-space:normal}.vd-table td:nth-child(5),.vd-table td:nth-child(6){font-family:var(--mono);text-align:right;white-space:nowrap}.vd-table td:nth-child(1),.vd-table td:nth-child(2){font:11px var(--mono);color:#849ab8}.vd-table td.vd-active-rank{color:#b4d6ff;background:#1a304b66;font-weight:700}.vd-table th small{font-size:10px}.vd-table th[data-vd-adv-heading],.vd-table th[data-vd-oi-heading]{text-align:right}.vd-table th[aria-sort="descending"]{color:#e1efff;background:#264369}.vd-page .vps-methodology p{font:12px/1.8 var(--sans,Arial,sans-serif)!important;color:#aebfd7!important;margin:14px 0 0!important}.vd-pro-link{display:flex;align-items:center;justify-content:space-between;gap:24px;padding:22px;border:1px solid #3b5577;background:#122238}.vd-pro-link b{font:600 14px/1.6 var(--sans,Arial,sans-serif);color:#dceaff}.vd-pro-link p{max-width:760px;font:12px/1.75 var(--sans,Arial,sans-serif)!important;color:#aebfd7!important;margin:8px 0 0!important}.vd-pro-link>a{flex-shrink:0;padding:12px 16px;border:1px solid #6589b9;background:#1e3d64}
+.vd-page .vps-benchmark-toolbar{margin:0;padding:16px}.vd-page .vps-benchmark-scroll{max-height:740px;min-width:0}.vd-table{min-width:840px;font-variant-numeric:tabular-nums}.vd-table td:nth-child(4){font-family:var(--sans,Arial,sans-serif);text-align:left;white-space:normal}.vd-table td:nth-child(5),.vd-table td:nth-child(6){font-family:var(--mono);text-align:right;white-space:nowrap}.vd-table td:nth-child(1),.vd-table td:nth-child(2){font:11px var(--mono);color:#849ab8}.vd-table td.vd-active-rank{color:#b4d6ff;background:#1a304b66;font-weight:700}.vd-table th small{font-size:10px}.vd-table th[data-vd-adv-heading],.vd-table th[data-vd-oi-heading]{text-align:right}.vd-table th[aria-sort="descending"]{color:#e1efff;background:#264369}.vd-page .vps-methodology p{font:12px/1.8 var(--sans,Arial,sans-serif)!important;color:#aebfd7!important;margin:14px 0 0!important}.vd-pro-link{display:flex;align-items:center;justify-content:space-between;gap:24px;padding:22px;border:1px solid #3b5577;background:#122238}.vd-pro-link b{font:600 14px/1.6 var(--sans,Arial,sans-serif);color:#dceaff}.vd-pro-link p{max-width:760px;font:12px/1.75 var(--sans,Arial,sans-serif)!important;color:#aebfd7!important;margin:8px 0 0!important}.vd-pro-link>button{flex-shrink:0;padding:12px 16px;border:1px solid #6589b9;background:#1e3d64;color:#bdd7ff;font:11px/1.6 var(--mono);cursor:pointer}
 @media(max-width:900px){.vd-page{padding:24px}.vd-summary>div{padding:18px}.vd-summary strong{font-size:26px}.vd-pro-link{align-items:flex-start;flex-direction:column}.vd-table{min-width:840px}}
 @media(max-width:600px){.vd-page{padding:20px 14px;gap:18px}body.v2-dashboard .vd-heading h2{font-size:32px!important}.vd-heading h2 span{display:block;margin:6px 0 0;font-size:22px}.vd-summary{grid-template-columns:1fr}.vd-summary>div+div{border-left:0;border-top:1px solid #344861}.vd-summary>div{padding:16px}.vd-summary strong{font-size:28px;margin:8px 0}.vd-page .vps-benchmark-toolbar label,.vd-rank-control{min-width:100%}.vd-rank-tabs button{padding:8px 14px}.vd-coverage>a{margin-left:0}.vd-pro-link{padding:18px}.vd-page .vps-benchmark-scroll{max-height:620px}}
 `;
