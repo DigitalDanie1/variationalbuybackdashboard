@@ -14,6 +14,17 @@
       ? '$' + n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + 'B'
       : n.toLocaleString('en-US');
   }
+  function contractEmoji(r) {
+    var bySymbol = {
+      SR3:'🏦', ZQ:'🏛️', ZN:'📜', ZT:'📜', ZF:'📜', TN:'📜', ZB:'📜', UB:'📜', YIY:'🔁', YIW:'🔁',
+      ES:'📈', MES:'📈', NQ:'⚡', MNQ:'⚡', RTY:'📊', M2K:'📊', YM:'🏭', MYM:'🏭',
+      CL:'🛢️', HO:'⛽', RB:'⛽', NG:'🔥',
+      GC:'🥇', MGC:'🥇', QO:'🥇', SI:'🥈', SIL:'🥈', HG:'🔌', MHG:'🔌', PL:'⚙️',
+      '6E':'🇪🇺', '6J':'🇯🇵', '6B':'🇬🇧', '6A':'🇦🇺', '6C':'🇨🇦', '6S':'🇨🇭', '6N':'🇳🇿', '6M':'🇲🇽', '6L':'🇧🇷',
+      ZS:'🫘', XK:'🫘', ZM:'🫘', ZL:'🫘', ZC:'🌽', XC:'🌽', LE:'🐄', GF:'🐄', ZW:'🌾', ZO:'🌾', HE:'🐖'
+    };
+    return bySymbol[r.symbol] || '📊';
+  }
   function ranked(metric) {
     var field = metric + (state.unit === 'usd' ? 'B' : 'Contracts');
     return data.rows.slice().sort(function(a,b) { return b[field] - a[field] || a.symbol.localeCompare(b.symbol); });
@@ -57,7 +68,7 @@
       section.querySelector('[data-vd-count]').textContent = list.length+' / '+data.rows.length+' contracts';
       section.querySelectorAll('[data-vd-sort]').forEach(function(b) { b.setAttribute('aria-pressed', String(b.dataset.vdSort===state.sort)); });
       section.querySelector('[data-vd-rows]').innerHTML = list.length ? list.map(function(r) {
-        return '<tr><td class="'+(state.sort==='adv'?'vd-active-rank':'')+'">'+ranks.adv[r.symbol]+'</td><td class="'+(state.sort==='oi'?'vd-active-rank':'')+'">'+ranks.oi[r.symbol]+'</td><th scope="row">'+safe(r.name)+'</th><td><span class="vd-ticker">'+safe(r.symbol)+'</span></td><td><span class="vd-asset">'+safe(r.asset)+'</span></td><td class="vd-number">'+value(r[state.unit==='usd'?'advB':'advContracts'])+'</td><td class="vd-number">'+value(r[state.unit==='usd'?'oiB':'oiContracts'])+'</td><td><button type="button" data-vd-model="'+safe(r.symbol)+'" aria-label="Model '+safe(r.name)+' ('+safe(r.symbol)+')">Model →</button></td></tr>';
+        return '<tr><td class="'+(state.sort==='adv'?'vd-active-rank':'')+'">'+ranks.adv[r.symbol]+'</td><td class="'+(state.sort==='oi'?'vd-active-rank':'')+'">'+ranks.oi[r.symbol]+'</td><th scope="row"><span class="vd-contract"><span class="vd-contract-emoji" aria-hidden="true">'+contractEmoji(r)+'</span><span>'+safe(r.name)+'</span></span></th><td><span class="vd-ticker">'+safe(r.symbol)+'</span></td><td><span class="vd-asset">'+safe(r.asset)+'</span></td><td class="vd-number">'+value(r[state.unit==='usd'?'advB':'advContracts'])+'</td><td class="vd-number">'+value(r[state.unit==='usd'?'oiB':'oiContracts'])+'</td><td><button type="button" data-vd-model="'+safe(r.symbol)+'" aria-label="Model '+safe(r.name)+' ('+safe(r.symbol)+')">Model →</button></td></tr>';
       }).join('') : '<tr><td colspan="8">No matching contracts. Change the search or asset filter.</td></tr>';
     }
     section.addEventListener('input', function(e) {
@@ -104,6 +115,7 @@
 @media(max-width:900px){.vd-page{padding:24px}.vd-summary>div{padding:18px}.vd-summary strong{font-size:26px}.vd-pro-link{align-items:flex-start;flex-direction:column}.vd-table{min-width:840px}}
 @media(max-width:600px){.vd-page{padding:20px 14px;gap:18px}body.v2-dashboard .vd-heading h2{font-size:32px!important}.vd-heading h2 span{display:block;margin:6px 0 0;font-size:22px}.vd-summary{grid-template-columns:1fr}.vd-summary>div+div{border-left:0;border-top:1px solid #344861}.vd-summary>div{padding:16px}.vd-summary strong{font-size:28px;margin:8px 0}.vd-page .vps-benchmark-toolbar label,.vd-rank-control{min-width:100%}.vd-rank-tabs button{padding:8px 14px}.vd-coverage>a{margin-left:0}.vd-pro-link{padding:18px}.vd-page .vps-benchmark-scroll{max-height:620px}}
 .vps-show-derivatives .vps-view-nav{margin-bottom:0;border-bottom-color:#263953;background:#0b111c}.vps-show-derivatives .vps-view-nav button{min-height:48px}.vps-show-derivatives .vd-page{border-top:0;background:#0b111c}.vd-table{min-width:1020px}.vd-table thead th:nth-child(1),.vd-table thead th:nth-child(2){width:82px}.vd-table thead th:nth-child(3){min-width:210px}.vd-table thead th:nth-child(4){width:88px}.vd-table thead th:nth-child(5){width:125px}.vd-table thead th:nth-child(6),.vd-table thead th:nth-child(7){min-width:150px}.vd-table tbody th{font:600 12px/1.5 var(--sans,Arial,sans-serif);color:#e2ebf6;white-space:nowrap}.vd-ticker{display:inline-flex;align-items:center;min-width:40px;justify-content:center;padding:5px 8px;border:1px solid #466589;background:#152740;color:#a9cbf6;font:10px/1 var(--mono);letter-spacing:.3px}.vd-asset{display:inline-block;padding:4px 7px;border:1px solid #2c405a;color:#a9b9ce;font:9px/1.2 var(--sans,Arial,sans-serif);white-space:nowrap}.vd-table td:nth-child(5){text-align:left}.vd-table td.vd-number{font:11px var(--mono);color:#d5e4f7;text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}.vd-table tbody tr:hover .vd-ticker{border-color:#82b5f2;color:#e4f1ff}.vd-table tbody tr:hover th{color:#fff}.vd-page .vps-benchmark-scroll{border-color:#344861}.vd-page .vd-table caption{font:10px/1.6 var(--sans,Arial,sans-serif);color:#9eafc4}.vd-page .vd-table button{background:#1c3554;border-color:#5277a4;color:#cde1fa}.vd-page .vd-table button:hover{background:#2a4e79;border-color:#83b4ed}
+ .vd-contract{display:inline-flex;align-items:center;gap:9px}.vd-contract-emoji{display:inline-flex;flex:none;align-items:center;justify-content:center;width:24px;font:18px/1 "Apple Color Emoji","Segoe UI Emoji",sans-serif}
 `;
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot); else boot();
 })();
