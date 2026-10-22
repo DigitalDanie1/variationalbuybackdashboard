@@ -747,7 +747,7 @@
      The value line is a scenario, not a forecast: total raised × a listing multiple × 25%
      to users. The multiples are anchored on what happened: Lighter raised $68M and listed
      at a $4B FDV (≈59×); Variational has raised $61.8M. */
-  var FARMS_ASOF = '2026-10-21';
+  var FARMS_ASOF = '2026-10-22';
   var FARM_SHARE = 0.25;
   var FARM_MULTS = [20, 40, 59];
   var farmMult = 40;
@@ -765,7 +765,7 @@
       status: ['gated', 'Mainnet live · invite-only'], stage: 1,
       points: { start: '2026-07-28', label: 'Ignite S1', note: '200K points a week · ends by Q2 2027 · referrers +10%', weekly: 200000 },
       raised: 7.2e6, raisedNote: 'Galaxy Ventures, Vitalik Buterin, EtherFi, Stani Kulechov',
-      bull: ['$3B volume before points even started', 'All RISE points go to RISEx users', 'Points live now: the only one of the five'],
+      bull: ['$3B volume before points even started', 'All RISE points go to RISEx users', 'Points program is live'],
       src: [['Chainwire', 'https://chainwire.org/2026/07/24/risex-launches-ignite-season-1-points-program-following-3b-in-volume-during-the-early-access-phase/'], ['CoinDesk', 'https://www.coindesk.com/tech/2025/11/12/ethereum-layer-2-rise-unveils-risex-and-marketcore-to-build-global-on-chain-markets']] },
     { k: 'truenorth', mine: true, name: 'TrueNorth', logo: 'assets/farms/truenorth.jpg', x: 'get_truenorth', ref: true, accent: '#3b7bff', kols: [
         { x: 'yh_0x', asOf: '2026-10-17', note: '“my go-to terminal”', post: 'https://x.com/yh_0x/status/2111535624683737445' },
@@ -808,7 +808,39 @@
       points: null, pointsNote: 'No points program found.',
       raised: null, raisedNote: 'No raise disclosed',
       bull: ['A new market type, not another perp clone', 'Launched April 2026: still early', 'Aiming for a CFTC licence'],
-      src: [['Founder post', 'https://x.com/antoni_kiszka/status/2046608631718658543'], ['CryptoTotem', 'https://cryptototem.com/derpetual/']] }
+      src: [['Founder post', 'https://x.com/antoni_kiszka/status/2046608631718658543'], ['CryptoTotem', 'https://cryptototem.com/derpetual/']] },
+    { k: 'silhouette', cat: 'non', name: 'Silhouette', logo: null, x: 'silhouette_ex', ref: false, accent: '#a6a2f7', kols: [],
+      url: 'https://silhouette.exchange/', cta: 'Explore Silhouette',
+      what: 'Block-trade RFQs across Hyperliquid spot, perps and tokenized assets.',
+      status: ['live', 'Trading live'], stage: 0,
+      points: null, pointsLabel: 'Not confirmed', pointsNote: 'No public points program confirmed in the cited product docs.',
+      raised: null, raisedNote: 'No funding amount confirmed in cited sources',
+      bull: ['One request invites competing market-maker quotes', 'Execution settles on HyperCore or HyperEVM', 'Built for larger orders across several asset types'],
+      src: [['Docs', 'https://docs.silhouette.exchange/about-silhouette']] },
+    { k: 'titan', cat: 'non', name: 'Titan Exchange', logo: null, x: 'TitanExchange_', ref: false, accent: '#d6a56b', kols: [],
+      url: 'https://testnet.titanx.cc/', cta: 'Explore Titan testnet',
+      what: 'Privacy-focused trading venue on Canton Network, with an order book and private pools.',
+      status: ['gated', 'Testnet live'], stage: 0,
+      points: null, pointsLabel: 'Not confirmed', pointsNote: 'No public token or points allocation confirmed on the official site.',
+      raised: null, raisedNote: 'No funding amount confirmed in cited sources',
+      bull: ['Canton-based privacy architecture', 'Anonymized central-limit order book', 'Official site links to a live testnet'],
+      src: [['Official site', 'https://titanx.cc/']] },
+    { k: 'hyperlink', cat: 'non', name: 'HyperLink', logo: null, x: 'hyperlink_xyz', ref: false, accent: '#79c7ef', kols: [],
+      url: 'https://hyperlink.xyz/', cta: 'Explore HyperLink',
+      what: 'Prime brokerage and execution layer for traders on Hyperliquid.',
+      status: ['live', 'Broker live'], stage: 0,
+      points: null, pointsLabel: 'Not confirmed', pointsNote: 'No public points allocation confirmed in cited sources.',
+      raised: null, raisedNote: 'Public funding amount not verified in cited sources',
+      bull: ['Routes into Hyperliquid liquidity', 'Pooled activity targets lower trading fees', 'Shared execution infrastructure reduces wallet-level visibility'],
+      src: [['Official profile', 'https://www.linkedin.com/company/hyperlink-xyz'], ['GitHub', 'https://github.com/hyperlink-xyz']] },
+    { k: 'flint', name: 'Flint', logo: null, x: 'flint_trade_', ref: false, accent: '#f1ae72', kols: [],
+      url: 'https://flint.trade/', cta: 'Explore Flint',
+      what: 'Solana spot venue live today; a fully on-chain perp DEX is in development.',
+      status: ['soon', 'Spot live · perps building'], stage: 0,
+      points: null, pointsLabel: 'Not confirmed', pointsNote: 'No perp points program confirmed; spot-maker rebates are a separate program.',
+      raised: null, raisedNote: 'No funding amount confirmed in cited sources',
+      bull: ['Spot quoting is already live', 'Perps are planned as a multi-maker prop AMM', 'Closed perp alpha is planned for later in 2026'],
+      src: [['Official site', 'https://flint.trade/'], ['Product update', 'https://flint.trade/blog/flint-is-building-perps-on-solana']] }
   ];
 
   /* The site owner's own farms lead the page: the hero, the first matrix row, a badge on
@@ -842,6 +874,11 @@
     if (v >= 1e6) return '$' + (v / 1e6).toFixed(v >= 1e8 ? 0 : 1) + 'M';
     return '$' + Math.round(v / 1e3) + 'K';
   }
+  function farmLogo(f, size) {
+    return f.logo
+      ? '<img src="' + esc(f.logo) + '" alt="' + esc(f.name) + ' logo" width="' + size + '" height="' + size + '">'
+      : '<span class="nf-logo-placeholder" style="width:' + size + 'px;height:' + size + 'px;font-size:' + Math.round(size * .33) + 'px" aria-label="' + esc(f.name) + '" title="' + esc(f.name) + '">' + esc(f.name.slice(0, 1)) + '</span>';
+  }
   /* counted to today, not to FARMS_ASOF: the start date is a fact, the day number is arithmetic */
   function farmDays(from) {
     return Math.max(0, Math.floor((Date.now() - Date.parse(from + 'T00:00:00Z')) / 864e5));
@@ -872,7 +909,7 @@
   }
 
   function farmCard(f) {
-    var hedge = '<a class="nf-hedge" href="' + esc(f.url) + '" target="_blank" rel="noopener noreferrer">Hedge it with ' + esc(f.name) + ' ↗' +
+    var hedge = '<a class="nf-hedge" href="' + esc(f.url) + '" target="_blank" rel="noopener noreferrer">' + esc(f.cta || ('Hedge it with ' + f.name)) + ' ↗' +
       (f.ref ? '<small>ref</small>' : '') + '</a>';
     var pts;
     if (f.points) {
@@ -880,7 +917,7 @@
       pts = '<div class="nf-pts live"><span>Points</span><b>' + esc(f.points.label) + ' · day ' + d + '</b>' +
         '<em>~' + (weeks * f.points.weekly / 1e6).toFixed(1) + 'M points out so far · ' + esc(f.points.note) + '</em></div>';
     } else {
-      pts = '<div class="nf-pts"><span>Points</span><b>Not started</b><em>' + esc(f.pointsNote) + '</em></div>';
+      pts = '<div class="nf-pts"><span>Points</span><b>' + esc(f.pointsLabel || 'Not started') + '</b><em>' + esc(f.pointsNote) + '</em></div>';
     }
     var pool = f.raised ? f.raised * farmMult * FARM_SHARE : null;
     var maxPool = 14e6 * 59 * FARM_SHARE;
@@ -888,7 +925,7 @@
       ? '<div class="nf-val"><span>If it lists at ' + farmMult + '× its raise</span><b>' + farmUsd(pool) + '</b>' +
         '<i style="--w:' + Math.min(100, pool / maxPool * 100).toFixed(1) + '%"></i>' +
         '<em>to users (25%) · FDV ' + farmUsd(f.raised * farmMult) + ' · raised ' + farmUsd(f.raised) + '</em></div>'
-      : '<div class="nf-val none"><span>Potential value</span><b>—</b><em>no raise disclosed, so no anchor to scale</em></div>';
+      : '<div class="nf-val none"><span>Potential value</span><b>—</b><em>no verified funding anchor for this scenario</em></div>';
     if (pool && f.points) {
       var seasonPts = f.points.weekly * 48;
       val = val.replace('</em></div>', ' · ≈ $' + (pool / seasonPts * 1000).toFixed(0) + ' per 1K points over a ~48-week season</em></div>');
@@ -898,7 +935,7 @@
       ' data-nf-text="' + esc((f.name + ' ' + kolText).toLowerCase()) + '" data-nf-kols="' + ((f.kols || []).length) + '"' +
       ' data-nf-stage="' + (f.points ? 'live' : 'pre') + '" data-nf-cat="' + (f.cat || 'perp') + '">' +
       '<div class="nf-head"><a class="nf-farm-id" href="' + esc(f.url) + '" target="_blank" rel="noopener noreferrer">' +
-        '<img src="' + esc(f.logo) + '" alt="' + esc(f.name) + ' logo" width="60" height="60"></a>' +
+        farmLogo(f, 60) + '</a>' +
         '<div><b>' + esc(f.name) + '</b><span class="nf-st ' + f.status[0] + '"><i></i>' + esc(f.status[1]) + '</span>' +
         (f.mine ? '<span class="nf-mine">★ I’m farming this</span>' : '') + '</div></div>' +
       '<p class="nf-what">' + esc(f.what) + '</p>' +
@@ -915,14 +952,14 @@
 
   /* where each farm sits: earlier on the track = cheaper entry, less certainty */
   function farmTrack() {
-    var stages = ['Cash rewards / nothing yet', 'Points live', 'Token'];
+    var stages = ['No confirmed points / rewards', 'Points live', 'Token'];
     return '<div class="nf-track"><div class="nf-track-line">' +
       stages.map(function (s, i) {
-        var here = FARMS_PERP.filter(function (f) { return f.stage === i; });
+        var here = FARMS_PERP.filter(function (f) { return (f.cat || 'perp') === 'perp' && f.stage === i; });
         return '<div class="nf-stage"><span>' + esc(s) + '</span><div class="nf-stage-logos">' +
-          (here.length ? here.map(function (f) { return '<img src="' + esc(f.logo) + '" alt="' + esc(f.name) + '" title="' + esc(f.name) + '" width="34" height="34">'; }).join('') : '<em>none yet</em>') +
+          (here.length ? here.map(function (f) { return farmLogo(f, 34); }).join('') : '<em>none yet</em>') +
           '</div></div>';
-      }).join('') + '</div><p>Earlier on the track = cheaper entry and less certainty. None of the five has a token yet.</p></div>';
+      }).join('') + '</div><p>Program status is based on cited public material; a testnet or live product does not imply a token allocation.</p></div>';
   }
 
   function farmControls() {
@@ -940,7 +977,7 @@
     ['who', 'Show', [['all', 'All farms'], ['mine', '★ My farms']]],
     ['sort', 'Sort', [['default', 'Featured'], ['name', 'Project A–Z'], ['kols', 'Most KOLs']]],
     ['pts', 'Points', [['all', 'All'], ['pre', 'Pre-points'], ['live', 'Points live']]],
-    ['cat', 'Type', [['all', 'All'], ['perp', 'Perp DEX'], ['non', 'Non-perp']]]
+    ['cat', 'Type', [['all', 'All'], ['perp', 'Perp venues'], ['non', 'Trading infrastructure']]]
   ];
   function nfToolbar() {
     return '<div class="nf-bar"><label class="nf-search"><span aria-hidden="true">⌕</span>' +
@@ -989,7 +1026,8 @@
      Each dot links to the post that shows it. */
   function kolMatrix() {
     var people = {};
-    FARMS_PERP.forEach(function (f) {
+    var matrixFarms = FARMS_PERP.filter(function (f) { return f.mine || (f.kols || []).length; });
+    matrixFarms.forEach(function (f) {
       (f.kols || []).forEach(function (kk) {
         var id = (kk.x || kk.tg).toLowerCase();
         (people[id] = people[id] || { kk: kk, farms: {} }).farms[f.k] = kk;
@@ -1000,12 +1038,12 @@
     rows.sort(function (a, b) {
       return Object.keys(b.farms).length - Object.keys(a.farms).length || (a.kk.x || '').toLowerCase().localeCompare((b.kk.x || '').toLowerCase());
     });
-    var head = '<tr><th>KOL</th>' + FARMS_PERP.map(function (f) {
+    var head = '<tr><th>KOL</th>' + matrixFarms.map(function (f) {
       return '<th title="' + esc(f.name) + '"><img src="' + esc(f.logo) + '" alt="' + esc(f.name) + '" width="26" height="26"><span>' + esc(f.name) + '</span></th>';
     }).join('') + '<th>Farms</th></tr>';
     var meRow = '<tr class="nf-mx-me"><td class="nf-mx-who"><a href="https://x.com/' + ME.x + '" target="_blank" rel="noopener noreferrer"><i class="me">KD</i>' +
       '<span><b>Me · ' + ME.name + '</b><small>@' + ME.x + '</small></span></a></td>' +
-      FARMS_PERP.map(function (f) {
+      matrixFarms.map(function (f) {
         return '<td>' + (f.mine ? '<a class="nf-dot" style="--acc:' + f.accent + '" href="' + esc(f.url) + '" target="_blank" rel="noopener noreferrer" title="' + esc(f.name) + ' · my farm"></a>' : '<span class="nf-nodot"></span>') + '</td>';
       }).join('') + '<td class="nf-mx-n">' + myFarms().length + '</td></tr>';
     var body = meRow + rows.map(function (r) {
@@ -1013,7 +1051,7 @@
       var face = pr.avatar ? '<img src="' + esc(pr.avatar) + '" alt="" width="28" height="28">' : '<i>' + esc((r.kk.x || r.kk.tg).slice(0, 2).toUpperCase()) + '</i>';
       return '<tr><td class="nf-mx-who"><a href="https://x.com/' + esc(r.kk.x) + '" target="_blank" rel="noopener noreferrer">' + face +
         '<span><b>' + esc(pr.name || r.kk.x) + '</b><small>@' + esc(r.kk.x) + '</small></span></a></td>' +
-        FARMS_PERP.map(function (f) {
+        matrixFarms.map(function (f) {
           var hit = r.farms[f.k];
           return '<td>' + (hit ? '<a class="nf-dot" style="--acc:' + f.accent + '" href="' + esc(hit.post) + '" target="_blank" rel="noopener noreferrer" title="' + esc(f.name + ' · ' + (hit.note || '') + ' · ' + hit.asOf) + '"></a>' : '<span class="nf-nodot"></span>') + '</td>';
         }).join('') + '<td class="nf-mx-n">' + Object.keys(r.farms).length + '</td></tr>';
@@ -1025,15 +1063,19 @@
   function renderNext() {
     var host = document.querySelector('[data-tg="whales-next"]');
     if (!host) return;
+    var infra = FARMS_PERP.filter(function (f) { return f.cat === 'non'; });
+    var perps = FARMS_PERP.filter(function (f) { return (f.cat || 'perp') === 'perp'; });
     host.innerHTML = '<div class="cmp-heading"><span class="cmp-eyebrow">POST-TGE · NEXT FARMS</span>' +
       '<h2>' + NEXT_TITLE + '</h2><p>Farming projects, with Varriors’ picks and reasons to farm.</p></div>' +
       myHero() + nfToolbar() + kolMatrix() +
       '<div class="nf-categories" aria-label="Upcoming farming projects">' +
-      '<section class="nf-category" data-nf-section="non" aria-labelledby="nf-non-perp"><span class="nf-part">PART 01</span><h3 id="nf-non-perp">Non Perp DEX</h3><div class="nf-empty"><h4>Coming soon</h4></div></section>' +
-      '<section class="nf-category" data-nf-section="perp" aria-labelledby="nf-perp"><span class="nf-part">PART 02</span><h3 id="nf-perp">Perp DEX</h3>' +
-      '<p class="nf-lede">Five perp venues worth farming while you hold VAR — and worth hedging it on. Facts as of ' + FARMS_ASOF + ', sourced on each card.</p>' +
+      '<section class="nf-category" data-nf-section="non" aria-labelledby="nf-non-perp"><span class="nf-part">PART 01</span><h3 id="nf-non-perp">Trading infrastructure</h3>' +
+      '<p class="nf-lede">Block trading, prime brokerage and private-market rails. Product access is separate from any unannounced rewards. Facts as of ' + FARMS_ASOF + '.</p>' +
+      '<div class="nf-farms">' + infra.map(farmCard).join('') + '</div><div class="nf-none" hidden>No project or KOL matches that. Clear the search or the filters.</div></section>' +
+      '<section class="nf-category" data-nf-section="perp" aria-labelledby="nf-perp"><span class="nf-part">PART 02</span><h3 id="nf-perp">Perp venues</h3>' +
+      '<p class="nf-lede">' + perps.length + ' venues to track, including Flint’s live spot market and planned perp launch. Facts as of ' + FARMS_ASOF + ', sourced on each card.</p>' +
       farmTrack() + farmControls() +
-      '<div class="nf-farms">' + FARMS_PERP.map(farmCard).join('') + '</div>' +
+      '<div class="nf-farms">' + perps.map(farmCard).join('') + '</div>' +
       '<div class="nf-none" hidden>No project or KOL matches that. Clear the search or the filters.</div></section></div>';
     applyNf();
   }
@@ -1117,6 +1159,7 @@
       '.nf-farm{position:relative;display:flex;flex-direction:column;gap:12px;padding:18px;border:1px solid var(--line);background:linear-gradient(160deg,color-mix(in srgb,var(--acc) 9%,var(--panel)),var(--panel) 45%);min-width:0;overflow:hidden;transition:transform .15s,border-color .15s}' +
       '.nf-farm::before{content:"";position:absolute;inset:0 0 auto 0;height:3px;background:var(--acc)}.nf-farm:hover{transform:translateY(-2px);border-color:var(--acc)}' +
       '.nf-head{display:flex;align-items:center;gap:14px;text-align:left}.nf-head>div{min-width:0}.nf-farm-id img{display:block;width:60px;height:60px;border-radius:16px;object-fit:cover;border:1px solid var(--line);box-shadow:0 6px 22px color-mix(in srgb,var(--acc) 35%,transparent)}' +
+      '.nf-logo-placeholder{display:flex;flex:none;align-items:center;justify-content:center;border:1px solid var(--acc);border-radius:16px;background:color-mix(in srgb,var(--acc) 16%,var(--panel));color:var(--acc);font-family:var(--mono);font-weight:900;box-shadow:0 6px 22px color-mix(in srgb,var(--acc) 22%,transparent)}.nf-stage-logos .nf-logo-placeholder{border-radius:9px}' +
       '.nf-head b{display:block;color:var(--text);font:800 20px/1.2 var(--sans);letter-spacing:-.3px}' +
       '.nf-st{display:inline-flex;align-items:center;gap:6px;margin-top:5px;color:var(--muted);font:800 9.5px var(--mono);letter-spacing:.5px;text-transform:uppercase}.nf-st i{width:7px;height:7px;border-radius:50%;background:var(--muted)}' +
       '.nf-st.live i{background:#2fb37e;box-shadow:0 0 0 3px color-mix(in srgb,#2fb37e 25%,transparent);animation:nfpulse 1.8s infinite}.nf-st.gated i{background:#d99a2b}.nf-st.soon i{background:#8a9bb0}' +
