@@ -295,6 +295,7 @@ body.v2-dashboard .vps-heading h3{font-size:clamp(30px,3.2vw,46px)!important;lin
       var derivativesPanel = section.querySelector('[data-vps-derivatives-panel]');
       if (view === 'derivatives' && !derivativesPanel) return;
       overviewPanel.hidden = view !== 'overview';
+      section.classList.toggle('vps-show-derivatives', view === 'derivatives');
       if (derivativesPanel) derivativesPanel.hidden = view !== 'derivatives';
       viewNav.querySelectorAll('[data-vps-view]').forEach(function (button) {
         button.setAttribute('aria-current', button.dataset.vpsView === view ? 'page' : 'false');
