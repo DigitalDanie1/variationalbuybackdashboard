@@ -43,7 +43,6 @@
       PROFILES = profiles;
       render();
       renderNext();
-      renderNext();
     }).catch(function () { /* Existing names and links remain usable. */ });
   }
 
@@ -1196,6 +1195,12 @@
 
   function registerTab() {
     try {
+      if (typeof VALID_TABS !== 'undefined' && VALID_TABS.indexOf('whales-next') < 0) VALID_TABS.push('whales-next');
+      if (typeof DEFAULT_TAB_ORDER !== 'undefined' && DEFAULT_TAB_ORDER.indexOf('whales-next') < 0) DEFAULT_TAB_ORDER.push('whales-next');
+      if (typeof SECTION_COPY !== 'undefined') SECTION_COPY['whales-next'] = {
+        eyebrow: 'Post-TGE', title: NEXT_TITLE,
+        description: 'Farming projects, with Varriors’ picks and reasons to farm.', chip: 'next farms'
+      };
       if (typeof VALID_TABS !== 'undefined' && VALID_TABS.indexOf('whales') < 0) VALID_TABS.push('whales');
       if (typeof DEFAULT_TAB_ORDER !== 'undefined' && DEFAULT_TAB_ORDER.indexOf('whales') < 0) {
         var i = DEFAULT_TAB_ORDER.indexOf('monitors');
@@ -1215,6 +1220,8 @@
     registerTab();
     mount();
     render();
+    mountNext();
+    renderNext();
     loadProfiles();
     /* the Playbook tab can change the same points value */
     document.addEventListener('var:points', function (e) {
@@ -1227,7 +1234,7 @@
     }, 60000);
     /* dashboard.js resolves the opening hash before this tab exists, so a shared
        #whales link would land on Overview without this */
-    if ((location.hash === '#whales') && typeof showTab === 'function') {
+    if ((location.hash === '#whales' || location.hash === '#whales-next') && typeof showTab === 'function') {
       try { showTab(location.hash.slice(1), { push: false }); } catch (_) {}
     }
     document.addEventListener('click', function (e) {
