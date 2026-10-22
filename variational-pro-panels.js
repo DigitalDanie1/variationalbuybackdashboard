@@ -6,7 +6,7 @@
 
   // Product descriptions follow the official About Pro documentation.
   var DOCS = 'https://docs.variational.io/pro/about-pro';
-  var SCREENS = ['Overview', 'Product design', 'Market context', 'Workflow comparison', 'Execution workflow', 'Risk & controls', 'Institutional scale', 'Derivatives benchmarks', 'Margin & revenue'];
+  var SCREENS = ['Overview', 'Product design', 'Market context', 'Workflow comparison', 'Execution workflow', 'Risk & controls', 'Institutional scale', 'Margin & revenue'];
 
   // BIS values are USD millions. OCC Table 13 reports USD millions as of June 30, 2026.
   // Peer OTC = forwards + swaps + OTC options + credit derivatives; exchange-traded and spot FX excluded.
@@ -37,28 +37,20 @@
       'Independent scenario analysis using BIS/OCC data; not a Variational forecast or an official market-share target.');
   }
 
-  function benchmarksScreen() {
-    return slide(7, 'DERIVATIVES BENCHMARKS', 'Derivatives benchmarks.<em> USD billions.</em>',
-      '50 selected CME Group futures across rates, FX, equities and commodities. A scale reference for Variational’s longer-term opportunity.',
-      '<div class="vps-benchmark-toolbar"><label>Search<input type="search" aria-label="Search" data-vps-search placeholder="Contract, symbol or asset class"></label><label>Asset class<select aria-label="Asset class" data-vps-asset><option value="">All asset classes</option>' + ['Rates','FX','Equity index','Metals','Energy','Agriculture'].map(function (a) { return '<option>' + a + '</option>'; }).join('') + '</select></label><label>Display<select aria-label="Display" data-vps-unit><option value="usd">USD B · reference notional</option><option value="contracts">Original contract counts</option></select></label><label>Rank by<select aria-label="Rank by" data-vps-sort><option value="adv">Average daily volume</option><option value="oi">Open interest</option></select></label></div>' +
-      '<div class="vps-benchmark-period"><span>ADV: SEP 2026 · OI: 30 SEP 2026</span><span data-vps-row-count></span></div><div class="vps-benchmark-scroll" tabindex="0" aria-label="Scrollable derivatives benchmark table"><table class="vps-benchmark-table"><caption>Rank within the selected 50-contract universe. USD figures are reference-notional estimates, not observed dollar turnover.</caption><thead><tr><th scope="col">Rank</th><th scope="col">Contract / symbol</th><th scope="col">Asset class</th><th scope="col" data-vps-adv-heading>ADV (USD B)*</th><th scope="col" data-vps-oi-heading>OI (USD B)*</th><th scope="col">Model</th></tr></thead><tbody data-vps-benchmark-rows></tbody></table></div>' +
-      '<details class="vps-methodology"><summary>Sources, notional conversion and coverage</summary><p><b>*Reference notional.</b> September contract ADV / month-end OI × contract size × an explicitly selected 21 October 2026 CME settlement. Rates use contract principal or Treasury face value. The same reference price is applied across expiries. This is not actual daily dollar turnover, DV01 or delta-adjusted exposure.</p><p><b>Coverage:</b> 50 selected CME Group futures, not the global top 50. OTC, options, ICE and Eurex are excluded. FX rows are futures on currency pairs, not the entire OTC pair market. Traditional ADV uses exchange trading days; crypto’s 24-hour figures use calendar days.</p><p><a href="https://www.cmegroup.com/daily_bulletin/monthly_volume/Web_ADV_Report_CMEG.pdf" target="_blank" rel="noopener">CME monthly ADV ↗</a> · <a href="https://www.cmegroup.com/daily_bulletin/monthly_volume/Web_OI_Report_CMEG.pdf" target="_blank" rel="noopener">CME month-end OI ↗</a> · <a href="https://www.cmegroup.com/market-data/daily-bulletin.html" target="_blank" rel="noopener">CME reference settlements ↗</a> · <a href="pro-derivatives-data.json" target="_blank" rel="noopener">All inputs and conversions ↗</a></p></details>',
-      'Source observations: CME Group, September 2026. Reference marks: 21 October 2026. These are external benchmarks, not live Pro listings.');
-  }
   function economicsScreen() {
-    return slide(8, 'MARGIN & REVENUE', 'Volume drives revenue.<br><em>Open interest drives collateral.</em>',
+    return slide(7, 'MARGIN & REVENUE', 'Volume drives revenue.<br><em>Open interest drives collateral.</em>',
       'An adjustable Variational opportunity model, based on a selected external market benchmark.',
       '<div class="vps-economics-inputs"><label>Benchmark market<select aria-label="Benchmark market" data-vps-model-market></select></label><label>Assumed capture (%)<input aria-label="Assumed capture (%)" data-vps-model="share" type="number" min="0" max="100" step="0.01" value="0.1"></label><label>Initial margin per side (%)<input aria-label="Initial margin per side (%)" data-vps-model="margin" type="number" min="0" max="100" step="1" value="10"></label><label>Gross revenue capture (bps)<input aria-label="Gross revenue capture (bps)" data-vps-model="bps" type="number" min="0" max="1000" step="0.1" value="1"></label><label>Trading days / year<input aria-label="Trading days per year" data-vps-model="days" type="number" min="1" max="366" step="1" value="252"></label></div>' +
       '<p class="vps-model-baseline" data-vps-model-baseline></p><div class="vps-economic-metrics" aria-live="polite"><div><span>CAPTURED ADV · USD B</span><b data-vps-economic="adv"></b><small>Benchmark ADV × capture rate</small></div><div><span>CAPTURED OI · USD B</span><b data-vps-economic="oi"></b><small>Benchmark OI × capture rate</small></div><div><span>INITIAL MARGIN / SIDE · USD B</span><b data-vps-economic="margin"></b><small>Captured OI × assumed margin rate</small></div><div><span>BOTH SIDES’ MARGIN · USD B</span><b data-vps-economic="bilateral"></b><small>Symmetric gross assumption: 2 × margin</small></div><div><span>GROSS DAILY REVENUE · USD B</span><b data-vps-economic="daily"></b><small>Captured ADV × assumed bps / 10,000</small></div><div><span>GROSS ANNUAL REVENUE · USD B</span><b data-vps-economic="annual"></b><small>Daily revenue × selected trading days</small></div></div>' +
       '<div class="vps-model-assumptions"><b>Illustrative economics · Pro is not live</b><p>Capture share, margin and revenue bps are user assumptions, not documented Pro fee schedules, required margins or revenue guidance. Revenue is a gross fee-equivalent before costs or allocations; it is not net income, OLP spread earnings or token-holder distributions.</p><p>The margin model assumes equal initial-margin rates on both sides, without netting, offsets, variation margin, collateral haircuts or liquidation losses. Actual pool terms are negotiated and may be asymmetric. Reference notional is not a risk-equivalent measure.</p></div>',
-      'Scenario only. No measured Pro revenue or collateral is implied. Select a market in the benchmarks table to load its inputs here.');
+      'Scenario only. No measured Pro revenue or collateral is implied. Select a market on the Top 50 derivatives page to load its inputs here.');
   }
 
   function slide(n, eyebrow, title, lead, content, foot) {
     return '<article class="vps-scr" data-scr="' + n + '" hidden aria-labelledby="vps-title-' + n + '">' +
       '<header class="vps-heading"><span>VARIATIONAL PRO <i>/</i> ' + eyebrow + '</span>' +
       '<h3 id="vps-title-' + n + '">' + title + '</h3><p>' + lead + '</p></header>' +
-      '<div class="vps-body">' + content + '</div><footer class="vps-foot"><span>' + foot + '</span><b>0' + (n === 6 ? 1 : n <= 5 ? n + 1 : n) + ' / 08</b></footer></article>';
+      '<div class="vps-body">' + content + '</div><footer class="vps-foot"><span>' + foot + '</span><b>0' + (n === 6 ? 1 : n <= 5 ? n + 1 : n) + ' / 07</b></footer></article>';
   }
   function productScreen() {
     return slide(6, 'DOCUMENTED PRODUCT DESIGN', 'Configurable derivatives.<br><em>Bilateral by design.</em>',
@@ -122,7 +114,7 @@
       '<section class="vps-control-row"><div class="vps-control-name"><span>02 / OPERATIONS</span><h4>Lifecycle management</h4></div><div><span class="vps-control-mobile">OTC FRICTION</span><p>Manual collateral checks, funding settlements and margin calls create operational dependencies.</p></div><div class="vps-control-design"><span class="vps-control-mobile">PROTOCOL DESIGN</span><h4>Rules-based trade administration</h4><p>Following clearing, the protocol tracks margin, settles applicable funding and handles liquidations.</p></div></section>' +
       '<section class="vps-control-row"><div class="vps-control-name"><span>03 / COLLATERAL</span><h4>Counterparty exposure</h4></div><div><span class="vps-control-mobile">OTC FRICTION</span><p>Collateral transferred directly to a dealer can introduce credit exposure and asymmetric margin arrangements.</p></div><div class="vps-control-design"><span class="vps-control-mobile">PROTOCOL DESIGN</span><h4>Bilateral settlement pools</h4><p>Both counterparties post collateral to their agreed pool. Positions and assets are isolated across pools; margin and liquidation parameters are agreed in the quote.</p></div></section></div>' +
       '<aside class="vps-risk-note"><span>RISK CONSIDERATIONS</span><p>These controls do not eliminate risk. Smart-contract, market, liquidity and counterparty risks remain; outcomes depend on collateral adequacy and the agreed trade parameters.</p></aside>',
-      'Design overview based on official Pro documentation. Pro is not live yet.') + scaleScreen() + benchmarksScreen() + economicsScreen();
+      'Design overview based on official Pro documentation. Pro is not live yet.') + scaleScreen() + economicsScreen();
   }
 
   function navBar() {
@@ -132,8 +124,9 @@
       '<span class="vps-dots">' + SCREENS.map(function (n, i) {
         return '<button type="button" data-vps-go="' + i + '" aria-label="' + n + '"' + (i ? '' : ' class="on"') + '></button>';
       }).join('') + '</span>' +
+      '<a class="vps-src" href="#derivatives">Top 50 derivatives ↗</a>' +
       '<a class="vps-src" href="' + DOCS + '" target="_blank" rel="noopener noreferrer">docs ↗</a>' +
-      '<span class="vp-coming-index" data-vps-index>01 / 09</span>' +
+      '<span class="vp-coming-index" data-vps-index>01 / 08</span>' +
       '<button type="button" class="vps-btn vps-start" data-vps="next" aria-label="Next screen">EXPLORE PRO →</button></div>';
   }
 
@@ -163,18 +156,8 @@
     }
     updateScale(0.1);
     var benchmarkData = (window.PRO_DERIVATIVES && window.PRO_DERIVATIVES.rows) || [];
-    var tableState = { query: '', asset: '', unit: 'usd', sort: 'adv' };
     function moneyB(n) { var digits = n > 0 && n < 1 ? Math.min(10, Math.max(2, 2 - Math.floor(Math.log10(n)))) : 2; return '$' + n.toLocaleString('en-US', { minimumFractionDigits: digits, maximumFractionDigits: digits }) + 'B'; }
     function safe(v) { return String(v).replace(/[&<>"']/g, function(c) { return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
-    function renderBenchmarks() {
-      var list = benchmarkData.filter(function(r) { return (!tableState.asset || r.asset === tableState.asset) && (r.name+' '+r.symbol+' '+r.asset).toLowerCase().indexOf(tableState.query.toLowerCase()) >= 0; });
-      var field = tableState.sort + (tableState.unit === 'usd' ? 'B' : 'Contracts');
-      list.sort(function(a,b) { return b[field]-a[field]; });
-      section.querySelector('[data-vps-row-count]').textContent = list.length + ' / ' + benchmarkData.length + ' markets';
-      section.querySelector('[data-vps-adv-heading]').textContent = tableState.unit === 'usd' ? 'ADV (USD B)*' : 'ADV (contracts)';
-      section.querySelector('[data-vps-oi-heading]').textContent = tableState.unit === 'usd' ? 'OI (USD B)*' : 'OI (contracts)';
-      section.querySelector('[data-vps-benchmark-rows]').innerHTML = list.length ? list.map(function(r,i) { return '<tr><td>'+(i+1)+'</td><th scope="row">'+safe(r.name)+'<small>'+safe(r.symbol)+'</small></th><td>'+safe(r.asset)+'</td><td>'+ (tableState.unit === 'usd' ? moneyB(r.advB) : r.advContracts.toLocaleString('en-US')) +'</td><td>'+ (tableState.unit === 'usd' ? moneyB(r.oiB) : r.oiContracts.toLocaleString('en-US')) +'</td><td><button type="button" data-vps-load-market="'+safe(r.symbol)+'" aria-label="Model '+safe(r.name)+'">Use →</button></td></tr>'; }).join('') : '<tr><td colspan="6">No matching contracts. Change the search or asset filter.</td></tr>';
-    }
     var marketSelect = section.querySelector('[data-vps-model-market]');
     marketSelect.innerHTML = benchmarkData.map(function(r) {return '<option value="'+safe(r.symbol)+'">'+safe(r.name)+' ('+safe(r.symbol)+')</option>';}).join('');
     function renderEconomics() {
@@ -188,18 +171,20 @@
       section.querySelector('[data-vps-model-baseline]').textContent=market.name+' reference benchmark: ADV '+moneyB(market.advB)+' / OI '+moneyB(market.oiB)+'. All outputs below are scenario estimates.';
       Object.keys(values).forEach(function(k){section.querySelector('[data-vps-economic="'+k+'"]').textContent=moneyB(values[k]);});
     }
-    section.addEventListener('input', function(e){
-      if (e.target.matches('[data-vps-search]')){tableState.query=e.target.value;renderBenchmarks();}
-      if(e.target.matches('[data-vps-model]'))renderEconomics();
+    section.addEventListener('input', function(e) {
+      if(e.target.matches('[data-vps-model]')) renderEconomics();
     });
-    section.addEventListener('change',function(e){
-      if(e.target.matches('[data-vps-asset]')){tableState.asset=e.target.value;renderBenchmarks();}
-      if(e.target.matches('[data-vps-unit]')){tableState.unit=e.target.value;renderBenchmarks();}
-      if(e.target.matches('[data-vps-sort]')){tableState.sort=e.target.value;renderBenchmarks();}
-      if(e.target.matches('[data-vps-model-market]'))renderEconomics();
+    section.addEventListener('change', function(e) {
+      if(e.target.matches('[data-vps-model-market]')) renderEconomics();
     });
-    section.addEventListener('click',function(e){var b=e.target.closest && e.target.closest('[data-vps-load-market]');if(b){marketSelect.value=b.dataset.vpsLoadMarket;renderEconomics();go(SCREENS.indexOf('Margin & revenue'));}});
-    renderBenchmarks(); renderEconomics();
+    document.addEventListener('var:pro-model-market', function(e) {
+      var symbol = e.detail && e.detail.symbol;
+      if (!benchmarkData.some(function(r) { return r.symbol === symbol; })) return;
+      marketSelect.value = symbol;
+      renderEconomics();
+      go(SCREENS.indexOf('Margin & revenue'));
+    });
+    renderEconomics();
 
     section.addEventListener('click', function (e) {
       var shareButton = e.target.closest && e.target.closest('[data-vps-share]');
@@ -265,8 +250,6 @@ body.v2-dashboard .vps-heading h3{font-size:clamp(30px,3.2vw,46px)!important;lin
 
 .vps-legacy-columns{display:grid;grid-template-columns:1fr 1fr;border:1px solid #354358}.vps-legacy-columns>section{padding:24px}.vps-legacy-pro{border-left:1px solid #354358;background:#111f31}.vps-legacy-title{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;padding-bottom:20px;border-bottom:1px solid #354358}.vps-legacy-title h4{margin:0!important}.vps-legacy-title>span{font:9px var(--mono);color:#adc4df}.vps-detailed-steps{list-style:none;counter-reset:otc;padding:0;margin:0}.vps-detailed-steps li{position:relative;padding:18px 0 18px 36px;counter-increment:otc;border-bottom:1px solid #29384b}.vps-detailed-steps li:before{content:counter(otc,decimal-leading-zero);position:absolute;left:0;top:20px;font:10px var(--mono);color:#9abce8}.vps-detailed-steps b{font:600 14px/1.5 var(--sans,Arial,sans-serif);color:#deebfb}.vps-detailed-steps p{font-size:12px!important;line-height:1.75!important;margin-top:7px!important}.vps-legacy-note,.vps-model-assumptions{padding:22px;margin-top:24px;background:#172638;border-left:2px solid #89a8cc}.vps-legacy-note>b,.vps-model-assumptions>b{font:600 13px var(--sans,Arial,sans-serif);color:#d9e7fb}.vps-legacy-note p,.vps-model-assumptions p{font-size:12px!important;line-height:1.75!important;margin-top:12px!important}.vps-benchmark-toolbar,.vps-economics-inputs{display:flex;flex-wrap:wrap;gap:16px;padding:20px;border:1px solid #354358;background:#101c2c}.vps-benchmark-toolbar label,.vps-economics-inputs label{display:flex;flex:1;min-width:150px;flex-direction:column;gap:10px;font:10px/1.5 var(--mono);color:#b9cce4}.vps-benchmark-toolbar input,.vps-benchmark-toolbar select,.vps-economics-inputs input,.vps-economics-inputs select{box-sizing:border-box;width:100%;min-height:42px;padding:10px;border:1px solid #4d6481;border-radius:2px;background:#0b1320;color:#e2edfc;font:12px var(--sans,Arial,sans-serif);color-scheme:dark}.vps-benchmark-toolbar input:focus-visible,.vps-benchmark-toolbar select:focus-visible,.vps-economics-inputs input:focus-visible,.vps-economics-inputs select:focus-visible{outline:2px solid #9dc6fa;outline-offset:2px}.vps-economics-inputs input[aria-invalid="true"]{border-color:#ef9f9f}.vps-benchmark-period{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;font:9px var(--mono);color:#a4bbd8}.vps-benchmark-scroll{max-height:640px;overflow:auto;border:1px solid #354358;scrollbar-color:#506987 #111b29}.vps-benchmark-table{width:100%;border-collapse:separate;border-spacing:0;min-width:720px;font:12px/1.5 var(--sans,Arial,sans-serif);color:#d4e0f1}.vps-benchmark-table caption{text-align:left;padding:16px 18px;background:#111d2d;font-size:11px;color:#aebfd5}.vps-benchmark-table thead th{position:sticky;top:0;z-index:1;background:#1b2a3e;color:#bdd1ec;font:10px/1.5 var(--mono);white-space:nowrap}.vps-benchmark-table td,.vps-benchmark-table th{text-align:left;padding:14px 18px;border-bottom:1px solid #29384b}.vps-benchmark-table td:nth-child(4),.vps-benchmark-table td:nth-child(5){font-family:var(--mono);white-space:nowrap;text-align:right}.vps-benchmark-table th small{display:block;font:9px/1.6 var(--mono);color:#8fafda;margin-top:3px}.vps-benchmark-table tbody tr:hover{background:#16263d}.vps-benchmark-table button{padding:7px 10px;border:1px solid #47678c;background:#1a304b;color:#cce1ff;font:10px var(--mono);cursor:pointer;white-space:nowrap}.vps-methodology{border:1px solid #354358;padding:18px 22px}.vps-methodology summary{font:12px/1.6 var(--sans,Arial,sans-serif);color:#dce9fb;cursor:pointer}.vps-methodology p{font-size:12px!important;margin-top:16px!important}.vps-methodology a{color:#b6d1f7!important;text-decoration:underline}.vps-economic-metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border-top:1px solid #354358;border-left:1px solid #354358}.vps-economic-metrics>div{padding:24px;border-bottom:1px solid #354358;border-right:1px solid #354358;background:#101c2c;min-width:0}.vps-economic-metrics span{font:8px/1.7 var(--mono);letter-spacing:.5px;color:#b0c7e5}.vps-economic-metrics b{display:block;margin:16px 0;font:600 clamp(22px,2.5vw,36px)/1.2 var(--sans,Arial,sans-serif);letter-spacing:-.03em;color:#e2efff;overflow-wrap:anywhere}.vps-economic-metrics small{display:block;font:10px/1.6 var(--sans,Arial,sans-serif);color:#9db2cf}.vps-model-baseline{font-size:12px!important}.vps-scr[data-scr="7"],.vps-scr[data-scr="8"]{gap:26px}.vps-market-size>strong{font-size:clamp(48px,6vw,82px)}
 @media(max-width:760px){.vps-legacy-columns{grid-template-columns:1fr}.vps-legacy-pro{border-left:0;border-top:1px solid #354358}.vps-legacy-columns>section{padding:20px}.vps-economic-metrics{grid-template-columns:1fr 1fr}.vps-economic-metrics>div{padding:18px}.vps-benchmark-toolbar,.vps-economics-inputs{padding:16px}.vps-benchmark-toolbar label,.vps-economics-inputs label{min-width:130px}.vps-benchmark-scroll{max-height:560px}.vps-benchmark-table td,.vps-benchmark-table th{padding:12px}.vps-market-size>strong{font-size:50px}}@media(max-width:400px){.vps-economic-metrics{grid-template-columns:1fr}}
-
-.vps-scr[data-scr="7"]{padding:28px;gap:18px}.vps-scr[data-scr="7"] .vps-heading h3{font-size:32px!important;line-height:1.15!important;margin:14px 0 12px!important}.vps-scr[data-scr="7"] .vps-heading>p{font-size:12px!important;max-width:900px}.vps-scr[data-scr="7"] .vps-body{gap:16px}.vps-benchmark-toolbar{padding:16px;gap:14px}.vps-benchmark-table td,.vps-benchmark-table th{padding:11px 14px}.vps-benchmark-table caption{padding:12px 14px}@media(max-width:600px){.vps-scr[data-scr="7"]{padding:22px 18px}.vps-scr[data-scr="7"] .vps-heading h3{font-size:28px!important}}
 `;
   function injectVpsStyle() {
     if (document.getElementById('vps-style')) return;
