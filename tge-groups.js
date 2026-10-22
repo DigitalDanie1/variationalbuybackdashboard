@@ -35,7 +35,7 @@
   var ALPHA_PUBLIC = false;
   /* The tabs that are locked, by tab id. Ids, not positions, so renumbering cannot move the
      lock onto a different row. */
-  var ALPHA_TABS = [];
+  var ALPHA_TABS = ['whales-next'];
   var ALPHA_FLAG = 'varAlphaOwnerV1';
   /* SHA-256 of the owner key — never the key itself. ?alpha=<key> is hashed in the browser
      and compared to this, so the source can be read without being able to open the tabs. */
@@ -104,8 +104,9 @@
   var owner = false;
   try { owner = localStorage.getItem(ALPHA_FLAG) === '1'; } catch (_) {}
   function locked() { return !ALPHA_PUBLIC && !owner; }
-  function isLocked(tab) { return locked() && ALPHA_TABS.indexOf(tab) >= 0; }
+  function isLocked(tab) { return tab === 'whales-next' || (locked() && ALPHA_TABS.indexOf(tab) >= 0); }
   function alphaState(tab) {
+    if (tab === 'whales-next') return 'locked';
     if (ALPHA_PUBLIC || ALPHA_TABS.indexOf(tab) < 0) return '';
     return owner ? 'owner' : 'locked';
   }

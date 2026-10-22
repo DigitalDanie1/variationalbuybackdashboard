@@ -42,8 +42,7 @@
     }).then(function (profiles) {
       PROFILES = profiles;
       render();
-      renderNext();
-    }).catch(function () { /* Existing names and links remain usable. */ });
+      }).catch(function () { /* Existing names and links remain usable. */ });
   }
 
   var WHALES = [
@@ -738,370 +737,16 @@
     document.head.appendChild(s);
   }
 
-  var NEXT_TITLE = 'Next Farm by Varriors';
-  /* Perp DEX farms, in the order given. Every fact below is dated and sourced; where a
-     source found nothing (no points program, no disclosed raise) the card says so rather
-     than filling it in. Logos are local (img-src 'self'). ref: the link carries a referral
-     code. stage: 0 = cash rewards / nothing yet, 1 = points live, 2 = token.
-
-     The value line is a scenario, not a forecast: total raised × a listing multiple × 25%
-     to users. The multiples are anchored on what happened: Lighter raised $68M and listed
-     at a $4B FDV (≈59×); Variational has raised $61.8M. */
-  var FARMS_ASOF = '2026-10-22';
-  var FARM_SHARE = 0.25;
-  var FARM_MULTS = [20, 40, 59];
-  var farmMult = 40;
-  var FARMS_PERP = [
-    { k: 'risex', mine: true, name: 'RISEx', logo: 'assets/farms/risex.png', x: null, ref: true, accent: '#19d38a', kols: [
-        { x: 'onchainmonk', asOf: '2026-10-21', note: '17K pts · rank #26', post: 'https://x.com/onchainmonk/status/2112781448755454077' },
-        { x: 'yh_0x', asOf: '2026-10-20', note: 'VAR + RISEx points, delta-neutral', post: 'https://x.com/yh_0x/status/2112571121824600114' },
-        { x: 'Ryuzaki_SEI', asOf: '2026-10-20', note: 'weekly points strategy posts', post: 'https://x.com/Ryuzaki_SEI/status/2112594348068245880' },
-        { x: 'corgil', asOf: '2026-08-02', note: '“RiseX too!”', post: 'https://x.com/corgil/status/2083915466167267572' },
-        { x: 'lynn000333', asOf: '2026-07-27', note: 'points-value breakdown', post: 'https://x.com/lynn000333/status/2081557611191902550' },
-        { x: 'linenmito', asOf: '2026-04-29', note: 'Founding Trader · less active since', post: 'https://x.com/linenmito/status/2049454803940487280' }
-      ],
-      url: 'https://www.rise.trade/invite/x04cfg1y',
-      what: 'Fully onchain orderbook perps on RISE (Ethereum L2), with yield on idle collateral.',
-      status: ['gated', 'Mainnet live · invite-only'], stage: 1,
-      points: { start: '2026-07-28', label: 'Ignite S1', note: '200K points a week · ends by Q2 2027 · referrers +10%', weekly: 200000 },
-      raised: 7.2e6, raisedNote: 'Galaxy Ventures, Vitalik Buterin, EtherFi, Stani Kulechov',
-      bull: ['$3B volume before points even started', 'All RISE points go to RISEx users', 'Points program is live'],
-      src: [['Chainwire', 'https://chainwire.org/2026/07/24/risex-launches-ignite-season-1-points-program-following-3b-in-volume-during-the-early-access-phase/'], ['CoinDesk', 'https://www.coindesk.com/tech/2025/11/12/ethereum-layer-2-rise-unveils-risex-and-marketcore-to-build-global-on-chain-markets']] },
-    { k: 'truenorth', mine: true, name: 'TrueNorth', logo: 'assets/farms/truenorth.jpg', x: 'get_truenorth', ref: true, accent: '#3b7bff', kols: [
-        { x: 'yh_0x', asOf: '2026-10-17', note: '“my go-to terminal”', post: 'https://x.com/yh_0x/status/2111535624683737445' },
-        { x: 'corgil', asOf: '2026-08-02', note: 'farming TrueNorth points', post: 'https://x.com/corgil/status/2083908861044396327' },
-        { x: 'ElNachoCrypto', asOf: '2026-07-30', note: '“real conviction” pick', post: 'https://x.com/ElNachoCrypto/status/2082729806580396068' }
-      ],
-      url: 'https://app.truenorth.xyz/ref/KOREAN',
-      what: 'Agentic brokerage: AI agents scan the market, set up trades and watch the portfolio.',
-      status: ['live', 'App live'], stage: 0,
-      points: null, pointsNote: 'No points yet: TruthSayer rewards pay USDC for volume and referrals.',
-      raised: 3e6, raisedNote: 'Pre-seed led by CyberFund; Delphi Labs, GSR; LayerZero’s Bryan Pellegrino',
-      bull: ['Paid in USDC today, before any token', 'Running a Lighter trading comp with $LIT prizes', 'Smallest raise here: most room to re-rate'],
-      src: [['ZyCrypto', 'https://zycrypto.com/truenorth-secures-3m-to-develop-purpose-built-financial-ai/'], ['Coinlaunch', 'https://coinlaunch.space/projects/truenorth-ai/']] },
-    { k: 'entropy', name: 'Entropy', logo: 'assets/farms/entropy.jpg', x: 'entropyIO', ref: false, accent: '#b9c2cf', kols: [
-        { x: 'punk2498_', asOf: '2026-09-22', note: '“engage heavily — it’s underfarmed”', post: 'https://x.com/punk2498_/status/2102438480249057447' },
-        { x: 'Ryuzaki_SEI', asOf: '2026-08-27', note: 'full Entropy guide', post: 'https://x.com/Ryuzaki_SEI/status/2092825224681267275' },
-        { x: 'lynn000333', asOf: '2026-08-26', note: 'shared it, bullish on the track', post: 'https://x.com/lynn000333/status/2092420400789835920' }
-      ],
-      url: 'https://entropy.io/leaderboard?filter=7d',
-      what: 'Perps on pre-IPO companies (Anthropic), stocks and commodities, deployed on Hyperliquid (HIP-3).',
-      status: ['live', 'Live since 2026-08-24'], stage: 0,
-      points: null, pointsNote: 'No points yet: fee rebates + referrals. A points multiplier was spotted in its backend (unconfirmed).',
-      raised: 14e6, raisedNote: 'Seed led by Ribbit Capital, plus a ~$40M HYPE stake',
-      bull: ['Only place to trade Anthropic’s valuation', 'Volume also counts on Hyperliquid', 'Buying new tickers (MOONSHOT, Oct 19)'],
-      src: [['Crypto Briefing', 'https://cryptobriefing.com/entropyio-pre-ipo-perps-hyperliquid/'], ['TokenPost', 'https://www.tokenpost.com/news/investing/35060']] },
-    { k: 'hellotrade', name: 'HelloTrade', logo: 'assets/farms/hellotrade.jpg', x: 'hellotradeapp', ref: false, accent: '#ff5a1f', kols: [],
-      url: 'https://x.com/hellotradeapp',
-      what: 'Mobile app for leveraged stocks, ETFs, commodities and crypto, built on MegaETH.',
-      status: ['soon', 'Early access · waitlist'], stage: 0,
-      points: null, pointsNote: 'No points terms published yet.',
-      raised: 4.6e6, raisedNote: 'Seed led by Dragonfly (also led Variational’s Series A)',
-      bull: ['Founded by ex-BlackRock digital-asset leads', 'Round closed in under a week', 'Pre-launch: the earliest possible entry'],
-      src: [['GlobeNewswire', 'https://www.globenewswire.com/news-release/2025/11/21/3192551/0/en/HelloTrade-Founded-by-Former-BlackRock-Crypto-Leaders-Announces-Fundraise-to-Unlock-Global-Frictionless-Access-to-Global-Equities.html']] },
-    { k: 'derpetual', name: 'Derpetual', logo: 'assets/farms/derpetual.jpg', x: 'derpetual', ref: false, accent: '#8ff0b5', kols: [
-        { x: 'whitesocks256', asOf: '2026-10-19', note: '“one of the first in”', post: 'https://x.com/whitesocks256/status/2112195491652136969' }
-      ],
-      url: 'https://www.derpetual.com/',
-      what: 'Abstract futures: leveraged markets on any number — indices, weather, events.',
-      status: ['live', 'Live on Solana via derp.trade'], stage: 0,
-      points: null, pointsNote: 'No points program found.',
-      raised: null, raisedNote: 'No raise disclosed',
-      bull: ['A new market type, not another perp clone', 'Launched April 2026: still early', 'Aiming for a CFTC licence'],
-      src: [['Founder post', 'https://x.com/antoni_kiszka/status/2046608631718658543'], ['CryptoTotem', 'https://cryptototem.com/derpetual/']] },
-    { k: 'silhouette', cat: 'infra', name: 'Silhouette', logo: null, x: 'silhouette_ex', ref: false, accent: '#a6a2f7', kols: [],
-      url: 'https://silhouette.exchange/', cta: 'Explore Silhouette',
-      what: 'Block-trade RFQs across Hyperliquid spot, perps and tokenized assets.',
-      status: ['live', 'Trading live'], stage: 0,
-      points: null, pointsLabel: 'Not confirmed', pointsNote: 'No public points program confirmed in the cited product docs.',
-      raised: null, raisedNote: 'No funding amount confirmed in cited sources',
-      bull: ['One request invites competing market-maker quotes', 'Execution settles on HyperCore or HyperEVM', 'Built for larger orders across several asset types'],
-      src: [['Docs', 'https://docs.silhouette.exchange/about-silhouette']] },
-    { k: 'titan', name: 'Titan Exchange', logo: null, x: 'TitanExchange_', ref: false, accent: '#d6a56b', kols: [],
-      url: 'https://testnet.titanx.cc/', cta: 'Explore Titan testnet',
-      what: 'Privacy-focused trading venue on Canton Network, with an order book and private pools.',
-      status: ['gated', 'Testnet live'], stage: 1,
-      points: null, pointsLive: true, pointsLabel: 'Testnet points live', pointsNote: 'The official testnet shows a Points tab and weekly distributions; token allocation is unconfirmed.',
-      raised: null, raisedNote: 'No funding amount confirmed in cited sources',
-      bull: ['Canton-based privacy architecture', 'Anonymized central-limit order book', 'Official site links to a live testnet'],
-      src: [['Official testnet', 'https://testnet.titanx.cc/rewards'], ['Official site', 'https://titanx.cc/']] },
-    { k: 'hyperlink', cat: 'infra', name: 'HyperLink', logo: null, x: 'hyperlink_xyz', ref: false, accent: '#79c7ef', kols: [],
-      url: 'https://hyperlink.xyz/', cta: 'Explore HyperLink',
-      what: 'Prime brokerage and execution layer for traders on Hyperliquid.',
-      status: ['live', 'Broker live'], stage: 0,
-      points: null, pointsLabel: 'Not confirmed', pointsNote: 'No public points allocation confirmed in cited sources.',
-      raised: null, raisedNote: 'Public funding amount not verified in cited sources',
-      bull: ['Routes into Hyperliquid liquidity', 'Pooled activity targets lower trading fees', 'Shared execution infrastructure reduces wallet-level visibility'],
-      src: [['Official profile', 'https://www.linkedin.com/company/hyperlink-xyz'], ['GitHub', 'https://github.com/hyperlink-xyz']] },
-    { k: 'metric', cat: 'non', name: 'Metric', logo: null, x: 'metricxyz', ref: false, accent: '#d8e486', kols: [],
-      url: 'https://app.metric.xyz/', cta: 'Explore Metric',
-      what: 'Spot DEX for active pools that track reference prices across tokenized assets and crypto.',
-      status: ['live', 'Public DEX live'], stage: 0,
-      points: null, pointsLabel: 'Terms not announced', pointsNote: 'Referrals are live; the team says benefits will be detailed later. No token allocation announced.',
-      raised: null, raisedNote: 'No funding amount confirmed in cited sources',
-      stats: [{ label: 'Public-launch volume', value: '$1.2B+', note: 'First 5 days · Oct 21' }, { label: 'TVL', value: '$11M+', note: 'Oct 21' }],
-      bull: ['Live on Ethereum, BNB Chain and Robinhood Chain', 'Swap, provide liquidity or deploy an active pool', 'Onchain pools price against live reference markets'],
-      src: [['Official metrics', 'https://x.com/metricxyz/status/2112669610747068897'], ['Official site', 'https://metric.xyz/'], ['Docs', 'https://docs.metric.xyz/'], ['Referral update', 'https://x.com/metricxyz/status/2112922190349844551']] },
-    { k: 'flint', name: 'Flint', logo: null, x: 'flint_trade_', ref: false, accent: '#f1ae72', kols: [],
-      url: 'https://flint.trade/', cta: 'Explore Flint',
-      what: 'Solana spot venue live today; a fully on-chain perp DEX is in development.',
-      status: ['soon', 'Spot live · perps building'], stage: 0,
-      points: null, pointsLabel: 'Not confirmed', pointsNote: 'No perp points program confirmed; spot-maker rebates are a separate program.',
-      raised: null, raisedNote: 'No funding amount confirmed in cited sources',
-      bull: ['Spot quoting is already live', 'Perps are planned as a multi-maker prop AMM', 'Closed perp alpha is planned for later in 2026'],
-      src: [['Official site', 'https://flint.trade/'], ['Product update', 'https://flint.trade/blog/flint-is-building-perps-on-solana']] }
-  ];
-
-  /* The site owner's own farms lead the page: the hero, the first matrix row, a badge on
-     the card and the "Mine" filter all read the mine: true flag above. */
-  var ME = { name: 'KoreanDaniel', x: '0xdefidaniel' };
-  function myFarms() { return FARMS_PERP.filter(function (f) { return f.mine; }); }
-
-  function myHero() {
-    var mine = myFarms();
-    if (!mine.length) return '';
-    return '<section class="nf-me"><div class="nf-me-h"><span class="nf-me-av">KD</span><div><span class="nf-me-k">WHAT I’M FARMING</span>' +
-      '<b>' + mine.length + ' farms I’m on right now</b><a href="https://x.com/' + ME.x + '" target="_blank" rel="noopener noreferrer">@' + ME.x + ' ↗</a></div></div>' +
-      '<div class="nf-me-grid">' + mine.map(function (f) {
-        var faces = (f.kols || []).slice(0, 5).map(function (kk) {
-          var pr = PROFILES[(kk.x || '').toLowerCase()] || {};
-          return pr.avatar ? '<img src="' + esc(pr.avatar) + '" alt="@' + esc(kk.x) + '" title="@' + esc(kk.x) + '" width="26" height="26">' : '';
-        }).join('');
-        var n = (f.kols || []).length;
-        return '<article class="nf-me-card" style="--acc:' + f.accent + '">' +
-          '<div class="nf-me-top"><img class="nf-me-logo" src="' + esc(f.logo) + '" alt="' + esc(f.name) + ' logo" width="52" height="52">' +
-          '<div><b>' + esc(f.name) + '</b><span>' + esc(f.points ? f.points.label + ' · day ' + farmDays(f.points.start) : f.status[1]) + '</span></div></div>' +
-          '<p>' + esc(f.what) + '</p>' +
-          (n ? '<div class="nf-me-with"><span class="nf-me-faces">' + faces + '</span><em>+ ' + n + ' tracked whale' + (n === 1 ? '' : 's') + ' farming it too</em></div>' : '') +
-          '<a class="nf-hedge" href="' + esc(f.url) + '" target="_blank" rel="noopener noreferrer">Hedge it with ' + esc(f.name) + ' ↗' + (f.ref ? '<small>my ref</small>' : '') + '</a>' +
-          '</article>';
-      }).join('') + '</div></section>';
-  }
-
-  function farmUsd(v) {
-    if (v >= 1e9) return '$' + (v / 1e9).toFixed(2) + 'B';
-    if (v >= 1e6) return '$' + (v / 1e6).toFixed(v >= 1e8 ? 0 : 1) + 'M';
-    return '$' + Math.round(v / 1e3) + 'K';
-  }
-  function farmLogo(f, size) {
-    return f.logo
-      ? '<img src="' + esc(f.logo) + '" alt="' + esc(f.name) + ' logo" width="' + size + '" height="' + size + '">'
-      : '<span class="nf-logo-placeholder" style="width:' + size + 'px;height:' + size + 'px;font-size:' + Math.round(size * .33) + 'px" aria-label="' + esc(f.name) + '" title="' + esc(f.name) + '">' + esc(f.name.slice(0, 1)) + '</span>';
-  }
-  /* counted to today, not to FARMS_ASOF: the start date is a fact, the day number is arithmetic */
-  function farmDays(from) {
-    return Math.max(0, Math.floor((Date.now() - Date.parse(from + 'T00:00:00Z')) / 864e5));
-  }
-
-  /* Variational KOLs farming this venue. One entry per person:
-       { name, x: 'handle', tg: 'username', post: 'https://x.com/…' (optional proof),
-         xImg / tgImg: local photo paths (optional) }
-     The X photo falls back to assets/whales/profiles.json; a missing photo shows initials.
-     Each face links to its own account (X or Telegram); the name links to the proof post
-     when there is one. Empty list = no row at all. */
-  function kolFace(img, label, href, cls) {
-    var inner = img ? '<img src="' + esc(img) + '" alt="" width="34" height="34">' : '<i>' + esc(label.slice(0, 2).toUpperCase()) + '</i>';
-    return '<a class="nf-face ' + cls + '" href="' + esc(href) + '" target="_blank" rel="noopener noreferrer" title="' + esc(label) + '">' + inner + '<u>' + (cls === 'x' ? '𝕏' : 'TG') + '</u></a>';
-  }
-  function farmKols(f) {
-    if (!f.kols || !f.kols.length) return '';
-    return '<div class="nf-kols"><span>' + f.kols.length + ' tracked whale' + (f.kols.length === 1 ? '' : 's') + ' farming it</span><div>' + f.kols.map(function (kk) {
-      var pr = kk.x ? (PROFILES[kk.x.toLowerCase()] || {}) : {};
-      var name = kk.name || pr.name || kk.x || kk.tg;
-      var faces = (kk.x ? kolFace(kk.xImg || pr.avatar, '@' + kk.x, 'https://x.com/' + kk.x, 'x') : '') +
-        (kk.tg ? kolFace(kk.tgImg, 't.me/' + kk.tg, 'https://t.me/' + kk.tg, 'tg') : '');
-      var nm = kk.post ? '<a href="' + esc(kk.post) + '" target="_blank" rel="noopener noreferrer">' + esc(name) + ' ↗</a>' : esc(name);
-      return '<div class="nf-kol"><span class="nf-faces">' + faces + '</span><span class="nf-kol-n"><b>' + nm + '</b>' +
-        '<small>' + (kk.x ? '@' + esc(kk.x) : '') + (kk.x && kk.tg ? ' · ' : '') + (kk.tg ? 'TG ' + esc(kk.tg) : '') + '</small>' +
-        (kk.note || kk.asOf ? '<small class="nf-kol-note">' + (kk.asOf ? esc(dateLabel(kk.asOf)) + ' · ' : '') + esc(kk.note || '') + '</small>' : '') + '</span></div>';
-    }).join('') + '</div></div>';
-  }
-
-  function farmCard(f) {
-    var hedge = '<a class="nf-hedge" href="' + esc(f.url) + '" target="_blank" rel="noopener noreferrer">' + esc(f.cta || ('Hedge it with ' + f.name)) + ' ↗' +
-      (f.ref ? '<small>ref</small>' : '') + '</a>';
-    var pts;
-    if (f.points) {
-      var d = farmDays(f.points.start), weeks = Math.floor(d / 7) + 1;
-      pts = '<div class="nf-pts live"><span>Points</span><b>' + esc(f.points.label) + ' · day ' + d + '</b>' +
-        '<em>~' + (weeks * f.points.weekly / 1e6).toFixed(1) + 'M points out so far · ' + esc(f.points.note) + '</em></div>';
-    } else {
-      pts = '<div class="nf-pts' + (f.pointsLive ? ' live' : '') + '"><span>Points</span><b>' + esc(f.pointsLabel || 'Not started') + '</b><em>' + esc(f.pointsNote) + '</em></div>';
-    }
-    var pool = f.raised ? f.raised * farmMult * FARM_SHARE : null;
-    var maxPool = 14e6 * 59 * FARM_SHARE;
-    var val = pool
-      ? '<div class="nf-val"><span>If it lists at ' + farmMult + '× its raise</span><b>' + farmUsd(pool) + '</b>' +
-        '<i style="--w:' + Math.min(100, pool / maxPool * 100).toFixed(1) + '%"></i>' +
-        '<em>to users (25%) · FDV ' + farmUsd(f.raised * farmMult) + ' · raised ' + farmUsd(f.raised) + '</em></div>'
-      : '<div class="nf-val none"><span>Potential value</span><b>—</b><em>no verified funding anchor for this scenario</em></div>';
-    if (pool && f.points) {
-      var seasonPts = f.points.weekly * 48;
-      val = val.replace('</em></div>', ' · ≈ $' + (pool / seasonPts * 1000).toFixed(0) + ' per 1K points over a ~48-week season</em></div>');
-    }
-    var kolText = (f.kols || []).map(function (kk) { return [kk.name, kk.x, kk.tg].join(' '); }).join(' ');
-    return '<article class="nf-farm' + (f.mine ? ' mine' : '') + '" style="--acc:' + f.accent + '" data-nf-mine="' + (f.mine ? 1 : 0) + '" data-nf-name="' + esc(f.name.toLowerCase()) + '"' +
-      ' data-nf-text="' + esc((f.name + ' ' + kolText).toLowerCase()) + '" data-nf-kols="' + ((f.kols || []).length) + '"' +
-      ' data-nf-stage="' + (f.points || f.pointsLive ? 'live' : 'pre') + '" data-nf-cat="' + (f.cat || 'perp') + '">' +
-      '<div class="nf-head"><a class="nf-farm-id" href="' + esc(f.url) + '" target="_blank" rel="noopener noreferrer">' +
-        farmLogo(f, 60) + '</a>' +
-        '<div><b>' + esc(f.name) + '</b><span class="nf-st ' + f.status[0] + '"><i></i>' + esc(f.status[1]) + '</span>' +
-        (f.mine ? '<span class="nf-mine">★ I’m farming this</span>' : '') + '</div></div>' +
-      '<p class="nf-what">' + esc(f.what) + '</p>' +
-      (f.stats ? '<div class="nf-farm-stats">' + f.stats.map(function (s) {
-        return '<div><span>' + esc(s.label) + '</span><b>' + esc(s.value) + '</b><small>' + esc(s.note) + '</small></div>';
-      }).join('') + '</div>' : '') +
-      pts +
-      '<ul class="nf-bull">' + f.bull.map(function (b) { return '<li>' + esc(b) + '</li>'; }).join('') + '</ul>' +
-      farmKols(f) +
-      '<div class="nf-raise"><span>Backing</span><b>' + (f.raised ? farmUsd(f.raised) : '—') + '</b><em>' + esc(f.raisedNote) + '</em></div>' +
-      val +
-      '<div class="nf-foot">' + hedge +
-        '<span class="nf-src">' + (f.x ? '<a href="https://x.com/' + esc(f.x) + '" target="_blank" rel="noopener noreferrer">@' + esc(f.x) + '</a>' : '') +
-        f.src.map(function (s) { return '<a href="' + esc(s[1]) + '" target="_blank" rel="noopener noreferrer">' + esc(s[0]) + '</a>'; }).join('') + '</span></div>' +
-      '</article>';
-  }
-
-  /* where each farm sits: earlier on the track = cheaper entry, less certainty */
-  function farmTrack() {
-    var stages = ['No confirmed points / rewards', 'Points live', 'Token'];
-    return '<div class="nf-track"><div class="nf-track-line">' +
-      stages.map(function (s, i) {
-        var here = FARMS_PERP.filter(function (f) { return (f.cat || 'perp') === 'perp' && f.stage === i; });
-        return '<div class="nf-stage"><span>' + esc(s) + '</span><div class="nf-stage-logos">' +
-          (here.length ? here.map(function (f) { return farmLogo(f, 34); }).join('') : '<em>none yet</em>') +
-          '</div></div>';
-      }).join('') + '</div><p>Program status is based on cited public material; a testnet or live product does not imply a token allocation.</p></div>';
-  }
-
-  function farmControls() {
-    return '<div class="nf-ctl"><span>Value scenario</span>' + FARM_MULTS.map(function (m) {
-      return '<button type="button" data-nf-mult="' + m + '"' + (m === farmMult ? ' class="on"' : '') + '>' + m + '× raise' + (m === 59 ? ' · Lighter' : '') + '</button>';
-    }).join('') + '<em>listing FDV = raise × multiple · 25% to users · Lighter raised $68M and listed at $4B (≈59×)</em></div>';
-  }
-
-  /* ---------- search, sort, filter ----------
-     Works on the rendered cards in place (show/hide and reorder), so typing in the search
-     box never re-renders the page and never loses focus. Search matches the project name
-     and every KOL's name, X handle and Telegram handle on its card. */
-  var nf = { q: '', who: 'all', sort: 'default', pts: 'all', cat: 'all' };
-  var NF_GROUPS = [
-    ['who', 'Show', [['all', 'All farms'], ['mine', '★ My farms']]],
-    ['sort', 'Sort', [['default', 'Featured'], ['name', 'Project A–Z'], ['kols', 'Most KOLs']]],
-    ['pts', 'Points', [['all', 'All'], ['pre', 'Pre-points'], ['live', 'Points live']]],
-    ['cat', 'Type', [['all', 'All'], ['non', 'Non-perp DEX'], ['perp', 'Perp venues'], ['infra', 'Trading infrastructure']]]
-  ];
-  function nfToolbar() {
-    return '<div class="nf-bar"><label class="nf-search"><span aria-hidden="true">⌕</span>' +
-      '<input type="search" data-nf-q placeholder="Search a project or a KOL (@handle)" aria-label="Search projects and KOLs" value="' + esc(nf.q) + '"></label>' +
-      NF_GROUPS.map(function (g) {
-        return '<div class="nf-seg" role="group" aria-label="' + g[1] + '"><span>' + g[1] + '</span>' + g[2].map(function (o) {
-          return '<button type="button" data-nf-set="' + g[0] + ':' + o[0] + '" aria-pressed="' + (nf[g[0]] === o[0]) + '"' + (nf[g[0]] === o[0] ? ' class="on"' : '') + '>' + o[1] + '</button>';
-        }).join('') + '</div>';
-      }).join('') + '<em class="nf-count" data-nf-count></em></div>';
-  }
-  function applyNf() {
-    var host = document.querySelector('[data-tg="whales-next"]');
-    if (!host) return;
-    var q = nf.q.trim().toLowerCase().replace(/^@/, '');
-    var shown = 0, total = 0;
-    host.querySelectorAll('.nf-farms').forEach(function (grid) {
-      var cards = [].slice.call(grid.querySelectorAll('.nf-farm'));
-      cards.forEach(function (c, i) {
-        if (!c.dataset.nfOrder) c.dataset.nfOrder = i;
-        var ok = (!q || c.dataset.nfText.indexOf(q) >= 0) &&
-          (nf.pts === 'all' || c.dataset.nfStage === nf.pts) &&
-          (nf.cat === 'all' || c.dataset.nfCat === nf.cat) &&
-          (nf.who === 'all' || c.dataset.nfMine === '1');
-        c.hidden = !ok;
-        total++; if (ok) shown++;
-      });
-      cards.sort(function (a, b) {
-        if (nf.sort === 'name') return a.dataset.nfName < b.dataset.nfName ? -1 : 1;
-        if (nf.sort === 'kols') return (+b.dataset.nfKols - +a.dataset.nfKols) || (+a.dataset.nfOrder - +b.dataset.nfOrder);
-        return +a.dataset.nfOrder - +b.dataset.nfOrder;
-      }).forEach(function (c) { grid.appendChild(c); });
-    });
-    /* a section the type filter excludes disappears; one the search empties says so */
-    host.querySelectorAll('.nf-category').forEach(function (sec) {
-      var cat = sec.getAttribute('data-nf-section');
-      sec.hidden = nf.cat !== 'all' && cat !== nf.cat;
-      var grid = sec.querySelector('.nf-farms'), none = sec.querySelector('.nf-none');
-      if (grid && none) none.hidden = !!grid.querySelector('.nf-farm:not([hidden])');
-    });
-    var cnt = host.querySelector('[data-nf-count]');
-    if (cnt) cnt.textContent = shown + ' of ' + total + ' projects';
-  }
-
-  /* Who farms what: every KOL on any card, one row each, a dot per project they farm.
-     Built from the cards' own kols lists, so the matrix and the cards cannot disagree.
-     Each dot links to the post that shows it. */
-  function kolMatrix() {
-    var people = {};
-    var matrixFarms = FARMS_PERP.filter(function (f) { return f.mine || (f.kols || []).length; });
-    matrixFarms.forEach(function (f) {
-      (f.kols || []).forEach(function (kk) {
-        var id = (kk.x || kk.tg).toLowerCase();
-        (people[id] = people[id] || { kk: kk, farms: {} }).farms[f.k] = kk;
-      });
-    });
-    var rows = Object.keys(people).map(function (id) { return people[id]; });
-    if (!rows.length) return '';
-    rows.sort(function (a, b) {
-      return Object.keys(b.farms).length - Object.keys(a.farms).length || (a.kk.x || '').toLowerCase().localeCompare((b.kk.x || '').toLowerCase());
-    });
-    var head = '<tr><th>KOL</th>' + matrixFarms.map(function (f) {
-      return '<th title="' + esc(f.name) + '"><img src="' + esc(f.logo) + '" alt="' + esc(f.name) + '" width="26" height="26"><span>' + esc(f.name) + '</span></th>';
-    }).join('') + '<th>Farms</th></tr>';
-    var meRow = '<tr class="nf-mx-me"><td class="nf-mx-who"><a href="https://x.com/' + ME.x + '" target="_blank" rel="noopener noreferrer"><i class="me">KD</i>' +
-      '<span><b>Me · ' + ME.name + '</b><small>@' + ME.x + '</small></span></a></td>' +
-      matrixFarms.map(function (f) {
-        return '<td>' + (f.mine ? '<a class="nf-dot" style="--acc:' + f.accent + '" href="' + esc(f.url) + '" target="_blank" rel="noopener noreferrer" title="' + esc(f.name) + ' · my farm"></a>' : '<span class="nf-nodot"></span>') + '</td>';
-      }).join('') + '<td class="nf-mx-n">' + myFarms().length + '</td></tr>';
-    var body = meRow + rows.map(function (r) {
-      var pr = r.kk.x ? (PROFILES[r.kk.x.toLowerCase()] || {}) : {};
-      var face = pr.avatar ? '<img src="' + esc(pr.avatar) + '" alt="" width="28" height="28">' : '<i>' + esc((r.kk.x || r.kk.tg).slice(0, 2).toUpperCase()) + '</i>';
-      return '<tr><td class="nf-mx-who"><a href="https://x.com/' + esc(r.kk.x) + '" target="_blank" rel="noopener noreferrer">' + face +
-        '<span><b>' + esc(pr.name || r.kk.x) + '</b><small>@' + esc(r.kk.x) + '</small></span></a></td>' +
-        matrixFarms.map(function (f) {
-          var hit = r.farms[f.k];
-          return '<td>' + (hit ? '<a class="nf-dot" style="--acc:' + f.accent + '" href="' + esc(hit.post) + '" target="_blank" rel="noopener noreferrer" title="' + esc(f.name + ' · ' + (hit.note || '') + ' · ' + hit.asOf) + '"></a>' : '<span class="nf-nodot"></span>') + '</td>';
-        }).join('') + '<td class="nf-mx-n">' + Object.keys(r.farms).length + '</td></tr>';
-    }).join('');
-    return '<section class="nf-mx"><div class="nf-mx-h"><b>Who’s farming what</b><span>Tracked whales from the Whales tab whose own posts show them on these farms · each dot opens the post</span></div>' +
-      '<div class="nf-mx-wrap"><table><thead>' + head + '</thead><tbody>' + body + '</tbody></table></div></section>';
-  }
-
-  function renderNext() {
-    var host = document.querySelector('[data-tg="whales-next"]');
-    if (!host) return;
-    var nonPerps = FARMS_PERP.filter(function (f) { return f.cat === 'non'; });
-    var perps = FARMS_PERP.filter(function (f) { return (f.cat || 'perp') === 'perp'; });
-    var infra = FARMS_PERP.filter(function (f) { return f.cat === 'infra'; });
-    host.innerHTML = '<div class="cmp-heading"><span class="cmp-eyebrow">POST-TGE · NEXT FARMS</span>' +
-      '<h2>' + NEXT_TITLE + '</h2><p>Farming projects, with Varriors’ picks and reasons to farm.</p></div>' +
-      myHero() + nfToolbar() + kolMatrix() +
-      '<div class="nf-categories" aria-label="Upcoming farming projects">' +
-      '<section class="nf-category" data-nf-section="non" aria-labelledby="nf-non-perp"><span class="nf-part">PART 01</span><h3 id="nf-non-perp">Non-perp DEX</h3>' +
-      '<p class="nf-lede">Spot and tokenized-asset venues. Snapshot metrics are dated on each card; points and token terms require a separate announcement.</p>' +
-      '<div class="nf-farms">' + nonPerps.map(farmCard).join('') + '</div><div class="nf-none" hidden>No project or KOL matches that. Clear the search or the filters.</div></section>' +
-      '<section class="nf-category" data-nf-section="perp" aria-labelledby="nf-perp"><span class="nf-part">PART 02</span><h3 id="nf-perp">Perp venues</h3>' +
-      '<p class="nf-lede">' + perps.length + ' venues to track, including Titan’s testnet and Flint’s planned perp launch. Facts as of ' + FARMS_ASOF + ', sourced on each card.</p>' +
-      farmTrack() + farmControls() +
-      '<div class="nf-farms">' + perps.map(farmCard).join('') + '</div>' +
-      '<div class="nf-none" hidden>No project or KOL matches that. Clear the search or the filters.</div></section>' +
-      '<section class="nf-category" data-nf-section="infra" aria-labelledby="nf-infra"><span class="nf-part">PART 03</span><h3 id="nf-infra">Trading infrastructure</h3>' +
-      '<p class="nf-lede">Block execution and prime brokerage around existing venues. Facts as of ' + FARMS_ASOF + '.</p>' +
-      '<div class="nf-farms">' + infra.map(farmCard).join('') + '</div><div class="nf-none" hidden>No project or KOL matches that. Clear the search or the filters.</div></section></div>';
-    applyNf();
-  }
-
+  var NEXT_TITLE = 'Next Varrior Farm';
+  /* The research moved to the owner-only Alpha Site. The public tab remains as a
+     non-interactive lock marker, with no farm data or referral URLs in this bundle. */
   function mountNext() {
     var main = document.querySelector('#main');
     if (!main || document.querySelector('[data-tg="whales-next"]')) return;
     var sec = document.createElement('section');
     sec.className = 'whales-next-report tsec tg-hide';
     sec.setAttribute('data-tg', 'whales-next');
+    sec.innerHTML = '<div style="margin:40px auto;max-width:620px;padding:32px;border:1px solid var(--line);background:var(--panel);text-align:center"><span style="color:var(--v2-accent,#4c9af8);font:800 11px var(--mono);letter-spacing:2px">PRIVATE ALPHA</span><h2 style="margin:14px 0">Next Varrior Farm is locked</h2><p style="color:var(--muted)">Owner-only research. Public access will be enabled when it is ready to share.</p></div>';
     main.appendChild(sec);
     var tabs = document.getElementById('tabs');
     if (tabs && !document.getElementById('tab-whales-next')) {
@@ -1110,8 +755,10 @@
       button.type = 'button';
       button.setAttribute('role', 'tab');
       button.setAttribute('aria-selected', 'false');
+      button.setAttribute('aria-disabled', 'true');
       button.dataset.tab = 'whales-next';
-      button.textContent = NEXT_TITLE;
+      button.textContent = NEXT_TITLE + ' 🔒';
+      button.disabled = true;
       tabs.appendChild(button);
     }
     document.querySelectorAll('[data-open-tab="whales"]').forEach(function (btn) {
@@ -1119,91 +766,15 @@
       if (!rail || rail.querySelector('[data-open-tab="whales-next"]')) return;
       var next = btn.cloneNode(true);
       next.setAttribute('data-open-tab', 'whales-next');
+      next.setAttribute('aria-disabled', 'true');
+      next.disabled = true;
       next.classList.remove('on');
       var title = next.querySelector('strong') || next.querySelector('b');
       if (title) title.textContent = NEXT_TITLE;
       var small = next.querySelector('small');
-      if (small) small.textContent = 'projects & Varriors’ picks';
+      if (small) small.textContent = 'Private Alpha · locked';
       rail.insertBefore(next, btn.nextSibling);
     });
-    var style = document.createElement('style');
-    style.textContent = '.nf-empty{border:1px dashed var(--line);padding:20px;background:var(--panel)}' +
-      '.nf-categories{margin:28px 0 36px}.nf-category{padding:24px 0}.nf-category+.nf-category{border-top:1px solid var(--line);margin-top:8px;padding-top:32px}.nf-part{color:var(--v2-accent,#4c9af8);font:800 10px var(--mono);letter-spacing:1px}.nf-category>h3{margin:10px 0 18px;color:var(--text);font-size:24px}.nf-empty{border-style:dashed}.nf-empty h4{margin:0 0 8px;color:var(--text);font-size:18px}.nf-empty p{margin:0;color:var(--muted)!important;font-size:13px;line-height:1.6}' +
-      '[data-open-tab="whales-next"]{height:auto!important;min-height:54px;white-space:normal!important;padding-top:10px!important;padding-bottom:10px!important}' +
-      '[data-open-tab="whales-next"] strong,[data-open-tab="whales-next"] b{white-space:normal!important;line-height:1.4!important}' +
-      '@media(max-width:1000px){[data-open-tab="whales-next"]{max-width:235px}}' +
-      '.nf-bar{position:sticky;top:0;z-index:5;display:flex;flex-wrap:wrap;align-items:center;gap:10px 18px;margin:18px 0 6px;padding:12px 14px;border:1px solid var(--line);background:color-mix(in srgb,var(--panel) 94%,transparent);backdrop-filter:blur(8px)}' +
-      '.nf-search{display:flex;align-items:center;gap:8px;flex:1 1 280px;min-width:0;padding:0 12px;border:1px solid var(--line);border-radius:6px;background:var(--panel2,var(--panel))}.nf-search:focus-within{border-color:var(--v2-accent,#4c9af8)}' +
-      '.nf-search span{color:var(--muted);font-size:16px}.nf-search input{flex:1;min-width:0;height:38px;border:0;background:transparent;color:var(--text);font:600 13px var(--sans);outline:none}' +
-      '.nf-seg{display:flex;align-items:center;gap:4px;flex-wrap:wrap}.nf-seg>span{margin-right:4px;color:var(--muted);font:800 9px var(--mono);letter-spacing:.8px;text-transform:uppercase}' +
-      '.nf-seg button{padding:6px 10px;border:1px solid var(--line);border-radius:4px;background:var(--panel);color:var(--muted);font:700 10.5px var(--mono);cursor:pointer}.nf-seg button:hover{color:var(--text)}.nf-seg button.on{background:var(--v2-accent,#4c9af8);border-color:var(--v2-accent,#4c9af8);color:#04101d}' +
-      '.nf-count{margin-left:auto;color:var(--muted);font:700 10.5px var(--mono);font-style:normal}' +
-      '.nf-none{margin-top:14px;padding:18px;border:1px dashed var(--line);color:var(--muted);font:12px var(--mono)}.nf-farm[hidden],.nf-category[hidden],.nf-none[hidden]{display:none!important}' +
-      '.nf-me{position:relative;margin:18px 0 16px;padding:20px;border:1px solid var(--v2-accent,#4c9af8);background:radial-gradient(ellipse at 0 0,color-mix(in srgb,var(--v2-accent,#4c9af8) 16%,transparent),transparent 60%),var(--panel);box-shadow:0 0 50px color-mix(in srgb,var(--v2-accent,#4c9af8) 14%,transparent)}' +
-      '.nf-me-h{display:flex;align-items:center;gap:14px;margin:0 0 16px}.nf-me-av{flex:none;display:flex;align-items:center;justify-content:center;width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#4c9af8,#8f80d9);color:#fff;font:900 16px var(--mono);box-shadow:0 0 24px #4c9af866}' +
-      '.nf-me-k{display:block;color:var(--v2-accent,#4c9af8);font:800 10px var(--mono);letter-spacing:2.5px}.nf-me-h b{display:block;margin:4px 0 2px;color:var(--text);font:900 clamp(20px,2.4vw,28px)/1.1 var(--sans);letter-spacing:-.6px}.nf-me-h a{color:var(--muted)!important;font:700 11px var(--mono);text-decoration:none}' +
-      '.nf-me-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}' +
-      '.nf-me-card{display:flex;flex-direction:column;gap:12px;padding:18px;border:1px solid var(--acc);border-radius:6px;background:linear-gradient(150deg,color-mix(in srgb,var(--acc) 14%,var(--panel)),var(--panel) 60%)}' +
-      '.nf-me-top{display:flex;align-items:center;gap:14px}.nf-me-logo{width:52px;height:52px;border-radius:14px;object-fit:cover;box-shadow:0 6px 24px color-mix(in srgb,var(--acc) 45%,transparent)}' +
-      '.nf-me-top b{display:block;color:var(--text);font:900 22px/1.1 var(--sans)}.nf-me-top span{display:block;margin-top:4px;color:var(--acc);font:800 10px var(--mono);letter-spacing:.5px;text-transform:uppercase;filter:brightness(1.15)}' +
-      '.nf-me-card p{margin:0;color:var(--text)!important;font-size:12.5px;line-height:1.55}' +
-      '.nf-me-with{display:flex;align-items:center;gap:10px}.nf-me-faces{display:flex}.nf-me-faces img{width:26px;height:26px;border-radius:50%;border:2px solid var(--panel);object-fit:cover}.nf-me-faces img+img{margin-left:-8px}.nf-me-with em{color:var(--muted);font:700 10.5px var(--mono);font-style:normal}' +
-      '.nf-me-card .nf-hedge{align-self:flex-start;margin-top:auto;padding:11px 16px;font-size:12px}' +
-      '.nf-mine{display:inline-block;margin:6px 0 0 0;padding:2px 8px;border-radius:3px;background:var(--v2-accent,#4c9af8);color:#04101d;font:800 9.5px var(--mono);letter-spacing:.4px}' +
-      '.nf-farm.mine{border-color:var(--acc);box-shadow:0 0 0 1px var(--acc),0 10px 40px color-mix(in srgb,var(--acc) 18%,transparent)}' +
-      '.nf-mx-me td{background:color-mix(in srgb,var(--v2-accent,#4c9af8) 9%,transparent)}.nf-mx-who i.me{background:linear-gradient(135deg,#4c9af8,#8f80d9);color:#fff}' +
-      '.nf-kol-n small.nf-kol-note{white-space:normal;color:var(--text);opacity:.75}' +
-      '.nf-mx{margin:14px 0 6px;padding:16px 18px;border:1px solid var(--line);background:var(--panel)}.nf-mx-h b{display:block;color:var(--text);font:800 17px var(--sans)}.nf-mx-h span{display:block;margin:3px 0 12px;color:var(--muted);font-size:11.5px}' +
-      '.nf-mx-wrap{overflow-x:auto}.nf-mx table{width:100%;min-width:560px;border-collapse:collapse}' +
-      '.nf-mx th{padding:6px 8px 10px;border-bottom:1px solid var(--line);color:var(--muted);font:800 9px var(--mono);letter-spacing:.6px;text-transform:uppercase;text-align:center;vertical-align:bottom}.nf-mx th:first-child{text-align:left}' +
-      '.nf-mx th img{display:block;margin:0 auto 5px;width:26px;height:26px;border-radius:7px;object-fit:cover}' +
-      '.nf-mx td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:center}.nf-mx tr:hover td{background:color-mix(in srgb,var(--v2-accent,#4c9af8) 5%,transparent)}' +
-      '.nf-mx-who a{display:flex;align-items:center;gap:9px;text-decoration:none;text-align:left}.nf-mx-who img,.nf-mx-who i{width:28px;height:28px;border-radius:50%;object-fit:cover;flex:none;display:flex;align-items:center;justify-content:center;background:var(--panel2,var(--panel));color:var(--muted);font:800 9px var(--mono);font-style:normal}' +
-      '.nf-mx-who b{display:block;color:var(--text);font:700 12px var(--sans)}.nf-mx-who small{display:block;color:var(--muted);font:10px var(--mono)}' +
-      '.nf-dot{display:inline-block;width:16px;height:16px;border-radius:50%;background:var(--acc);box-shadow:0 0 0 3px color-mix(in srgb,var(--acc) 25%,transparent)}.nf-dot:hover{transform:scale(1.2)}.nf-nodot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--line)}' +
-      '.nf-mx-n{color:var(--text);font:800 13px var(--mono)}' +
-      '.nf-lede{margin:6px 0 18px;color:var(--muted)!important;font-size:13px;line-height:1.6}' +
-      '.nf-track{margin:0 0 18px;padding:16px 18px;border:1px solid var(--line);background:var(--panel)}.nf-track p{margin:10px 0 0;color:var(--muted)!important;font-size:11.5px}' +
-      '.nf-track-line{position:relative;display:grid;grid-template-columns:2fr 1fr 1fr;gap:12px}.nf-track-line::before{content:"";position:absolute;left:0;right:0;top:9px;height:2px;background:linear-gradient(90deg,var(--line),#19d38a 55%,var(--v2-accent,#4c9af8))}' +
-      '.nf-stage{position:relative;padding-top:24px}.nf-stage::before{content:"";position:absolute;left:0;top:3px;width:14px;height:14px;border-radius:50%;background:var(--panel);border:2px solid var(--muted)}' +
-      '.nf-stage>span{display:block;color:var(--muted);font:800 9.5px var(--mono);letter-spacing:.8px;text-transform:uppercase}' +
-      '.nf-stage-logos{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}.nf-stage-logos img{width:34px;height:34px;border-radius:9px;border:1px solid var(--line);object-fit:cover}.nf-stage-logos em{color:var(--muted);font:11px var(--mono);font-style:normal}' +
-      '.nf-ctl{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin:0 0 16px}.nf-ctl>span{color:var(--muted);font:800 9.5px var(--mono);letter-spacing:.8px;text-transform:uppercase}' +
-      '.nf-ctl button{padding:6px 11px;border:1px solid var(--line);border-radius:4px;background:var(--panel);color:var(--muted);font:800 10.5px var(--mono);cursor:pointer}.nf-ctl button.on{background:var(--v2-accent,#4c9af8);border-color:var(--v2-accent,#4c9af8);color:#04101d}' +
-      '.nf-ctl em{flex-basis:100%;color:var(--muted);font:10.5px var(--mono);font-style:normal}' +
-      '.nf-farms{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}' +
-      '.nf-farm{position:relative;display:flex;flex-direction:column;gap:12px;padding:18px;border:1px solid var(--line);background:linear-gradient(160deg,color-mix(in srgb,var(--acc) 9%,var(--panel)),var(--panel) 45%);min-width:0;overflow:hidden;transition:transform .15s,border-color .15s}' +
-      '.nf-category[data-nf-section="non"] .nf-farms{grid-template-columns:minmax(0,1fr)}.nf-category[data-nf-section="non"] .nf-farm{display:grid;grid-template-columns:minmax(0,1fr) minmax(280px,.9fr);grid-template-areas:"head stats" "what stats" "bull pts" "bull raise" "foot val";align-items:start;gap:12px 28px}.nf-category[data-nf-section="non"] .nf-head{grid-area:head}.nf-category[data-nf-section="non"] .nf-what{grid-area:what}.nf-category[data-nf-section="non"] .nf-farm-stats{grid-area:stats}.nf-category[data-nf-section="non"] .nf-pts{grid-area:pts}.nf-category[data-nf-section="non"] .nf-bull{grid-area:bull}.nf-category[data-nf-section="non"] .nf-raise{grid-area:raise}.nf-category[data-nf-section="non"] .nf-val{grid-area:val}.nf-category[data-nf-section="non"] .nf-foot{grid-area:foot}' +
-      '.nf-farm::before{content:"";position:absolute;inset:0 0 auto 0;height:3px;background:var(--acc)}.nf-farm:hover{transform:translateY(-2px);border-color:var(--acc)}' +
-      '.nf-head{display:flex;align-items:center;gap:14px;text-align:left}.nf-head>div{min-width:0}.nf-farm-id img{display:block;width:60px;height:60px;border-radius:16px;object-fit:cover;border:1px solid var(--line);box-shadow:0 6px 22px color-mix(in srgb,var(--acc) 35%,transparent)}' +
-      '.nf-logo-placeholder{display:flex;flex:none;align-items:center;justify-content:center;border:1px solid var(--acc);border-radius:16px;background:color-mix(in srgb,var(--acc) 16%,var(--panel));color:var(--acc);font-family:var(--mono);font-weight:900;box-shadow:0 6px 22px color-mix(in srgb,var(--acc) 22%,transparent)}.nf-stage-logos .nf-logo-placeholder{border-radius:9px}' +
-      '.nf-head b{display:block;color:var(--text);font:800 20px/1.2 var(--sans);letter-spacing:-.3px}' +
-      '.nf-st{display:inline-flex;align-items:center;gap:6px;margin-top:5px;color:var(--muted);font:800 9.5px var(--mono);letter-spacing:.5px;text-transform:uppercase}.nf-st i{width:7px;height:7px;border-radius:50%;background:var(--muted)}' +
-      '.nf-st.live i{background:#2fb37e;box-shadow:0 0 0 3px color-mix(in srgb,#2fb37e 25%,transparent);animation:nfpulse 1.8s infinite}.nf-st.gated i{background:#d99a2b}.nf-st.soon i{background:#8a9bb0}' +
-      '@keyframes nfpulse{50%{box-shadow:0 0 0 6px transparent}}' +
-      '.nf-what{margin:0;color:var(--text)!important;font-size:12.5px;line-height:1.55}' +
-      '.nf-farm-stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.nf-farm-stats>div{padding:12px;border:1px solid color-mix(in srgb,var(--acc) 45%,var(--line));background:color-mix(in srgb,var(--acc) 8%,var(--panel))}.nf-farm-stats span,.nf-farm-stats small{display:block;color:var(--muted);font:800 9px var(--mono);letter-spacing:.3px}.nf-farm-stats b{display:block;margin:5px 0;color:var(--acc);font:900 22px/1 var(--mono)}.nf-farm-stats small{font-weight:500;letter-spacing:0}' +
-      '.nf-pts,.nf-raise,.nf-val{padding:10px 12px;border:1px solid var(--line);background:color-mix(in srgb,var(--panel) 70%,transparent)}' +
-      '.nf-pts span,.nf-raise span,.nf-val span{display:block;color:var(--muted);font:800 8.5px var(--mono);letter-spacing:.8px;text-transform:uppercase}' +
-      '.nf-pts b,.nf-raise b{display:block;margin:5px 0 3px;color:var(--text);font:800 15px var(--mono)}.nf-pts.live{border-color:#19d38a}.nf-pts.live b{color:#19d38a}' +
-      '.nf-pts em,.nf-raise em,.nf-val em{display:block;color:var(--muted);font-size:10.5px;line-height:1.5;font-style:normal}' +
-      '.nf-bull{list-style:none;margin:0;padding:0;display:grid;gap:5px}.nf-bull li{position:relative;padding-left:20px;color:var(--text);font-size:12px;line-height:1.45}.nf-bull li::before{content:"▲";position:absolute;left:0;top:1px;color:#2fb37e;font-size:10px}' +
-      '.nf-val b{display:block;margin:5px 0 6px;color:var(--acc);font:800 24px/1 var(--mono);letter-spacing:-.6px;filter:brightness(1.1)}.nf-val.none b{color:var(--muted)}' +
-      '.nf-val i{display:block;height:5px;margin:0 0 7px;border-radius:3px;background:color-mix(in srgb,var(--muted) 18%,transparent);position:relative;overflow:hidden}.nf-val i::after{content:"";position:absolute;inset:0 auto 0 0;width:var(--w);background:var(--acc)}' +
-      '.nf-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:auto;padding-top:4px}' +
-      '.nf-hedge{display:inline-flex;align-items:center;gap:7px;padding:9px 13px;border-radius:5px;background:var(--acc);color:#04101d!important;font:800 11px var(--mono);text-decoration:none}.nf-hedge:hover{filter:brightness(1.12)}' +
-      '.nf-hedge small{padding:1px 5px;border-radius:3px;background:rgba(0,0,0,.18);font:800 8.5px var(--mono);text-transform:uppercase}' +
-      '.nf-src{display:flex;gap:9px;flex-wrap:wrap}.nf-src a{color:var(--muted)!important;font:700 10px var(--mono);text-decoration:none}.nf-src a:hover{color:var(--text)!important}' +
-      '.nf-kols>span{display:block;margin:0 0 7px;color:var(--muted);font:800 8.5px var(--mono);letter-spacing:.8px;text-transform:uppercase}.nf-kols>div{display:grid;gap:6px}' +
-      '.nf-kol{display:flex;align-items:center;gap:10px;padding:6px 8px;border:1px solid var(--line);border-radius:6px;background:color-mix(in srgb,var(--panel) 70%,transparent)}' +
-      '.nf-faces{display:flex;flex:none}.nf-face{position:relative;display:block;width:34px;height:34px;border-radius:50%;border:2px solid var(--panel);text-decoration:none}.nf-face+.nf-face{margin-left:-10px}' +
-      '.nf-face img,.nf-face i{display:flex;width:100%;height:100%;border-radius:50%;object-fit:cover;align-items:center;justify-content:center;background:var(--panel2,var(--panel));color:var(--muted);font:800 10px var(--mono);font-style:normal}' +
-      '.nf-face u{position:absolute;right:-4px;bottom:-4px;min-width:15px;height:15px;padding:0 2px;border-radius:8px;display:flex;align-items:center;justify-content:center;font:900 7.5px var(--mono);text-decoration:none;color:#fff;background:#111}.nf-face.tg u{background:#2aabee}' +
-      '.nf-face:hover{z-index:1;transform:translateY(-2px)}' +
-      '.nf-kol-n{min-width:0}.nf-kol-n b,.nf-kol-n b a{display:block;color:var(--text)!important;font:800 12px var(--sans);text-decoration:none}.nf-kol-n small{display:block;color:var(--muted);font:10px var(--mono);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}' +
-      '@media(max-width:800px){.nf-category[data-nf-section="non"] .nf-farm{display:flex;flex-direction:column}.nf-category[data-nf-section="non"] .nf-farm>*{width:100%}}' +
-      '@media(max-width:600px){.nf-empty{padding:16px}.nf-farms{grid-template-columns:minmax(0,1fr)}.nf-farm{padding:15px}.nf-track-line{grid-template-columns:minmax(0,1fr)}.nf-track-line::before{display:none}}';
-    document.head.appendChild(style);
   }
 
   function mount() {
@@ -1283,7 +854,6 @@
     mount();
     render();
     mountNext();
-    renderNext();
     loadProfiles();
     /* the Playbook tab can change the same points value */
     document.addEventListener('var:points', function (e) {
@@ -1296,8 +866,11 @@
     }, 60000);
     /* dashboard.js resolves the opening hash before this tab exists, so a shared
        #whales link would land on Overview without this */
-    if ((location.hash === '#whales' || location.hash === '#whales-next') && typeof showTab === 'function') {
-      try { showTab(location.hash.slice(1), { push: false }); } catch (_) {}
+    if (location.hash === '#whales-next') {
+      history.replaceState(null, '', '#whales');
+    }
+    if (location.hash === '#whales' && typeof showTab === 'function') {
+      try { showTab('whales', { push: false }); } catch (_) {}
     }
     document.addEventListener('click', function (e) {
       if (e.target && e.target.closest && e.target.closest('[data-wh-sort-direction]')) {
@@ -1311,24 +884,6 @@
         render();
         return;
       }
-      var ns = e.target && e.target.closest && e.target.closest('[data-nf-set]');
-      if (ns) {
-        var kv = ns.getAttribute('data-nf-set').split(':');
-        nf[kv[0]] = kv[1];
-        ns.parentNode.querySelectorAll('[data-nf-set]').forEach(function (b) {
-          var on = b === ns;
-          b.classList.toggle('on', on);
-          b.setAttribute('aria-pressed', String(on));
-        });
-        applyNf();
-        return;
-      }
-      var nm = e.target && e.target.closest && e.target.closest('[data-nf-mult]');
-      if (nm) {
-        farmMult = +nm.getAttribute('data-nf-mult');
-        renderNext();
-        return;
-      }
       var pt = e.target && e.target.closest && e.target.closest('[data-wh-pts]');
       if (pt) {
         setMyPts(+pt.getAttribute('data-wh-pts'));
@@ -1339,11 +894,6 @@
       if (!b) return;
       fdv = +b.getAttribute('data-wh-fdv');
       render();
-    });
-    document.addEventListener('input', function (e) {
-      if (!e.target || !e.target.matches || !e.target.matches('[data-nf-q]')) return;
-      nf.q = e.target.value;
-      applyNf();
     });
     document.addEventListener('change', function (e) {
       if (e.target && e.target.matches && e.target.matches('[data-wh-pts-input]')) {
