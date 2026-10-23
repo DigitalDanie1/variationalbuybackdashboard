@@ -3,20 +3,26 @@ window.PRO_DERIVATIVES = {
   "period": "September 2026",
   "oiDate": "2026-09-30",
   "referencePriceDate": "2026-10-21",
-  "retrieved": "2026-10-22",
-  "scope": "50 selected CME Group futures; ranked within this covered universe, not a global top-50. Excludes OTC, options, ICE and Eurex.",
-  "method": "USD B reference notional = contract count \u00d7 contract quantity \u00d7 Oct 21 reference settlement / 1e9. Rates use principal or Treasury face value. Dollar ADV is a reference-price equivalent, not a measured time-weighted dollar ADV. Same reference applied to all expiries; not DV01 or delta-adjusted.",
+  "retrieved": "2026-10-23",
+  "scope": "50 selected CME Group and Eurex futures, including eight euro rates contracts. Ranked within this covered universe, not a global top-50. Excludes OTC, options and ICE.",
+  "method": "USD B reference notional = contract ADV or month-end OI \u00d7 reference unit USD / 1e9. CME non-rates use 21 Oct 2026 reference settlements; CME rates and Eurex rates use contract principal or face value. Eurex FEU3/FST3 use EUR 1m equivalent principal, derived from the EUR 2,500-per-index-point specification (EUR 25 per bp for a three-month period). Eurex ADV = September monthly traded contracts / 22 Eurex trading days; 1 Oct daily file previous-day OI gives 30 Sep OI. EUR amounts use the 30 Sep 2026 ECB reference rate of 1 EUR = 1.1355 USD. These are reference-price/principal equivalents, not observed time-weighted dollar ADV, market value, DV01 or delta-adjusted exposure.",
   "sources": {
     "adv": "https://www.cmegroup.com/daily_bulletin/monthly_volume/Web_ADV_Report_CMEG.pdf",
     "oi": "https://www.cmegroup.com/daily_bulletin/monthly_volume/Web_OI_Report_CMEG.pdf",
     "settlements": "https://www.cmegroup.com/market-data/daily-bulletin.html",
-    "specifications": "https://www.cmegroup.com/markets/products.html"
+    "specifications": "https://www.cmegroup.com/markets/products.html",
+    "eurexAdv": "https://www.eurex.com/resource/blob/5604748/561668142ca72e76af2fb23ea3479cd8/data/dailystat_20260930.xls",
+    "eurexOi": "https://www.eurex.com/resource/blob/5607438/e61316cb2dda48eb5f3a5b9578d8553c/data/dailystat_20261001.xls",
+    "eurexSpecs": "https://www.eurex.com/ex-en/markets/int/long-term-interest-rates/fix/government-bonds/Euro-Schatz-Futures-34678",
+    "eurexStirSpecs": "https://www.eurex.com/ex-en/markets/int/mon/euribor-derivatives/euribor/Three-Month-EURIBOR-Futures-137458",
+    "eurUsd": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=OJ%3AC_202604617"
   },
   "rows": [
     {
       "name": "3-Month SOFR",
       "symbol": "SR3",
       "asset": "Rates",
+      "venue": "CME Group",
       "advContracts": 4594097,
       "oiContracts": 13957666,
       "referenceUnitUSD": 1000000.0,
@@ -33,6 +39,7 @@ window.PRO_DERIVATIVES = {
       "name": "30-Day Federal Funds",
       "symbol": "ZQ",
       "asset": "Rates",
+      "venue": "CME Group",
       "advContracts": 618578,
       "oiContracts": 2645696,
       "referenceUnitUSD": 5000000.0,
@@ -49,6 +56,7 @@ window.PRO_DERIVATIVES = {
       "name": "E-mini S&P 500",
       "symbol": "ES",
       "asset": "Equity index",
+      "venue": "CME Group",
       "advContracts": 1839326,
       "oiContracts": 1894473,
       "referenceUnitUSD": 390012.5,
@@ -65,6 +73,7 @@ window.PRO_DERIVATIVES = {
       "name": "E-mini Nasdaq-100",
       "symbol": "NQ",
       "asset": "Equity index",
+      "venue": "CME Group",
       "advContracts": 603753,
       "oiContracts": 273903,
       "referenceUnitUSD": 600140.0,
@@ -81,6 +90,7 @@ window.PRO_DERIVATIVES = {
       "name": "10-Year Treasury Note",
       "symbol": "ZN",
       "asset": "Rates",
+      "venue": "CME Group",
       "advContracts": 2646717,
       "oiContracts": 5744864,
       "referenceUnitUSD": 100000.0,
@@ -97,6 +107,7 @@ window.PRO_DERIVATIVES = {
       "name": "2-Year Treasury Note",
       "symbol": "ZT",
       "asset": "Rates",
+      "venue": "CME Group",
       "advContracts": 1250894,
       "oiContracts": 4452506,
       "referenceUnitUSD": 200000.0,
@@ -110,9 +121,44 @@ window.PRO_DERIVATIVES = {
       "rank": 6
     },
     {
+      "name": "Euro-Bobl Futures",
+      "symbol": "FGBM",
+      "asset": "Rates",
+      "venue": "Eurex",
+      "advContracts": 1871178.045,
+      "oiContracts": 1633155,
+      "referenceUnitUSD": 113550.0,
+      "multiplier": 100000,
+      "referencePriceUSD": 1.1355,
+      "referenceExpiry": "Principal / face value",
+      "advB": 212.47226706136362,
+      "oiB": 185.44475025,
+      "reportLabel": "FGBM",
+      "conversion": "EUR principal / face value \u00d7 30 Sep 2026 EUR/USD",
+      "rank": 7
+    },
+    {
+      "name": "Euro-Bund Futures",
+      "symbol": "FGBL",
+      "asset": "Rates",
+      "venue": "Eurex",
+      "advContracts": 1833846.0,
+      "oiContracts": 1816407,
+      "referenceUnitUSD": 113550.0,
+      "multiplier": 100000,
+      "referencePriceUSD": 1.1355,
+      "referenceExpiry": "Principal / face value",
+      "advB": 208.2332133,
+      "oiB": 206.25301485,
+      "reportLabel": "FGBL",
+      "conversion": "EUR principal / face value \u00d7 30 Sep 2026 EUR/USD",
+      "rank": 8
+    },
+    {
       "name": "5-Year Treasury Note",
       "symbol": "ZF",
       "asset": "Rates",
+      "venue": "CME Group",
       "advContracts": 1913161,
       "oiContracts": 6852530,
       "referenceUnitUSD": 100000.0,
@@ -123,12 +169,47 @@ window.PRO_DERIVATIVES = {
       "oiB": 685.253,
       "reportLabel": "5-YR NOTE",
       "conversion": "principal / face value",
-      "rank": 7
+      "rank": 9
+    },
+    {
+      "name": "Euro-Schatz Futures",
+      "symbol": "FGBS",
+      "asset": "Rates",
+      "venue": "Eurex",
+      "advContracts": 1682550.636,
+      "oiContracts": 2918622,
+      "referenceUnitUSD": 113550.0,
+      "multiplier": 100000,
+      "referencePriceUSD": 1.1355,
+      "referenceExpiry": "Principal / face value",
+      "advB": 191.05362475909092,
+      "oiB": 331.4095281,
+      "reportLabel": "FGBS",
+      "conversion": "EUR principal / face value \u00d7 30 Sep 2026 EUR/USD",
+      "rank": 10
+    },
+    {
+      "name": "Three-Month EURIBOR Futures",
+      "symbol": "FEU3",
+      "asset": "Rates",
+      "venue": "Eurex",
+      "advContracts": 135449.364,
+      "oiContracts": 431921,
+      "referenceUnitUSD": 1135500.0,
+      "multiplier": 1000000,
+      "referencePriceUSD": 1.1355,
+      "referenceExpiry": "Principal / face value",
+      "advB": 153.8027524090909,
+      "oiB": 490.4462955,
+      "reportLabel": "FEU3",
+      "conversion": "EUR principal / face value \u00d7 30 Sep 2026 EUR/USD",
+      "rank": 11
     },
     {
       "name": "Micro E-mini Nasdaq-100",
       "symbol": "MNQ",
       "asset": "Equity index",
+      "venue": "CME Group",
       "advContracts": 2356348,
       "oiContracts": 137428,
       "referenceUnitUSD": 60014.0,
@@ -139,12 +220,30 @@ window.PRO_DERIVATIVES = {
       "oiB": 8.247603992,
       "reportLabel": "MICRO E-MINI NASDAQ 100",
       "conversion": "quantity \u00d7 reference settlement",
-      "rank": 8
+      "rank": 12
+    },
+    {
+      "name": "Three-Month Euro STR Futures",
+      "symbol": "FST3",
+      "asset": "Rates",
+      "venue": "Eurex",
+      "advContracts": 119187.909,
+      "oiContracts": 1100792,
+      "referenceUnitUSD": 1135500.0,
+      "multiplier": 1000000,
+      "referencePriceUSD": 1.1355,
+      "referenceExpiry": "Principal / face value",
+      "advB": 135.33787077272726,
+      "oiB": 1249.949316,
+      "reportLabel": "FST3",
+      "conversion": "EUR principal / face value \u00d7 30 Sep 2026 EUR/USD",
+      "rank": 13
     },
     {
       "name": "WTI Crude Oil",
       "symbol": "CL",
       "asset": "Energy",
+      "venue": "CME Group",
       "advContracts": 1313664,
       "oiContracts": 1930910,
       "referenceUnitUSD": 97150.0,
@@ -155,12 +254,13 @@ window.PRO_DERIVATIVES = {
       "oiB": 187.5879065,
       "reportLabel": "CRUDE OIL PHY",
       "conversion": "quantity \u00d7 reference settlement",
-      "rank": 9
+      "rank": 14
     },
     {
       "name": "Gold",
       "symbol": "GC",
       "asset": "Metals",
+      "venue": "CME Group",
       "advContracts": 204576,
       "oiContracts": 397291,
       "referenceUnitUSD": 415000.0,
@@ -171,12 +271,13 @@ window.PRO_DERIVATIVES = {
       "oiB": 164.875765,
       "reportLabel": "COMEX GOLD",
       "conversion": "quantity \u00d7 reference settlement",
-      "rank": 10
+      "rank": 15
     },
     {
       "name": "Ultra 10-Year Treasury Note",
       "symbol": "TN",
       "asset": "Rates",
+      "venue": "CME Group",
       "advContracts": 777893,
       "oiContracts": 2563720,
       "referenceUnitUSD": 100000.0,
@@ -187,12 +288,30 @@ window.PRO_DERIVATIVES = {
       "oiB": 256.372,
       "reportLabel": "Ultra 10-Year Note",
       "conversion": "principal / face value",
-      "rank": 11
+      "rank": 16
+    },
+    {
+      "name": "Euro-OAT-Futures",
+      "symbol": "FOAT",
+      "asset": "Rates",
+      "venue": "Eurex",
+      "advContracts": 540783.818,
+      "oiContracts": 761149,
+      "referenceUnitUSD": 113550.0,
+      "multiplier": 100000,
+      "referencePriceUSD": 1.1355,
+      "referenceExpiry": "Principal / face value",
+      "advB": 61.406002554545466,
+      "oiB": 86.42846895,
+      "reportLabel": "FOAT",
+      "conversion": "EUR principal / face value \u00d7 30 Sep 2026 EUR/USD",
+      "rank": 17
     },
     {
       "name": "Treasury Bond",
       "symbol": "ZB",
       "asset": "Rates",
+      "venue": "CME Group",
       "advContracts": 609453,
       "oiContracts": 1900691,
       "referenceUnitUSD": 100000.0,
@@ -203,12 +322,30 @@ window.PRO_DERIVATIVES = {
       "oiB": 190.0691,
       "reportLabel": "30-YR BOND",
       "conversion": "principal / face value",
-      "rank": 12
+      "rank": 18
+    },
+    {
+      "name": "Euro-BTP Futures",
+      "symbol": "FBTP",
+      "asset": "Rates",
+      "venue": "Eurex",
+      "advContracts": 523188.955,
+      "oiContracts": 595994,
+      "referenceUnitUSD": 113550.0,
+      "multiplier": 100000,
+      "referencePriceUSD": 1.1355,
+      "referenceExpiry": "Principal / face value",
+      "advB": 59.40810578863636,
+      "oiB": 67.6751187,
+      "reportLabel": "FBTP",
+      "conversion": "EUR principal / face value \u00d7 30 Sep 2026 EUR/USD",
+      "rank": 19
     },
     {
       "name": "Ultra Treasury Bond",
       "symbol": "UB",
       "asset": "Rates",
+      "venue": "CME Group",
       "advContracts": 457843,
       "oiContracts": 2482748,
       "referenceUnitUSD": 100000.0,
@@ -219,12 +356,13 @@ window.PRO_DERIVATIVES = {
       "oiB": 248.2748,
       "reportLabel": "ULTRA T-BOND",
       "conversion": "principal / face value",
-      "rank": 13
+      "rank": 20
     },
     {
       "name": "EUR/USD",
       "symbol": "6E",
       "asset": "FX",
+      "venue": "CME Group",
       "advContracts": 317270,
       "oiContracts": 850622,
       "referenceUnitUSD": 140606.25,
@@ -235,12 +373,13 @@ window.PRO_DERIVATIVES = {
       "oiB": 119.6027695875,
       "reportLabel": "EURO FX",
       "conversion": "quantity \u00d7 reference settlement",
-      "rank": 14
+      "rank": 21
     },
     {
       "name": "NY Harbor ULSD",
       "symbol": "HO",
       "asset": "Energy",
+      "venue": "CME Group",
       "advContracts": 215414,
       "oiContracts": 237987,
       "referenceUnitUSD": 200058.6,
@@ -251,12 +390,13 @@ window.PRO_DERIVATIVES = {
       "oiB": 47.611346038200004,
       "reportLabel": "HEATING OIL PHY",
       "conversion": "quantity \u00d7 reference settlement",
-      "rank": 15
+      "rank": 22
     },
     {
       "name": "Micro E-mini S&P 500",
       "symbol": "MES",
       "asset": "Equity index",
+      "venue": "CME Group",
       "advContracts": 1069218,
       "oiContracts": 144903,
       "referenceUnitUSD": 39001.25,
@@ -267,12 +407,30 @@ window.PRO_DERIVATIVES = {
       "oiB": 5.65139812875,
       "reportLabel": "MICRO E-MINI S&P500",
       "conversion": "quantity \u00d7 reference settlement",
-      "rank": 16
+      "rank": 23
+    },
+    {
+      "name": "Euro-Buxl Futures",
+      "symbol": "FGBX",
+      "asset": "Rates",
+      "venue": "Eurex",
+      "advContracts": 311481.318,
+      "oiContracts": 381836,
+      "referenceUnitUSD": 113550.0,
+      "multiplier": 100000,
+      "referencePriceUSD": 1.1355,
+      "referenceExpiry": "Principal / face value",
+      "advB": 35.368703679545455,
+      "oiB": 43.3574778,
+      "reportLabel": "FGBX",
+      "conversion": "EUR principal / face value \u00d7 30 Sep 2026 EUR/USD",
+      "rank": 24
     },
     {
       "name": "E-mini Russell 2000",
       "symbol": "RTY",
       "asset": "Equity index",
+      "venue": "CME Group",
       "advContracts": 235197,
       "oiContracts": 425231,
       "referenceUnitUSD": 139710.0,
@@ -283,12 +441,13 @@ window.PRO_DERIVATIVES = {
       "oiB": 59.40902301,
       "reportLabel": "E-MINI RUSSELL 2000",
       "conversion": "quantity \u00d7 reference settlement",
-      "rank": 17
+      "rank": 25
     },
     {
       "name": "RBOB Gasoline",
       "symbol": "RB",
       "asset": "Energy",
+      "venue": "CME Group",
       "advContracts": 223546,
       "oiContracts": 349655,
       "referenceUnitUSD": 127638.0,
@@ -299,12 +458,13 @@ window.PRO_DERIVATIVES = {
       "oiB": 44.62926489,
       "reportLabel": "RBOB PHY",
       "conversion": "quantity \u00d7 reference settlement",
-      "rank": 18
+      "rank": 26
     },
     {
       "name": "JPY/USD",
       "symbol": "6J",
       "asset": "FX",
+      "venue": "CME Group",
       "advContracts": 309876,
       "oiContracts": 362633,
       "referenceUnitUSD": 79306.25,
@@ -315,12 +475,13 @@ window.PRO_DERIVATIVES = {
       "oiB": 28.75906335625,
       "reportLabel": "JAPANESE YEN",
       "conversion": "quantity \u00d7 reference settlement",
-      "rank": 19
+      "rank": 27
     },
     {
       "name": "E-mini Dow",
       "symbol": "YM",
       "asset": "Equity index",
+      "venue": "CME Group",
       "advContracts": 86984,
       "oiContracts": 89286,
       "referenceUnitUSD": 265295.0,
@@ -331,12 +492,13 @@ window.PRO_DERIVATIVES = {
       "oiB": 23.68712937,
       "reportLabel": "E-mini ($5) Dow",
       "conversion": "quantity \u00d7 reference settlement",
-      "rank": 20
+      "rank": 28
     },
     {
       "name": "Henry Hub Natural Gas",
       "symbol": "NG",
       "asset": "Energy",
+      "venue": "CME Group",
       "advContracts": 569681,
       "oiContracts": 1784155,
       "referenceUnitUSD": 31820.0,
@@ -347,12 +509,13 @@ window.PRO_DERIVATIVES = {
       "oiB": 56.7718121,
       "reportLabel": "NATURAL GAS PHY",
       "conversion": "quantity \u00d7 reference settlement",
-      "rank": 21
+      "rank": 29
     },
     {
       "name": "Soybeans",
       "symbol": "ZS",
       "asset": "Agriculture",
+      "venue": "CME Group",
       "advContracts": 289853,
       "oiContracts": 1095617,
       "referenceUnitUSD": 62262.5,
@@ -363,12 +526,13 @@ window.PRO_DERIVATIVES = {
       "oiB": 68.2158534625,
       "reportLabel": "SOYBEAN",
       "conversion": "quantity \u00d7 reference settlement",
-      "rank": 22
+      "rank": 30
     },
     {
       "name": "Micro Gold",
       "symbol": "MGC",
       "asset": "Metals",
+      "venue": "CME Group",
       "advContracts": 377509,
       "oiContracts": 100473,
       "referenceUnitUSD": 41500.0,
@@ -379,12 +543,13 @@ window.PRO_DERIVATIVES = {
       "oiB": 4.1696295,
       "reportLabel": "MICRO GOLD",
       "conversion": "quantity \u00d7 reference settlement",
-      "rank": 23
+      "rank": 31
     },
     {
       "name": "Silver",
       "symbol": "SI",
       "asset": "Metals",
+      "venue": "CME Group",
       "advContracts": 53808,
       "oiContracts": 106011,
       "referenceUnitUSD": 288550.0,
@@ -395,12 +560,13 @@ window.PRO_DERIVATIVES = {
       "oiB": 30.58947405,
       "reportLabel": "COMEX SILVER",
       "conversion": "quantity \u00d7 reference settlement",
-      "rank": 24
+      "rank": 32
     },
     {
       "name": "GBP/USD",
       "symbol": "6B",
       "asset": "FX",
+      "venue": "CME Group",
       "advContracts": 133702,
       "oiContracts": 256768,
       "referenceUnitUSD": 83662.5,
@@ -411,12 +577,13 @@ window.PRO_DERIVATIVES = {
       "oiB": 21.4818528,
       "reportLabel": "BRITISH POUND",
       "conversion": "quantity \u00d7 reference settlement",
-      "rank": 25
+      "rank": 33
     },
     {
       "name": "Corn",
       "symbol": "ZC",
       "asset": "Agriculture",
+      "venue": "CME Group",
       "advContracts": 461528,
       "oiContracts": 1877245,
       "referenceUnitUSD": 23162.5,
@@ -427,12 +594,13 @@ window.PRO_DERIVATIVES = {
       "oiB": 43.4816873125,
       "reportLabel": "CORN",
       "conversion": "quantity \u00d7 reference settlement",
-      "rank": 26
+      "rank": 34
     },
     {
       "name": "Copper",
       "symbol": "HG",
       "asset": "Metals",
+      "venue": "CME Group",
       "advContracts": 64545,
       "oiContracts": 299330,
       "referenceUnitUSD": 164487.5,
@@ -443,12 +611,13 @@ window.PRO_DERIVATIVES = {
       "oiB": 49.236043375,
       "reportLabel": "COMEX COPPER",
       "conversion": "quantity \u00d7 reference settlement",
-      "rank": 27
+      "rank": 35
     },
     {
       "name": "AUD/USD",
       "symbol": "6A",
       "asset": "FX",
+      "venue": "CME Group",
       "advContracts": 134033,
       "oiContracts": 312667,
       "referenceUnitUSD": 70170.0,
@@ -459,12 +628,13 @@ window.PRO_DERIVATIVES = {
       "oiB": 21.93984339,
       "reportLabel": "AUSTRALIAN DOLLAR",
       "conversion": "quantity \u00d7 reference settlement",
-      "rank": 28
+      "rank": 36
     },
     {
       "name": "CAD/USD",
       "symbol": "6C",
       "asset": "FX",
+      "venue": "CME Group",
       "advContracts": 124728,
       "oiContracts": 349350,
       "referenceUnitUSD": 71350.0,
@@ -475,12 +645,13 @@ window.PRO_DERIVATIVES = {
       "oiB": 24.9261225,
       "reportLabel": "CANADIAN DOLLAR",
       "conversion": "quantity \u00d7 reference settlement",
-      "rank": 29
+      "rank": 37
     },
     {
       "name": "CHF/USD",
       "symbol": "6S",
       "asset": "FX",
+      "venue": "CME Group",
       "advContracts": 49931,
       "oiContracts": 134863,
       "referenceUnitUSD": 152400.0,
@@ -491,12 +662,13 @@ window.PRO_DERIVATIVES = {
       "oiB": 20.5531212,
       "reportLabel": "SWISS FRANC",
       "conversion": "quantity \u00d7 reference settlement",
-      "rank": 30
+      "rank": 38
     },
     {
       "name": "Soybean Meal",
       "symbol": "ZM",
       "asset": "Agriculture",
+      "venue": "CME Group",
       "advContracts": 213478,
       "oiContracts": 635021,
       "referenceUnitUSD": 34830.0,
@@ -507,12 +679,13 @@ window.PRO_DERIVATIVES = {
       "oiB": 22.11778143,
       "reportLabel": "SOYBEAN MEAL",
       "conversion": "quantity \u00d7 reference settlement",
-      "rank": 31
+      "rank": 39
     },
     {
       "name": "Soybean Oil",
       "symbol": "ZL",
       "asset": "Agriculture",
+      "venue": "CME Group",
       "advContracts": 185351,
       "oiContracts": 548439,
       "referenceUnitUSD": 39582.0,
@@ -523,12 +696,13 @@ window.PRO_DERIVATIVES = {
       "oiB": 21.708312498,
       "reportLabel": "SOYBEAN OIL",
       "conversion": "quantity \u00d7 reference settlement",
-      "rank": 32
+      "rank": 40
     },
     {
       "name": "Live Cattle",
       "symbol": "LE",
       "asset": "Agriculture",
+      "venue": "CME Group",
       "advContracts": 74737,
       "oiContracts": 295169,
       "referenceUnitUSD": 92448.0,
@@ -539,12 +713,13 @@ window.PRO_DERIVATIVES = {
       "oiB": 27.287783712,
       "reportLabel": "CATTLE",
       "conversion": "quantity \u00d7 reference settlement",
-      "rank": 33
+      "rank": 41
     },
     {
       "name": "Feeder Cattle",
       "symbol": "GF",
       "asset": "Agriculture",
+      "venue": "CME Group",
       "advContracts": 25848,
       "oiContracts": 62455,
       "referenceUnitUSD": 174410.0,
@@ -555,12 +730,13 @@ window.PRO_DERIVATIVES = {
       "oiB": 10.89277655,
       "reportLabel": "FEEDER CATTLE",
       "conversion": "quantity \u00d7 reference settlement",
-      "rank": 34
+      "rank": 42
     },
     {
       "name": "Chicago SRW Wheat",
       "symbol": "ZW",
       "asset": "Agriculture",
+      "venue": "CME Group",
       "advContracts": 142002,
       "oiContracts": 495536,
       "referenceUnitUSD": 31412.5,
@@ -571,12 +747,13 @@ window.PRO_DERIVATIVES = {
       "oiB": 15.5660246,
       "reportLabel": "CHI WHEAT",
       "conversion": "quantity \u00d7 reference settlement",
-      "rank": 35
+      "rank": 43
     },
     {
       "name": "Micro Silver",
       "symbol": "SIL",
       "asset": "Metals",
+      "venue": "CME Group",
       "advContracts": 71968,
       "oiContracts": 28979,
       "referenceUnitUSD": 57710.0,
@@ -587,12 +764,13 @@ window.PRO_DERIVATIVES = {
       "oiB": 1.67237809,
       "reportLabel": "SILVER",
       "conversion": "quantity \u00d7 reference settlement",
-      "rank": 36
+      "rank": 44
     },
     {
       "name": "NZD/USD",
       "symbol": "6N",
       "asset": "FX",
+      "venue": "CME Group",
       "advContracts": 62640,
       "oiContracts": 116313,
       "referenceUnitUSD": 57025.0,
@@ -603,12 +781,13 @@ window.PRO_DERIVATIVES = {
       "oiB": 6.632748825,
       "reportLabel": "NEW ZEALND DOLLAR",
       "conversion": "quantity \u00d7 reference settlement",
-      "rank": 37
+      "rank": 45
     },
     {
       "name": "MXN/USD",
       "symbol": "6M",
       "asset": "FX",
+      "venue": "CME Group",
       "advContracts": 129929,
       "oiContracts": 281707,
       "referenceUnitUSD": 26605.0,
@@ -619,12 +798,13 @@ window.PRO_DERIVATIVES = {
       "oiB": 7.494814735,
       "reportLabel": "MEXICAN PESO",
       "conversion": "quantity \u00d7 reference settlement",
-      "rank": 38
+      "rank": 46
     },
     {
       "name": "Micro E-mini Dow",
       "symbol": "MYM",
       "asset": "Equity index",
+      "venue": "CME Group",
       "advContracts": 124224,
       "oiContracts": 21014,
       "referenceUnitUSD": 26529.5,
@@ -635,12 +815,13 @@ window.PRO_DERIVATIVES = {
       "oiB": 0.557490913,
       "reportLabel": "MICRO MINI $5 DOW",
       "conversion": "quantity \u00d7 reference settlement",
-      "rank": 39
+      "rank": 47
     },
     {
       "name": "Platinum",
       "symbol": "PL",
       "asset": "Metals",
+      "venue": "CME Group",
       "advContracts": 29830,
       "oiContracts": 64060,
       "referenceUnitUSD": 81795.0,
@@ -651,12 +832,13 @@ window.PRO_DERIVATIVES = {
       "oiB": 5.2397877,
       "reportLabel": "NYMEX PLATINUM",
       "conversion": "quantity \u00d7 reference settlement",
-      "rank": 40
+      "rank": 48
     },
     {
       "name": "10-Year Eris SOFR Swap",
       "symbol": "YIY",
       "asset": "Rates",
+      "venue": "CME Group",
       "advContracts": 20886,
       "oiContracts": 199057,
       "referenceUnitUSD": 100000.0,
@@ -667,12 +849,13 @@ window.PRO_DERIVATIVES = {
       "oiB": 19.9057,
       "reportLabel": "10-YR Eris SOFR",
       "conversion": "principal / face value",
-      "rank": 41
+      "rank": 49
     },
     {
       "name": "Lean Hogs",
       "symbol": "HE",
       "asset": "Agriculture",
+      "venue": "CME Group",
       "advContracts": 75291,
       "oiContracts": 289509,
       "referenceUnitUSD": 26288.0,
@@ -682,134 +865,6 @@ window.PRO_DERIVATIVES = {
       "advB": 1.979249808,
       "oiB": 7.610612592,
       "reportLabel": "HOGS",
-      "conversion": "quantity \u00d7 reference settlement",
-      "rank": 42
-    },
-    {
-      "name": "5-Year Eris SOFR Swap",
-      "symbol": "YIW",
-      "asset": "Rates",
-      "advContracts": 18632,
-      "oiContracts": 195572,
-      "referenceUnitUSD": 100000.0,
-      "multiplier": 100000.0,
-      "referencePriceUSD": 1.0,
-      "referenceExpiry": "Principal",
-      "advB": 1.8632,
-      "oiB": 19.5572,
-      "reportLabel": "5-YR Eris SOFR",
-      "conversion": "principal / face value",
-      "rank": 43
-    },
-    {
-      "name": "Micro E-mini Russell 2000",
-      "symbol": "M2K",
-      "asset": "Equity index",
-      "advContracts": 82347,
-      "oiContracts": 54623,
-      "referenceUnitUSD": 13971.0,
-      "multiplier": 5.0,
-      "referencePriceUSD": 2794.2,
-      "referenceExpiry": "Dec 2026",
-      "advB": 1.150469937,
-      "oiB": 0.763137933,
-      "reportLabel": "MICRO E-MINI RUSSELL 2000",
-      "conversion": "quantity \u00d7 reference settlement",
-      "rank": 44
-    },
-    {
-      "name": "BRL/USD",
-      "symbol": "6L",
-      "asset": "FX",
-      "advContracts": 49958,
-      "oiContracts": 151320,
-      "referenceUnitUSD": 19725.0,
-      "multiplier": 100000.0,
-      "referencePriceUSD": 0.19725,
-      "referenceExpiry": "Dec 2026",
-      "advB": 0.98542155,
-      "oiB": 2.984787,
-      "reportLabel": "BRAZIL REAL",
-      "conversion": "quantity \u00d7 reference settlement",
-      "rank": 45
-    },
-    {
-      "name": "E-mini Gold",
-      "symbol": "QO",
-      "asset": "Metals",
-      "advContracts": 3193,
-      "oiContracts": 8672,
-      "referenceUnitUSD": 207500.0,
-      "multiplier": 50.0,
-      "referencePriceUSD": 4150.0,
-      "referenceExpiry": "Dec 2026",
-      "advB": 0.6625475,
-      "oiB": 1.79944,
-      "reportLabel": "COMEX E-Mini GOLD",
-      "conversion": "quantity \u00d7 reference settlement",
-      "rank": 46
-    },
-    {
-      "name": "Micro Copper",
-      "symbol": "MHG",
-      "asset": "Metals",
-      "advContracts": 14089,
-      "oiContracts": 15330,
-      "referenceUnitUSD": 16448.75,
-      "multiplier": 2500.0,
-      "referencePriceUSD": 6.5795,
-      "referenceExpiry": "Dec 2026",
-      "advB": 0.23174643875,
-      "oiB": 0.2521593375,
-      "reportLabel": "COPPER",
-      "conversion": "quantity \u00d7 reference settlement",
-      "rank": 47
-    },
-    {
-      "name": "Mini Soybeans",
-      "symbol": "XK",
-      "asset": "Agriculture",
-      "advContracts": 1587,
-      "oiContracts": 25297,
-      "referenceUnitUSD": 12452.5,
-      "multiplier": 1000.0,
-      "referencePriceUSD": 12.4525,
-      "referenceExpiry": "Nov 2026",
-      "advB": 0.0197621175,
-      "oiB": 0.3150108925,
-      "reportLabel": "MINI SOYBEAN",
-      "conversion": "quantity \u00d7 reference settlement",
-      "rank": 48
-    },
-    {
-      "name": "Oats",
-      "symbol": "ZO",
-      "asset": "Agriculture",
-      "advContracts": 408,
-      "oiContracts": 3627,
-      "referenceUnitUSD": 19037.5,
-      "multiplier": 5000.0,
-      "referencePriceUSD": 3.8075,
-      "referenceExpiry": "Dec 2026",
-      "advB": 0.0077673,
-      "oiB": 0.0690490125,
-      "reportLabel": "OATS",
-      "conversion": "quantity \u00d7 reference settlement",
-      "rank": 49
-    },
-    {
-      "name": "Mini Corn",
-      "symbol": "XC",
-      "asset": "Agriculture",
-      "advContracts": 1318,
-      "oiContracts": 13683,
-      "referenceUnitUSD": 4632.5,
-      "multiplier": 1000.0,
-      "referencePriceUSD": 4.6325,
-      "referenceExpiry": "Dec 2026",
-      "advB": 0.006105635,
-      "oiB": 0.0633864975,
-      "reportLabel": "MINI CORN",
       "conversion": "quantity \u00d7 reference settlement",
       "rank": 50
     }

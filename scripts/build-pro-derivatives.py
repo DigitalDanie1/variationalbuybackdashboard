@@ -1,6 +1,6 @@
-"""Build reproducible notional-reference benchmarks from reviewed CME report rows.
-Inputs: CME Sep 2026 ADV and month-end OI; Oct 21 2026 reference settlements.
-This is a 50-contract covered universe, not a global top-50 or actual dollar ADV.
+"""Build 50 selected futures benchmarks from reviewed CME and Eurex observations.
+September 2026 ADV and month-end OI are converted to USD principal/face or
+reference-price equivalents. This is not a global top-50 or actual dollar ADV.
 """
 import re,json
 from pathlib import Path
@@ -68,16 +68,27 @@ HOGS|Lean Hogs|HE|Agriculture|40000|0.6572|Dec 2026
 MINI CORN|Mini Corn|XC|Agriculture|1000|4.6325|Dec 2026
 MINI SOYBEAN|Mini Soybeans|XK|Agriculture|1000|12.4525|Nov 2026'''
 rows=[]
+excluded={'M2K','6L','QO','MHG','XK','ZO','XC','YIW'}
 for line in raw.splitlines():
  report,name,symbol,asset,mult,price,expiry=line.split('|')
+ if symbol in excluded:continue
  assert report in adv,(report,'missing ADV')
  assert report in oi,(report,'missing OI')
  unit=float(mult)*float(price)
- rows.append(dict(name=name,symbol=symbol,asset=asset,advContracts=adv[report],oiContracts=oi[report],referenceUnitUSD=unit,multiplier=float(mult),referencePriceUSD=float(price),referenceExpiry=expiry,advB=adv[report]*unit/1e9,oiB=oi[report]*unit/1e9,reportLabel=report,conversion='principal / face value' if asset=='Rates' else 'quantity × reference settlement'))
+ rows.append(dict(name=name,symbol=symbol,asset=asset,venue='CME Group',advContracts=adv[report],oiContracts=oi[report],referenceUnitUSD=unit,multiplier=float(mult),referencePriceUSD=float(price),referenceExpiry=expiry,advB=adv[report]*unit/1e9,oiB=oi[report]*unit/1e9,reportLabel=report,conversion='principal / face value' if asset=='Rates' else 'quantity × reference settlement'))
+eurex=json.loads((root/'scripts/eurex-derivatives-observations.json').read_text())
+assert eurex['period']=='September 2026' and eurex['oiDate']=='2026-09-30'
+assert eurex['tradingDays']==22 and len(eurex['observations'])==8
+for symbol,o in eurex['observations'].items():
+ assert abs(o['advContracts']-o['monthlyContracts']/eurex['tradingDays'])<0.001
+ # FEU3/FST3: EUR 2,500 per index point implies EUR 25 per bp,
+ # equivalent to 3 months of interest on EUR 1m principal.
+ unit=o['principalEUR']*eurex['eurUsd']
+ rows.append(dict(name=o['name'],symbol=symbol,asset='Rates',venue='Eurex',advContracts=o['advContracts'],oiContracts=o['oiContracts'],referenceUnitUSD=unit,multiplier=o['principalEUR'],referencePriceUSD=eurex['eurUsd'],referenceExpiry='Principal / face value',advB=o['monthlyContracts']/eurex['tradingDays']*unit/1e9,oiB=o['oiContracts']*unit/1e9,reportLabel=symbol,conversion='EUR principal / face value × 30 Sep 2026 EUR/USD'))
 assert len(rows)==50 and len(set(r['symbol'] for r in rows))==50
 rows.sort(key=lambda x:-x['advB'])
 for i,r in enumerate(rows,1):r['rank']=i
-meta={'period':'September 2026','oiDate':'2026-09-30','referencePriceDate':'2026-10-21','retrieved':'2026-10-22','scope':'50 selected CME Group futures; ranked within this covered universe, not a global top-50. Excludes OTC, options, ICE and Eurex.','method':'USD B reference notional = contract count × contract quantity × Oct 21 reference settlement / 1e9. Rates use principal or Treasury face value. Dollar ADV is a reference-price equivalent, not a measured time-weighted dollar ADV. Same reference applied to all expiries; not DV01 or delta-adjusted.','sources':{'adv':'https://www.cmegroup.com/daily_bulletin/monthly_volume/Web_ADV_Report_CMEG.pdf','oi':'https://www.cmegroup.com/daily_bulletin/monthly_volume/Web_OI_Report_CMEG.pdf','settlements':'https://www.cmegroup.com/market-data/daily-bulletin.html','specifications':'https://www.cmegroup.com/markets/products.html'},'rows':rows}
+meta={'period':'September 2026','oiDate':'2026-09-30','referencePriceDate':'2026-10-21','retrieved':'2026-10-23','scope':'50 selected CME Group and Eurex futures, including eight euro rates contracts. Ranked within this covered universe, not a global top-50. Excludes OTC, options and ICE.','method':'USD B reference notional = contract ADV or month-end OI × reference unit USD / 1e9. CME non-rates use 21 Oct 2026 reference settlements; CME rates and Eurex rates use contract principal or face value. Eurex FEU3/FST3 use EUR 1m equivalent principal, derived from the EUR 2,500-per-index-point specification (EUR 25 per bp for a three-month period). Eurex ADV = September monthly traded contracts / 22 Eurex trading days; 1 Oct daily file previous-day OI gives 30 Sep OI. EUR amounts use the 30 Sep 2026 ECB reference rate of 1 EUR = 1.1355 USD. These are reference-price/principal equivalents, not observed time-weighted dollar ADV, market value, DV01 or delta-adjusted exposure.','sources':{'adv':'https://www.cmegroup.com/daily_bulletin/monthly_volume/Web_ADV_Report_CMEG.pdf','oi':'https://www.cmegroup.com/daily_bulletin/monthly_volume/Web_OI_Report_CMEG.pdf','settlements':'https://www.cmegroup.com/market-data/daily-bulletin.html','specifications':'https://www.cmegroup.com/markets/products.html','eurexAdv':eurex['sources']['adv'],'eurexOi':eurex['sources']['oi'],'eurexSpecs':eurex['sources']['specifications'],'eurexStirSpecs':eurex['sources']['stirSpecifications'],'eurUsd':eurex['sources']['eurUsd']},'rows':rows}
 (root/'pro-derivatives-data.js').write_text('/* Reviewed exchange observations and explicit reference-notional conversions. */\nwindow.PRO_DERIVATIVES = '+json.dumps(meta,indent=2)+';\n')
 (root/'pro-derivatives-data.json').write_text(json.dumps(meta,indent=2)+'\n')
 print('Built',len(rows),'unique futures; matched ADV and OI. Top five:')

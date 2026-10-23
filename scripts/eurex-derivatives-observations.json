@@ -1,0 +1,72 @@
+{
+  "period": "September 2026",
+  "tradingDays": 22,
+  "oiDate": "2026-09-30",
+  "eurUsdDate": "2026-09-30",
+  "eurUsd": 1.1355,
+  "sources": {
+    "adv": "https://www.eurex.com/resource/blob/5604748/561668142ca72e76af2fb23ea3479cd8/data/dailystat_20260930.xls",
+    "oi": "https://www.eurex.com/resource/blob/5607438/e61316cb2dda48eb5f3a5b9578d8553c/data/dailystat_20261001.xls",
+    "eurUsd": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=OJ%3AC_202604617",
+    "specifications": "https://www.eurex.com/ex-en/markets/int/long-term-interest-rates/fix/government-bonds/Euro-Schatz-Futures-34678",
+    "stirSpecifications": "https://www.eurex.com/ex-en/markets/int/mon/euribor-derivatives/euribor/Three-Month-EURIBOR-Futures-137458"
+  },
+  "observations": {
+    "FBTP": {
+      "name": "Euro-BTP Futures",
+      "monthlyContracts": 11510157,
+      "advContracts": 523188.955,
+      "oiContracts": 595994,
+      "principalEUR": 100000
+    },
+    "FEU3": {
+      "name": "Three-Month EURIBOR Futures",
+      "monthlyContracts": 2979886,
+      "advContracts": 135449.364,
+      "oiContracts": 431921,
+      "principalEUR": 1000000
+    },
+    "FGBL": {
+      "name": "Euro-Bund Futures",
+      "monthlyContracts": 40344612,
+      "advContracts": 1833846.0,
+      "oiContracts": 1816407,
+      "principalEUR": 100000
+    },
+    "FGBM": {
+      "name": "Euro-Bobl Futures",
+      "monthlyContracts": 41165917,
+      "advContracts": 1871178.045,
+      "oiContracts": 1633155,
+      "principalEUR": 100000
+    },
+    "FGBS": {
+      "name": "Euro-Schatz Futures",
+      "monthlyContracts": 37016114,
+      "advContracts": 1682550.636,
+      "oiContracts": 2918622,
+      "principalEUR": 100000
+    },
+    "FGBX": {
+      "name": "Euro-Buxl Futures",
+      "monthlyContracts": 6852589,
+      "advContracts": 311481.318,
+      "oiContracts": 381836,
+      "principalEUR": 100000
+    },
+    "FOAT": {
+      "name": "Euro-OAT-Futures",
+      "monthlyContracts": 11897244,
+      "advContracts": 540783.818,
+      "oiContracts": 761149,
+      "principalEUR": 100000
+    },
+    "FST3": {
+      "name": "Three-Month Euro STR Futures",
+      "monthlyContracts": 2622134,
+      "advContracts": 119187.909,
+      "oiContracts": 1100792,
+      "principalEUR": 1000000
+    }
+  }
+}
