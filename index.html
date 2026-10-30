@@ -6082,6 +6082,43 @@
     gap:30px;
   }
   body.v2-overview .srv2-canvas>.earnings-workspace{order:-1}
+  /* Crypto Key News (crypto-news.js). Sits above the calendar; hidden outside the Overview. */
+  .srv2-news{display:none}
+  body.v2-overview .srv2-canvas>.srv2-news{display:block;order:-2;min-width:0}
+  .srv2-news-head{display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:10px 24px;padding:0 0 14px;border-bottom:1px solid var(--v2-line)}
+  .srv2-news-kicker{display:block;margin-bottom:7px;font:800 9px/1 var(--mono);letter-spacing:1.35px;text-transform:uppercase;color:var(--v2-accent)}
+  .srv2-news-title{margin:0!important;font:760 23px/1.08 var(--sans)!important;letter-spacing:-.65px!important;color:var(--v2-text)!important}
+  .srv2-news-stamp{font:600 10px var(--mono);letter-spacing:1.1px;text-transform:uppercase;color:var(--v2-faint)}
+  .srv2-news-group{display:grid;grid-template-columns:112px minmax(0,1fr);gap:0 20px;border-bottom:1px solid var(--v2-line)}
+  .srv2-news-rail{display:flex;flex-direction:column;gap:3px;padding:17px 0;min-width:0}
+  .srv2-news-wd{font:600 9.5px var(--mono);letter-spacing:.9px;text-transform:uppercase;color:var(--v2-faint)}
+  .srv2-news-date{font:700 12.5px var(--mono);letter-spacing:.2px;color:var(--v2-text)}
+  .srv2-news-rel{font:600 9.5px var(--mono);letter-spacing:.9px;text-transform:uppercase;color:var(--v2-dim)}
+  .srv2-news-rel.is-today{color:var(--v2-accent)}
+  .srv2-news-items{display:flex;flex-direction:column;gap:18px;padding:17px 0;min-width:0}
+  .srv2-news-item{min-width:0;padding:1px 0 1px 14px;border-left:2px solid var(--v2-line)}
+  .srv2-news-item.is-high{border-left-color:var(--v2-accent)}
+  .srv2-news-item.is-critical{border-left-color:var(--v2-neg)}
+  .srv2-news-tag{display:inline-block;margin-bottom:7px;padding:2px 6px;border:1px solid var(--v2-line);border-radius:3px;font:700 8.5px/1.3 var(--mono);letter-spacing:1px;text-transform:uppercase;color:var(--v2-dim)}
+  .srv2-news-item.is-critical .srv2-news-tag{color:var(--v2-neg);border-color:var(--v2-neg)}
+  .srv2-news-item.is-high .srv2-news-tag{color:var(--v2-accent);border-color:var(--v2-accent)}
+  .srv2-news-hl{display:block;font:650 15px/1.3 var(--sans);letter-spacing:-.2px;color:var(--v2-text);overflow-wrap:anywhere}
+  .srv2-news-detail{margin:5px 0 0!important;max-width:78ch;overflow-wrap:anywhere}
+  .srv2-news-src{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 14px;margin-top:8px;font:500 11px var(--sans)}
+  .srv2-news-src span{font:600 9px var(--mono);letter-spacing:1.1px;text-transform:uppercase;color:var(--v2-faint)}
+  .srv2-news-src a{color:var(--v2-muted);text-decoration:underline;text-decoration-color:var(--v2-line);text-underline-offset:3px}
+  .srv2-news-src a:hover,.srv2-news-src a:focus-visible{color:var(--v2-accent);text-decoration-color:var(--v2-accent);outline:0}
+  .srv2-news[data-open="0"] .is-extra{display:none}
+  .srv2-news-more{margin-top:14px;padding:8px 14px;border:1px solid var(--v2-line);background:transparent;color:var(--v2-muted);font:700 9.5px var(--mono);letter-spacing:1.1px;text-transform:uppercase;cursor:pointer}
+  .srv2-news-more:hover,.srv2-news-more:focus-visible{border-color:var(--v2-accent);color:var(--v2-accent);outline:0}
+  .srv2-news-more .nw-close,.srv2-news[data-open="1"] .srv2-news-more .nw-open{display:none}
+  .srv2-news[data-open="1"] .srv2-news-more .nw-close{display:inline}
+  @media(max-width:720px){
+    .srv2-news-group{grid-template-columns:minmax(0,1fr);gap:0}
+    .srv2-news-rail{flex-direction:row;flex-wrap:wrap;align-items:baseline;gap:4px 10px;padding:15px 0 0}
+    .srv2-news-items{padding:12px 0 16px}
+    .srv2-news-title{font-size:20px!important}
+  }
   body.v2-overview .srv2-canvas>.srv2-market-chart{margin-top:0}
   body.v2-overview .earnings-workspace .earnings-summary{display:none!important}
 
@@ -8631,6 +8668,7 @@ body.theme-light .bw-viz text.bw-pct.in{fill:#fff!important}
     </div>
   </header>
   <div class="srv2-canvas">
+    <section class="srv2-news" id="v2CryptoNews" aria-label="Crypto key news"></section>
     <div class="srv2-headline">
       <div><span class="srv2-kicker">On-chain treasury accumulation</span><strong class="srv2-balance" id="v2Balance">—</strong></div>
       <p>Net USDC held on-chain. This is the clearest observable record of protocol value accumulating in the treasury wallet.</p>
@@ -11108,9 +11146,10 @@ body.theme-light .bw-viz text.bw-pct.in{fill:#fff!important}
 <script src="playbook-panels.js?v=20261021-rank-to-whales" defer></script>
 <script src="monitors-panels.js?v=20261021-hash" defer></script>
 <script src="whales-panels.js?v=20261023-private-next-farm" defer></script>
-<script src="i18n-dict.js?v=1792324603" defer></script>
+<script src="i18n-dict.js?v=20261030-news" defer></script>
 <script src="i18n.js?v=1789148292" defer></script>
 <script src="app-inline.js?v=20260809-theme-toggle" defer></script>
+<script src="crypto-news.js?v=20261030-news" defer></script>
 <script src="comparison-lab-panels.js?v=1792036513" defer></script>
 <script src="pretge-panels.js?v=1787844401" defer></script>
 <script src="pro-derivatives-data.js?v=20261023-eu-rates" defer></script>
