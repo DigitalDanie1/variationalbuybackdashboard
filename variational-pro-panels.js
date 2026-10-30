@@ -1,4 +1,4 @@
-/* Pro explainer: a single scrolling one-pager (what Pro is + how big the market is).
+/* Pro explainer: tabbed views (what Pro is + how big the market is).
    Mount before tge-groups.js arranges the navigation. */
 (function () {
   'use strict';
@@ -10,7 +10,7 @@
   var RFQ_DOC = 'https://docs.variational.io/variational-protocol/key-concepts/trading-via-rfq';
   var POOL_DOC = 'https://docs.variational.io/variational-protocol/key-concepts/settlement-pools';
 
-  // Sections of the one-pager; drives the sticky in-page index.
+  // Independent views; navigation replaces content without scrolling.
   var SECTIONS = [
     { id: 'market', label: 'Market size' },
     { id: 'crypto', label: 'Crypto today' },
@@ -302,8 +302,8 @@
   }
 
   function indexBar() {
-    return '<nav class="vps-index" aria-label="On this page">' + SECTIONS.map(function (s, i) {
-      return '<button type="button" data-vps-jump="' + s.id + '" aria-current="' + (i ? 'false' : 'true') + '"><span>0' + (i + 1) + '</span> ' + s.label + '</button>';
+    return '<nav class="vps-index" aria-label="Pro topics"><button type="button" data-vps-jump="overview" aria-current="true">Overview</button>' + SECTIONS.map(function (s, i) {
+      return '<button type="button" data-vps-jump="' + s.id + '" aria-current="' + 'false' + '"><span>0' + (i + 1) + '</span> ' + s.label + '</button>';
     }).join('') + '</nav>';
   }
   function hero() {
@@ -316,93 +316,63 @@
       '<div class="vp-bottom"><span class="vp-status"><i></i> COMING SOON</span><span class="vps-chip">NOT LIVE YET · ILLUSTRATIVE</span><p>Infrastructure for advanced derivatives trading.</p><a class="vps-docs-link" href="' + DOCS + '" target="_blank" rel="noopener noreferrer">DOCS ↗</a></div></div>';
   }
   function page() {
-    return hero() + indexBar() + '<div class="vps-doc">' + marketSection() + cryptoSection() + ladderSection() + scenariosSection() + proSection() + calculatorSection() + sourcesSection() + '<div class="vps-end" data-vps-end aria-hidden="true"></div></div>';
+    return indexBar() + hero() + '<div class="vps-doc">' + marketSection() + cryptoSection() + ladderSection() + scenariosSection() + proSection() + calculatorSection() + sourcesSection() + '<div class="vps-end" data-vps-end aria-hidden="true"></div></div>';
   }
 
   function wireDoc(section, panel) {
     var indexEl = section.querySelector('.vps-index');
     var btns = [].slice.call(section.querySelectorAll('[data-vps-jump]'));
     var secs = [].slice.call(section.querySelectorAll('[data-vps-sec]'));
-    var endEl = section.querySelector('[data-vps-end]');
-    var active = btns.length ? btns[0].getAttribute('data-vps-jump') : '';
-    var lock = 0, endVisible = false, io = null, ioEnd = null;
-    var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-    // Height of the app's fixed top bars (desktop: top bar; narrow: top bar + horizontal rail) so the index never hides under them.
-    function stickyTop() {
-      var h = 0;
-      ['.srv2-global-top', '.srv2-global-nav'].forEach(function (sel) {
-        var el = document.querySelector(sel);
-        if (!el) return;
-        var cs = getComputedStyle(el);
-        if (cs.position !== 'fixed' || cs.display === 'none') return;
-        var r = el.getBoundingClientRect();
-        if (r.top < 120 && r.width > window.innerWidth * 0.5) h = Math.max(h, r.bottom);
+    var heroEl = panel.querySelector('.vps-hero');
+    var reader = document.createElement('div');
+    reader.className = 'vps-reader';
+    panel.appendChild(reader);
+    reader.appendChild(heroEl);
+    reader.appendChild(panel.querySelector('.vps-doc'));
+    var paging = document.createElement('nav');
+    paging.className = 'vps-paging';
+    paging.setAttribute('aria-label', 'Content pages');
+    paging.innerHTML = '<button type="button" data-vps-page="-1">← Previous</button><span aria-live="polite"></span><button type="button" data-vps-page="1">Next →</button>';
+    panel.appendChild(paging);
+    function pageStatus() {
+      var count = Math.max(1, Math.ceil((reader.scrollHeight - 24) / Math.max(1, reader.clientHeight - 24)));
+      var current = Math.min(count, Math.round(reader.scrollTop / Math.max(1, reader.clientHeight - 24)) + 1);
+      paging.querySelector('span').textContent = current + ' / ' + count;
+      paging.children[0].disabled = reader.scrollTop < 1;
+      paging.children[2].disabled = reader.scrollTop + reader.clientHeight >= reader.scrollHeight - 2;
+    }
+    function fit() {
+      if (section.classList.contains('tg-hide') || section.classList.contains('vps-show-derivatives')) { section.style.height = ''; return; }
+      section.style.height = Math.max(220, window.innerHeight - section.getBoundingClientRect().top - 12) + 'px';
+      pageStatus();
+    }
+    new MutationObserver(function () { requestAnimationFrame(fit); }).observe(section, { attributes:true, attributeFilter:['class'] });
+    window.addEventListener('resize', fit);
+    window.addEventListener('load', fit);
+    if (window.ResizeObserver) new ResizeObserver(pageStatus).observe(reader);
+    paging.addEventListener('click', function (e) {
+      var button = e.target.closest('[data-vps-page]');
+      if (!button) return;
+      reader.scrollTop += Number(button.dataset.vpsPage) * Math.max(1, reader.clientHeight - 24);
+      pageStatus();
+    });
+    reader.addEventListener('scroll', pageStatus);
+    requestAnimationFrame(fit);
+    function jump(id) {
+      var overview = id === 'overview';
+      reader.scrollTop = 0;
+      heroEl.hidden = !overview;
+      panel.querySelector('.vps-doc').hidden = overview;
+      secs.forEach(function (el) { el.hidden = el.dataset.vpsSec !== id; });
+      btns.forEach(function (button) {
+        button.setAttribute('aria-current', button.dataset.vpsJump === id ? 'true' : 'false');
       });
-      return h || 68;
+      requestAnimationFrame(fit);
     }
-    function mark(id) {
-      if (id === active) return;
-      active = id;
-      btns.forEach(function (b) {
-        var on = b.getAttribute('data-vps-jump') === id;
-        b.setAttribute('aria-current', on ? 'true' : 'false');
-        if (on && indexEl.scrollWidth > indexEl.clientWidth) indexEl.scrollLeft = b.offsetLeft - (indexEl.clientWidth - b.offsetWidth) / 2;
-      });
-    }
-    function compute() {
-      if (lock || panel.hidden || section.classList.contains('tg-hide')) return;
-      var line = stickyTop() + indexEl.offsetHeight + 24, cur = secs[0];
-      secs.forEach(function (s) { if (s.getBoundingClientRect().top <= line) cur = s; });
-      var last = secs[secs.length - 1];
-      if (endVisible && last.getBoundingClientRect().top < window.innerHeight * 0.7) cur = last;
-      mark(cur.getAttribute('data-vps-sec'));
-    }
-    var curTop = -1;
-    // Keep --vps-top in step with the app shell (it only exists once the dashboard layout is applied, and changes on resize).
-    function syncTop() {
-      var t = stickyTop();
-      if (t === curTop) return false;
-      curTop = t;
-      section.style.setProperty('--vps-top', t + 'px');
-      return true;
-    }
-    function observe() {
-      syncTop();
-      if (io) io.disconnect();
-      if (ioEnd) ioEnd.disconnect();
-      if (!('IntersectionObserver' in window)) { window.addEventListener('scroll', compute, { passive: true }); return; }
-      var line = Math.round(curTop + indexEl.offsetHeight + 24), vh = window.innerHeight;
-      // A 2px band at the activation line: a section intersects it exactly while it contains that line.
-      io = new IntersectionObserver(compute, { rootMargin: '-' + line + 'px 0px -' + Math.max(0, vh - line - 2) + 'px 0px', threshold: 0 });
-      secs.forEach(function (s) { io.observe(s); });
-      ioEnd = new IntersectionObserver(function (en) { endVisible = en[en.length - 1].isIntersecting; compute(); }, { threshold: 0 });
-      ioEnd.observe(endEl);
-      compute();
-    }
-    function jump(id, instant) {
-      var el = section.querySelector('[data-vps-sec="' + id + '"]');
-      if (!el) return;
-      mark(id);
-      // Land just under the sticky index. Explicit offset (not scroll-margin) so page-level scroll-padding cannot add to it.
-      var top = Math.max(0, el.getBoundingClientRect().top + window.pageYOffset - (stickyTop() + indexEl.offsetHeight + 8));
-      // Smooth only for short hops; a long document would otherwise scroll for seconds.
-      var smooth = !instant && !reduce && Math.abs(top - window.pageYOffset) < window.innerHeight * 2.5;
-      var done = function () { clearTimeout(lock); lock = 0; compute(); };
-      clearTimeout(lock);
-      lock = setTimeout(done, smooth ? 1200 : 80);
-      if (smooth && 'onscrollend' in window) window.addEventListener('scrollend', done, { once: true });
-      window.scrollTo({ top: top, behavior: smooth ? 'smooth' : 'instant' });
-    }
-    var resizeTimer = 0;
-    window.addEventListener('resize', function () { clearTimeout(resizeTimer); resizeTimer = setTimeout(observe, 120); });
-    // The shell bars can appear after boot (tab opened later, fonts, rail layout): re-sync on load and while scrolling, re-aim the observer if they moved.
-    window.addEventListener('load', observe);
-    window.addEventListener('scroll', function () { if (!panel.hidden && stickyTop() !== curTop) observe(); }, { passive: true });
-    observe();
+    jump('overview');
     section.addEventListener('click', function (e) {
-      var b = e.target.closest && e.target.closest('[data-vps-jump]');
-      if (b) jump(b.getAttribute('data-vps-jump'));
+      var button = e.target.closest && e.target.closest('[data-vps-jump]');
+      if (button) jump(button.dataset.vpsJump);
     });
 
     function updateScale(share) {
@@ -443,7 +413,6 @@
       document.dispatchEvent(new CustomEvent('var:pro-view', { detail: { view: 'overview' } }));
       marketSelect.value = symbol;
       renderEconomics();
-      observe();
       jump('calculator', true);
     });
     renderEconomics();
@@ -997,7 +966,7 @@ body.v2-dashboard .vps-body .vps-sub-head h4{font-size:18px!important}
         button.setAttribute('aria-current', button.dataset.vpsView === view ? 'page' : 'false');
       });
       if (!section.classList.contains('tg-hide')) history.replaceState(null, '', view === 'derivatives' ? '#derivatives' : '#variational-pro');
-      section.scrollIntoView({ block: 'start', behavior: 'instant' });
+
     }
     section.addEventListener('click', function (e) {
       var target = e.target.closest && e.target.closest('[data-vps-view]');
@@ -1054,6 +1023,9 @@ body.v2-dashboard .vp-bottom p{margin:0 auto 0 0!important;color:#8fa3c0!importa
 @media(prefers-reduced-motion:reduce){.vps-index button{transition:none}}
 `;
     style.textContent += VPS_COMPACT_CSS;
+    style.textContent += '\n/* Topic navigation stays above a single selected view. No in-page scroll jumps. */\n[data-vps-overview-panel] [hidden]{display:none!important}\n.vps-index{position:relative;top:auto;flex-wrap:wrap;overflow:visible;min-height:0;padding:4px;box-shadow:none;border-top:1px solid #273953}\n.vps-index button{min-height:38px;padding:8px 12px}\n.vps-doc{border-top:0}\n.vps-sec+.vps-sec{border-top:0}\n.vps-hero{margin-top:10px}\n@media(min-width:901px){.vps-hero .vp-identity{padding:24px}.vps-hero .vp-brand{font-size:34px}body.v2-dashboard .vps-hero h2.vp-pro{font-size:150px!important;margin:10px 0!important}}\n@media(max-width:600px){.vps-index{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:2px}.vps-index button{white-space:normal;text-align:left;font-size:11px;min-height:36px}.vps-hero .vp-topline{display:none}.vps-hero .vp-identity{padding:18px 12px}body.v2-dashboard .vps-hero h2.vp-pro{font-size:88px!important}.vps-hero .vps-thesis{font-size:12px!important;line-height:1.5!important}.vps-hero .vp-bottom{padding:8px 12px}}\n';
+    style.textContent += '\nbody:has(.tsec[data-tg="variational-pro"]:not(.tg-hide):not(.vps-show-derivatives)){overflow:hidden!important}\nbody:has(.tsec[data-tg="variational-pro"]:not(.tg-hide):not(.vps-show-derivatives)) #money-definitions{display:none!important}\n.tsec[data-tg="variational-pro"]:not(.tg-hide):not(.vps-show-derivatives){display:flex!important;flex-direction:column;min-height:0;box-sizing:border-box;padding-top:0;overflow:hidden}\n.tsec[data-tg="variational-pro"]>.vps-view-nav{flex-shrink:0;margin-bottom:6px}\n[data-vps-overview-panel]:not([hidden]){display:flex;flex:1;flex-direction:column;min-height:0}\n.vps-index{flex-shrink:0}\n.vps-reader{flex:1;min-height:0;overflow:hidden;overflow-anchor:none}\n.vps-paging{display:flex;flex-shrink:0;align-items:center;justify-content:space-between;padding:8px 12px;border:1px solid #273953;background:#0a1422;color:#9eb3d0;font:11px var(--mono)}\n.vps-paging button{padding:8px 14px;border:1px solid #314561;background:#142a46;color:#e8f2ff;cursor:pointer;font:12px var(--sans)}\n.vps-paging button:disabled{opacity:.35;cursor:default}\n.vps-paging button:focus-visible{outline:2px solid #9dc6fa}\n.vps-reader .vps-hero{min-height:100%;box-sizing:border-box;margin:0}\n@media(max-width:600px){.vps-index{grid-template-columns:repeat(4,minmax(0,1fr))}.vps-index button{padding:6px;font-size:10px;gap:4px}.vps-index button span{display:none}.vps-reader .vps-sec{padding:16px 12px}.vps-hero .vp-identity{padding:12px}.vps-hero .vp-brand{font-size:24px}body.v2-dashboard .vps-hero h2.vp-pro{font-size:72px!important}.vps-hero .vps-thesis{margin-top:12px!important}.vps-hero .vp-bottom{gap:5px}}\n';
+    style.textContent += '.vps-reader .vps-hero{min-height:0;height:100%}.vps-hero .vp-topline{display:none}.vps-hero .vp-identity{padding:12px}.vps-hero .vp-bottom{padding:8px 12px}.vps-hero .vps-thesis{font-size:12px!important;line-height:1.5!important;margin-top:12px!important}';
     document.head.appendChild(style);
 
     if (location.hash === '#' + TAB) showTab(TAB, { push: false });
