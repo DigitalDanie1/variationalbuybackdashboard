@@ -16,15 +16,8 @@
 <link rel="manifest" href="/site.webmanifest?v=20260731">
 <link rel="image_src" href="https://www.variational.money/variational-money-card-root-20260731c.png">
 <link rel="stylesheet" href="fonts.css">
-<script>
-  // Apply the saved theme before first paint to prevent a dark-to-light flash.
-  (function(){
-    var mode='dark';
-    try{mode=localStorage.getItem('variationalRadarTheme')||'dark';}catch(_){ }
-    document.documentElement.dataset.theme=mode==='light'?'light':'dark';
-    if(mode==='light')document.documentElement.classList.add('theme-light-pending');
-  })();
-</script>
+<!-- Apply the saved theme before first paint (external file: CSP blocks inline scripts). -->
+<script src="theme-boot.js?v=20261030"></script>
 <!-- Vercel Web Analytics (same-origin; enabled in the Vercel project) -->
 <script defer src="/_vercel/insights/script.js"></script>
 
