@@ -2766,6 +2766,13 @@ function renderEfficiency(){
   $('#fmDailyVol') && ($('#fmDailyVol').textContent=fmtBig(e.vol));
   $('#fmOi') && ($('#fmOi').textContent=fmtBig(MKT.oi));
   $('#fmDailyBurn') && ($('#fmDailyBurn').textContent=fmtBig(e.rev*MKT.burnShare));
+  const costEstimate=dailyHedgingEstimate(currentTreasuryDate(),e.spread,e.spread-e.rev);
+  $('#effHedgingCost') && ($('#effHedgingCost').textContent=costEstimate.cost==null?'—':fmtBig(costEstimate.cost));
+  $('#effOlpRemainder') && ($('#effOlpRemainder').textContent=costEstimate.remaining==null?'—':fmtBig(costEstimate.remaining));
+  $('#effHedgingFormula') && ($('#effHedgingFormula').textContent=costEstimate.rate==null?'Cost estimate unavailable':`${periodLabel}: ${fmtUSD(e.spread)} × ${(costEstimate.rate*100).toFixed(2)}%`);
+  $('#effOlpFormula') && ($('#effOlpFormula').textContent=costEstimate.cost==null?'—':`${fmtUSD(e.spread)} − ${fmtUSD(e.rev)} treasury − ${fmtUSD(costEstimate.cost)} cost`);
+  $('#effCostBasis') && ($('#effCostBasis').textContent=costEstimate.reports.length?`${costEstimate.reports.length} reports · ${costEstimate.reports[0].asOf} → ${costEstimate.reports.at(-1).asOf}`:'No comparable reports in the last 25 weeks');
+
   if($('#fmValLine')){
     const annRev=e.dailyRev*365, annSpread=e.dailySpread*365;
     const modelM=typeof valPred==='function'&&MKT.oi>0?valPred(MKT.oi):0;

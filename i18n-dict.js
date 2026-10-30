@@ -5652,3 +5652,6 @@ Object.assign(window.__VDICT.ko, {
  'Cost estimate unavailable':'비용 추정치 없음',
  'No comparable reports in the last 25 weeks':'지난 25주 비교 가능한 리포트 없음'
 });
+Object.assign(window.__VDICT.ko, {
+ 'Estimated hedging / market-making cost':'추정 헤징·마켓메이킹 비용'
+});
