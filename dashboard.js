@@ -2029,7 +2029,7 @@ function renderVsLighter(){
         <td><span class="lead ${lead.c}">${lead.t}</span></td>
       </tr>`;
     }).join('')}</tbody></table>`;
-  $('#h2hNote').innerHTML=`Variational's 30D fee pool is an estimate (MODELED): the net treasury-wallet inflow over the 30 days to ${win} (WALLET INFLOW) divided by the ${(MKT.spreadShare*100).toFixed(0)}% allocation the latest official reports observe. This is not audited protocol revenue, and non-revenue wallet transfers could affect it. Current Docs still describe a 10% treasury share; recent official reports imply 20%. Lighter and Extended fee pools are REPORTED: DeFiLlama daily fees summed over the same 30 days, from <a href="https://defillama.com/protocol/lighter" target="_blank" rel="noopener">DeFiLlama Lighter</a> and <a href="https://defillama.com/protocol/extended" target="_blank" rel="noopener">DeFiLlama Extended</a>; Extended's <a href="https://dune.com/extended/extended" target="_blank" rel="noopener">Dune dashboard</a> all-time fee total is shown only as a source check. OI basis: ${PEERS.mixed
+  $('#h2hNote').innerHTML=`Variational's 30D fee pool is an estimate (MODELED): the net treasury-wallet inflow over the 30 days to ${win} (WALLET INFLOW) divided by the ${(MKT.spreadShare*100).toFixed(0)}% allocation the latest official reports observe. This is not audited protocol revenue, and non-revenue wallet transfers could affect it. Current official Docs state 20%, subject to change; historical estimates retain their period-specific report share. Lighter and Extended fee pools are REPORTED: DeFiLlama daily fees summed over the same 30 days, from <a href="https://defillama.com/protocol/lighter" target="_blank" rel="noopener">DeFiLlama Lighter</a> and <a href="https://defillama.com/protocol/extended" target="_blank" rel="noopener">DeFiLlama Extended</a>; Extended's <a href="https://dune.com/extended/extended" target="_blank" rel="noopener">Dune dashboard</a> all-time fee total is shown only as a source check. OI basis: ${PEERS.mixed
     ?'<b>mixed</b> — Variational is live from its own feed while '+PEERS.mixedNote.replace(/^\d+ of \d+ venues live · /,'')+', so shares across the two are marked on the board'
     :(PEERS.live?'live CoinGecko derivatives for the peers, Variational from its own live feed'
                :'the '+PEERS.snapAsOf+' snapshot for every venue')}. Volume uses ${PEERS.live?'live CoinGecko data':'the '+PEERS.snapAsOf+' snapshot'} for the current activity column. Extended does not publish a matched booked-revenue series here, so the revenue cell stays unavailable instead of being guessed. Same-basis fee-pool check: ${cB(fees30)} Variational (modeled) vs ${cB(li.fees30)} Lighter and ${cB(extFees30)} Extended over the 30 days to ${win}. Snapshot: ${S.freshness}.`;
@@ -2774,7 +2774,7 @@ function renderEfficiency(){
       :`<span>VALUATION LENS · PROXY</span><b>${fmtBig(annRev)}</b><small>annualized net treasury inflow at ${e.label} pace</small>`;
   }
   $('#fmDailyRevFormula') && ($('#fmDailyRevFormula').textContent=periodLabel+' net wallet balance change');
-  $('#fmDailyFeesFormula') && ($('#fmDailyFeesFormula').textContent='daily inflow ÷ period-specific report share · current '+(MKT.spreadShare*100).toFixed(0)+'%; Docs 10%');
+  $('#fmDailyFeesFormula') && ($('#fmDailyFeesFormula').textContent='daily inflow ÷ period-specific report share · current '+(MKT.spreadShare*100).toFixed(0)+'%; historical rates vary');
   $('#fmDailyVolFormula') && ($('#fmDailyVolFormula').textContent=e.volSource);
   $('#fmDailyBurnFormula') && ($('#fmDailyBurnFormula').textContent=periodLabel+' inflow × 100% (intended, not yet executed burn)');
   $('#raTreasuryDay') && ($('#raTreasuryDay').textContent=fmtBig(e.dailyRev));
@@ -4191,7 +4191,7 @@ function paintCalendar(){
     $('#calGrid').innerHTML=summaries.length?summaries.map(x=>`<div class="cal-summary-card" data-d="${x.d}">
       <div class="cal-summary-period">${x.label}</div>
       <div class="cal-summary-metrics">
-        <div><span>${x.period} Revenue</span><strong>+${fmtUSD(x.v)}</strong><small>treasury inflow · measured wallet change</small></div>
+        <div><span>${x.period} treasury net inflow</span><strong>+${fmtUSD(x.v)}</strong><small>treasury inflow · measured wallet change</small></div>
         <div><span>${x.period} Spread Fees*</span><strong>${calMiniMoney(x.spreads)}</strong><small>implied from official report shares</small></div>
       </div>
     </div>`).join(''):'<div class="cal-summary-empty">No completed result for this period yet.</div>';

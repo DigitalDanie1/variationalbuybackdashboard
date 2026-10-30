@@ -8585,6 +8585,8 @@ body.theme-light .lb-card{box-shadow:0 1px 0 rgba(20,40,80,.03),0 14px 30px -22p
 @media(prefers-reduced-motion:reduce){.lb-art img,.lb-action,.lb-action i{transition:none}}
 </style>
 <link rel="stylesheet" href="overview-responsive.css?v=20261030">
+<link rel="stylesheet" href="metric-definitions.css?v=20261030">
+<script src="metric-definitions.js?v=20261030" defer></script>
 </head>
 <body>
 <div class="tipbar" id="tipbar" hidden>
@@ -8915,8 +8917,8 @@ body.theme-light .lb-card{box-shadow:0 1px 0 rgba(20,40,80,.03),0 14px 30px -22p
     <div class="daily-news-sources-head"><span>Verify the numbers</span><span>Open the primary or methodology source for each metric</span></div>
     <div class="daily-news-source-grid">
       <div class="daily-news-source">
-        <span>Treasury balance + ET revenue</span>
-        <p>Live USDC held by the protocol treasury. Daily revenue is the balance change between exact 00:00 ET closes.</p>
+        <span>Treasury balance + ET net inflow</span>
+        <p>Live USDC held by the protocol treasury. Daily net inflow is the wallet balance change between exact 00:00 ET closes; it excludes OLP PnL and may include non-revenue transfers.</p>
         <small id="dailySourceTreasuryAsOf">Latest completed ET close</small>
         <div class="daily-news-source-links"><a href="https://arbiscan.io/address/0x5e91b40467fb8902c46a7b6cb90482363188d645#tokentxns" target="_blank" rel="noopener noreferrer">Arbiscan wallet ↗</a></div>
       </div>
@@ -9228,7 +9230,7 @@ body.theme-light .lb-card{box-shadow:0 1px 0 rgba(20,40,80,.03),0 14px 30px -22p
         <div class="cap-note-body">
           <p><b>Data policy:</b> Treasury inflow is measured from changes in the on-chain USDC wallet balance. Implied gross spreads use allocation ratios observed in official biweekly reports. Non-revenue transfers and exact policy-change dates are not independently verified.</p>
           <p><b>Net treasury inflow</b> is the change in USDC held by Variational's on-chain treasury wallet. It is directly measurable on Arbiscan, but non-revenue transfers could also change the balance.</p>
-          <p><b>Implied gross spreads</b> are estimated from treasury inflow using the share observed in the official report for that period. Recent reports show <b id="calSharePct">&mdash;</b>; current Docs still state 10% and say the rate is subject to change.</p>
+          <p><b>Implied gross spreads</b> are estimated from treasury inflow using the share observed in the official report for that period. Recent reports show <b id="calSharePct">&mdash;</b>; current official Docs also state 20%, subject to change.</p>
           <p>The non-treasury remainder covers market-making costs, rewards, and residual OLP PnL. It is not automatically OLP revenue. A day closes at 00:00 ET; today stays pending until then.</p>
         </div>
       </details>
@@ -9453,7 +9455,7 @@ body.theme-light .lb-card{box-shadow:0 1px 0 rgba(20,40,80,.03),0 14px 30px -22p
 
 <div class="card tsec tg-hide" data-tg="implied" style="margin-top:16px">
   <h2>Implied Spreads <span class="tag">money circuit</span></h2>
-  <div class="cap">One view for the whole engine: volume creates customer spread payments and open interest shows capacity. The latest three official reports put exactly 20% of gross spreads into treasury; the docs page still says 10%, so this model clearly labels the observed rate.</div>
+  <div class="cap">One view for the whole engine: volume creates customer spread payments and open interest shows capacity. The latest three official reports put exactly 20% of gross spreads into treasury; current official Docs also state 20%, subject to change. Historical estimates use period-specific report shares.</div>
   <div class="spread-circuit">
     <div class="flow-map" aria-label="Volume and open interest flow into implied fees, treasury, and buyback-burn">
       <div class="circuit-node flow-node source money-source">
@@ -9484,7 +9486,7 @@ body.theme-light .lb-card{box-shadow:0 1px 0 rgba(20,40,80,.03),0 14px 30px -22p
       <div class="circuit-node flow-node burn">
         <div class="k">Buyback-burn firepower</div>
         <div class="v" id="sfBurnTotal">—</div>
-        <div class="d">30% of treasury revenue earmarked for $VAR</div>
+        <div class="d">100% of treasury-directed revenue intended for VAR buy & burn; execution tracked separately</div>
       </div>
     </div>
     <div class="flow-caption"><b>FLOW:</b> market activity → trader spread fees → Variational treasury → future $VAR buyback-burn firepower.</div>
@@ -9655,7 +9657,7 @@ body.theme-light .lb-card{box-shadow:0 1px 0 rgba(20,40,80,.03),0 14px 30px -22p
   <h2>How this is calculated <span class="tag">for the team to verify</span></h2>
   <div class="cap">Every number above is derived from two public sources — verify each step:</div>
   <div class="method">
-    <div class="mrow"><span class="ms">Fees / revenue</span><span class="mf">Treasury balance on-chain (Arbitrum USDC <a href="https://arbiscan.io/address/0x5e91b40467fb8902c46a7b6cb90482363188d645" target="_blank" rel="noopener"><code>0x5e91…d645 ↗</code></a>), sampled daily via archive RPC. The latest three official reports show treasury = exactly 20% of gross spreads, so current spread estimates use revenue ÷ 0.20. The docs page currently says 10% and subject to change; that conflict is disclosed rather than averaged away.</span></div>
+    <div class="mrow"><span class="ms">Fees / revenue</span><span class="mf">Treasury balance on-chain (Arbitrum USDC <a href="https://arbiscan.io/address/0x5e91b40467fb8902c46a7b6cb90482363188d645" target="_blank" rel="noopener"><code>0x5e91…d645 ↗</code></a>), sampled daily via archive RPC. The latest three official reports show treasury = exactly 20% of gross spreads, so current spread estimates use revenue ÷ 0.20. Current official Docs also state 20%, subject to change. Historical estimates use the rate available for each period.</span></div>
     <div class="mrow"><span class="ms">Perp volume &amp; OI</span><span class="mf">Historical daily values come directly from DeFiLlama's public <code>/v2/chart/derivatives/protocol/variational</code> and <code>/v2/chart/open-interest/protocol/variational</code> series. Live rolling-24h volume and OI come from Variational's official <code>/metadata/stats</code> endpoint, which is also the source used by DeFiLlama's adapter.</span></div>
     <div class="mrow"><span class="ms">Volume → $1 spread</span><span class="mf"><code>volume_30d ÷ spreads_30d</code> where <code>spreads_30d = revenue_30d ÷ 0.20</code> using the latest observed share. Take-rate (bps) = <code>spreads ÷ volume × 10000</code>.</span></div>
     <div class="mrow"><span class="ms">Volume → $1 burned</span><span class="mf"><code>volume_30d ÷ (revenue_30d × 1.00)</code> — 100% of revenue is committed to burn (intended, not yet executed).</span></div>
@@ -9668,7 +9670,7 @@ body.theme-light .lb-card{box-shadow:0 1px 0 rgba(20,40,80,.03),0 14px 30px -22p
 
 <div class="card historical-combo tsec tg-hide" data-tg="historical">
   <h2>Cumulative Accumulation <span class="tag" id="curveTag">—</span></h2>
-  <div class="cap">Total USDC held over time — pure buyback inflow (no outflows recorded).</div>
+  <div class="cap">Treasury USDC balance over time — accumulated funds, not executed buybacks or burned tokens.</div>
   <div class="legend">
     <b><span class="sw act"></span>Actual on-chain</b>
     <b><span class="sw fc"></span>Projected pace</b>
@@ -9801,7 +9803,7 @@ body.theme-light .lb-card{box-shadow:0 1px 0 rgba(20,40,80,.03),0 14px 30px -22p
     <div class="cmp-hl-brand"><img class="cmp-logo lg" src="logo-hyperliquid.png" alt="Hyperliquid" width="20" height="20"><span><b>Hyperliquid benchmark</b><small>Scale ceiling, not a direct peer</small></span></div>
     <div><strong id="kingOi">-</strong><span>open interest</span></div>
     <div><strong id="kingVol">-</strong><span>24H volume</span></div>
-    <div><strong id="kingRev">-</strong><span>30D revenue</span></div>
+    <div><strong id="kingRev">-</strong><span>30D protocol revenue / inflow proxy</span></div>
   </div>
 
   <section class="cmp-direct" id="cmpDirect">
@@ -11290,7 +11292,7 @@ body.theme-light .lb-card{box-shadow:0 1px 0 rgba(20,40,80,.03),0 14px 30px -22p
 <script src="dashboard.js?v=1792040001" defer></script>
 <script src="paths-panels.js?v=20261021-founders2" defer></script>
 <script src="playbook-panels.js?v=20261021-rank-to-whales" defer></script>
-<script src="monitors-panels.js?v=20261030-baseline" defer></script>
+<script src="monitors-panels.js?v=20261030-money-labels" defer></script>
 <script src="whales-panels.js?v=20261023-private-next-farm" defer></script>
 <script src="i18n-dict.js?v=20261030-spread" defer></script>
 <script src="i18n.js?v=1789148292" defer></script>

@@ -5531,3 +5531,19 @@ window.__VDICT = {
     "Advisers and funds could self-custody when no qualified custodian is available, and state trust companies could act as custodians. 60-day comment period.": "当没有合格托管人时，投顾和基金可自行托管，州信托公司也可担任托管人。意见征询期为 60 天。"
   }
 };
+
+/* Money definitions: keep the measured treasury proxy distinct from fees and LP PnL. */
+Object.assign(window.__VDICT.ko, {
+  'Treasury net inflow': '트레저리 순유입',
+  'Does the protocol treasury keep receiving funds? Excludes OLP PnL; not gross spreads or executed buybacks.': '프로토콜 트레저리 유입이 유지되나요? OLP 손익을 제외하며, 총 스프레드나 실제 바이백 집행액이 아닙니다.',
+  '100% of treasury-directed revenue intended for VAR buy & burn; execution tracked separately': '트레저리 배정 수익의 100%를 VAR 매입·소각에 사용할 계획 · 집행액은 별도 확인',
+  'Treasury USDC balance over time — accumulated funds, not executed buybacks or burned tokens.': '시간별 트레저리 USDC 잔액 — 축적된 자금이며 실제 바이백·소각 실적이 아닙니다.',
+  '30D protocol revenue / inflow proxy': '30일 프로토콜 수익 / 순유입 대용 지표'
+});
+Object.assign(window.__VDICT.zh, {
+  'Treasury net inflow': '金库净流入',
+  'Does the protocol treasury keep receiving funds? Excludes OLP PnL; not gross spreads or executed buybacks.': '协议金库是否持续收到资金？不含 OLP 损益，不是总点差或已执行回购。',
+  '100% of treasury-directed revenue intended for VAR buy & burn; execution tracked separately': '计划将金库收入的 100% 用于 VAR 回购销毁；执行额另行跟踪',
+  'Treasury USDC balance over time — accumulated funds, not executed buybacks or burned tokens.': '金库 USDC 历史余额：累积资金，不是已执行回购或销毁。',
+  '30D protocol revenue / inflow proxy': '30日协议收入 / 净流入代理指标'
+});

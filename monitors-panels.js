@@ -240,7 +240,7 @@
       unit: 'perp volume / day', src: 'DeFiLlama daily' });
     seriesRow({ k: 'oi', n: '02', name: 'Open interest', q: 'Can OI keep growing?', series: 'oi', grow: true,
       unit: 'end-of-day OI', src: 'DeFiLlama daily' });
-    seriesRow({ k: 'rev', n: '03', name: 'Revenue', key: true, q: 'Can revenue hold up? — his most important metric', series: 'rev',
+    seriesRow({ k: 'rev', n: '03', name: 'Treasury net inflow', key: true, q: 'Does the protocol treasury keep receiving funds? Excludes OLP PnL; not gross spreads or executed buybacks.', series: 'rev',
       unit: 'treasury inflow / day', src: 'on-chain · 20% of spreads' });
 
     /* revenue again on the reports' own basis, so the on-chain read can be checked */

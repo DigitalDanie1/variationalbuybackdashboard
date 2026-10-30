@@ -1,0 +1,8 @@
+.money-definitions{order:-3;min-width:0;margin:0 0 18px;border:1px solid var(--line,#293548);border-radius:6px;background:var(--panel,#101722);color:var(--text,var(--ink));font:13px/1.55 var(--sans,sans-serif)}
+.money-definitions summary{padding:13px 16px;cursor:pointer;overflow-wrap:anywhere}
+.money-definitions summary b{margin-right:14px;color:var(--v2-accent,#4c9af8)}
+.money-definitions summary span{color:var(--muted,#9aabc0);font-size:12px}
+.money-def-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;padding:0 16px 16px}
+.money-def-grid article{min-width:0;border-top:1px solid var(--line);padding-top:12px}.money-def-grid h3{margin:0 0 6px;font-size:13px}.money-def-grid p{margin:0;color:var(--muted,#9aabc0);overflow-wrap:anywhere}
+.money-def-source{margin:0;padding:0 16px 14px;font-size:12px}.money-def-source a{color:var(--v2-accent,#4c9af8)}
+@media(max-width:700px){.money-def-grid{grid-template-columns:1fr}.money-definitions summary span{display:block;margin-top:4px}}

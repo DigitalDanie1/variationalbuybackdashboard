@@ -730,8 +730,7 @@ function renderRatios(){
     derivatives volume, so numerator and denominator come from one source and one window. Variational publishes no
     fee series there, so its numerator is modeled (*): net Arbitrum USDC treasury inflow over the last 30 days
     (${usd(VAR_TREASURY_30D)}) divided by the ${(VAR_SPREAD_SHARE*100).toFixed(0)}% allocation ratio observed in the
-    official biweekly reports, giving a ${usd(byName('Variational').fees30)} gross pool. Docs still describe a 10%
-    share; the reports imply 20%. Non-revenue wallet transfers would distort it.
+    official biweekly reports, giving a ${usd(byName('Variational').fees30)} gross pool. Current Docs also state 20%, subject to change. Non-revenue wallet transfers would distort it.
     <br><br><b>Turnover</b> divides 30D volume by <em>current</em> open interest, so a venue whose book grew sharply
     inside the window reads high. <b>OI share</b> is measured against the ${VENUES.length} venues on this board, not
     the whole market — it is a board share, not a global one.
@@ -1642,7 +1641,7 @@ function renderRevenueMeta(){
     `<text class="rm-ax" x="${P.l}" y="${H-8}">diagonals = annual holder yield · 30D return × 365 ÷ 30 ÷ market cap</text>`+
     `<text class="rm-axt" x="${P.l}" y="${P.t-20}">Market cap ↑</text></svg>`+
     `<div class="rm-tip" hidden><b></b><div class="rm-tip-r"><span>Market cap</span><i data-mc></i></div>`+
-    `<div class="rm-tip-r"><span>30D revenue</span><i data-rev></i></div>`+
+    `<div class="rm-tip-r"><span>30D protocol revenue / inflow proxy</span><i data-rev></i></div>`+
     `<div class="rm-tip-r"><span>Share returned</span><i data-pay></i></div>`+
     `<div class="rm-tip-r"><span>Holder yield</span><i data-y></i></div></div>`;
 
