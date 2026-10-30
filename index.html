@@ -8447,6 +8447,143 @@ body.theme-light .bw-viz text.bw-pct.in{fill:#fff!important}
 .pts-tge-fixed .pts-tge-scenario{display:flex;align-items:baseline;gap:10px}
 .pts-tge-fixed .pts-tge-scenario small{margin-top:0;font-size:12px!important}
 </style>
+<style id="v2-landing-bento">
+/* Landing = one centred bento. Loaded last so it wins over the older .srv2-land-* grid rules
+   (those still style the shared header; everything else here is new .lb-* markup). */
+body.v2-landing{overflow:auto}
+body.v2-landing .srv2-landing.lb-landing{
+  display:flex!important;flex-direction:column;height:auto!important;
+  min-height:calc(100dvh - 28px)!important;overflow:visible!important;
+  background:var(--v2-bg);font-family:var(--sans);
+}
+.lb-landing .srv2-land-head{border-bottom:0!important;flex:0 0 auto;min-height:72px}
+.lb-stage{
+  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:clamp(14px,2.6vh,24px);padding:4px 24px clamp(18px,4vh,40px);min-width:0;
+}
+.lb-bento{
+  width:min(1060px,100%);display:grid;gap:12px;
+  grid-template-columns:minmax(0,1.48fr) minmax(0,1fr) minmax(0,1fr);
+  grid-template-rows:clamp(150px,23vh,208px) clamp(108px,15vh,148px) clamp(84px,11vh,112px);
+}
+.lb-card{
+  position:relative;min-width:0;border:1px solid var(--v2-line);border-radius:10px;
+  background:var(--v2-panel);color:var(--v2-text);overflow:hidden;text-decoration:none;
+  font-family:var(--sans);margin:0;
+}
+body.theme-light .lb-card{box-shadow:0 1px 0 rgba(20,40,80,.03),0 14px 30px -22px rgba(20,50,100,.28)}
+.lb-label{font:500 11px/1 var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--v2-muted)}
+.lb-num{
+  font:600 clamp(30px,3.3vw,44px)/1 var(--sans);letter-spacing:-.045em;color:var(--v2-text);
+  font-variant-numeric:tabular-nums;display:block;white-space:nowrap;
+}
+.lb-num em{font-style:normal;color:var(--v2-accent);margin-left:.03em}
+.lb-num-xl{font-size:clamp(50px,5.9vw,84px);letter-spacing:-.055em}
+
+/* A · brand visual */
+.lb-art{grid-column:1;grid-row:1/4;background:#00050f}
+.lb-art img{
+  position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 40%;
+  transition:transform .9s cubic-bezier(.2,.7,.2,1);
+}
+.lb-art:hover img{transform:scale(1.035)}
+.lb-art::before{
+  content:"";position:absolute;inset:0;z-index:1;pointer-events:none;
+  background:radial-gradient(58% 46% at 50% 43%,rgba(76,154,248,.24),transparent 72%),
+             linear-gradient(180deg,transparent 52%,rgba(0,5,15,.9));
+}
+.lb-art figcaption{position:absolute;left:18px;right:18px;bottom:16px;z-index:2;display:flex;flex-direction:column;gap:7px}
+.lb-art figcaption b{font:600 16px/1 var(--sans);letter-spacing:-.01em;color:#e9eef6}
+.lb-art figcaption span{font:500 10.5px/1 var(--mono);letter-spacing:.14em;color:#9aabc0}
+
+/* B · treasury + sparkline */
+.lb-treasury{grid-column:2/4;grid-row:1;display:flex;flex-direction:column;justify-content:space-between;padding:16px 18px 17px}
+.lb-treasury>*{position:relative;z-index:1}
+.lb-treasury .lb-label-r{position:absolute;top:16px;right:18px;color:var(--v2-faint)}
+.lb-treasury .lb-curve{
+  position:absolute;z-index:0;left:34%;right:0;bottom:0;width:66%;height:72%;pointer-events:none;
+  -webkit-mask-image:linear-gradient(90deg,transparent 0,#000 38%);mask-image:linear-gradient(90deg,transparent 0,#000 38%);
+}
+.lb-delta{margin:9px 0 0;font:500 13px/1.3 var(--sans);color:var(--v2-muted);font-variant-numeric:tabular-nums}
+.lb-delta b{font-weight:600;color:var(--v2-pos)}
+.lb-delta i{font-style:normal;margin:0 3px;color:var(--v2-faint)}
+
+/* C, D · stats */
+.lb-stat{display:flex;flex-direction:column;justify-content:space-between;padding:16px 18px 17px}
+
+/* E, F · actions */
+.lb-action{
+  display:flex;align-items:flex-end;justify-content:space-between;gap:12px;padding:16px 18px;
+  font:600 clamp(18px,1.7vw,22px)/1.1 var(--sans);letter-spacing:-.02em;text-align:left;
+  cursor:pointer;-webkit-appearance:none;appearance:none;
+  transition:box-shadow .2s ease,border-color .2s ease,filter .2s ease,transform .1s ease;
+}
+.lb-action i{font-style:normal;font-size:1.25em;line-height:1;transition:transform .2s ease}
+.lb-action:hover i{transform:translate(3px,-1px)}
+.lb-action:active{transform:translateY(1px)}
+.lb-enter{background:var(--v2-accent);border-color:var(--v2-accent);color:var(--v2-on-accent)}
+.lb-enter:hover{filter:brightness(1.07);box-shadow:0 0 0 1px var(--v2-accent),0 12px 44px -10px var(--v2-accent)}
+.lb-trade:hover{border-color:var(--v2-accent);box-shadow:0 0 0 1px var(--v2-accent),0 12px 40px -18px var(--v2-accent)}
+.lb-trade:hover i{color:var(--v2-accent)}
+.lb-card:focus-visible,.lb-chips button:focus-visible,.lb-foot a:focus-visible{outline:2px solid var(--v2-accent);outline-offset:3px}
+
+/* Jump-to chips */
+.lb-jump{width:min(1060px,100%);display:flex;align-items:flex-start;gap:14px}
+.lb-jump-label{flex:0 0 auto;font:500 11px/30px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--v2-faint)}
+.lb-chips{display:flex;flex-wrap:wrap;gap:6px;min-width:0}
+.lb-chips button{
+  flex:0 0 auto;height:30px;padding:0 12px;border:1px solid var(--v2-line);border-radius:7px;background:transparent;
+  color:var(--v2-muted);font:500 12.5px/1 var(--sans);white-space:nowrap;cursor:pointer;
+  transition:border-color .15s,color .15s,background .15s;
+}
+.lb-chips button b{font:inherit}
+.lb-chips button:hover{border-color:var(--v2-accent);color:var(--v2-text);background:var(--v2-panel)}
+.lb-chips [data-open-tab="whales-next"]{display:none}
+/* canonical order, whatever order the panel files mount their extra tabs in */
+.lb-chips [data-open-tab="overview"]{order:1}.lb-chips [data-open-tab="daily-news"]{order:2}
+.lb-chips [data-open-tab="efficiency"]{order:3}.lb-chips [data-open-tab="comparison"]{order:4}
+.lb-chips [data-open-tab="pretge"]{order:5}.lb-chips [data-open-tab="tokenomics"]{order:6}
+.lb-chips [data-open-tab="historical"]{order:7}.lb-chips [data-open-tab="biweekly"]{order:8}
+.lb-chips [data-open-tab="implied"]{order:9}.lb-chips [data-open-tab="roadmap"]{order:10}
+.lb-chips [data-open-tab="points"]{order:11}.lb-chips [data-open-tab="paths"]{order:12}
+.lb-chips [data-open-tab="plan"]{order:13}.lb-chips [data-open-tab="monitors"]{order:14}
+.lb-chips [data-open-tab="whales"]{order:15}.lb-chips [data-open-tab="variational-pro"]{order:16}
+
+/* Footer line */
+.lb-foot{width:min(1060px,100%);display:flex;flex-wrap:wrap;gap:6px 22px;font:400 11px/1.4 var(--sans);color:var(--v2-faint)}
+.lb-foot i,.lb-foot a>span{font-style:normal;font-weight:600;letter-spacing:.08em;margin-right:6px;color:var(--v2-dim)}
+.lb-foot a{color:var(--v2-muted);text-decoration:none;margin-right:auto}
+.lb-foot a:hover{color:var(--v2-accent)}
+
+@media(max-width:1099px){
+  .lb-bento{grid-template-columns:1fr 1fr;grid-template-rows:230px 190px 132px 92px}
+  .lb-art{grid-column:1/-1;grid-row:1}
+  .lb-treasury{grid-column:1/-1;grid-row:2}
+  .lb-art img{object-fit:contain;transform:scale(1.5)}
+  .lb-art:hover img{transform:scale(1.55)}
+}
+@media(max-width:760px){
+  body.v2-landing{padding-left:0!important;padding-right:0!important}
+  .lb-landing .srv2-land-head{padding-inline:16px!important}
+  .lb-landing .srv2-head-right{flex:0 0 auto!important;gap:8px}
+  .lb-landing .srv2-head-right .theme-toggle-liquid{flex:0 0 48px}
+  .lb-landing .lang-picker{margin-right:0}
+  .lb-stage{padding:4px 16px 28px;justify-content:flex-start;gap:20px}
+  .lb-bento{grid-template-rows:240px 168px 112px 76px 76px}
+  .lb-art img,.lb-art:hover img{object-fit:cover;object-position:50% 67%;transform:none}
+  .lb-enter,.lb-trade{grid-column:1/-1}
+  .lb-treasury .lb-label-r{display:none}
+  .lb-num{font-size:34px}.lb-num-xl{font-size:54px}
+  .lb-action{font-size:20px}
+  .lb-jump{flex-direction:column;gap:8px}
+  .lb-jump-label{line-height:1}
+  .lb-chips{flex-wrap:nowrap;overflow-x:auto;padding:2px 0 6px;max-width:100%;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+  .lb-chips::-webkit-scrollbar{display:none}
+  .lb-chips button{height:40px;padding:0 14px;font-size:13px}
+  .lb-foot{flex-direction:column;gap:4px}
+}
+@media(prefers-reduced-motion:reduce){.lb-art img,.lb-action,.lb-action i{transition:none}}
+</style>
 </head>
 <body>
 <div class="tipbar" id="tipbar" hidden>
@@ -8576,10 +8713,9 @@ body.theme-light .bw-viz text.bw-pct.in{fill:#fff!important}
 
 
 
-<section class="srv2-landing tsec" data-tg="overview" aria-label="Variational Money control index">
+<section class="srv2-landing lb-landing tsec" data-tg="overview" aria-label="Variational Money control index">
   <header class="srv2-land-head">
     <div class="srv2-land-brand"><img src="variational-symbol-transparent.png?v=4" alt="Variational"><div><span>Variational Money</span><small>TAKE US TO VARHALLA</small></div></div>
-    <small>CONTROL INDEX · LIVE PROTOCOL DATA</small>
     <div class="srv2-head-right">
       <span class="srv2-land-live">SYSTEM ONLINE</span>
       <button class="theme-toggle-liquid" type="button" data-theme-toggle aria-pressed="false" aria-label="Switch between dark and light mode">
@@ -8588,106 +8724,57 @@ body.theme-light .bw-viz text.bw-pct.in{fill:#fff!important}
       </button>
     </div>
   </header>
-  <div class="srv2-land-main">
-    <div class="srv2-land-hero">
-    <span class="srv2-land-eyebrow">CURRENT PROTOCOL STATE</span>
-    <strong class="srv2-land-total" id="v2LandBalance">—</strong>
-    <p>USDC held in the on-chain protocol treasury. Select a workspace to inspect the activity, economics, and assumptions behind this number.</p>
-    <!-- Same on-chain SERIES as the Overview hero and the Historical tab, drawn by
-         drawTreasuryCurve(). Paths start empty so nothing decorative ships as evidence. -->
-    <div class="srv2-land-chart" aria-label="Treasury accumulation since the first recorded day">
-      <span class="srv2-land-chart-cap">CUMULATIVE USDC ON-CHAIN</span>
-      <svg id="v2LandCurve" viewBox="0 0 1000 260" preserveAspectRatio="none" role="img" aria-label="Cumulative treasury growth">
-        <!-- Colours come from CSS so the curve follows the brand accent and the theme. -->
-        <defs><linearGradient id="srv2LandArea" x1="0" y1="0" x2="0" y2="1"><stop class="srv2-grad-in" offset="0" stop-opacity=".28"/><stop class="srv2-grad-out" offset="1" stop-opacity="0"/></linearGradient></defs>
-        <path id="v2LandCurveArea" d="" fill="url(#srv2LandArea)"/>
-        <path id="v2LandCurveLine" d="" fill="none" stroke-width="2.5" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
-      </svg>
-      <div class="srv2-land-axis" id="v2LandAxis" aria-hidden="true"></div>
+  <div class="lb-stage">
+    <div class="lb-bento">
+      <figure class="lb-card lb-art">
+        <img src="assets/image%20(3).png" alt="" width="2000" height="2000" fetchpriority="high">
+        <figcaption><b>Variational Money</b><span>TAKE US TO VARHALLA</span></figcaption>
+      </figure>
+      <section class="lb-card lb-treasury" aria-label="Protocol treasury">
+        <span class="lb-label">Protocol treasury</span>
+        <span class="lb-label lb-label-r">CUMULATIVE USDC ON-CHAIN</span>
+        <!-- Same on-chain SERIES as the Overview hero and the Historical tab, drawn by
+             drawTreasuryCurve(). Paths start empty so nothing decorative ships as evidence. -->
+        <svg class="lb-curve" id="v2LandCurve" viewBox="0 0 1000 260" preserveAspectRatio="none" role="img" aria-label="Cumulative treasury growth">
+          <defs><linearGradient id="srv2LandArea" x1="0" y1="0" x2="0" y2="1"><stop class="srv2-grad-in" offset="0" stop-opacity=".30"/><stop class="srv2-grad-out" offset="1" stop-opacity="0"/></linearGradient></defs>
+          <path id="v2LandCurveArea" d="" fill="url(#srv2LandArea)"/>
+          <path id="v2LandCurveLine" d="" fill="none" stroke-width="2" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
+        </svg>
+        <div class="lb-treasury-foot">
+          <strong class="lb-num lb-num-xl" id="v2LandBalance">—</strong>
+          <p class="lb-delta"><b id="v2LandDay">—</b> latest day <i aria-hidden="true">·</i> <b id="v2Land30">—</b> 30D</p>
+        </div>
+      </section>
+      <div class="lb-card lb-stat"><span class="lb-label">24H volume</span><strong class="lb-num" id="v2LandVolume">—</strong></div>
+      <div class="lb-card lb-stat"><span class="lb-label">Open interest</span><strong class="lb-num" id="v2LandOi">—</strong></div>
+      <button type="button" class="lb-card lb-action lb-enter" data-open-tab="overview"><span>Enter dashboard</span><i aria-hidden="true">→</i></button>
+      <a class="lb-card lb-action lb-trade" href="https://omni.variational.io/?ref=OMNIKOREAN" target="_blank" rel="noopener" aria-label="Trade on Variational (opens Omni with referral code OMNIKOREAN)"><span>Trade on Variational</span><i aria-hidden="true">↗</i></a>
     </div>
-    <div class="srv2-land-metrics">
-      <div class="srv2-land-metric"><span>24H trading volume</span><b id="v2LandVolume">—</b></div>
-      <div class="srv2-land-metric"><span>Open interest</span><b id="v2LandOi">—</b></div>
-    </div>
-    </div>
-    <section class="srv2-land-ops" aria-label="Treasury windows and operating intelligence">
-    <div class="srv2-strip">
-      <div><span>Latest day</span><b id="v2Day">—</b></div>
-      <div><span>Trailing 7 days</span><b id="v2Week">—</b></div>
-      <div><span>Trailing 30 days</span><b id="v2Month">—</b></div>
-      <div><span>30D daily pace</span><b id="v2Pace">—</b></div>
-    </div>
-    <section class="srv2-intel" aria-label="Overview operating intelligence">
-      <div class="srv2-intel-head"><div><span>OPERATING INTELLIGENCE</span><h2>What is happening now</h2></div><p>Short windows show the current earning speed. Market windows show the activity supporting it.</p></div>
-      <div class="srv2-window-grid">
-        <article class="live"><span id="v2HourLabel">Current ET hour</span><strong id="v2Hour">—</strong><small>Earned so far</small></article>
-        <article><span>Rolling 12 hours</span><strong id="v2Twelve">—</strong><small>Net treasury inflow</small></article>
-        <article><span>Rolling 24 hours</span><strong id="v2TwentyFour">—</strong><small>Net treasury inflow</small></article>
-        <article><span>Rolling 7 days</span><strong id="v2SevenWindow">—</strong><small>Net treasury inflow</small></article>
+    <nav class="lb-jump" aria-label="Open a workspace">
+      <span class="lb-jump-label">Jump to</span>
+      <!-- panel files clone the Roadmap button into this row to mount their own tabs, so it
+           must stay the direct parent of the data-open-tab buttons; CSS order sets the sequence. -->
+      <div class="lb-chips">
+        <button type="button" data-open-tab="overview"><b>Overview</b></button>
+        <button type="button" data-open-tab="daily-news"><b>Daily Earnings</b></button>
+        <button type="button" data-open-tab="efficiency"><b>Fundamentals</b></button>
+        <button type="button" data-open-tab="comparison"><b>Comparison</b></button>
+        <button type="button" data-open-tab="pretge"><b>Pre-TGE</b></button>
+        <button type="button" data-open-tab="tokenomics"><b>Tokenomics</b></button>
+        <button type="button" data-open-tab="historical"><b>Historical Data</b></button>
+        <button type="button" data-open-tab="biweekly"><b>Official Reports</b></button>
+        <button type="button" data-open-tab="implied"><b>Money Mechanic</b></button>
+        <button type="button" data-open-tab="roadmap"><b>Roadmap</b></button>
+        <button type="button" data-open-tab="points"><b>Points Calculator</b></button>
       </div>
-      <div class="srv2-market-grid">
-        <article><span>7D trading volume</span><strong id="v2Volume7">—</strong><small>Daily observations</small></article>
-        <article><span>30D trading volume</span><strong id="v2Volume30">—</strong><small>Daily observations</small></article>
-        <article><span>Month-to-date treasury</span><strong id="v2Mtd">—</strong><small id="v2MtdRange">Current ET month</small></article>
-        <article><span>Current treasury held</span><strong id="v2Held">—</strong><small>On-chain USDC</small></article>
-      </div>
-    </section>
-  
-  <!-- Moved here from the Overview canvas: the home page carries the full snapshot now.
-       Its own full-width row, so the hero (balance + curve) keeps its two-column shape. -->
-    </section>
-    <nav class="srv2-land-routes" aria-label="Quick analysis routes">
-      <button type="button" data-open-tab="efficiency">
-        <span>FOR TRADERS</span><b>Read market activity</b>
-        <small>Volume, open interest, spreads, and revenue efficiency</small><em>OPEN FUNDAMENTALS →</em>
-      </button>
-      <button type="button" data-open-tab="comparison">
-        <span>FOR INVESTORS</span><b>Value the protocol</b>
-        <small>Peer positioning, implied market cap, FDV, and premiums</small><em>OPEN COMPARISON →</em>
-      </button>
-      <button type="button" data-open-tab="biweekly">
-        <span>VERIFY THE NUMBERS</span><b>Read official reports</b>
-        <small>Every operating metric, report date, cost, and profit line</small><em>OPEN REPORTS →</em>
-      </button>
     </nav>
-    <div class="srv2-land-utility" aria-label="Creator, referral, and live actions">
-      <a class="creator" href="https://x.com/0xdefidaniel" target="_blank" rel="noopener">
-        <span class="srv2-land-utility-label">BUILT BY</span><strong>@0xdefidaniel ↗</strong>
-      </a>
-      <a class="ref direct-ref" href="https://omni.variational.io/?ref=OMNIKOREAN" target="_blank" rel="noopener" aria-label="Open Omni with referral code OMNIKOREAN">
-        <img src="variational-symbol-transparent.png?v=4" alt="" width="22" height="20">
-        <span class="srv2-land-utility-label">REF</span><strong>OMNIKOREAN</strong>
-        <span class="direct-ref-open">OPEN OMNI ↗</span>
-      </a>
-      <div class="live-actions">
-        <span class="live-state">LIVE · 3/3 VERIFIED</span>
-        <button type="button" id="v2LandingRefresh">REFRESH</button>
-      </div>
-    </div>
+    <footer class="lb-foot">
+      <a href="https://x.com/0xdefidaniel" target="_blank" rel="noopener"><span>BUILT BY</span> @0xdefidaniel ↗</a>
+      <span><i>PRIMARY SOURCE</i> Arbitrum treasury wallet</span>
+      <span><i>OPERATING SOURCE</i> Official biweekly reports</span>
+      <span><i>MARKET SOURCE</i> Official API and DeFiLlama</span>
+    </footer>
   </div>
-
-  <aside class="srv2-land-proof srv2-workspaces">
-    <span>SELECT WORKSPACE</span>
-    <p class="srv2-workspace-hint"><b>Choose a workspace to open</b><span>CLICK ANY ROW</span></p>
-    <div class="srv2-workspace-list">
-      <button type="button" data-open-tab="overview"><span>01</span><b>Live Overview</b><small>Treasury and daily money path</small></button>
-      <button type="button" data-open-tab="daily-news"><span>02</span><b>Daily Earnings</b><small>Latest completed ET day</small></button>
-      <button type="button" data-open-tab="efficiency"><span>03</span><b>Fundamentals</b><small>Volume, OI, fees, and revenue</small></button>
-      <button type="button" data-open-tab="comparison"><span>04</span><b>Comparison</b><small>Positioning and implied valuation</small></button>
-      <button type="button" data-open-tab="pretge"><span>05</span><b>Pre-TGE Comparison</b><small>Lighter as the priced comparable</small></button>
-      <button type="button" data-open-tab="tokenomics"><span>06</span><b>Tokenomics / Fundraise history</b><small>Allocation, unlocks, supply sinks and funding rounds</small></button>
-      <button type="button" data-open-tab="historical"><span>07</span><b>Historical Data</b><small>Accumulation and interval growth</small></button>
-      <button type="button" data-open-tab="biweekly"><span>08</span><b>Official Reports</b><small>Biweekly operating history</small></button>
-      <button type="button" data-open-tab="implied"><span>09</span><b>Money Mechanic</b><small>Verify every formula</small></button>
-      <button type="button" data-open-tab="roadmap"><span>10</span><b>Roadmap</b><small>Shipped and remaining work</small></button>
-      <button type="button" data-open-tab="points"><span>11</span><b>Points Calculator</b><small>FDV and TGE scenarios</small></button>
-    </div>
-  </aside>
-  <footer class="srv2-land-foot">
-    <div><span>PRIMARY SOURCE</span><b>Arbitrum treasury wallet</b></div>
-    <div><span>OPERATING SOURCE</span><b>Official biweekly reports</b></div>
-    <div><span>MARKET SOURCE</span><b>Official API and DeFiLlama</b></div>
-  </footer>
 </section>
 
 <section class="signal-room-v2 tsec" data-tg="overview" aria-label="Variational Signal Room overview">

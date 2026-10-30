@@ -77,7 +77,7 @@
       dailyBriefSpreadFees: ['v2Spreads'],
       dailyBriefOlpSide: ['v2Olp'],
       marketEarn7: ['v2Week'],
-      marketEarn30: ['v2Month'],
+      marketEarn30: ['v2Month', 'v2Land30'],
       ticker: ['v2Hour'],
       liveHourLabel: ['v2HourLabel'],
       ac12h: ['v2Twelve'],
