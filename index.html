@@ -8587,7 +8587,7 @@ body.theme-light .lb-card{box-shadow:0 1px 0 rgba(20,40,80,.03),0 14px 30px -22p
 <link rel="stylesheet" href="overview-responsive.css?v=20261030">
 <link rel="stylesheet" href="metric-definitions.css?v=20261030">
 <script src="metric-definitions.js?v=20261030" defer></script>
-<link rel="stylesheet" href="implied-clarity.css?v=20261030">
+<link rel="stylesheet" href="implied-clarity.css?v=20261030-fork">
 </head>
 <body>
 <div class="tipbar" id="tipbar" hidden>
@@ -9457,68 +9457,23 @@ body.theme-light .lb-card{box-shadow:0 1px 0 rgba(20,40,80,.03),0 14px 30px -22p
 <div class="card tsec tg-hide" data-tg="implied" style="margin-top:16px">
   <h2>Implied Spreads <span class="tag">money circuit</span></h2>
   <div class="cap">One view for the whole engine: volume creates customer spread payments and open interest shows capacity. The latest three official reports put exactly 20% of gross spreads into treasury; current official Docs also state 20%, subject to change. Historical estimates use period-specific report shares.</div>
-  <div class="spread-circuit">
-    <div class="flow-map" aria-label="Volume and open interest flow into implied fees, treasury, and buyback-burn">
-      <div class="circuit-node flow-node source money-source">
-        <div class="k">Trading activity · not revenue</div>
-        <div class="source-pair">
-          <div><b id="sfVol30">—</b><span>30D volume</span></div>
-          <div><b id="sfOi">—</b><span>open interest</span></div>
-        </div>
-        <div class="money-streams" aria-hidden="true">
-          <div class="money-stream s1"><span>trader flow</span></div>
-          <div class="money-stream s2"><span>open positions</span></div>
-        </div>
-        <div class="d">Trading activity feeds the spread pool.</div>
-      </div>
-      <div class="flow-arrow">→</div>
-      <div class="circuit-node flow-node fee">
-        <div class="k">Cumulative gross spreads · estimated</div>
-        <div class="v" id="impliedSpreadTotal">—</div>
-        <div class="d">Cumulative estimate: sum of each treasury inflow ÷ its period-specific share</div>
-      </div>
-      <div class="flow-arrow">→</div>
-      <div class="circuit-node flow-node treasury">
-        <div class="k">Protocol treasury</div>
-        <div class="v" id="sfTreasuryTotal">—</div>
-        <div class="d">20% of gross spreads in the latest 3 reports</div>
-      </div>
-      <div class="flow-arrow">→</div>
-      <div class="circuit-node flow-node burn">
-        <div class="k">Intended buyback allocation</div>
-        <div class="v" id="sfBurnTotal">—</div>
-        <div class="d">100% of treasury-directed revenue intended for VAR buy & burn; execution tracked separately</div>
-      </div>
+  <section class="cash-path" aria-label="Separate protocol and OLP money flows">
+    <header><span>ONE DOLLAR · TWO DIFFERENT DESTINATIONS</span><h3>Gross spreads split. Only the treasury branch funds the VAR buyback plan.</h3></header>
+    <div class="cash-origin"><b>$1.00</b><strong>Customer gross spread</strong><span>Before hedging costs and rewards · current 20% / 80% allocation</span></div>
+    <div class="cash-fork" aria-hidden="true"><span>↙ 20%</span><span>80% ↘</span></div>
+    <div class="cash-branches">
+      <article class="cash-protocol"><div class="cash-role">A · PROTOCOL SHARE</div><h3>Treasury allocation</h3><div class="cash-value">$0.20</div><div class="cash-equation">$1.00 × 20% = $0.20</div><b class="cash-badge">REVENUE COMPARISON BASIS · EXCLUDES OLP PnL</b><p>Daily dashboard measure: treasury net inflow, an on-chain proxy.</p>
+        <div class="cash-plan"><span>⇣ 100% intended allocation</span><h4>VAR buy &amp; burn plan</h4><b>$0.20</b><strong>Same treasury money — not extra revenue</strong><div class="cash-execution">ACTUAL PURCHASE / BURN <b>Not established by this model</b></div></div>
+      </article>
+      <article class="cash-olp"><div class="cash-role">B · OLP SIDE</div><h3>OLP pool before costs</h3><div class="cash-value">$0.80</div><div class="cash-equation">$1.00 − $0.20 = $0.80</div><b class="cash-badge">BEFORE COSTS · NOT OLP PROFIT</b><div class="cash-cost"><span>− Hedging / market-making costs</span><span>− Rewards and other reported deductions</span><strong>= OLP net PnL</strong></div><div class="cash-execution">DAILY OLP NET PnL <b>Not measured here</b></div><p>Use dated official reports for actual OLP results. A historical margin applied to today is an estimate.</p></article>
     </div>
-    <div class="flow-caption"><b>FLOW:</b> market activity → trader spread fees → Variational treasury → future $VAR buyback-burn firepower.</div>
-  </div>
-  <h2 style="margin-top:18px">How $1 of gross spread is allocated <span class="tag">unit economics</span></h2>
-  <div class="cap">The only unit-economics view that matters: one customer spread dollar, the treasury cut, and the activity needed to produce it.</div>
-  <div class="spread-flow">
-    <div class="spread-slice">
-      <div class="k">Customer pays</div>
-      <div class="v">$1.00</div>
-      <div class="d">spread paid on a trade</div>
-    </div>
-    <div class="spread-arrow">→</div>
-    <div class="spread-slice olp">
-      <div class="k">OLP side · before costs</div>
-      <div class="v">$0.80</div>
-      <div class="d">funds market-making costs, rewards, and residual OLP PnL</div>
-    </div>
-    <div class="spread-arrow">+</div>
-    <div class="spread-slice treasury">
-      <div class="k">Protocol treasury</div>
-      <div class="v" id="bbTreasuryCut">$0.20</div>
-      <div class="d">current allocation basis; subject to change</div>
-    </div>
-    <div class="spread-arrow">→</div>
-    <div class="spread-slice burn">
-      <div class="k">Intended buyback allocation</div>
-      <div class="v" id="bbSpreadBurn">$0.20</div>
-      <div class="d">100% of treasury revenue committed to $VAR (intended, not yet executed)</div>
-    </div>
-  </div>
+    <div class="cash-rule">Protocol revenue ≠ gross spreads ≠ OLP profit ≠ executed buybacks</div>
+  </section>
+  <div class="cash-totals"><h3>Cumulative estimates and current balances · different measurement bases</h3><div class="cash-total-grid">
+    <article><span>Gross spreads · cumulative estimate</span><b id="impliedSpreadTotal">—</b><small>Σ (period treasury inflow ÷ period share)</small></article>
+    <article><span>Treasury · current USDC balance</span><b id="sfTreasuryTotal">—</b><small>Wallet balance · excludes OLP vault</small></article>
+    <article><span>Intended allocation · balance × 100%</span><b id="sfBurnTotal">—</b><small>Same treasury balance · not executed buybacks</small></article>
+  </div><div class="cash-activity">Activity context · not revenue: <b id="sfVol30">—</b> 30D volume · <b id="sfOi">—</b> open interest</div></div>
   <div class="eff-ratios unit-core">
     <div class="er"><div class="er-v" id="oneSpreadVol">—</div><div class="er-l">Trading volume needed to create <b>$1 of trader spread payment</b><span class="er-note" id="oneSpreadVolNote">selected volume ÷ implied spread payments</span></div></div>
     <div class="er"><div class="er-v" id="oneSpreadOi">—</div><div class="er-l">Open interest needed to create <b>$1/day of trader spread payment</b><span class="er-note">OI ÷ implied daily spread payments</span></div></div>
@@ -11290,12 +11245,12 @@ body.theme-light .lb-card{box-shadow:0 1px 0 rgba(20,40,80,.03),0 14px 30px -22p
 </style>
 
 <script src="market-regime-data.js?v=1790400001" defer></script>
-<script src="dashboard.js?v=20261030-implied-v2" defer></script>
+<script src="dashboard.js?v=20261030-money-fork" defer></script>
 <script src="paths-panels.js?v=20261021-founders2" defer></script>
 <script src="playbook-panels.js?v=20261021-rank-to-whales" defer></script>
 <script src="monitors-panels.js?v=20261030-money-labels" defer></script>
 <script src="whales-panels.js?v=20261023-private-next-farm" defer></script>
-<script src="i18n-dict.js?v=20261030-implied-v2" defer></script>
+<script src="i18n-dict.js?v=20261030-money-fork" defer></script>
 <script src="i18n.js?v=1789148292" defer></script>
 <script src="app-inline.js?v=20260809-theme-toggle" defer></script>
 <script src="crypto-news.js?v=20261030-news-h" defer></script>

@@ -5559,3 +5559,35 @@ Object.assign(window.__VDICT.ko, {
  'Cumulative estimate: sum of each treasury inflow ÷ its period-specific share':'누적 추정치: 각 기간 트레저리 유입 ÷ 해당 기간 배분율의 합',
  '30D treasury net inflow ÷ 30 × 100%; allocation estimate, not execution':'30일 트레저리 순유입 ÷ 30 × 100% · 예정 재원이며 집행액 아님'
 });
+
+Object.assign(window.__VDICT.ko, {
+  "ONE DOLLAR · TWO DIFFERENT DESTINATIONS": "스프레드 $1 · 서로 다른 두 돈의 흐름",
+  "Gross spreads split. Only the treasury branch funds the VAR buyback plan.": "총 스프레드는 두 갈래로 나뉩니다. VAR 바이백 계획은 트레저리 몫에서만 나옵니다.",
+  "Customer gross spread": "고객이 지불한 총 스프레드",
+  "Before hedging costs and rewards · current 20% / 80% allocation": "헤징 비용·보상 차감 전 · 현재 배분율 20% / 80%",
+  "A · PROTOCOL SHARE": "A · 프로토콜 몫",
+  "Treasury allocation": "트레저리 배정액",
+  "REVENUE COMPARISON BASIS · EXCLUDES OLP PnL": "거래소 Revenue 비교 기준 · OLP 손익 제외",
+  "Daily dashboard measure: treasury net inflow, an on-chain proxy.": "일일 표시값은 온체인 대용 지표인 트레저리 순유입입니다.",
+  "⇣ 100% intended allocation": "⇣ 이 몫의 100%를 사용할 계획",
+  "VAR buy & burn plan": "VAR 매입·소각 계획",
+  "Same treasury money — not extra revenue": "같은 트레저리 자금 · 추가 수익이 아님",
+  "ACTUAL PURCHASE / BURN": "실제 매입·소각",
+  "Not established by this model": "이 모델에서는 실행 여부를 확인하지 않음",
+  "B · OLP SIDE": "B · OLP 측 몫",
+  "OLP pool before costs": "비용 차감 전 OLP 측 자금",
+  "BEFORE COSTS · NOT OLP PROFIT": "비용 차감 전 · OLP 순이익이 아님",
+  "− Hedging / market-making costs": "− 헤징·마켓메이킹 비용",
+  "− Rewards and other reported deductions": "− 보상 및 기타 보고된 차감 항목",
+  "= OLP net PnL": "= OLP 순손익",
+  "DAILY OLP NET PnL": "일일 OLP 순손익",
+  "Not measured here": "여기서는 측정하지 않음",
+  "Use dated official reports for actual OLP results. A historical margin applied to today is an estimate.": "OLP 실적은 날짜가 명시된 공식 보고서를 확인하세요. 과거 이익률을 오늘에 적용하면 추정치입니다.",
+  "Protocol revenue ≠ gross spreads ≠ OLP profit ≠ executed buybacks": "프로토콜 수익 ≠ 총 스프레드 ≠ OLP 순이익 ≠ 실제 바이백",
+  "Cumulative estimates and current balances · different measurement bases": "누적 추정치와 현재 잔액 · 서로 다른 측정 기준",
+  "Gross spreads · cumulative estimate": "총 스프레드 · 누적 추정치",
+  "Treasury · current USDC balance": "트레저리 · 현재 USDC 잔액",
+  "Intended allocation · balance × 100%": "예정 재원 · 잔액 × 100%",
+  "Wallet balance · excludes OLP vault": "지갑 잔액 · OLP 볼트 제외",
+  "Same treasury balance · not executed buybacks": "동일한 트레저리 잔액 · 실제 바이백 아님"
+});
