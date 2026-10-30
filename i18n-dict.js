@@ -5607,3 +5607,23 @@ Object.assign(window.__VDICT.ko, {
  '↙ A · protocol share':'↙ A · 프로토콜 몫',
  'B · OLP side ↘':'B · OLP 측 몫 ↘'
 });
+Object.assign(window.__VDICT.ko, {
+ 'Daily money allocation':'하루의 자금 배분',
+ 'Latest completed ET day · same money, two destinations':'최근 마감 ET 일자 · 같은 자금의 두 도착지',
+ 'OLP quotes & hedges both':'두 상품 모두 OLP가 가격 제시·헤징',
+ 'GROSS SPREADS · ESTIMATED':'총 스프레드 · 추정치',
+ 'Product-level revenue split unavailable':'상품별 매출 분리 데이터 없음',
+ '↓ Protocol share':'↓ 프로토콜 몫',
+ '↓ OLP-side pool':'↓ OLP 측 몫',
+ 'PROTOCOL':'프로토콜',
+ 'ESTIMATED':'추정치',
+ 'Revenue comparison basis · excludes OLP PnL':'Revenue 비교 기준 · OLP 손익 제외',
+ 'VAR buy & burn · intended':'VAR 매입·소각 · 예정 재원',
+ 'Same treasury money · execution unverified':'동일한 트레저리 자금 · 집행 여부 별도 검증',
+ 'OLP pool before costs':'비용 차감 전 OLP 측 자금',
+ 'Not OLP profit':'OLP 순이익이 아님',
+ '− Hedging costs − rewards':'− 헤징 비용 − 보상',
+ '= OLP net PnL':'= OLP 순손익',
+ 'Daily result not measured here':'여기서는 일일 실적을 측정하지 않음',
+ 'Gross spreads = treasury share + OLP pool before costs':'총 스프레드 = 트레저리 몫 + 비용 차감 전 OLP 측 몫'
+});

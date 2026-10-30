@@ -8588,9 +8588,9 @@ body.theme-light .lb-card{box-shadow:0 1px 0 rgba(20,40,80,.03),0 14px 30px -22p
 <link rel="stylesheet" href="metric-definitions.css?v=20261030">
 <script src="metric-definitions.js?v=20261030" defer></script>
 <link rel="stylesheet" href="implied-clarity.css?v=20261030-fork">
-<link rel="stylesheet" href="daily-money-flow.css?v=20261030">
+<link rel="stylesheet" href="daily-money-flow.css?v=20261030-compact">
 <link rel="stylesheet" href="product-money-map.css?v=20261030">
-<script src="product-money-map.js?v=20261030" defer></script>
+<script src="product-money-map.js?v=20261030-compact" defer></script>
 </head>
 <body>
 <div class="tipbar" id="tipbar" hidden>
@@ -8864,25 +8864,15 @@ body.theme-light .lb-card{box-shadow:0 1px 0 rgba(20,40,80,.03),0 14px 30px -22p
   </div>
   <div class="daily-brief-evidence-head"><b>Numbers behind the post</b><span>Every figure quoted above, with its source and comparison window.</span></div>
   <div class="daily-brief-grid" aria-label="Variational daily status metrics">
-<section class="daily-money-flow" aria-label="Daily treasury and OLP money flows">    <div class="daily-brief-metric spread-fee">
-      <span>Gross spreads · estimated</span>
-      <strong id="dailyBriefSpreadFees">—</strong>
-      <em class="daily-brief-delta" id="dailyBriefSpreadShare">Waiting for report share</em>
-      <small>TOTAL BEFORE COSTS · not protocol revenue</small>
-    </div>
-<div class="daily-fork" aria-hidden="true">↙ A · protocol share <span>B · OLP side ↘</span></div><div class="daily-money-branches">    <div class="daily-brief-metric revenue">
-      <span>A · Protocol treasury net inflow</span>
-      <strong id="dailyBriefRevenue">—</strong>
-      <em class="daily-brief-delta" id="dailyBriefRevenueDelta">Waiting for completed close</em>
-      <b class="daily-flow-tag">REVENUE COMPARISON BASIS · OLP PnL EXCLUDED</b><div class="daily-buyback-plan"><span>⇣ Same treasury money · 100% intended for buy &amp; burn</span><small id="dailyBriefBurn">Intended buyback allocation —</small><b>Execution not established by this model</b></div>
-    </div>
-    <div class="daily-brief-metric olp-side">
-      <span>B · OLP-side pool · estimated</span>
-      <strong id="dailyBriefOlpSide">—</strong>
-      <em class="daily-brief-delta" id="dailyBriefOlpShare">Spread pool after treasury share</em>
-      <small>BEFORE COSTS · NOT OLP PROFIT</small>
-<div class="daily-cost-path"><span>− Hedging / market-making costs</span><span>− Rewards and other deductions</span><b>= OLP net PnL · not measured daily here</b></div>    </div>
-</div><div class="daily-flow-rule">Gross spreads = treasury share + OLP-side pool before costs</div></section>    <div class="daily-brief-metric volume">
+<section class="daily-money-flow" aria-label="Daily money allocation">
+ <div class="dm-heading"><h3>Daily money allocation</h3><span>Latest completed ET day · same money, two destinations</span></div>
+ <div class="dm-source"><div class="dm-products"><b>Perps</b><span>+</span><b>Swaps</b><small>OLP quotes &amp; hedges both</small></div><div class="dm-total"><span>GROSS SPREADS · ESTIMATED</span><strong id="dailyBriefSpreadFees">—</strong><em id="dailyBriefSpreadShare">—</em></div><span class="dm-source-note">Product-level revenue split unavailable</span></div>
+ <div class="dm-split"><span>↓ Protocol share</span><span>↓ OLP-side pool</span></div>
+ <div class="daily-money-branches">
+  <article class="dm-card dm-protocol"><div class="dm-label"><h4>Treasury net inflow</h4><b>PROTOCOL</b></div><strong id="dailyBriefRevenue">—</strong><em id="dailyBriefRevenueDelta">—</em><span class="dm-caption">Revenue comparison basis · excludes OLP PnL</span><div class="dm-footer dm-plan"><b>VAR buy &amp; burn · intended</b><small id="dailyBriefBurn">—</small><span>Same treasury money · execution unverified</span></div></article>
+  <article class="dm-card dm-olp"><div class="dm-label"><h4>OLP pool before costs</h4><b>ESTIMATED</b></div><strong id="dailyBriefOlpSide">—</strong><em id="dailyBriefOlpShare">—</em><span class="dm-caption">Not OLP profit</span><div class="dm-footer dm-costs"><b>− Hedging costs − rewards</b><strong>= OLP net PnL</strong><span>Daily result not measured here</span></div></article>
+ </div><div class="dm-equation">Gross spreads = treasury share + OLP pool before costs</div>
+</section>    <div class="daily-brief-metric volume">
       <span>Rolling 24H volume</span>
       <strong id="dailyBriefVolume">—</strong>
       <em class="daily-brief-delta" id="dailyBriefVolumeDelta">Official live stats</em>
@@ -11248,12 +11238,12 @@ body.theme-light .lb-card{box-shadow:0 1px 0 rgba(20,40,80,.03),0 14px 30px -22p
 </style>
 
 <script src="market-regime-data.js?v=1790400001" defer></script>
-<script src="dashboard.js?v=20261030-daily-flow" defer></script>
+<script src="dashboard.js?v=20261030-daily-compact" defer></script>
 <script src="paths-panels.js?v=20261021-founders2" defer></script>
 <script src="playbook-panels.js?v=20261021-rank-to-whales" defer></script>
 <script src="monitors-panels.js?v=20261030-money-labels" defer></script>
 <script src="whales-panels.js?v=20261023-private-next-farm" defer></script>
-<script src="i18n-dict.js?v=20261030-daily-flow" defer></script>
+<script src="i18n-dict.js?v=20261030-daily-compact" defer></script>
 <script src="i18n.js?v=1789148292" defer></script>
 <script src="app-inline.js?v=20260809-theme-toggle" defer></script>
 <script src="crypto-news.js?v=20261030-news-h" defer></script>
