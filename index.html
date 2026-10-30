@@ -8591,6 +8591,7 @@ body.theme-light .lb-card{box-shadow:0 1px 0 rgba(20,40,80,.03),0 14px 30px -22p
 <link rel="stylesheet" href="product-money-map.css?v=20261030">
 <script src="product-money-map.js?v=20261030-overview-clean" defer></script>
 <link rel="stylesheet" href="revenue-comparison.css?v=20261030">
+<style>.daily-cost-evidence{margin-top:8px;font:10px/1.6 var(--mono);color:var(--muted)}.daily-cost-evidence summary{cursor:pointer}.daily-cost-evidence a{color:var(--v2-accent)}.daily-cost-evidence>div{margin-top:8px}.daily-brief-metric.olp-side>small{line-height:1.6!important}</style>
 </head>
 <body>
 <div class="tipbar" id="tipbar" hidden>
@@ -8866,7 +8867,7 @@ body.theme-light .lb-card{box-shadow:0 1px 0 rgba(20,40,80,.03),0 14px 30px -22p
   <div class="daily-brief-grid" aria-label="Variational daily status metrics">
 <div class="daily-brief-metric spread-fee"><span>Gross spreads · estimated</span><strong id="dailyBriefSpreadFees">—</strong><em class="daily-brief-delta" id="dailyBriefSpreadShare">—</em><small>Before costs · not protocol revenue</small></div>
 <div class="daily-brief-metric revenue"><span>Treasury net inflow</span><strong id="dailyBriefRevenue">—</strong><em class="daily-brief-delta" id="dailyBriefRevenueDelta">—</em><small id="dailyBriefBurn">—</small></div>
-<div class="daily-brief-metric olp-side"><span>OLP side · before costs</span><strong id="dailyBriefOlpSide">—</strong><em class="daily-brief-delta" id="dailyBriefOlpShare">—</em><small>Not OLP profit</small></div>    <div class="daily-brief-metric volume">
+<div class="daily-brief-metric olp-side"><span>OLP remainder after estimated hedging costs</span><strong id="dailyBriefOlpSide">—</strong><em class="daily-brief-delta" id="dailyBriefOlpShare">—</em><small>Estimate: last 25 weeks of biweekly reports, gross-spread-weighted cost rate applied. Rewards not deducted.</small><small id="dailyBriefCostBasis"></small><details class="daily-cost-evidence"><summary>Cost estimate sources</summary><div id="dailyBriefCostSources"></div></details></div>    <div class="daily-brief-metric volume">
       <span>Rolling 24H volume</span>
       <strong id="dailyBriefVolume">—</strong>
       <em class="daily-brief-delta" id="dailyBriefVolumeDelta">Official live stats</em>
@@ -8927,7 +8928,7 @@ body.theme-light .lb-card{box-shadow:0 1px 0 rgba(20,40,80,.03),0 14px 30px -22p
       </div>
       <div class="daily-news-source">
         <span>Revenue share + buy-&amp;-burn</span>
-        <p>Daily gross spreads equal net treasury inflow divided by the report-observed treasury share. OLP-side dollars are the remainder before market-making costs, rewards, and OLP PnL. The burn figure applies 100% of treasury inflow (intended, not yet executed).</p>
+        <p>Daily gross spreads are estimated from treasury inflow and the period allocation rate. Displayed OLP remainder deducts estimated hedging/market-making costs using the last 25 weeks of biweekly reports (total costs / total gross spreads). Rewards are not deducted. This is not actual daily OLP PnL. Buyback allocation is intended, not executed.</p>
         <small id="dailySourceReportAsOf">Latest official report window</small>
         <div class="daily-news-source-links">
           <a href="https://docs.variational.io/omni/the-omni-liquidity-provider-olp" target="_blank" rel="noopener noreferrer">Variational Docs ↗</a>
@@ -11232,12 +11233,12 @@ body.theme-light .lb-card{box-shadow:0 1px 0 rgba(20,40,80,.03),0 14px 30px -22p
 </style>
 
 <script src="market-regime-data.js?v=1790400001" defer></script>
-<script src="dashboard.js?v=20261030-simple-cards" defer></script>
+<script src="dashboard.js?v=20261030-hedging-estimate" defer></script>
 <script src="paths-panels.js?v=20261021-founders2" defer></script>
 <script src="playbook-panels.js?v=20261021-rank-to-whales" defer></script>
 <script src="monitors-panels.js?v=20261030-money-labels" defer></script>
 <script src="whales-panels.js?v=20261023-private-next-farm" defer></script>
-<script src="i18n-dict.js?v=20261030-revenue" defer></script>
+<script src="i18n-dict.js?v=20261030-hedging-estimate" defer></script>
 <script src="i18n.js?v=1789148292" defer></script>
 <script src="app-inline.js?v=20260809-theme-toggle" defer></script>
 <script src="crypto-news.js?v=20261030-news-h" defer></script>

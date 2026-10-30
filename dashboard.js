@@ -3143,6 +3143,13 @@ function renderPointsDeadline(){
     }
   }
 }
+function dailyHedgingEstimate(asOf,grossSpreads,olpBeforeCosts){
+  const from=addDays(asOf,-25*7);
+  const reports=BIWEEKLY_HISTORY.filter(r=>r.asOf>=from&&r.asOf<=asOf&&r.spreads2w>0&&Number.isFinite(r.mmCosts2w)&&r.mmCosts2w>=0);
+  const totalGross=reports.reduce((v,r)=>v+r.spreads2w,0),totalCost=reports.reduce((v,r)=>v+r.mmCosts2w,0);
+  const rate=totalGross>0?totalCost/totalGross:null,cost=rate==null?null:grossSpreads*rate;
+  return {from,reports,totalGross,totalCost,rate,cost,remaining:cost==null?null:olpBeforeCosts-cost};
+}
 function renderDailyBrief(){
   const root=$('#dailyBrief');if(!root||SERIES.length<3)return;
   const earnings=dailyEarn();
@@ -3200,7 +3207,7 @@ function renderDailyBrief(){
     :heroHot>=3?`, a ${heroHot}th straight day above the 30-day average`:'';
   $('#dailyBriefHeadline').textContent=`${dateShort} Daily VAR Fundamentals`;
   $('#dailyBriefAsOf').textContent=`ET treasury inflow through ${dateLabel} · ${liveLabel}`;
-  $('#dailyBriefSummary').textContent=`Daily money flow first: implied gross spread fees → OLP-side pool + net treasury inflow. Then check 24H volume, open interest, and treasury balance. ${heroNote?heroNote.slice(2)+'. ':''}Wallet inflow is measurable on-chain but is not audited accounting revenue.`;
+  $('#dailyBriefSummary').textContent=`Estimated gross spreads → treasury inflow + estimated hedging/MM costs + OLP remainder before rewards. Then check 24H volume, open interest, and treasury balance. ${heroNote?heroNote.slice(2)+'. ':''}Wallet inflow is measurable on-chain but is not audited accounting revenue.`;
 
   $('#dailyBriefSpreadFees').textContent=fmtUSD(dailySpreadFees);
   $('#dailyBriefSpreadShare').textContent=`Inflow ÷ ${(reportShare*100).toFixed(0)}% observed treasury share`;
@@ -3210,8 +3217,13 @@ function renderDailyBrief(){
   if(vsPrevious!=null&&Math.abs(vsPrevious)>.05)revenueDelta.classList.add(vsPrevious>0?'up':'down');
   revenueDelta.textContent=`${money0(previous.e)} → ${money0(latest.e)} · ${signedPct(vsPrevious)} DoD`;
   $('#dailyBriefBurn').textContent=`${fmtUSD(Math.max(0,latest.e*MKT.burnShare))} intended buyback allocation (not yet executed)`;
-  $('#dailyBriefOlpSide').textContent=fmtUSD(dailyOlpSide);
-  $('#dailyBriefOlpShare').textContent=`${((1-reportShare)*100).toFixed(0)}% non-treasury side of implied spreads`;
+  const hedge=dailyHedgingEstimate(latest.d,dailySpreadFees,dailyOlpSide);
+  $('#dailyBriefOlpSide').textContent=hedge.remaining==null?'—':fmtUSD(hedge.remaining);
+  $('#dailyBriefOlpShare').textContent=hedge.cost==null?'Cost estimate unavailable':`${fmtUSD(dailyOlpSide)} − ${fmtUSD(hedge.cost)} Hedging/MM est. (${(hedge.rate*100).toFixed(2)}%)`;
+  const hedgeBasis=$('#dailyBriefCostBasis');
+  if(hedgeBasis)hedgeBasis.textContent=hedge.reports.length?`${hedge.reports.length} reports · ${hedge.reports[0].asOf} → ${hedge.reports.at(-1).asOf}`:'No comparable reports in the last 25 weeks';
+  const hedgeSources=$('#dailyBriefCostSources');
+  if(hedgeSources)hedgeSources.innerHTML=hedge.reports.map(r=>`<div><a href="#biweekly">${r.asOf}</a> · ${fmtUSD(r.mmCosts2w)} / ${fmtUSD(r.spreads2w)} = ${(r.mmCosts2w/r.spreads2w*100).toFixed(2)}%</div>`).join('')+`<div><b>Σ ${fmtUSD(hedge.totalCost)} / Σ ${fmtUSD(hedge.totalGross)} = ${hedge.rate==null?'—':(hedge.rate*100).toFixed(2)+'%'}</b></div>`;
   $('#dailyBriefVolume').textContent=marketBig(volume);
   setDelta('#dailyBriefVolumeDelta',volumeDelta,volumePrev?`${marketBig(volumePrev)} → ${marketBig(volume)}`:'daily comparison');
   $('#dailyBriefOi').textContent=marketBig(oi);
@@ -3229,7 +3241,7 @@ function renderDailyBrief(){
   $('#dailySourceReportAsOf').textContent=`Latest report in dataset: ${BIWEEKLY.asOf}`;
 
   NEWS_CTX={
-    rev:latest.e,dailySpreadFees,previousSpreadFees,dailyOlpSide,previousOlpSide,reportShare,previousReportShare,
+    rev:latest.e,dailySpreadFees,previousSpreadFees,dailyOlpSide,previousOlpSide,olpAfterEstimatedCosts:hedge.remaining,estimatedHedgingCost:hedge.cost,hedgingRate:hedge.rate,reportShare,previousReportShare,
     perHour:latest.e/24,
     perMin:latest.e/1440,
     vsAverage,vsPrevious,volume,volumePrev,volumeDelta,oi,oiPrev,oiDelta,earned7,earned30,cur,treasuryPrev,treasuryHeldDelta,status,dateLabel,
@@ -3387,9 +3399,10 @@ function renderNewsPost(){
     title+' · ET close',
     `Gross spreads*: ${val(c.dailySpreadFees,money0)}`,
     `├ Treasury: ${val(c.latestRevenue,money0)}`,
-    `└ OLP pre-cost*: ${val(c.dailyOlpSide,money0)}`,
+    `├ Hedging/MM*: ${val(c.estimatedHedgingCost,money0)}`,
+    `└ OLP before rewards*: ${val(c.olpAfterEstimatedCosts,money0)}`,
     `24H vol ${val(c.volume,marketBig)} · OI ${val(c.oi,marketBig)}`,
-    '*Estimated; OLP profit unmeasured.',
+    '*Estimates; 25W cost rate; before rewards.',
     'Buyback: intended, not executed.'
   ].join('\n');
   root.dataset.tweet=body;

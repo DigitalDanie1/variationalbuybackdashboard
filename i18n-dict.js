@@ -5645,3 +5645,10 @@ Object.assign(window.__VDICT.ko, {
  'Separate source and ET day boundary. This is wallet inflow, not a DeFiLlama-reported or UTC-aligned revenue figure.':'별도 출처·ET 일자 기준의 지갑 순유입입니다. DeFiLlama가 보고한 Revenue나 UTC 기준으로 일치시킨 수치가 아닙니다.',
  'Revenue only — not Fees or Holders Revenue. Rows are individual DeFiLlama adapters; parent totals are not added again. Definitions differ by venue. Missing values remain “—”; reported zero remains $0.':'Fees·Holders Revenue가 아닌 Revenue입니다. 개별 DeFiLlama 어댑터 기준이며 상위 프로토콜 합계를 중복 추가하지 않습니다. 거래소별 정의는 출처에서 확인하세요. 미공개는 —, 보고된 0은 $0로 표시합니다.'
 });
+Object.assign(window.__VDICT.ko, {
+ 'OLP remainder after estimated hedging costs':'추정 헤징 비용 차감 후 OLP 잔여액',
+ 'Estimate: last 25 weeks of biweekly reports, gross-spread-weighted cost rate applied. Rewards not deducted.':'추정치 · 지난 25주 격주 리포트의 평균 비용률(총 스프레드 가중평균)을 대입했습니다. 보상 차감 전입니다.',
+ 'Cost estimate sources':'평균 비용 계산 근거',
+ 'Cost estimate unavailable':'비용 추정치 없음',
+ 'No comparable reports in the last 25 weeks':'지난 25주 비교 가능한 리포트 없음'
+});
