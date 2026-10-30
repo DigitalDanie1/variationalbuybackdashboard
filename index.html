@@ -7234,56 +7234,56 @@ body.theme-light .valuation-report #valScatter .val-var-label{
   stroke:#fff!important;
 }
 
-/* Daily News: money flow gets a full, readable row before market context. */
+/* Daily News "Numbers behind the post": one 4-column grid so both rows share the same
+   column lines. Seven cards fill eight slots because the OLP card (the longest copy) spans
+   two. Hairlines come from the 1px grid gap, so no per-card borders to keep in sync.
+   Numbers size to their own card (container units), so long figures never overflow. */
 .daily-news .daily-brief-grid{
-  grid-template-columns:repeat(12,minmax(0,1fr))!important;
+  grid-template-columns:repeat(4,minmax(0,1fr))!important;
+  gap:1px!important;background:var(--v2-line,var(--line))!important;
 }
 .daily-news .daily-brief-metric{
-  grid-column:span 3;
-  min-height:122px;
-  padding:16px 18px 15px!important;
-  border-top:1px solid var(--line);
+  grid-column:span 1;container-type:inline-size;
+  display:flex;flex-direction:column;align-items:flex-start;gap:0;
+  min-height:136px;padding:clamp(14px,1.5vw,22px)!important;
+  border:0!important;
 }
-.daily-news .daily-brief-metric:nth-child(-n+3){grid-column:span 4;border-top:0}
-.daily-news .daily-brief-metric:first-child,
-.daily-news .daily-brief-metric:nth-child(4){border-left:0!important}
+.daily-news .daily-brief-metric.olp-side{grid-column:span 2}
 .daily-news .daily-brief-metric.spread-fee,
 .daily-news .daily-brief-metric.revenue,
 .daily-news .daily-brief-metric.olp-side{
-  background:color-mix(in srgb,var(--panel2) 58%,transparent);
+  background:color-mix(in srgb,var(--panel2) 58%,var(--v2-bg,var(--bg)))!important;
 }
 .daily-news .daily-brief-metric.spread-fee>strong{color:var(--ink)}
 .daily-news .daily-brief-metric.olp-side>strong{color:var(--sub)}
 .daily-news .daily-brief-metric>span{
-  overflow:visible!important;
-  text-overflow:clip!important;
-  white-space:normal!important;
-  font-size:11px!important;
-  line-height:1.25!important;
+  overflow:visible!important;text-overflow:clip!important;white-space:normal!important;
+  font-size:11px!important;line-height:1.3!important;min-height:1.3em;
 }
 .daily-news .daily-brief-metric>strong{
-  margin-top:10px!important;
-  font-size:clamp(25px,2.15vw,34px)!important;
+  margin-top:10px!important;line-height:1!important;white-space:nowrap;
+  font-size:clamp(22px,12.5cqi,38px)!important;
 }
+.daily-news .daily-brief-metric.olp-side>strong{font-size:clamp(22px,6.2cqi,38px)!important}
+.daily-news .daily-brief-delta{margin-top:9px!important}
+.daily-news .daily-brief-metric>small{margin-top:7px!important}
 .daily-news .daily-brief-metric>small,
 .daily-news .daily-brief-delta{
-  overflow:visible!important;
-  text-overflow:clip!important;
-  white-space:normal!important;
-  font-size:11px!important;
-  line-height:1.35!important;
+  overflow:visible!important;text-overflow:clip!important;white-space:normal!important;
+  font-size:11px!important;line-height:1.4!important;max-width:100%;
 }
-@media(max-width:1050px){
+.daily-news .daily-brief-metric details{margin-top:auto;padding-top:10px}
+/* laptop: two columns, OLP takes its own full row → GS·TNI / OLP / Vol·OI / 7D·Held */
+@media(max-width:1180px){
   .daily-news .daily-brief-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
-  .daily-news .daily-brief-metric:nth-child(n){grid-column:span 1;border-top:1px solid var(--line)}
-  .daily-news .daily-brief-metric:nth-child(-n+2){border-top:0}
-  .daily-news .daily-brief-metric:nth-child(odd){border-left:0!important}
-  .daily-news .daily-brief-metric:nth-child(even){border-left:1px solid var(--line)!important}
+  .daily-news .daily-brief-metric{min-height:124px}
+  .daily-news .daily-brief-metric.olp-side>strong{font-size:clamp(22px,6.2cqi,38px)!important}
 }
+/* phone: one column, every card full width */
 @media(max-width:560px){
   .daily-news .daily-brief-grid{grid-template-columns:1fr!important}
-  .daily-news .daily-brief-metric:nth-child(n){border-left:0!important;border-top:1px solid var(--line)}
-  .daily-news .daily-brief-metric:first-child{border-top:0}
+  .daily-news .daily-brief-metric,.daily-news .daily-brief-metric.olp-side{grid-column:auto;min-height:0}
+  .daily-news .daily-brief-metric>strong,.daily-news .daily-brief-metric.olp-side>strong{font-size:clamp(26px,10cqi,34px)!important}
 }
 </style>
 <style id="ethena-inspired-overview">
