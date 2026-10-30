@@ -121,17 +121,22 @@
 
   /* ---------- Post-TGE stats ----------
      Henrik's five buy-back questions, run as numbers: each fundamental's average over the
-     30 days before the start against its average since. Points pull activity forward, so
+     selected 30/60/90 days before the start against its average since. Points pull activity forward, so
      the read that matters after listing is how much of the pre-TGE level survives without
      them — not where the token trades.
 
      TGE_DATE is unannounced. Until it is set, the post column is empty and the baseline is
-     the last 30 days; a reader can pick a past date to preview how the comparison reads.
+     the selected trailing window; a reader can pick a past date to preview how the comparison reads.
      Volume and OI are DeFiLlama daily closes (same feed as Historical Data); revenue is
      the treasury's daily on-chain inflow (20% of spreads); TVL and markets come from the
      biweekly reports and the live stats endpoint. Trader counts are not published. */
   var TGE_DATE = null;   /* 'YYYY-MM-DD' once $VAR lists */
   var PRE_DAYS = 30;
+  var DAYS_KEY = 'varPostTgeDaysV1';
+  try {
+    var savedDays = Number(localStorage.getItem(DAYS_KEY));
+    if ([30, 60, 90].indexOf(savedDays) >= 0) PRE_DAYS = savedDays;
+  } catch (_) {}
   var START_KEY = 'varPostTgeStartV1';
   var STATS_URL = 'https://omni-client-api.prod.ap-northeast-1.variational.io/metadata/stats';
   var previewStart = null;
@@ -239,7 +244,7 @@
       unit: 'treasury inflow / day', src: 'on-chain · 20% of spreads' });
 
     /* revenue again on the reports' own basis, so the on-chain read can be checked */
-    var nrPre = reportsPre(start, 'netRevenue2w').slice(-2), nrPost = live ? reportsPost(start, 'netRevenue2w') : [];
+    var nrPre = reportsPre(start, 'netRevenue2w').filter(function (r) { return r.asOf >= addDays(start, -PRE_DAYS); }), nrPost = live ? reportsPost(start, 'netRevenue2w') : [];
     var nrPreV = nrPre.length ? avg(nrPre.map(function (r) { return { v: r.netRevenue2w }; })) : null;
     var nrPostV = nrPost.length ? avg(nrPost.map(function (r) { return { v: r.netRevenue2w }; })) : null;
 
@@ -257,7 +262,7 @@
     var html = rows.map(function (r) {
       return '<div class="pt-row' + (r.o.key ? ' key' : '') + '">' +
         '<div class="pt-q"><span>' + r.o.n + '</span><b>' + esc(r.o.name) + (r.o.key ? ' <em>key</em>' : '') + '</b><p>' + esc(r.o.q) + '</p></div>' +
-        '<div class="pt-v"><small>Pre-TGE 30D</small><b>' + money(r.pre) + '</b><i>' + esc(r.o.unit) + '</i></div>' +
+        '<div class="pt-v"><small>Pre-TGE ' + PRE_DAYS + 'D</small><b>' + money(r.pre) + '</b><i>' + esc(r.o.unit) + ' · ' + r.preN + '/' + PRE_DAYS + ' days' + (r.preN < PRE_DAYS ? ' · partial' : '') + '</i></div>' +
         '<div class="pt-v"><small>Post-TGE avg</small><b>' + (live ? money(r.post) : '—') + '</b><i>' + (live ? r.postN + ' day' + (r.postN === 1 ? '' : 's') + ' counted' : 'starts at listing') + '</i></div>' +
         '<div class="pt-v"><small>vs pre-TGE</small><b class="pt-' + r.v.cls + '">' + ratioStr(r.ratio) + '</b><i class="pt-pill ' + r.v.cls + '">' + esc(r.v.t) + '</i></div>' +
         '<div class="pt-sp">' + r.spark + '<i>' + esc(r.o.src) + '</i></div></div>';
@@ -292,7 +297,9 @@
     return '<section class="pt" id="post-tge-stats">' +
       '<div class="cmp-heading"><span class="cmp-eyebrow">POST-TGE STATS · START</span>' +
       '<h2>Do the fundamentals hold once the points stop?</h2>' +
-      '<p>Points pull activity forward. After listing, the question is not who sells their points but how much of the pre-TGE business survives without them. Each row is one of the five questions from <a href="https://x.com/Henrik_on_HL/status/2100614542053019776" target="_blank" rel="noopener noreferrer">Henrik’s playbook</a>, measured as the average since the start against the 30 days before it.</p></div>' +
+      '<p>Points pull activity forward. After listing, the question is not who sells their points but how much of the pre-TGE business survives without them. Each row is one of the five questions from <a href="https://x.com/Henrik_on_HL/status/2100614542053019776" target="_blank" rel="noopener noreferrer">Henrik’s playbook</a>, measured as the average since the start against the selected ' + PRE_DAYS + ' days before it.</p></div>' +
+      '<div class="pt-period" role="group" aria-label="Pre-TGE baseline period"><span>Pre-TGE baseline</span>' +
+      [30, 60, 90].map(function (d) { return '<button type="button" data-pt-days="' + d + '" aria-pressed="' + (PRE_DAYS === d) + '">' + d + 'D</button>'; }).join('') + '</div>' +
       startCtl +
       '<div class="pt-sum">' +
         '<div><span>Start</span><b>' + esc(start) + '</b><em>' + (listed ? 'TGE' : preview ? 'preview · not the TGE' : 'today · not listed yet') + '</em></div>' +
@@ -302,9 +309,9 @@
       '</div>' +
       '<div class="pt-rows">' + html + '</div>' +
       '<div class="tp-note"><b>Reading it.</b> vs pre-TGE = post-TGE average ÷ pre-TGE average, as a change. Holding ≥90%, softening 60–90%, falling below 60%; OI counts as growing above 100%. Net revenue on the biweekly reports’ basis: ' +
-        (nrPreV ? esc(usd(nrPreV)) + ' per two weeks before the start' : 'no pre-start report') +
+        (nrPreV ? esc(usd(nrPreV)) + ' per two weeks in the selected baseline window' : 'no pre-start report') +
         (live ? (nrPostV ? ', ' + esc(usd(nrPostV)) + ' after (' + ratioStr(nrPostV / nrPreV) + ')' : ', no wholly post-start report yet') : '') +
-        '. The first days after a listing are the noisiest, so a week or two of post data says more than day one.</div>' +
+        '. Daily averages use available complete UTC days; partial coverage is shown per metric. Retention and product use the latest pre-start report, rather than a daily average. The first days after a listing are the noisiest, so a week or two of post data says more than day one.</div>' +
       '</section>';
   }
 
@@ -398,6 +405,7 @@
 
   var PT_CSS =
     '.pt{margin:0 0 34px}.pt .cmp-heading a{color:var(--v2-accent,#4c9af8)}' +
+    '.pt-period{display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin:0 0 16px}.pt-period span{margin-right:8px;color:var(--muted);font:700 10px var(--mono);text-transform:uppercase;letter-spacing:.5px}.pt-period button{min-width:52px;padding:9px 12px;border:1px solid var(--line);border-radius:5px;background:var(--panel);color:var(--muted);font:700 12px var(--mono);cursor:pointer}.pt-period button[aria-pressed=true]{background:var(--v2-accent,#4c9af8);border-color:var(--v2-accent,#4c9af8);color:#08111e}.pt-period button:focus-visible{outline:2px solid var(--text);outline-offset:3px}' +
     '.pt-ctl{display:flex;align-items:center;flex-wrap:wrap;gap:10px 14px;margin:0 0 14px;color:var(--muted);font:700 10px var(--mono);letter-spacing:.5px;text-transform:uppercase}' +
     '.pt-ctl label{display:inline-flex;align-items:center;gap:8px}.pt-ctl input{padding:6px 8px;border:1px solid var(--line);border-radius:4px;background:var(--panel);color:var(--text);font:700 12px var(--mono)}' +
     '.pt-ctl button{padding:6px 10px;border:1px dashed var(--line);border-radius:4px;background:none;color:var(--muted);font:700 10px var(--mono);cursor:pointer}.pt-ctl span{text-transform:none;letter-spacing:0;font-weight:500;font-size:11px}' +
@@ -466,7 +474,19 @@
       render();
     });
     document.addEventListener('click', function (e) {
-      if (!e.target || !e.target.closest || !e.target.closest('[data-pt-clear]')) return;
+      if (!e.target || !e.target.closest) return;
+      var period = e.target.closest('[data-pt-days]');
+      if (period) {
+        var days = Number(period.getAttribute('data-pt-days'));
+        if ([30, 60, 90].indexOf(days) < 0) return;
+        PRE_DAYS = days;
+        try { localStorage.setItem(DAYS_KEY, String(days)); } catch (_) {}
+        render();
+        var selected = document.querySelector('[data-pt-days="' + days + '"]');
+        if (selected) selected.focus({ preventScroll: true });
+        return;
+      }
+      if (!e.target.closest('[data-pt-clear]')) return;
       previewStart = null;
       try { localStorage.removeItem(START_KEY); } catch (_) {}
       render();
