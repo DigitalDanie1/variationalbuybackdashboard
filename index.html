@@ -8594,6 +8594,7 @@ body.theme-light .lb-card{box-shadow:0 1px 0 rgba(20,40,80,.03),0 14px 30px -22p
 <style>.daily-cost-evidence{margin-top:8px;font:10px/1.6 var(--mono);color:var(--muted)}.daily-cost-evidence summary{cursor:pointer}.daily-cost-evidence a{color:var(--v2-accent)}.daily-cost-evidence>div{margin-top:8px}.daily-brief-metric.olp-side>small{line-height:1.6!important}</style>
 <link rel="stylesheet" href="efficiency-costs.css?v=20261030">
 <link rel="stylesheet" href="money-map-clean.css?v=20261030">
+<link rel="stylesheet" href="landing-e.css?v=20261030">
 </head>
 <body>
 <div class="tipbar" id="tipbar" hidden>
@@ -8723,67 +8724,41 @@ body.theme-light .lb-card{box-shadow:0 1px 0 rgba(20,40,80,.03),0 14px 30px -22p
 
 
 
-<section class="srv2-landing lb-landing tsec" data-tg="overview" aria-label="Variational Money control index">
-  <header class="srv2-land-head">
-    <div class="srv2-land-brand"><img src="variational-symbol-transparent.png?v=4" alt="Variational"><div><span>Variational Money</span><small>TAKE US TO VARHALLA</small></div></div>
-    <div class="srv2-head-right">
-      <span class="srv2-land-live">SYSTEM ONLINE</span>
-      <button class="theme-toggle-liquid" type="button" data-theme-toggle aria-pressed="false" aria-label="Switch between dark and light mode">
-        <span class="tgl-track" aria-hidden="true"><span class="tgl-fill"></span><span class="tgl-word tgl-night">Dark</span><span class="tgl-word tgl-light">Light</span></span>
-        <span class="tgl-knob" aria-hidden="true"></span>
-      </button>
+<section class="srv2-landing lb-landing le-landing tsec" data-tg="overview" aria-label="Variational Money: the best Variational dashboard">
+  <i class="le-sq tl" aria-hidden="true"></i><i class="le-sq tr" aria-hidden="true"></i><i class="le-sq bl" aria-hidden="true"></i><i class="le-sq br" aria-hidden="true"></i>
+  <div class="le-wrap">
+    <a class="le-brand le-up" style="--d:0ms" href="#landing" data-back-home><canvas width="13" height="10" aria-hidden="true"></canvas>var-metrics</a>
+    <dl class="le-stats le-up" style="--d:500ms">
+      <div><small>Treasury · on-chain</small><strong class="hot" id="leTreasury">—</strong></div>
+      <div><small>Added last 30D</small><strong id="leAdded30">—</strong></div>
+      <div><small>Days tracked</small><strong id="leDays">—</strong></div>
+    </dl>
+    <p class="le-eyebrow le-up" style="--d:80ms">Live · Treasury read from the Arbitrum wallet</p>
+    <h1 class="le-title" aria-label="The best Variational Dashboard."><span class="w" aria-hidden="true"><span style="--i:0">The</span></span> <span class="w" aria-hidden="true"><span style="--i:1">best</span></span> <span class="w" aria-hidden="true"><span class="em" style="--i:2">Variational</span></span> <span class="w" aria-hidden="true"><span style="--i:3">Dashboard.</span></span></h1>
+    <div class="le-meta le-up" style="--d:650ms">
+      <button type="button" class="le-btn le-btn-hot" data-open-tab="overview">Enter dashboard <span aria-hidden="true">→</span></button>
+      <a class="le-btn" href="https://omni.variational.io/?ref=OMNIKOREAN" target="_blank" rel="noopener" aria-label="Trade on Variational (opens Omni with referral code OMNIKOREAN)">Trade on Variational ↗</a>
+      <p>Below: the real Variational treasury, read from the Arbitrum wallet. One pixel column per day since launch — brighter tops are bigger days. Hover to read it, click to replay.</p>
     </div>
-  </header>
-  <div class="lb-stage">
-    <div class="lb-bento">
-      <figure class="lb-card lb-art">
-        <img src="assets/image%20(3).png" alt="" width="2000" height="2000" fetchpriority="high">
-        <figcaption><b>Variational Money</b><span>TAKE US TO VARHALLA</span></figcaption>
-      </figure>
-      <section class="lb-card lb-treasury" aria-label="Protocol treasury">
-        <span class="lb-label">Protocol treasury</span>
-        <span class="lb-label lb-label-r">CUMULATIVE USDC ON-CHAIN</span>
-        <!-- Same on-chain SERIES as the Overview hero and the Historical tab, drawn by
-             drawTreasuryCurve(). Paths start empty so nothing decorative ships as evidence. -->
-        <svg class="lb-curve" id="v2LandCurve" viewBox="0 0 1000 260" preserveAspectRatio="none" role="img" aria-label="Cumulative treasury growth">
-          <defs><linearGradient id="srv2LandArea" x1="0" y1="0" x2="0" y2="1"><stop class="srv2-grad-in" offset="0" stop-opacity=".30"/><stop class="srv2-grad-out" offset="1" stop-opacity="0"/></linearGradient></defs>
-          <path id="v2LandCurveArea" d="" fill="url(#srv2LandArea)"/>
-          <path id="v2LandCurveLine" d="" fill="none" stroke-width="2" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
-        </svg>
-        <div class="lb-treasury-foot">
-          <strong class="lb-num lb-num-xl" id="v2LandBalance">—</strong>
-          <p class="lb-delta"><b id="v2LandDay">—</b> latest day <i aria-hidden="true">·</i> <b id="v2Land30">—</b> 30D</p>
-        </div>
-      </section>
-      <div class="lb-card lb-stat"><span class="lb-label">24H volume</span><strong class="lb-num" id="v2LandVolume">—</strong></div>
-      <div class="lb-card lb-stat"><span class="lb-label">Open interest</span><strong class="lb-num" id="v2LandOi">—</strong></div>
-      <button type="button" class="lb-card lb-action lb-enter" data-open-tab="overview"><span>Enter dashboard</span><i aria-hidden="true">→</i></button>
-      <a class="lb-card lb-action lb-trade" href="https://omni.variational.io/?ref=OMNIKOREAN" target="_blank" rel="noopener" aria-label="Trade on Variational (opens Omni with referral code OMNIKOREAN)"><span>Trade on Variational</span><i aria-hidden="true">↗</i></a>
-    </div>
+    <div class="le-tree"><canvas role="img" aria-label="Variational treasury balance rising since launch, one pixel column per day"></canvas><div class="le-tip"></div></div>
     <nav class="lb-jump" aria-label="Open a workspace">
-      <span class="lb-jump-label">Jump to</span>
-      <!-- panel files clone the Roadmap button into this row to mount their own tabs, so it
-           must stay the direct parent of the data-open-tab buttons; CSS order sets the sequence. -->
-      <div class="lb-chips">
-        <button type="button" data-open-tab="overview"><b>Overview</b></button>
-        <button type="button" data-open-tab="daily-news"><b>Daily Earnings</b></button>
-        <button type="button" data-open-tab="efficiency"><b>Fundamentals</b></button>
-        <button type="button" data-open-tab="comparison"><b>Comparison</b></button>
-        <button type="button" data-open-tab="pretge"><b>Pre-TGE</b></button>
-        <button type="button" data-open-tab="tokenomics"><b>Tokenomics</b></button>
-        <button type="button" data-open-tab="historical"><b>Historical Data</b></button>
-        <button type="button" data-open-tab="biweekly"><b>Official Reports</b></button>
-        <button type="button" data-open-tab="implied"><b>Money Mechanic</b></button>
-        <button type="button" data-open-tab="roadmap"><b>Roadmap</b></button>
-        <button type="button" data-open-tab="points"><b>Points Calculator</b></button>
-      </div>
-    </nav>
-    <footer class="lb-foot">
-      <a href="https://x.com/0xdefidaniel" target="_blank" rel="noopener"><span>BUILT BY</span> @0xdefidaniel ↗</a>
-      <span><i>PRIMARY SOURCE</i> Arbitrum treasury wallet</span>
-      <span><i>OPERATING SOURCE</i> Official biweekly reports</span>
-      <span><i>MARKET SOURCE</i> Official API and DeFiLlama</span>
-    </footer>
+        <span class="lb-jump-label">Jump to</span>
+        <!-- panel files clone the Roadmap button into this row to mount their own tabs, so it
+             must stay the direct parent of the data-open-tab buttons; CSS order sets the sequence. -->
+        <div class="lb-chips">
+          <button type="button" data-open-tab="overview"><b>Overview</b></button>
+          <button type="button" data-open-tab="daily-news"><b>Daily Earnings</b></button>
+          <button type="button" data-open-tab="efficiency"><b>Fundamentals</b></button>
+          <button type="button" data-open-tab="comparison"><b>Comparison</b></button>
+          <button type="button" data-open-tab="pretge"><b>Pre-TGE</b></button>
+          <button type="button" data-open-tab="tokenomics"><b>Tokenomics</b></button>
+          <button type="button" data-open-tab="historical"><b>Historical Data</b></button>
+          <button type="button" data-open-tab="biweekly"><b>Official Reports</b></button>
+          <button type="button" data-open-tab="implied"><b>Money Mechanic</b></button>
+          <button type="button" data-open-tab="roadmap"><b>Roadmap</b></button>
+          <button type="button" data-open-tab="points"><b>Points Calculator</b></button>
+        </div>
+      </nav>
   </div>
 </section>
 
@@ -11248,6 +11223,7 @@ body.theme-light .lb-card{box-shadow:0 1px 0 rgba(20,40,80,.03),0 14px 30px -22p
 <script src="i18n-dict.js?v=20261030-three-metrics" defer></script>
 <script src="i18n.js?v=1789148292" defer></script>
 <script src="app-inline.js?v=20260809-theme-toggle" defer></script>
+<script src="landing-e.js?v=20261030" defer></script>
 <script src="crypto-news.js?v=20261030-news-h" defer></script>
 <script src="comparison-lab-panels.js?v=1792036513" defer></script>
 <script src="pretge-panels.js?v=1787844401" defer></script>
