@@ -8593,6 +8593,7 @@ body.theme-light .lb-card{box-shadow:0 1px 0 rgba(20,40,80,.03),0 14px 30px -22p
 <link rel="stylesheet" href="revenue-comparison.css?v=20261030">
 <style>.daily-cost-evidence{margin-top:8px;font:10px/1.6 var(--mono);color:var(--muted)}.daily-cost-evidence summary{cursor:pointer}.daily-cost-evidence a{color:var(--v2-accent)}.daily-cost-evidence>div{margin-top:8px}.daily-brief-metric.olp-side>small{line-height:1.6!important}</style>
 <link rel="stylesheet" href="efficiency-costs.css?v=20261030">
+<link rel="stylesheet" href="money-map-clean.css?v=20261030">
 </head>
 <body>
 <div class="tipbar" id="tipbar" hidden>
@@ -9056,13 +9057,13 @@ body.theme-light .lb-card{box-shadow:0 1px 0 rgba(20,40,80,.03),0 14px 30px -22p
 <div class="protocol-map tsec tg-hide" data-tg="efficiency">
   <div class="pm-panel">
     <div class="pm-title">Protocol money map</div>
-    <svg class="pm-sankey" id="pmSankey" viewBox="0 0 720 230" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Modeled money flow: implied gross spreads, operating remainder, current treasury balance, and theoretical buyback allocation"></svg>
-    <div class="pm-cap">
+    <div class="pm-money-flow" id="pmSankey" aria-label="30-day treasury, estimated cost and OLP remainder"></div>
+    <details class="pm-cap"><summary>Definitions &amp; sources</summary>
       <span><b>Core OLP Vault</b> quotes liquidity and absorbs trading flow. The non-treasury portion funds market-making costs, rewards, and residual OLP PnL; the vault balance itself is not company revenue. <a href="https://arbiscan.io/address/0x74bbbb0e7f0bad6938509dd4b556a39a4db1f2cd" target="_blank" rel="noopener">0x74bbbb…1f2cd ↗</a></span>
-      <span><b>Implied gross spreads</b> — <b id="pmSpreadTotal">—</b>, estimated from daily treasury inflows using the latest report-observed share available on each date. Before comparable reports, the model uses the 10% Docs rate.</span>
+      <span><b>Implied gross spreads</b> — <b id="pmSpreadTotal">—</b>, estimated from daily treasury inflows using the latest report-observed share available on each date. Earlier periods without comparable allocation reports use a historical 10% assumption.</span>
       <span><b>Protocol Treasury</b> — current on-chain USDC balance. Balance changes are a transparent inflow proxy, but internal transfers or withdrawals may not be operating revenue. <a href="https://arbiscan.io/address/0x5e91b40467fb8902c46a7b6cb90482363188d645" target="_blank" rel="noopener">0x5e91…d645 ↗</a></span>
       <span><b>Settlement Pool Factory</b> creates settlement pools. It is infrastructure, not a direct revenue wallet. <a href="https://arbiscan.io/address/0x0F820B9afC270d658a9fD7D16B1Bdc45b70f074C" target="_blank" rel="noopener">0x0F820…074C ↗</a></span>
-    </div>
+    </details>
     <div class="pm-metrics">
       <div class="pm-metric">
         <strong id="pmOlpBalance">syncing</strong><span>Core OLP Vault USDC</span>
@@ -9094,7 +9095,7 @@ body.theme-light .lb-card{box-shadow:0 1px 0 rgba(20,40,80,.03),0 14px 30px -22p
         <small class="pm-formula" id="pmDailyFormula">Formula: <b>(current balance - balance 30D ago) / 30</b></small>
       </div>
       <div class="pm-metric">
-        <strong id="pmFeesTotal">—</strong><span>implied gross spreads · modeled</span>
+        <strong id="pmFeesTotal">—</strong><span>Cumulative gross spreads · estimated</span>
         <small class="pm-formula" id="pmFeesFormula">Formula: <b>daily net inflow / period-specific observed share</b></small>
       </div>
     </div>
@@ -11239,7 +11240,7 @@ body.theme-light .lb-card{box-shadow:0 1px 0 rgba(20,40,80,.03),0 14px 30px -22p
 </style>
 
 <script src="market-regime-data.js?v=1790400001" defer></script>
-<script src="dashboard.js?v=20261030-efficiency-costs" defer></script>
+<script src="dashboard.js?v=20261030-money-map" defer></script>
 <script src="paths-panels.js?v=20261021-founders2" defer></script>
 <script src="playbook-panels.js?v=20261021-rank-to-whales" defer></script>
 <script src="monitors-panels.js?v=20261030-money-labels" defer></script>

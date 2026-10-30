@@ -969,7 +969,7 @@ function renderImpliedSpreadTotal(treasuryTotal){
   $('#sfTreasuryTotal') && ($('#sfTreasuryTotal').textContent=compact(treasuryTotal));
   $('#sfBurnTotal') && ($('#sfBurnTotal').textContent=compact(burnFirepower));
   $('#pmTreasuryTotal') && ($('#pmTreasuryTotal').textContent=fmtUSD(treasuryTotal));
-  $('#pmDailyRevenue') && ($('#pmDailyRevenue').textContent=fmtUSD(dailyRate(30))+'/day');
+  $('#pmDailyRevenue') && ($('#pmDailyRevenue').textContent=fmtUSD(avg30)+'/day');
   $('#pmFeesTotal') && ($('#pmFeesTotal').textContent=compact(totalFees));
   $('#pmSpreadTotal') && ($('#pmSpreadTotal').textContent=compact(totalFees));
   $('#pmTreasuryFormula') && ($('#pmTreasuryFormula').innerHTML=`Formula: <b>USDC balanceOf(${walletLink(ADDR.treasury,'0x5e91...d645')}) = ${fmtUSD(treasuryTotal)}</b>`);
@@ -1050,51 +1050,19 @@ function renderPmDailyMonitor(){
   $('#pmDailyVsAvg').textContent=signedPct(vsAverage);
   $('#pmDailyAvg').textContent=`Prior ${baselineRows.length}D average: ${signedMoney(average)}`;
 }
-/* income-flow sankey: gross spreads -> non-treasury pool / treasury -> burn / dry powder */
+/* One aligned 30D window; current wallet balances remain separate in the cards below. */
 function renderMoneyMap(T){
-  const svg=$('#pmSankey'); if(!svg||!T)return;
-  const F=impliedSpreadsAllTime(), REMAINDER=Math.max(0,F-T), BURN=T*MKT.burnShare, DRY=T-BURN;
-  const currentPct=(MKT.spreadShare*100).toFixed(0), treasuryPct=(T/F*100).toFixed(1), remainderPct=(100-T/F*100).toFixed(1);
-  const c=n=>n>=1e9?'$'+(n/1e9).toFixed(2)+'B':'$'+(n/1e6).toFixed(2)+'M';
-  const W=720,H=230,bw=11,x1=20,x2=350,x3=690,top=46,bot=184,gap=9;
-  const usable=bot-top-gap, hv=v=>Math.max(4,v/F*usable);
-  const hOLP=hv(REMAINDER), hT=hv(T);
-  const yA0=top, yA1=top+usable+gap;                       // source bar (full)
-  const yO0=top, yO1=top+hOLP;                             // OLP bar
-  const yT0=yO1+gap, yT1=yT0+hT;                           // treasury bar
-  const hB=hv(BURN)*0.999, hD=hv(DRY);                     // stage C (rises right, keeps labels clear)
-  const cGap=11;
-  const yB0=Math.max(top+30,yT0-46), yB1=yB0+hB;
-  const yD0=yB1+cGap, yD1=yD0+hD;
-  const rib=(xa,ya0,ya1,xb,yb0,yb1,fill,tip)=>{const mx=((xa+xb)/2).toFixed(1);
-    return `<path d="M ${xa} ${ya0} C ${mx} ${ya0} ${mx} ${yb0} ${xb} ${yb0} L ${xb} ${yb1} C ${mx} ${yb1} ${mx} ${ya1} ${xa} ${ya1} Z" fill="${fill}"><title>${tip}</title></path>`;};
-  // treasury bar's internal split point for outgoing ribbons
-  const tSplit=yT0+(hT*(BURN/T));
-  svg.innerHTML=`
-   <defs>
-     <linearGradient id="pmRibOlp" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#3f74c9" stop-opacity=".34"/><stop offset="1" stop-color="#25406b" stop-opacity=".3"/></linearGradient>
-     <linearGradient id="pmRibT" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#22e6a0" stop-opacity=".55"/><stop offset="1" stop-color="#38e1ff" stop-opacity=".5"/></linearGradient>
-     <linearGradient id="pmRibB" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#8b6cff" stop-opacity=".6"/><stop offset="1" stop-color="#8b6cff" stop-opacity=".45"/></linearGradient>
-     <linearGradient id="pmRibD" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#22e6a0" stop-opacity=".45"/><stop offset="1" stop-color="#22e6a0" stop-opacity=".35"/></linearGradient>
-   </defs>
-   ${rib(x1+bw,yA0,yA0+hOLP,x2,yO0,yO1,'url(#pmRibOlp)',`Non-treasury pool · ${fmtUSD(REMAINDER)} (${remainderPct}%) before costs, rewards, and OLP PnL`)}
-   ${rib(x1+bw,yA0+hOLP+gap,yA1,x2,yT0,yT1,'url(#pmRibT)',`Current treasury balance · ${fmtUSD(T)} (${treasuryPct}% of modeled historical spreads)`)}
-   ${rib(x2+bw,yT0,tSplit,x3,yB0,yB1,'url(#pmRibB)',`$VAR buy & burn firepower · ${fmtUSD(BURN)} (100% of treasury, intended — not yet executed)`)}
-   ${rib(x2+bw,tSplit,yT1,x3,yD0,yD1,'url(#pmRibD)',`Dry powder retained · ${fmtUSD(DRY)}`)}
-   <rect x="${x1}" y="${yA0}" width="${bw}" height="${yA1-yA0}" rx="3" fill="#3f74c9"/>
-   <rect x="${x2}" y="${yO0}" width="${bw}" height="${hOLP}" rx="3" fill="#2f5590"/>
-   <rect x="${x2}" y="${yT0}" width="${bw}" height="${hT}" rx="3" fill="#22e6a0"/>
-   <rect x="${x3}" y="${yB0}" width="${bw}" height="${hB}" rx="3" fill="#8b6cff"/>
-   <rect x="${x3}" y="${yD0}" width="${bw}" height="${hD}" rx="3" fill="#1db584"/>
-   <text x="${x1}" y="20" fill="#7d8aa5" font-size="9.5" font-weight="800" letter-spacing="1.5">TRADER SPREADS</text>
-   <text x="${x1}" y="36" fill="#eaf1ff" font-size="16" font-weight="900">${c(F)} · 100%</text>
-   <text x="${x2}" y="20" fill="#7d8aa5" font-size="9.5" font-weight="800" letter-spacing="1.5">SPLIT</text>
-   <text x="${x2}" y="36" fill="#eaf1ff" font-size="15" font-weight="900">Operating pool ${c(REMAINDER)} · ${remainderPct}%</text>
-   <text x="${x2}" y="${Math.min(H-10,yT1+22)}" fill="#22e6a0" font-size="15" font-weight="900">Treasury balance ${c(T)} · current observed share ${currentPct}%</text>
-   <text x="${x3}" y="20" fill="#7d8aa5" font-size="9.5" font-weight="800" letter-spacing="1.5" text-anchor="end">USE OF TREASURY</text>
-   <text x="${x3}" y="${Math.max(56,yB0-8)}" fill="#c7bcff" font-size="13" font-weight="900" text-anchor="end">Burn ${c(BURN)}</text>
-   <text x="${x3}" y="${Math.min(H-10,yD1+16)}" fill="#7fe8c4" font-size="13" font-weight="900" text-anchor="end">Dry powder ${c(DRY)}</text>`;
+  const host=$('#pmSankey');if(!host||!T)return;
+  const e=computeEff(),F=MKT.vol.d30/e.volPerFee,treasury=e.rev30;
+  const estimate=dailyHedgingEstimate(currentTreasuryDate(),F,F-treasury);
+  const cash=v=>v==null?'—':fmtCompact(v),pct=v=>F>0?(v/F*100).toFixed(1)+'%':'—';
+  const ko=(document.documentElement.lang||'').startsWith('ko'),t=(en,kr)=>ko?kr:en;
+  host.innerHTML=`<div class="pm-flow-head"><b>${t('30D gross spreads · estimated','30일 총 스프레드 · 추정치')}</b><strong>${cash(F)}</strong><span>${t('One reporting window · amounts below reconcile to this total','동일한 30일 기준 · 아래 세 금액의 합계')}</span></div><div class="pm-flow-arrows" aria-hidden="true">↙ &nbsp; ↓ &nbsp; ↘</div><div class="pm-flow-parts">
+  <article class="pm-flow-treasury"><span>${t('PROTOCOL SHARE','프로토콜 몫')}</span><h3>${t('Treasury net inflow','트레저리 순유입')}</h3><strong>${cash(treasury)}</strong><em>${pct(treasury)}</em><small>${t('Excludes OLP profit','OLP 손익 제외')}</small><div class="pm-flow-plan">↓ ${t('100% intended for VAR buy & burn','이 몫의 100%를 VAR 매입·소각에 사용할 계획')}<b>${t('Planned allocation · not executed burn','예정 재원 · 실제 소각액 아님')}</b></div></article>
+  <article class="pm-flow-cost"><span>${t('ESTIMATED COST','추정 비용')}</span><h3>${t('Hedging / market making','헤징·마켓메이킹')}</h3><strong>${cash(estimate.cost)}</strong><em>${pct(estimate.cost)}</em><small>${t('25W report weighted-average rate × gross spreads','25주 리포트 가중평균 비용률 × 총 스프레드')}</small></article>
+  <article class="pm-flow-olp"><span>${t('ESTIMATED REMAINDER','추정 잔여액')}</span><h3>${t('OLP · before rewards','OLP · 보상 차감 전')}</h3><strong>${cash(estimate.remaining)}</strong><em>${pct(estimate.remaining)}</em><small>${t('Not actual OLP net profit','실제 OLP 순이익이 아님')}</small></article></div><div class="pm-flow-basis">${t('Estimate · last 25 weeks of biweekly reports','추정치 · 지난 25주 격주 리포트')} · ${estimate.reports.length} ${t('reports','개 리포트')} · ${estimate.rate==null?'—':(estimate.rate*100).toFixed(2)+'%'} · ${t('Rewards not deducted. Wallet balances below are stocks, not additional revenue.','보상 차감 전. 아래 지갑 잔액은 보유액이며 추가 매출이 아닙니다.')}</div>`;
 }
+
 function feeRevenueHistory(){
   const out=[];
   for(const p of SERIES){
