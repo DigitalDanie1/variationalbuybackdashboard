@@ -5655,3 +5655,23 @@ Object.assign(window.__VDICT.ko, {
 Object.assign(window.__VDICT.ko, {
  'Estimated hedging / market-making cost':'추정 헤징·마켓메이킹 비용'
 });
+Object.assign(window.__VDICT.ko, {
+ 'Protocol Revenue':'Protocol Revenue · 프로토콜 몫',
+ 'Holders Revenue':'Holders Revenue · 홀더 귀속분',
+ 'User payments':'사용자가 지불한 총액',
+ 'Protocol share · excludes LPs':'프로토콜 몫 · LP 몫 제외',
+ 'Tokenholder accrual':'배분·매입·소각을 통한 홀더 귀속분',
+ 'Nested amounts, not three amounts to add. Holder accrual includes distributions and token buybacks / burns.':'Fees 안에 Protocol Revenue가, 그 안에 Holders Revenue가 포함됩니다. 세 금액을 더하지 않습니다. 홀더 귀속분에는 배분·토큰 매입·소각이 포함됩니다.',
+ 'DeFiLlama definitions ↗':'DeFiLlama 공식 정의 ↗',
+ 'Period':'기간',
+ 'Separate wallet source, outside DeFiLlama ranking. Intended buyback allocation is not measured Holders Revenue.':'별도 지갑 출처이며 DeFiLlama 순위에 포함하지 않습니다. 바이백 예정 재원은 실제로 집계된 Holders Revenue가 아닙니다.',
+ 'Same selected reporting window across all three columns. “—” means not reported; $0 means reported zero. Individual adapters only; parent totals are not added again. Each venue’s definition is available in its source detail.':'세 열 모두 선택한 동일 기간입니다. —는 미공개, $0는 보고된 0입니다. 개별 어댑터 기준이며 상위 합계를 중복 추가하지 않습니다. 거래소별 정의는 출처에서 확인할 수 있습니다.',
+ 'Fees source ↗':'Fees 출처 ↗',
+ 'Revenue source ↗':'Revenue 출처 ↗',
+ 'Holders Revenue source ↗':'Holders Revenue 출처 ↗'
+});
+Object.assign(window.__VDICT.ko, {
+ 'Protocol Revenue':'Protocol Revenue',
+ 'Holders Revenue':'Holders Revenue',
+ 'Tokenholder accrual':'토큰 홀더 귀속분'
+});
