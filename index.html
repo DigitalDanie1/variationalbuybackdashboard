@@ -7948,7 +7948,7 @@ body.theme-light .valuation-report #valScatter .val-var-label{
   .earnings-live-sync{margin:0!important;white-space:nowrap}
   .earnings-inspector .cal-sel{
     display:grid!important;
-    grid-template-columns:minmax(150px,auto) minmax(260px,1fr) auto;
+    grid-template-columns:auto minmax(260px,1fr) auto;
     align-items:center;gap:24px;width:100%;
   }
   .earnings-inspector .cal-sel .amt{margin:0!important;text-align:left;white-space:nowrap}
@@ -7956,12 +7956,28 @@ body.theme-light .valuation-report #valScatter .val-var-label{
   .earnings-inspector-actions{margin:0!important;justify-content:flex-end!important;white-space:nowrap}
   @media(max-width:1080px){
     .earnings-inspector-head{grid-template-columns:1fr!important;gap:14px!important}
-    .earnings-inspector .cal-sel{grid-template-columns:minmax(150px,auto) minmax(220px,1fr) auto}
+    .earnings-inspector .cal-sel{grid-template-columns:auto minmax(220px,1fr) auto}
   }
   @media(max-width:680px){
     .earnings-inspector-dateblock{align-items:flex-start;flex-direction:column;gap:8px}
     .earnings-inspector .cal-sel{grid-template-columns:1fr auto;gap:10px 16px}
     .earnings-inspector .cal-sel .lab{grid-column:1/-1;grid-row:2}
+    .earnings-inspector .cal-sel-figs{grid-column:1/-1;grid-row:1}
+    .earnings-inspector .cal-sel .earnings-inspector-actions{grid-column:1/-1;grid-row:3;justify-content:flex-start!important}
+  }
+
+  /* selected-day inspector: two labelled figures (treasury inflow | implied gross spreads) */
+  .earnings-inspector .cal-sel-figs{display:flex;align-items:stretch;gap:28px;min-width:0}
+  .earnings-inspector .cal-sel-fig{display:flex;flex-direction:column;gap:6px;min-width:0}
+  .earnings-inspector .cal-sel-fig + .cal-sel-fig{padding-left:28px;border-left:1px solid var(--v2-line,var(--line))}
+  .earnings-inspector .cal-sel-k{font:700 9px/1 var(--mono);letter-spacing:1.2px;text-transform:uppercase;color:var(--sub)}
+  .earnings-inspector .cal-sel-fig.spread .amt{color:var(--cyan)!important;-webkit-text-fill-color:var(--cyan)!important;background:none!important}
+  body.theme-light .earnings-inspector .cal-sel-k{color:#31557c!important}
+  body.theme-light .earnings-inspector .cal-sel-fig.spread .amt{color:#31557c!important;-webkit-text-fill-color:#31557c!important}
+  @media(max-width:680px){
+    .earnings-inspector .cal-sel-figs{gap:16px}
+    .earnings-inspector .cal-sel-fig + .cal-sel-fig{padding-left:16px}
+    .earnings-inspector .cal-sel .amt{font-size:clamp(20px,6.4vw,28px)!important;letter-spacing:-1px!important}
   }
 
   .srv2-land-routes{
@@ -9198,7 +9214,10 @@ body.theme-light .bw-viz text.bw-pct.in{fill:#fff!important}
             <i class="earnings-status pending" id="calInspectorStatus">Pending</i>
           </div>
           <div class="cal-sel" id="calSel">
-            <div class="amt pos" id="calAmt">—</div>
+            <div class="cal-sel-figs">
+              <div class="cal-sel-fig"><span class="cal-sel-k">Treasury inflow</span><div class="amt pos" id="calAmt">—</div></div>
+              <div class="cal-sel-fig spread"><span class="cal-sel-k">Gross spreads*</span><div class="amt" id="calSpread">—</div></div>
+            </div>
             <div class="lab" id="calLab">Click a calendar cell to inspect it.</div>
             <div class="earnings-inspector-actions">
               <button class="share-btn" id="calShare" type="button">𝕏 Share</button>
@@ -11187,12 +11206,12 @@ body.theme-light .bw-viz text.bw-pct.in{fill:#fff!important}
 </style>
 
 <script src="market-regime-data.js?v=1790400001" defer></script>
-<script src="dashboard.js?v=1792036613" defer></script>
+<script src="dashboard.js?v=1792040001" defer></script>
 <script src="paths-panels.js?v=20261021-founders2" defer></script>
 <script src="playbook-panels.js?v=20261021-rank-to-whales" defer></script>
 <script src="monitors-panels.js?v=20261021-hash" defer></script>
 <script src="whales-panels.js?v=20261023-private-next-farm" defer></script>
-<script src="i18n-dict.js?v=20261030-news" defer></script>
+<script src="i18n-dict.js?v=20261030-spread" defer></script>
 <script src="i18n.js?v=1789148292" defer></script>
 <script src="app-inline.js?v=20260809-theme-toggle" defer></script>
 <script src="crypto-news.js?v=20261030-news-h" defer></script>

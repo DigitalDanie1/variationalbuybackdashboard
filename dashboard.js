@@ -4000,6 +4000,7 @@ function tickLive(){
   if(CALMODE==='day'&&CAL.selectedDate===hp.date){
     const todayEarned=Math.max(0,bal-cumAt(addDays(hp.date,-1)));
     $('#calAmt').textContent='+'+fmtUSD(todayEarned);
+    {const r=spreadShareAt(hp.date).rate;paintCalSpread(todayEarned/r,r);}
     if(CAL.sel)CAL.sel.amt='+'+fmtUSD(todayEarned);
   }
   if(performance.now()-_lastHourDom>1000){
@@ -4252,8 +4253,18 @@ function selectedDateHeading(dateStr){
     timeZone:RESET_TZ.tz,month:'short',day:'numeric',weekday:'short',year:'numeric'
   });
 }
+/* Hero "Gross spreads*" figure: implied from the report-observed treasury share, same basis
+   as the calendar cells. spread===null paints the pending dash. */
+function paintCalSpread(spread,rate,span){
+  const el=$('#calSpread'); if(!el)return;
+  if(spread==null||!Number.isFinite(spread)){el.textContent='—';el.removeAttribute('title');return;}
+  el.textContent=fmtUSD(spread);
+  const pct=(rate*100).toFixed(1);
+  el.title=span?`Implied from the report-observed treasury share of spreads (${pct}% at period end)`:`Implied from the ${pct}% report-observed treasury share of spreads`;
+}
 function selectCell(dateStr){
   let amt,label,scope,complete=true,showAmount=true,status='COMPLETE',statusClass='estimated';
+  let spread=null,spreadRate=null,spreadSpan=false;
   const events=macroByDate(dateStr);
   CAL.selectedDate=dateStr;
   if(CALMODE==='day'){
@@ -4261,8 +4272,11 @@ function selectCell(dateStr){
     const isToday=dateStr===resetDateKey();
     amt=complete?(CAL.eMap.get(dateStr)||0):(isToday?Math.max(0,currentTreasuryBalance()-cumAt(addDays(dateStr,-1))):0);
     const wd=resetWeekday(dateStr);
+    spreadRate=spreadShareAt(dateStr).rate;
+    if(complete||isToday)spread=amt/spreadRate;
     if(complete){
       const a=calImpliedActivity(amt,dateStr);
+      spread=a.spreadFees;
       label=`<b>${dateStr}</b> (${wd}) · completed daily total<br>
         <b>${calMiniMoney(a.volume)}</b> modeled volume · <b>${calMiniMoney(a.oi)}</b> modeled OI context · <b>${calMiniMoney(a.burn)}</b> intended buy-&amp;-burn (100%, not yet executed)`;
       status='COMPLETE';statusClass='estimated';
@@ -4277,18 +4291,21 @@ function selectCell(dateStr){
   }else if(CALMODE==='week'){
     const ws=weekStart(dateStr),we=addDays(ws,6); complete=we<=CAL.last;
     amt=complete?(CAL.wk.get(ws)||0):0;
+    if(complete){spread=impliedSpreadsBetween(addDays(ws,-1),we,amt);spreadRate=spreadShareAt(we).rate;spreadSpan=true;}
     label=complete?`<b>${ws} → ${we}</b> · official weekly total`:`<b>${ws} → ${we}</b> · final posts Saturday`;
     showAmount=complete;status=complete?'WEEK TOTAL':'PENDING';statusClass=complete?'estimated':'pending';
     scope=`the week of ${ws}`;
   }else{
     const ym=dateStr.slice(0,7),me=monthEnd(dateStr); complete=me<=CAL.last;
     amt=complete?(CAL.mo.get(ym)||0):0;
+    if(complete){spread=impliedSpreadsBetween(addDays(ym+'-01',-1),me,amt);spreadRate=spreadShareAt(me).rate;spreadSpan=true;}
     label=complete?`<b>${monthName(ym)}</b> · official monthly total`:`<b>${monthName(ym)}</b> · final posts ${me}`;
     showAmount=complete;status=complete?'MONTH TOTAL':'PENDING';statusClass=complete?'estimated':'pending';
     scope=`in ${monthName(ym)}`;
   }
   CAL.sel={amt:showAmount?('+'+fmtUSD(amt)):'pending final close',scope};
   $('#calAmt').textContent=showAmount?('+'+fmtUSD(amt)):'—';
+  paintCalSpread(showAmount?spread:null,spreadRate,spreadSpan);
   $('#calLab').innerHTML=label;
   renderCalendarLiveSync(dateStr);
   if($('#calInspectorDate'))$('#calInspectorDate').textContent=selectedDateHeading(dateStr);
