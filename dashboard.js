@@ -3384,16 +3384,13 @@ function renderNewsPost(){
   const val=(v,fmt)=>v==null||!Number.isFinite(+v)?'—':fmt(v);
   const moneyPlus=v=>v==null||!Number.isFinite(+v)?'—':(v>=0?'+':'-')+money0(Math.abs(v));
   const body=[
-    title,
-    period,
-    '',
-    `Treasury ${val(c.previousRevenue,moneyPlus)} → ${val(c.latestRevenue,moneyPlus)}${arrow(c.vsPrevious)}`,
-    `Spreads* ${val(c.previousSpreadFees,money0)} → ${val(c.dailySpreadFees,money0)}${arrow(pctChange(c.dailySpreadFees,c.previousSpreadFees))}`,
-    `OLP side* ${val(c.previousOlpSide,money0)} → ${val(c.dailyOlpSide,money0)}${arrow(pctChange(c.dailyOlpSide,c.previousOlpSide))}`,
-    `24H vol ${val(c.volumePrev||0,marketBig)} → ${val(c.volume,marketBig)}${arrow(c.volumeDelta)}`,
-    `OI ${val(c.oiPrev||0,marketBig)} → ${val(c.oi,marketBig)}${arrow(c.oiDelta)}`,
-    `Treasury held ${val(c.treasuryPrev,marketBig)} → ${val(c.cur,marketBig)}${arrow(c.treasuryHeldDelta)}`,
-    '*implied; OLP pre-cost'
+    title+' · ET close',
+    `Gross spreads*: ${val(c.dailySpreadFees,money0)}`,
+    `├ Treasury: ${val(c.latestRevenue,money0)}`,
+    `└ OLP pre-cost*: ${val(c.dailyOlpSide,money0)}`,
+    `24H vol ${val(c.volume,marketBig)} · OI ${val(c.oi,marketBig)}`,
+    '*Estimated; OLP profit unmeasured.',
+    'Buyback: intended, not executed.'
   ].join('\n');
   root.dataset.tweet=body;
   root.dataset.url=NEWS_URL;

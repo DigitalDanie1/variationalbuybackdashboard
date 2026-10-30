@@ -5591,3 +5591,19 @@ Object.assign(window.__VDICT.ko, {
   "Wallet balance · excludes OLP vault": "지갑 잔액 · OLP 볼트 제외",
   "Same treasury balance · not executed buybacks": "동일한 트레저리 잔액 · 실제 바이백 아님"
 });
+Object.assign(window.__VDICT.ko, {
+ 'Gross spreads · estimated':'총 스프레드 · 추정치',
+ 'TOTAL BEFORE COSTS · not protocol revenue':'비용 차감 전 전체 금액 · 프로토콜 수익 아님',
+ 'A · Protocol treasury net inflow':'A · 프로토콜 트레저리 순유입',
+ 'REVENUE COMPARISON BASIS · OLP PnL EXCLUDED':'거래소 Revenue 비교 기준 · OLP 손익 제외',
+ '⇣ Same treasury money · 100% intended for buy & burn':'⇣ 동일한 트레저리 자금 · 100% 매입·소각 예정',
+ 'Execution not established by this model':'이 모델에서는 실제 집행 여부를 확인하지 않음',
+ 'B · OLP-side pool · estimated':'B · OLP 측 자금 · 추정치',
+ '= OLP net PnL · not measured daily here':'= OLP 순손익 · 여기서는 일일 실적을 측정하지 않음',
+ 'Gross spreads = treasury share + OLP-side pool before costs':'총 스프레드 = 트레저리 몫 + 비용 차감 전 OLP 측 몫'
+});
+Object.assign(window.__VDICT.ko, {
+ '− Rewards and other deductions':'− 보상 및 기타 차감 항목',
+ '↙ A · protocol share':'↙ A · 프로토콜 몫',
+ 'B · OLP side ↘':'B · OLP 측 몫 ↘'
+});
