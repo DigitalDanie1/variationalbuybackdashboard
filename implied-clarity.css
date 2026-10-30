@@ -1,0 +1,9 @@
+[data-tg="implied"] .flow-map{grid-template-columns:minmax(0,1fr) 28px minmax(0,1fr) 28px minmax(0,1fr) 28px minmax(0,1fr)}
+[data-tg="implied"] .flow-node,[data-tg="implied"] .spread-slice{min-width:0;overflow-wrap:anywhere}
+[data-tg="implied"] .flow-node .v,[data-tg="implied"] .spread-slice .v{font-size:clamp(24px,2.6vw,42px);white-space:normal;overflow-wrap:anywhere}
+[data-tg="implied"] .eq{min-width:0;overflow-wrap:anywhere}
+@media(max-width:1450px){
+[data-tg="implied"] .flow-map,[data-tg="implied"] .spread-flow{grid-template-columns:minmax(0,1fr)}
+[data-tg="implied"] .flow-arrow,[data-tg="implied"] .spread-arrow{transform:rotate(90deg);justify-self:center;height:36px;width:50px}
+[data-tg="implied"] .flow-node{min-height:0;width:100%;box-sizing:border-box}
+}

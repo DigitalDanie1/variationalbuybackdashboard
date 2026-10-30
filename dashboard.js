@@ -2148,7 +2148,7 @@ function renderFeeVs(){
 }
 function renderMath(){
   if(!$('#mqF'))return;
-  const e=computeEff(), s=MKT.spreadShare, b=MKT.burnShare, T=e.cur, F=T/s;
+  const e=computeEff(), s=MKT.spreadShare, b=MKT.burnShare, T=e.cur, F=impliedSpreadsAllTime();
   const C=n=>n>=1e9?'$'+(n/1e9).toFixed(2)+'B':n>=1e6?'$'+(n/1e6).toFixed(2)+'M':'$'+fmtK(n);
   $('#mqT').textContent=C(T);
   $('#mqV').textContent=C(MKT.vol.d30);
@@ -2159,7 +2159,7 @@ function renderMath(){
   $('#mqTau').textContent=e.takeBpsFee.toFixed(2)+' bps';
   $('#mqVolFee').textContent='$'+fmtK(e.volPerFee);
   $('#mqVolBurn').textContent='$'+fmtK(e.volPerRev/b);
-  $('#mqOiFee').textContent='$'+fmtK(e.oiPerDayRev*s);
+  $('#mqOiFee').textContent='$'+fmtK(MKT.oi/(MKT.vol.d30/e.volPerFee/30));
   $('#mqOiBurn').textContent='$'+fmtK(e.oiPerDayRev/b);
 }
 const BW_METRIC_DEFS=[
@@ -2831,6 +2831,7 @@ function renderEfficiency(){
   const ev=REVENUE_EVIDENCE, perDollar=n=>fmtUSD(ev.grossSpreads?n/ev.grossSpreads:0,2);
   $('#bbEvidenceNote') && ($('#bbEvidenceNote').innerHTML=`Across the latest ${ev.reports.length} official updates, each <b>$1.00 gross spread</b> produced <b>${perDollar(ev.treasury)}</b> treasury revenue, <b>${perDollar(ev.marketMakingCosts)}</b> market-making costs, <b>${perDollar(ev.rewards)}</b> rewards, and <b>${perDollar(ev.olpPnl)}</b> OLP PnL. Treasury and OLP PnL split <b>${(ev.treasuryNetShare*100).toFixed(1)}% / ${(ev.olpNetShare*100).toFixed(1)}%</b> only at the net-profit stage. At ${(MKT.burnShare*100).toFixed(0)}% of treasury committed to buy & burn (intended, not yet executed), buyback-burn firepower is <b>${fmtUSD(burnPerSpread,2)} per $1 gross spread</b>.`);
 
+  renderMath(); // Keep formula values synchronized with live flow totals.
   renderFeePerTrader();
 }
 function renderFeeOi(){

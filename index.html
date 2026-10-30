@@ -8587,6 +8587,7 @@ body.theme-light .lb-card{box-shadow:0 1px 0 rgba(20,40,80,.03),0 14px 30px -22p
 <link rel="stylesheet" href="overview-responsive.css?v=20261030">
 <link rel="stylesheet" href="metric-definitions.css?v=20261030">
 <script src="metric-definitions.js?v=20261030" defer></script>
+<link rel="stylesheet" href="implied-clarity.css?v=20261030">
 </head>
 <body>
 <div class="tipbar" id="tipbar" hidden>
@@ -9459,7 +9460,7 @@ body.theme-light .lb-card{box-shadow:0 1px 0 rgba(20,40,80,.03),0 14px 30px -22p
   <div class="spread-circuit">
     <div class="flow-map" aria-label="Volume and open interest flow into implied fees, treasury, and buyback-burn">
       <div class="circuit-node flow-node source money-source">
-        <div class="k">Money enters the venue</div>
+        <div class="k">Trading activity · not revenue</div>
         <div class="source-pair">
           <div><b id="sfVol30">—</b><span>30D volume</span></div>
           <div><b id="sfOi">—</b><span>open interest</span></div>
@@ -9472,9 +9473,9 @@ body.theme-light .lb-card{box-shadow:0 1px 0 rgba(20,40,80,.03),0 14px 30px -22p
       </div>
       <div class="flow-arrow">→</div>
       <div class="circuit-node flow-node fee">
-        <div class="k">Implied spread payments</div>
+        <div class="k">Cumulative gross spreads · estimated</div>
         <div class="v" id="impliedSpreadTotal">—</div>
-        <div class="d">treasury accumulated ÷ observed 20% share</div>
+        <div class="d">Cumulative estimate: sum of each treasury inflow ÷ its period-specific share</div>
       </div>
       <div class="flow-arrow">→</div>
       <div class="circuit-node flow-node treasury">
@@ -9484,14 +9485,14 @@ body.theme-light .lb-card{box-shadow:0 1px 0 rgba(20,40,80,.03),0 14px 30px -22p
       </div>
       <div class="flow-arrow">→</div>
       <div class="circuit-node flow-node burn">
-        <div class="k">Buyback-burn firepower</div>
+        <div class="k">Intended buyback allocation</div>
         <div class="v" id="sfBurnTotal">—</div>
         <div class="d">100% of treasury-directed revenue intended for VAR buy & burn; execution tracked separately</div>
       </div>
     </div>
     <div class="flow-caption"><b>FLOW:</b> market activity → trader spread fees → Variational treasury → future $VAR buyback-burn firepower.</div>
   </div>
-  <h2 style="margin-top:18px">Customer $1 Spread → Buyback Burn <span class="tag">unit economics</span></h2>
+  <h2 style="margin-top:18px">How $1 of gross spread is allocated <span class="tag">unit economics</span></h2>
   <div class="cap">The only unit-economics view that matters: one customer spread dollar, the treasury cut, and the activity needed to produce it.</div>
   <div class="spread-flow">
     <div class="spread-slice">
@@ -9501,7 +9502,7 @@ body.theme-light .lb-card{box-shadow:0 1px 0 rgba(20,40,80,.03),0 14px 30px -22p
     </div>
     <div class="spread-arrow">→</div>
     <div class="spread-slice olp">
-      <div class="k">Operating remainder</div>
+      <div class="k">OLP side · before costs</div>
       <div class="v">$0.80</div>
       <div class="d">funds market-making costs, rewards, and residual OLP PnL</div>
     </div>
@@ -9509,11 +9510,11 @@ body.theme-light .lb-card{box-shadow:0 1px 0 rgba(20,40,80,.03),0 14px 30px -22p
     <div class="spread-slice treasury">
       <div class="k">Protocol treasury</div>
       <div class="v" id="bbTreasuryCut">$0.20</div>
-      <div class="d">observed in the latest three official reports</div>
+      <div class="d">current allocation basis; subject to change</div>
     </div>
     <div class="spread-arrow">→</div>
     <div class="spread-slice burn">
-      <div class="k">Buyback-burn firepower</div>
+      <div class="k">Intended buyback allocation</div>
       <div class="v" id="bbSpreadBurn">$0.20</div>
       <div class="d">100% of treasury revenue committed to $VAR (intended, not yet executed)</div>
     </div>
@@ -9521,31 +9522,31 @@ body.theme-light .lb-card{box-shadow:0 1px 0 rgba(20,40,80,.03),0 14px 30px -22p
   <div class="eff-ratios unit-core">
     <div class="er"><div class="er-v" id="oneSpreadVol">—</div><div class="er-l">Trading volume needed to create <b>$1 of trader spread payment</b><span class="er-note" id="oneSpreadVolNote">selected volume ÷ implied spread payments</span></div></div>
     <div class="er"><div class="er-v" id="oneSpreadOi">—</div><div class="er-l">Open interest needed to create <b>$1/day of trader spread payment</b><span class="er-note">OI ÷ implied daily spread payments</span></div></div>
-    <div class="er"><div class="er-v" id="bbDayBurn">—</div><div class="er-l">Current <b>buyback-burn firepower loaded per day</b><span class="er-note">daily treasury revenue × 100% (intended, not yet executed)</span></div></div>
+    <div class="er"><div class="er-v" id="bbDayBurn">—</div><div class="er-l">Trailing 30D average <b>intended buyback allocation / day</b><span class="er-note">30D treasury net inflow ÷ 30 × 100%; allocation estimate, not execution</span></div></div>
   </div>
   <div class="eff-note" id="bbEvidenceNote">Across the latest three official updates, a customer’s <b>$1.00 gross spread</b> sent <b id="bbTreasuryCutNote">$0.20</b> to treasury. At <b id="bbShare">100%</b> of treasury committed to buy &amp; burn (intended, not yet executed), that implies <b id="bbSpreadBurnNote">$0.20</b> of buyback-burn firepower. The near 50:50 split applies only to net profit after costs and rewards, not to gross spreads.</div>
 </div>
 
 <div class="card math tsec tg-hide" data-tg="implied" style="margin-top:16px">
   <h2>The Math <span class="tag">수식 · every implied number, derived</span></h2>
-  <div class="cap">Only <b>2 measured inputs</b> and <b>2 protocol constants</b> drive the whole engine — every "implied" figure is one of these equations with the live value plugged in. Verify each line.</div>
+  <div class="cap">Inputs: treasury balance and inflow history, trailing-30D volume, and current open interest. Historical allocation rates are applied by period; the current treasury share and intended buyback share are policies that may change. These are estimates, not an audited income statement.</div>
   <div class="math-legend">
     <span class="lg meas"><var>T</var> = treasury USDC on-chain <b id="mqT">—</b></span>
     <span class="lg meas"><var>V</var> = 30D perp volume <b id="mqV">—</b></span>
     <span class="lg meas"><var>Q</var> = open interest <b id="mqQ">—</b></span>
     <span class="lg con"><var>s</var> = observed treasury share of spreads <b>0.20</b></span>
-    <span class="lg con"><var>b</var> = burn share <b>1.00</b> (intended, not yet executed)</span>
-    <span class="lg tag2">subscript ₃₀ = trailing-30-day amount</span>
+    <span class="lg con"><var>b</var> = intended buyback allocation share <b>1.00</b> (intended, not yet executed)</span>
+    <span class="lg tag2">T = current treasury balance; ΔTᵢ = period inflow; sᵢ = period treasury share; subscript ₃₀ = trailing 30 days</span>
   </div>
   <div class="eqlist">
-    <div class="eq"><span class="eq-n">Spread fees paid by traders</span><span class="eq-f"><var>F</var> = <span class="frac"><span class="num"><var>T</var></span><span class="den"><var>s</var></span></span></span><span class="eq-eq">=</span><span class="eq-v" id="mqF">—</span></div>
-    <div class="eq"><span class="eq-n">Non-treasury operating pool</span><span class="eq-f"><var>F</var><sub>ops</sub> = <var>F</var> − <var>T</var> = <span class="frac"><span class="num"><var>T</var>(1−<var>s</var>)</span><span class="den"><var>s</var></span></span></span><span class="eq-eq">=</span><span class="eq-v" id="mqOlp">—</span></div>
-    <div class="eq"><span class="eq-n">Buyback-burn firepower</span><span class="eq-f"><var>B</var> = <var>b</var>·<var>T</var></span><span class="eq-eq">=</span><span class="eq-v" id="mqB">—</span></div>
+    <div class="eq"><span class="eq-n">Cumulative gross spreads · estimated</span><span class="eq-f"><var>F</var> = <span>Σ (ΔTᵢ / sᵢ)</span></span><span class="eq-eq">=</span><span class="eq-v" id="mqF">—</span></div>
+    <div class="eq"><span class="eq-n">Cumulative OLP-side pool · before costs</span><span class="eq-f"><var>F</var><sub>ops</sub> = <var>F</var> − <var>T</var></span><span class="eq-eq">=</span><span class="eq-v" id="mqOlp">—</span></div>
+    <div class="eq"><span class="eq-n">Intended buyback allocation</span><span class="eq-f"><var>B</var> = <var>b</var>·<var>T</var></span><span class="eq-eq">=</span><span class="eq-v" id="mqB">—</span></div>
     <div class="eq"><span class="eq-n">Effective spread take-rate</span><span class="eq-f"><var>τ</var> = <span class="frac"><span class="num"><var>F</var><sub>30</sub></span><span class="den"><var>V</var></span></span> × 10⁴</span><span class="eq-eq">=</span><span class="eq-v" id="mqTau">—</span></div>
-    <div class="eq"><span class="eq-n">Volume for $1 in spread fees</span><span class="eq-f"><span class="frac"><span class="num"><var>V</var></span><span class="den"><var>F</var><sub>30</sub></span></span> = <var>s</var>·<span class="frac"><span class="num"><var>V</var></span><span class="den"><var>T</var><sub>30</sub></span></span></span><span class="eq-eq">=</span><span class="eq-v" id="mqVolFee">—</span></div>
-    <div class="eq"><span class="eq-n">Volume for $1 bought &amp; burned</span><span class="eq-f"><span class="frac"><span class="num"><var>V</var></span><span class="den"><var>B</var><sub>30</sub></span></span> = <span class="frac"><span class="num"><var>V</var></span><span class="den"><var>b</var>·<var>T</var><sub>30</sub></span></span></span><span class="eq-eq">=</span><span class="eq-v" id="mqVolBurn">—</span></div>
+    <div class="eq"><span class="eq-n">Volume for $1 in spread fees</span><span class="eq-f"><span class="frac"><span class="num"><var>V</var></span><span class="den"><var>F</var><sub>30</sub></span></span></span><span class="eq-eq">=</span><span class="eq-v" id="mqVolFee">—</span></div>
+    <div class="eq"><span class="eq-n">Volume per $1 intended buyback allocation</span><span class="eq-f"><span class="frac"><span class="num"><var>V</var></span><span class="den"><var>B</var><sub>30</sub></span></span> = <span class="frac"><span class="num"><var>V</var></span><span class="den"><var>b</var>·<var>T</var><sub>30</sub></span></span></span><span class="eq-eq">=</span><span class="eq-v" id="mqVolBurn">—</span></div>
     <div class="eq"><span class="eq-n">OI for $1/day in spread fees</span><span class="eq-f"><span class="frac"><span class="num"><var>Q</var></span><span class="den"><var>F</var><sub>30</sub> / 30</span></span></span><span class="eq-eq">=</span><span class="eq-v" id="mqOiFee">—</span></div>
-    <div class="eq"><span class="eq-n">OI for $1/day burned</span><span class="eq-f"><span class="frac"><span class="num"><var>Q</var></span><span class="den"><var>B</var><sub>30</sub> / 30</span></span></span><span class="eq-eq">=</span><span class="eq-v" id="mqOiBurn">—</span></div>
+    <div class="eq"><span class="eq-n">OI per $1/day intended buyback allocation</span><span class="eq-f"><span class="frac"><span class="num"><var>Q</var></span><span class="den"><var>B</var><sub>30</sub> / 30</span></span></span><span class="eq-eq">=</span><span class="eq-v" id="mqOiBurn">—</span></div>
   </div>
   <div class="unit-eq">
     <span>Per <b>$1</b> customer spread:</span>
@@ -11289,12 +11290,12 @@ body.theme-light .lb-card{box-shadow:0 1px 0 rgba(20,40,80,.03),0 14px 30px -22p
 </style>
 
 <script src="market-regime-data.js?v=1790400001" defer></script>
-<script src="dashboard.js?v=1792040001" defer></script>
+<script src="dashboard.js?v=20261030-implied-v2" defer></script>
 <script src="paths-panels.js?v=20261021-founders2" defer></script>
 <script src="playbook-panels.js?v=20261021-rank-to-whales" defer></script>
 <script src="monitors-panels.js?v=20261030-money-labels" defer></script>
 <script src="whales-panels.js?v=20261023-private-next-farm" defer></script>
-<script src="i18n-dict.js?v=20261030-spread" defer></script>
+<script src="i18n-dict.js?v=20261030-implied-v2" defer></script>
 <script src="i18n.js?v=1789148292" defer></script>
 <script src="app-inline.js?v=20260809-theme-toggle" defer></script>
 <script src="crypto-news.js?v=20261030-news-h" defer></script>

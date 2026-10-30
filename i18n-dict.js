@@ -5547,3 +5547,15 @@ Object.assign(window.__VDICT.zh, {
   'Treasury USDC balance over time — accumulated funds, not executed buybacks or burned tokens.': '金库 USDC 历史余额：累积资金，不是已执行回购或销毁。',
   '30D protocol revenue / inflow proxy': '30日协议收入 / 净流入代理指标'
 });
+Object.assign(window.__VDICT.ko, {
+ 'Trading activity · not revenue':'거래 활동 · 매출 아님',
+ 'Cumulative gross spreads · estimated':'누적 총 스프레드 · 추정치',
+ 'Cumulative OLP-side pool · before costs':'누적 OLP 측 몫 · 비용 차감 전',
+ 'Intended buyback allocation':'바이백 예정 재원',
+ 'How $1 of gross spread is allocated':'총 스프레드 $1의 배분 구조',
+ 'OLP side · before costs':'OLP 측 몫 · 비용 차감 전',
+ 'Volume per $1 intended buyback allocation':'바이백 예정 재원 $1당 거래량',
+ 'OI per $1/day intended buyback allocation':'일일 바이백 예정 재원 $1당 OI',
+ 'Cumulative estimate: sum of each treasury inflow ÷ its period-specific share':'누적 추정치: 각 기간 트레저리 유입 ÷ 해당 기간 배분율의 합',
+ '30D treasury net inflow ÷ 30 × 100%; allocation estimate, not execution':'30일 트레저리 순유입 ÷ 30 × 100% · 예정 재원이며 집행액 아님'
+});
