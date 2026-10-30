@@ -10,7 +10,8 @@
      - level: 'critical' = left rule in the negative colour (use sparingly, a live crisis);
               'high' = accent rule; 'normal' = neutral.
      - tag is one of SECURITY / PERP DEX / MACRO / REGULATION / INFRA / PRODUCTS.
-   The newest 6 items show by default; the rest sit behind "Show older".
+   All items sit on one horizontal timeline, newest on the left; same-day items share one
+   date label.
 
    Translations: the block's fixed strings, tags, headlines and details are keyed by their
    exact English text in i18n-dict.js. A new item needs its title and detail added there,
@@ -101,7 +102,6 @@
     }
   ];
 
-  const VISIBLE = 6;
   const DAY_MS = 86400000;
 
   function esc(s) {
@@ -151,17 +151,30 @@
     return level === 'critical' ? ' is-critical' : (level === 'high' ? ' is-high' : '');
   }
 
-  function itemHtml(it, extra) {
+  function whenHtml(date, today) {
+    var rel = relLabel(date, today);
+    return '<div class="srv2-news-when">' +
+      '<span class="srv2-news-wd">' + esc(fmt(date, { weekday: 'long' })) + '</span>' +
+      '<span class="srv2-news-dl"><b class="srv2-news-date">' + esc(fmt(date, { month: 'short', day: 'numeric' })) + '</b>' +
+      '<span class="srv2-news-rel' + (rel === 'Today' ? ' is-today' : '') + '">' + esc(rel) + '</span></span>' +
+      '</div>';
+  }
+
+  /* showDate is true only for the first card of each date, so same-day cards read as a group. */
+  function itemHtml(it, showDate, today) {
     var srcs = (it.sources || []).map(function (s) {
       return '<a href="' + esc(safeUrl(s.url)) + '" target="_blank" rel="noopener">' + esc(s.label) + '</a>';
     }).join('');
     var label = (it.sources || []).length > 1 ? 'Sources' : 'Source';
-    return '<article class="srv2-news-item' + levelClass(it.level) + (extra ? ' is-extra' : '') + '">' +
+    return '<article class="srv2-news-item' + levelClass(it.level) + (showDate ? ' has-date' : '') + '" data-d="' + esc(it.date) + '">' +
+      (showDate ? whenHtml(it.date, today) : '<div class="srv2-news-when"></div>') +
+      '<div class="srv2-news-pin" aria-hidden="true"></div>' +
+      '<div class="srv2-news-card">' +
       '<span class="srv2-news-tag">' + esc(it.tag) + '</span>' +
       '<strong class="srv2-news-hl">' + esc(it.title) + '</strong>' +
-      '<p class="srv2-news-detail">' + esc(it.detail) + '</p>' +
+      '<p class="srv2-news-detail" title="' + esc(it.detail) + '">' + esc(it.detail) + '</p>' +
       (srcs ? '<div class="srv2-news-src"><span>' + label + '</span>' + srcs + '</div>' : '') +
-      '</article>';
+      '</div></article>';
   }
 
   function render() {
@@ -174,56 +187,145 @@
         return a.it.date < b.it.date ? 1 : a.it.date > b.it.date ? -1 : a.i - b.i;
       });
 
-    var groups = [];
-    items.forEach(function (o, idx) {
-      var g = groups[groups.length - 1];
-      if (!g || g.date !== o.it.date) { g = { date: o.it.date, rows: [] }; groups.push(g); }
-      g.rows.push({ it: o.it, extra: idx >= VISIBLE });
-    });
-
     var today = todayET();
-    var hasMore = items.length > VISIBLE;
+    var prevDate = null;
 
     var html = '<div class="srv2-news-head">' +
       '<div><span class="srv2-news-kicker">CRYPTO KEY NEWS</span>' +
       '<h2 class="srv2-news-title">What actually moved the market</h2></div>' +
+      '<div class="srv2-news-tools">' +
       '<span class="srv2-news-stamp">As of ' + esc(fmt(CRYPTO_NEWS_ASOF, { month: 'short', day: 'numeric', year: 'numeric' })) + ' · curated</span>' +
-      '</div><div class="srv2-news-list" id="v2CryptoNewsList">';
+      '<span class="srv2-news-nav">' +
+      '<button type="button" class="srv2-news-arrow" data-dir="-1" aria-label="Previous news" disabled>‹</button>' +
+      '<button type="button" class="srv2-news-arrow" data-dir="1" aria-label="Next news" disabled>›</button>' +
+      '</span></div></div>' +
+      '<div class="srv2-news-wrap"><div class="srv2-news-track" id="v2CryptoNewsList" role="region" aria-label="Crypto key news" tabindex="0">';
 
-    groups.forEach(function (g) {
-      var allExtra = g.rows.every(function (r) { return r.extra; });
-      var rel = relLabel(g.date, today);
-      html += '<div class="srv2-news-group' + (allExtra ? ' is-extra' : '') + '">' +
-        '<div class="srv2-news-rail">' +
-        '<span class="srv2-news-wd">' + esc(fmt(g.date, { weekday: 'long' })) + '</span>' +
-        '<b class="srv2-news-date">' + esc(fmt(g.date, { month: 'short', day: 'numeric' })) + '</b>' +
-        '<span class="srv2-news-rel' + (rel === 'Today' ? ' is-today' : '') + '">' + esc(rel) + '</span>' +
-        '</div><div class="srv2-news-items">' +
-        g.rows.map(function (r) { return itemHtml(r.it, r.extra); }).join('') +
-        '</div></div>';
+    items.forEach(function (o) {
+      html += itemHtml(o.it, o.it.date !== prevDate, today);
+      prevDate = o.it.date;
     });
 
-    html += '</div>';
-    if (hasMore) {
-      html += '<button type="button" class="srv2-news-more" aria-expanded="false" aria-controls="v2CryptoNewsList">' +
-        '<span class="nw-open">Show older</span><span class="nw-close">Show fewer</span></button>';
-    }
-
-    root.setAttribute('data-open', '0');
+    html += '</div></div>';
     root.innerHTML = html;
 
-    if (!root.__newsBound) {
-      root.__newsBound = true;
-      root.addEventListener('click', function (e) {
-        var btn = e.target.closest ? e.target.closest('.srv2-news-more') : null;
-        if (!btn) return;
-        var open = root.getAttribute('data-open') !== '1';
-        root.setAttribute('data-open', open ? '1' : '0');
-        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
-      });
+    var track = root.querySelector('.srv2-news-track');
+    var wrap = root.querySelector('.srv2-news-wrap');
+    var prev = root.querySelector('.srv2-news-arrow[data-dir="-1"]');
+    var next = root.querySelector('.srv2-news-arrow[data-dir="1"]');
+
+    function sync() {
+      var max = track.scrollWidth - track.clientWidth;
+      var x = track.scrollLeft;
+      prev.disabled = x <= 1;
+      next.disabled = x >= max - 1;
+      wrap.setAttribute('data-more', max > 1 && x < max - 1 ? '1' : '0');
+    }
+
+    function step(dir) {
+      var smooth = !(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+      track.scrollBy({ left: dir * Math.max(200, track.clientWidth * 0.9), behavior: smooth ? 'smooth' : 'auto' });
+    }
+
+    prev.addEventListener('click', function () { step(-1); });
+    next.addEventListener('click', function () { step(1); });
+    track.addEventListener('scroll', sync, { passive: true });
+    window.addEventListener('resize', sync);
+    /* The Overview starts hidden (display:none), so sizes are 0 until it is shown. */
+    if (window.ResizeObserver) new ResizeObserver(sync).observe(track);
+    sync();
+  }
+
+  /* ---------- Calendar day-cell markers ---------------------------------------------------
+     dashboard.js rebuilds #calGrid.innerHTML on every month / mode switch and refresh, so the
+     markers are re-applied from a MutationObserver. The observer watches only the grid's own
+     children (no subtree), so appending a marker inside a cell can never re-trigger it, and a
+     cell that already carries one is skipped. */
+  function newsByDate() {
+    var map = {};
+    CRYPTO_NEWS.forEach(function (it) { (map[it.date] = map[it.date] || []).push(it); });
+    return map;
+  }
+
+  function markerHtml(list) {
+    var rows = list.slice(0, 1).map(function (it) {
+      return '<button type="button" class="cal-news-row' + levelClass(it.level) + '" title="' + esc(it.title) + '">' +
+        '<span class="cal-news-dot"></span><span class="cal-news-hl">' + esc(it.title) + '</span></button>';
+    }).join('');
+    if (list.length > 1) {
+      var rest = list.slice(1);
+      rows += '<button type="button" class="cal-news-more" title="' + esc(rest.map(function (it) { return it.title; }).join('\n')) + '">' +
+        rest.map(function (it) { return '<span class="cal-news-dot cal-news-xdot' + levelClass(it.level) + '"></span>'; }).join('') +
+        '<span class="cal-news-mt">+' + rest.length + ' more</span></button>';
+    }
+    return '<div class="cal-news-in">' + rows + '</div>';
+  }
+
+  function decorateCalendar() {
+    var grid = document.getElementById('calGrid');
+    if (!grid) return;
+    var map = newsByDate();
+    var cells = grid.querySelectorAll('.cal-cell[data-d]');
+    for (var i = 0; i < cells.length; i++) {
+      var cell = cells[i];
+      var list = map[cell.getAttribute('data-d')];
+      if (!list || !list.length) continue;
+      var have = false;
+      for (var c = cell.firstElementChild; c; c = c.nextElementSibling) {
+        if (c.classList.contains('cal-news')) { have = true; break; }
+      }
+      if (have) continue;
+      var box = document.createElement('div');
+      box.className = 'cal-news';
+      box.setAttribute('data-d', cell.getAttribute('data-d'));
+      box.innerHTML = markerHtml(list);
+      cell.appendChild(box);
     }
   }
 
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', render);
-  else render();
+  var flashTimer = null;
+  function jumpToNews(ymd) {
+    var root = document.getElementById('v2CryptoNews');
+    if (!root) return;
+    var card = root.querySelector('.srv2-news-item[data-d="' + ymd + '"]');
+    if (!card) return;
+    var smooth = !(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+    card.scrollIntoView({ behavior: smooth ? 'smooth' : 'auto', inline: 'start', block: 'nearest' });
+    var prev = root.querySelector('.srv2-news-item.is-flash');
+    if (prev) prev.classList.remove('is-flash');
+    card.classList.add('is-flash');
+    clearTimeout(flashTimer);
+    flashTimer = setTimeout(function () { card.classList.remove('is-flash'); }, 1200);
+  }
+
+  function bindCalendar() {
+    var grid = document.getElementById('calGrid');
+    if (!grid || grid.__newsBound) return !!grid;
+    grid.__newsBound = true;
+    /* Capture phase: runs before dashboard.js's own click handler on the grid, and
+       stopPropagation keeps the marker click from selecting the day cell. */
+    grid.addEventListener('click', function (e) {
+      var box = e.target.closest ? e.target.closest('.cal-news') : null;
+      if (!box) return;
+      e.stopPropagation();
+      jumpToNews(box.getAttribute('data-d'));
+    }, true);
+    if (window.MutationObserver) new MutationObserver(decorateCalendar).observe(grid, { childList: true });
+    decorateCalendar();
+    return true;
+  }
+
+  function initCalendar() {
+    if (bindCalendar() || !window.MutationObserver) return;
+    /* The grid is not in the DOM yet: wait for it, then hand over to the grid observer. */
+    var wait = new MutationObserver(function () {
+      if (bindCalendar()) wait.disconnect();
+    });
+    wait.observe(document.documentElement, { childList: true, subtree: true });
+  }
+
+  function init() { render(); initCalendar(); }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
 })();
