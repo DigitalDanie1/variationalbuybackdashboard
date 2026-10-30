@@ -24,7 +24,7 @@
     box.innerHTML = '<summary><b>' + c[0] + '</b><span>' + c[1] + '</span></summary><div class="money-def-grid">' + c.slice(2).map(function(x){return '<article><h3>'+x[0]+'</h3><p>'+x[1]+'</p></article>';}).join('') + '</div><p class="money-def-source"><a href="https://docs.variational.io/omni/the-omni-liquidity-provider-olp" target="_blank" rel="noopener">Official OLP Docs ↗</a> · <a href="https://x.com/variational_io/status/2102929439063765192" target="_blank" rel="noopener">VAR buy & burn announcement ↗</a></p>';
   }
   function place() {
-    box.hidden = ['#daily-news','#overview','','#landing'].indexOf(location.hash) >= 0;
+    box.hidden = ['#daily-news','#overview','#comparing-revenue','','#landing'].indexOf(location.hash) >= 0;
     var host = document.body.classList.contains('v2-overview') ? document.querySelector('.srv2-canvas') : document.getElementById('main');
     if (host && box.parentNode !== host) host.prepend(box);
   }

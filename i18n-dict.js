@@ -5627,3 +5627,21 @@ Object.assign(window.__VDICT.ko, {
  'Daily result not measured here':'여기서는 일일 실적을 측정하지 않음',
  'Gross spreads = treasury share + OLP pool before costs':'총 스프레드 = 트레저리 몫 + 비용 차감 전 OLP 측 몫'
 });
+Object.assign(window.__VDICT.ko, {
+ 'Comparing Revenue':'Revenue 비교',
+ 'Scope':'비교 범위',
+ 'Rank by':'정렬 기준',
+ 'Perp / derivatives protocols':'무기한·파생상품 프로토콜',
+ 'All protocol categories':'전체 프로토콜 카테고리',
+ 'Search revenue protocols':'Revenue 프로토콜 검색',
+ 'Search protocols':'프로토콜 검색',
+ 'Refresh':'새로고침',
+ 'Definition & source':'정의 및 출처',
+ 'Adapter methodology ↗':'집계 방식·어댑터 ↗',
+ 'Revenue 24H':'Revenue 24시간',
+ 'Revenue 7D':'Revenue 7일',
+ 'Revenue 30D':'Revenue 30일',
+ 'Treasury net inflow proxy · OLP PnL excluded · outside DeFiLlama ranking':'트레저리 순유입 대용 지표 · OLP 손익 제외 · DeFiLlama 순위에 미포함',
+ 'Separate source and ET day boundary. This is wallet inflow, not a DeFiLlama-reported or UTC-aligned revenue figure.':'별도 출처·ET 일자 기준의 지갑 순유입입니다. DeFiLlama가 보고한 Revenue나 UTC 기준으로 일치시킨 수치가 아닙니다.',
+ 'Revenue only — not Fees or Holders Revenue. Rows are individual DeFiLlama adapters; parent totals are not added again. Definitions differ by venue. Missing values remain “—”; reported zero remains $0.':'Fees·Holders Revenue가 아닌 Revenue입니다. 개별 DeFiLlama 어댑터 기준이며 상위 프로토콜 합계를 중복 추가하지 않습니다. 거래소별 정의는 출처에서 확인하세요. 미공개는 —, 보고된 0은 $0로 표시합니다.'
+});
