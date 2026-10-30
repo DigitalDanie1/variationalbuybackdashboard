@@ -88,7 +88,7 @@
         ['Collateral transfer','Send collateral directly to the dealer, introducing exposure to the dealer’s financial condition.'],
         ['Trade clearing','The trade is marked as cleared.'],
         ['Ongoing margin administration','Periodic manual checks and Telegram/email margin calls. The example describes one-way collateral posting.']
-      ].map(function (x) { return '<li><b>' + x[0] + '</b><p>' + x[1] + '</p></li>'; }).join('') + '</ol></section>' +
+      ].map(function (x) { return '<li><details><summary><b>' + x[0] + '</b></summary><p>' + x[1] + '</p></details></li>'; }).join('') + '</ol></section>' +
       '<section class="vps-legacy-pro"><div class="vps-legacy-title"><h4>Variational Pro</h4><span>6 DOCUMENTED STEPS</span></div><ol class="vps-detailed-steps">' +
       [
         ['Investment mandate','Choose the altcoin option to trade.'],
@@ -97,7 +97,7 @@
         ['Select a counterparty','Evaluate price, margin terms and counterparty reputation, then accept a quote or decline to trade.'],
         ['Bilateral collateral','Both counterparties are prompted to deposit into their on-chain escrow / settlement pool.'],
         ['Clear &amp; administer','After verified deposits, clearing is recorded automatically. The protocol manages margin, applicable funding and liquidations.']
-      ].map(function (x) { return '<li><b>' + x[0] + '</b><p>' + x[1] + '</p></li>'; }).join('') + '</ol><div class="vps-legacy-note"><b>What changes</b><p>Competitive quoting, bilateral on-chain collateral and integrated lifecycle management.</p><p>The example does not establish that ISDA, KYC or other legal requirements are waived for every user.</p></div></section></div>',
+      ].map(function (x) { return '<li><details><summary><b>' + x[0] + '</b></summary><p>' + x[1] + '</p></details></li>'; }).join('') + '</ol><div class="vps-legacy-note"><b>What changes</b><p>Competitive quoting, bilateral on-chain collateral and integrated lifecycle management.</p><p>The example does not establish that ISDA, KYC or other legal requirements are waived for every user.</p></div></section></div>',
       'Source: About Pro · illustrative workflow, not a universal onboarding checklist or a measured speed benchmark.') +
     slide(3, 'TRADE FLOW', 'From price discovery<br><em>to on-chain clearing.</em>',
       'You choose the quote. Both sides fund the pool. The protocol manages the cleared trade.',
@@ -252,6 +252,155 @@ body.v2-dashboard .vps-heading h3{font-size:clamp(30px,3.2vw,46px)!important;lin
 .vps-legacy-columns{display:grid;grid-template-columns:1fr 1fr;border:1px solid #354358}.vps-legacy-columns>section{padding:24px}.vps-legacy-pro{border-left:1px solid #354358;background:#111f31}.vps-legacy-title{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;padding-bottom:20px;border-bottom:1px solid #354358}.vps-legacy-title h4{margin:0!important}.vps-legacy-title>span{font:9px var(--mono);color:#adc4df}.vps-detailed-steps{list-style:none;counter-reset:otc;padding:0;margin:0}.vps-detailed-steps li{position:relative;padding:18px 0 18px 36px;counter-increment:otc;border-bottom:1px solid #29384b}.vps-detailed-steps li:before{content:counter(otc,decimal-leading-zero);position:absolute;left:0;top:20px;font:10px var(--mono);color:#9abce8}.vps-detailed-steps b{font:600 14px/1.5 var(--sans,Arial,sans-serif);color:#deebfb}.vps-detailed-steps p{font-size:12px!important;line-height:1.75!important;margin-top:7px!important}.vps-legacy-note,.vps-model-assumptions{padding:22px;margin-top:24px;background:#172638;border-left:2px solid #89a8cc}.vps-legacy-note>b,.vps-model-assumptions>b{font:600 13px var(--sans,Arial,sans-serif);color:#d9e7fb}.vps-legacy-note p,.vps-model-assumptions p{font-size:12px!important;line-height:1.75!important;margin-top:12px!important}.vps-benchmark-toolbar,.vps-economics-inputs{display:flex;flex-wrap:wrap;gap:16px;padding:20px;border:1px solid #354358;background:#101c2c}.vps-benchmark-toolbar label,.vps-economics-inputs label{display:flex;flex:1;min-width:150px;flex-direction:column;gap:10px;font:10px/1.5 var(--mono);color:#b9cce4}.vps-benchmark-toolbar input,.vps-benchmark-toolbar select,.vps-economics-inputs input,.vps-economics-inputs select{box-sizing:border-box;width:100%;min-height:42px;padding:10px;border:1px solid #4d6481;border-radius:2px;background:#0b1320;color:#e2edfc;font:12px var(--sans,Arial,sans-serif);color-scheme:dark}.vps-benchmark-toolbar input:focus-visible,.vps-benchmark-toolbar select:focus-visible,.vps-economics-inputs input:focus-visible,.vps-economics-inputs select:focus-visible{outline:2px solid #9dc6fa;outline-offset:2px}.vps-economics-inputs input[aria-invalid="true"]{border-color:#ef9f9f}.vps-benchmark-period{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;font:9px var(--mono);color:#a4bbd8}.vps-benchmark-scroll{max-height:640px;overflow:auto;border:1px solid #354358;scrollbar-color:#506987 #111b29}.vps-benchmark-table{width:100%;border-collapse:separate;border-spacing:0;min-width:720px;font:12px/1.5 var(--sans,Arial,sans-serif);color:#d4e0f1}.vps-benchmark-table caption{text-align:left;padding:16px 18px;background:#111d2d;font-size:11px;color:#aebfd5}.vps-benchmark-table thead th{position:sticky;top:0;z-index:1;background:#1b2a3e;color:#bdd1ec;font:10px/1.5 var(--mono);white-space:nowrap}.vps-benchmark-table td,.vps-benchmark-table th{text-align:left;padding:14px 18px;border-bottom:1px solid #29384b}.vps-benchmark-table td:nth-child(4),.vps-benchmark-table td:nth-child(5){font-family:var(--mono);white-space:nowrap;text-align:right}.vps-benchmark-table th small{display:block;font:9px/1.6 var(--mono);color:#8fafda;margin-top:3px}.vps-benchmark-table tbody tr:hover{background:#16263d}.vps-benchmark-table button{padding:7px 10px;border:1px solid #47678c;background:#1a304b;color:#cce1ff;font:10px var(--mono);cursor:pointer;white-space:nowrap}.vps-methodology{border:1px solid #354358;padding:18px 22px}.vps-methodology summary{font:12px/1.6 var(--sans,Arial,sans-serif);color:#dce9fb;cursor:pointer}.vps-methodology p{font-size:12px!important;margin-top:16px!important}.vps-methodology a{color:#b6d1f7!important;text-decoration:underline}.vps-economic-metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border-top:1px solid #354358;border-left:1px solid #354358}.vps-economic-metrics>div{padding:24px;border-bottom:1px solid #354358;border-right:1px solid #354358;background:#101c2c;min-width:0}.vps-economic-metrics span{font:8px/1.7 var(--mono);letter-spacing:.5px;color:#b0c7e5}.vps-economic-metrics b{display:block;margin:16px 0;font:600 clamp(22px,2.5vw,36px)/1.2 var(--sans,Arial,sans-serif);letter-spacing:-.03em;color:#e2efff;overflow-wrap:anywhere}.vps-economic-metrics small{display:block;font:10px/1.6 var(--sans,Arial,sans-serif);color:#9db2cf}.vps-model-baseline{font-size:12px!important}.vps-scr[data-scr="7"],.vps-scr[data-scr="8"]{gap:26px}.vps-market-size>strong{font-size:clamp(48px,6vw,82px)}
 @media(max-width:760px){.vps-legacy-columns{grid-template-columns:1fr}.vps-legacy-pro{border-left:0;border-top:1px solid #354358}.vps-legacy-columns>section{padding:20px}.vps-economic-metrics{grid-template-columns:1fr 1fr}.vps-economic-metrics>div{padding:18px}.vps-benchmark-toolbar,.vps-economics-inputs{padding:16px}.vps-benchmark-toolbar label,.vps-economics-inputs label{min-width:130px}.vps-benchmark-scroll{max-height:560px}.vps-benchmark-table td,.vps-benchmark-table th{padding:12px}.vps-market-size>strong{font-size:50px}}@media(max-width:400px){.vps-economic-metrics{grid-template-columns:1fr}}
 `;
+
+  // Density pass. Injected last so it wins the cascade over every rule above and the title/nav rules in boot().
+  // Sticky nav (bottom of viewport), tighter spacing, collapsible workflow steps, one-row nav on phones.
+  var VPS_COMPACT_CSS = `
+/* nav: always reachable */
+.vps-nav{position:sticky;bottom:0;z-index:30;flex-wrap:wrap;gap:6px 14px;padding:8px 16px;background:#0a1220;box-shadow:0 -8px 18px #02060d99}
+:root[data-theme="light"] .vps-nav{box-shadow:0 -6px 14px #0a122033}
+.vps-btn{padding:8px 12px;white-space:nowrap}.vps-nav .vp-coming-index{white-space:nowrap}
+/* title screen */
+.vp-reveal{min-height:clamp(480px,calc(100svh - 300px),600px)}
+.vp-topline{padding:14px 24px}.vp-bottom{padding:14px 24px}
+.vp-identity{padding:24px 24px 26px}
+.vp-brand{font-size:clamp(26px,3.4vw,48px)}
+body.v2-dashboard h2.vp-pro{font-size:clamp(110px,15vw,230px)!important;margin:12px 0 20px!important}
+.vp-identity>.vps-press{margin-top:22px;padding:14px 26px;font-size:18px}
+/* slide frame */
+.vps-scr[data-scr]{min-height:0;gap:16px;padding:26px 32px 18px}
+.vps-heading>span{line-height:1.4}
+body.v2-dashboard .vps-scr .vps-heading h3{font-size:clamp(26px,2.5vw,36px)!important;line-height:1.1!important;margin:8px 0 8px!important}
+.vps-heading>p{font-size:14px!important;line-height:1.5!important;max-width:760px}
+.vps-scr[data-scr] .vps-body{gap:12px}
+.vps-foot{padding-top:12px;gap:20px}
+/* 01 product */
+.vps-product-grid>section{gap:8px;padding:16px 18px}
+body.v2-dashboard .vps-product-grid h4{font-size:17px!important}
+.vps-product-grid p{line-height:1.6!important}
+.vps-product-pools{gap:12px;padding:16px 18px}.vps-pool-map{gap:10px}.vps-pool-line{gap:26px}.vps-pool-line>span{padding:10px 8px}.vps-pool-line>div{padding:10px}.vps-pool-line small{margin-top:3px}
+.vps-product-status{gap:18px;padding:12px 18px}
+/* 02 market scale */
+.vps-market-size,.vps-scr[data-scr="1"] .vps-market-size{padding:16px 22px}
+.vps-market-size>strong{gap:14px;margin:8px 0;font-size:clamp(44px,4.6vw,64px)}
+.vps-market-size>div{gap:6px 20px}
+.vps-participants-title{padding:16px 18px}
+body.v2-dashboard .vps-participants-title h4{font-size:18px!important;margin:6px 0!important}
+.vps-market-participants li{gap:8px;padding:16px 18px}
+.vps-market-scenarios>div{padding:14px 18px}
+.vps-market-scenarios b{margin:6px 0;font-size:28px}
+.vps-scale-context{gap:20px}.vps-scale-context p,.vps-protocol-detail p{line-height:1.6!important}
+.vps-data-sources{gap:6px 24px}
+/* 03 workflow: titles only, descriptions on demand */
+.vps-legacy-columns>section{padding:14px 20px 16px}
+.vps-legacy-title{padding-bottom:10px}
+.vps-detailed-steps li{padding:0}
+.vps-detailed-steps li:before{top:0;height:38px;display:flex;align-items:center;pointer-events:none}
+.vps-detailed-steps summary{box-sizing:border-box;display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:38px;padding:7px 4px 7px 34px;list-style:none;cursor:pointer}
+.vps-detailed-steps summary::-webkit-details-marker{display:none}
+.vps-detailed-steps summary::marker{content:""}
+.vps-detailed-steps summary::after{content:"+";flex:none;width:16px;text-align:center;font:15px/1 var(--mono);color:#7fb0ee}
+.vps-detailed-steps details[open]>summary::after{content:"\\2212"}
+.vps-detailed-steps summary:hover b{color:#fff}
+.vps-detailed-steps summary:focus-visible{outline:2px solid #9dc6fa;outline-offset:-2px}
+.vps-detailed-steps details[open]{background:#142236}
+.vps-detailed-steps details>p{margin:0!important;padding:0 32px 12px 34px;line-height:1.6!important}
+.vps-legacy-note,.vps-model-assumptions{padding:14px 18px;margin-top:14px}
+.vps-legacy-note p,.vps-model-assumptions p{margin-top:8px!important;line-height:1.6!important}
+/* 04 trade flow */
+.vps-execution{gap:18px}.vps-execution>li{gap:10px;padding:16px}
+body.v2-dashboard .vps-execution h4{font-size:18px!important}
+.vps-execution>li>p{line-height:1.55!important}
+.vps-request-ticket{min-height:92px;gap:8px;padding:14px}.vps-request-ticket>b{font-size:24px}
+.vps-maker-list{gap:6px}.vps-maker-list li{padding:8px 10px}
+.vps-settlement{min-height:84px;gap:6px;padding:10px 8px}.vps-settlement>b{font-size:20px}
+.vps-pool-funders span{padding:8px 6px}
+.vps-protocol-detail{gap:20px;padding:10px 18px}
+.vps-managed{gap:20px;padding:14px 18px}
+body.v2-dashboard .vps-managed h4{font-size:19px!important;margin:6px 0 4px!important}
+.vps-managed ul{gap:8px}
+/* 05 risk */
+.vps-controls-head>span{padding:10px 18px}
+.vps-control-row>div{padding:14px 18px}
+body.v2-dashboard .vps-control-name h4{font-size:16px!important;margin:6px 0 0!important}
+body.v2-dashboard .vps-control-design h4{font-size:15px!important;margin:0 0 4px!important}
+.vps-control-row p{line-height:1.6!important}
+.vps-risk-note{gap:18px;padding:12px 18px}
+/* 06 fractional share */
+.vps-share-controls button{padding:8px 18px}
+.vps-scale-result{gap:20px;padding:14px 0}
+.vps-scale-result strong{margin-top:6px;font-size:44px}
+.vps-scale-axis{margin-bottom:6px}
+.vps-scale-row{padding:6px 0}
+/* 07 margin & revenue */
+.vps-economics-inputs{gap:10px 12px;padding:12px 14px}
+.vps-economics-inputs label{gap:5px;min-width:140px}
+.vps-economics-inputs input,.vps-economics-inputs select{min-height:36px;padding:7px 10px}
+.vps-economic-metrics>div{padding:14px 16px}
+.vps-economic-metrics b{margin:8px 0;font-size:clamp(20px,2vw,28px)}
+.vps-model-assumptions{margin-top:0}
+@media(max-width:1000px){
+.vps-scr[data-scr]{padding:22px 24px 16px}
+.vp-reveal{min-height:clamp(440px,calc(100svh - 300px),560px)}
+.vps-derivatives-link{display:none}
+}
+@media(max-width:760px){
+.vps-src{display:none}
+.vps-nav{flex-wrap:nowrap}
+.vps-execution{gap:22px}.vps-execution>li+li:before{top:-20px}
+.vps-market-scenarios>div{display:grid;grid-template-columns:minmax(0,1fr) auto;column-gap:12px;align-items:center;padding:8px 14px}
+.vps-market-scenarios>div>span{grid-column:1;grid-row:1}.vps-market-scenarios>div>p{grid-column:1;grid-row:2}.vps-market-scenarios b{grid-column:2;grid-row:1/3;margin:0;font-size:24px}
+.vps-market-participants li{padding:12px 16px}
+.vps-participants-title{padding:14px 16px}
+.vps-legacy-columns>section{padding:10px 12px 12px}.vps-legacy-title{flex-wrap:nowrap;gap:8px;padding-bottom:8px}.vps-legacy-title>span{font-size:8px;text-align:right}
+.vps-control-name{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 10px}
+.vps-control-row>div{padding:10px 14px}
+.vps-control-mobile{margin-bottom:6px}
+.vps-managed{gap:12px}
+}
+@media(max-width:600px){
+.vp-reveal{min-height:400px}
+.vp-topline{padding:12px 14px}.vp-bottom{padding:12px;gap:6px}
+.vp-identity{padding:26px 16px 28px}
+.vp-brand{font-size:30px}
+body.v2-dashboard h2.vp-pro{font-size:clamp(96px,30vw,130px)!important;margin:12px 0 16px!important}
+.vp-identity>.vps-press{margin-top:18px;padding:12px 18px;font-size:14px}
+.vps-scr[data-scr]{padding:14px 12px 10px;gap:10px}
+.vps-scr[data-scr] .vps-body{gap:10px}
+body.v2-dashboard .vps-scr .vps-heading h3{font-size:25px!important;margin:6px 0!important}
+.vps-heading>p{font-size:13px!important}
+.vps-foot{padding-top:10px;gap:12px}
+.vps-nav{gap:6px;padding:4px 8px!important}.vps-nav>.vps-btn,.vps-nav>.vps-dots{flex:none}.vps-nav>.vps-btn:first-child{min-width:40px}
+.vps-product-grid a,.vps-protocol-detail a,.vps-data-sources a{display:inline-flex;align-items:center;align-self:flex-start;min-height:30px}
+.vps-nav .vp-coming-label{display:none}
+.vps-nav .vp-coming-index{font-size:9px}
+.vps-btn{padding:9px 8px;font-size:9px;letter-spacing:.3px}
+.vps-dots{gap:4px}.vps-dots button{position:relative;width:7px;height:7px}.vps-dots button:after{content:"";position:absolute;inset:-10px -2px}
+.vps-scr .vps-body p,.vps-detailed-steps details>p,.vps-product-grid p,.vps-control-row p,.vps-market-participants li>p,.vps-scale-context p,.vps-protocol-detail p,.vps-legacy-note p,.vps-model-assumptions p,.vps-execution>li>p{line-height:1.5!important}
+.vps-product-grid>section{padding:12px}
+.vps-product-pools{padding:14px 12px}
+.vps-product-status{gap:6px;padding:12px 14px}
+.vps-market-size,.vps-scr[data-scr="1"] .vps-market-size{padding:14px 16px}
+.vps-market-size>strong{margin:6px 0;font-size:42px}
+.vps-scale-context{gap:10px}
+.vps-detailed-steps li:before,.vps-detailed-steps summary{min-height:34px}.vps-detailed-steps li:before{height:34px}.vps-detailed-steps summary{padding-top:5px;padding-bottom:5px;padding-left:30px}.vps-detailed-steps details>p{padding-left:30px;padding-right:20px}
+.vps-protocol-detail{gap:6px;padding:10px 14px}
+.vps-execution>li{padding:12px;gap:8px}
+.vps-request-ticket{min-height:0;padding:12px}.vps-request-ticket>b{font-size:22px}
+.vps-settlement{min-height:0}
+.vps-managed{padding:14px}
+.vps-risk-note{gap:6px;padding:12px 14px}
+.vps-scale-result{gap:8px;padding:12px 0}.vps-scale-result strong{font-size:38px}
+.vps-share-controls{gap:6px}.vps-share-controls button{padding:10px 14px}
+.vps-scale-row{padding:4px 0;gap:4px 8px}
+.vps-economics-inputs{padding:10px;gap:8px}.vps-economics-inputs label{min-width:100px;font-size:9px}
+.vps-economic-metrics>div{padding:12px}
+.vps-economic-metrics b{margin:6px 0;font-size:19px}
+.vps-economic-metrics span{line-height:1.5}.vps-economic-metrics small{font-size:11px;line-height:1.4}
+.vps-legacy-note,.vps-model-assumptions{padding:12px 14px}
+}
+@media(max-width:400px){.vps-economic-metrics{grid-template-columns:1fr 1fr}}
+`;
   function injectVpsStyle() {
     if (document.getElementById('vps-style')) return;
     var st = document.createElement('style');
@@ -356,6 +505,7 @@ body.v2-dashboard h2.vp-pro{font:900 clamp(140px,23vw,340px)/.87 var(--sans,Aria
 @media(max-width:600px){.vp-reveal{min-height:max(570px,calc(100svh - 185px))}.vp-topline{padding:20px 16px;font-size:7px;letter-spacing:1px}.vp-topline>span:first-child{letter-spacing:2px}.vp-brand{font-size:34px;gap:10px;letter-spacing:-1.5px}body.v2-dashboard h2.vp-pro{font-size:clamp(115px,34vw,200px)!important;margin:25px 0 32px!important}.vp-identity{padding:70px 18px 90px}.vp-caption{gap:12px}.vp-caption p{font-size:12px!important;letter-spacing:.3px}.vp-bottom{flex-direction:column;align-items:center;padding:22px 12px;gap:10px}.vp-bottom p{font-size:10px!important}.vp-orbit{top:58%;width:200%;left:-50%}}
 `;
     style.textContent += '.vps-nav{display:flex;align-items:center;flex-wrap:wrap;padding:18px 24px;background:#0a1220;border:1px solid #273953;color:#b7ccea}.vps-nav .vp-coming-label{font:700 10px var(--mono);letter-spacing:1px}.vps-nav .vp-coming-index{font:10px var(--mono);color:#6695d2}.vps-btn:focus-visible,.vps-dots button:focus-visible{outline:2px solid #acd0ff;outline-offset:4px}.vp-identity>.vps-press{position:relative;left:auto;bottom:auto;transform:none;margin-top:32px;padding:16px 28px;font-size:20px;letter-spacing:3px;animation:none;box-shadow:0 0 24px #4c9af822}.vp-identity>.vps-press:hover,.vp-identity>.vps-press:focus-visible{transform:none}.vp-identity{padding-bottom:48px}.vps-scr{box-sizing:border-box}@media(max-width:600px){.vp-identity>.vps-press{font-size:15px;padding:14px 20px;margin-top:28px}.vp-identity{padding:54px 18px 56px}.vps-nav{gap:12px}.vps-nav .vp-coming-label{font-size:8px}.vps-btn{font-size:9px;padding:8px}.vps-dots{gap:5px}.vps-dots button{width:8px;height:8px}}@media(prefers-reduced-motion:reduce){.vps-start,.vps-press{animation:none}}';
+    style.textContent += VPS_COMPACT_CSS;
     document.head.appendChild(style);
 
     if (location.hash === '#' + TAB) showTab(TAB, { push: false });
