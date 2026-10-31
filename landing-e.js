@@ -5,6 +5,55 @@
   const root = document.querySelector('.le-landing');
   if (!root) return;
   const host = root.querySelector('.le-tree'), cv = host.querySelector('canvas'), g = cv.getContext('2d'), tip = root.querySelector('.le-tip');
+  // Product dates are launch announcements, independent of treasury milestone dates.
+  const RELEASES = [
+    { date: '2026-05-20', title: 'RWA perps', detail: 'Gold · silver · copper · oil', source: 'https://www.businesswire.com/news/home/20260520402312/en/' },
+    { date: '2026-09-01', title: 'Swaps live', detail: 'XAU + US100 · TradFi liquidity', source: 'https://www.linkedin.com/pulse/swaps-live-tradfi-liquidity-now-on-chain-variational-ibcse' }
+  ];
+  const markers = document.createElement('div');
+  markers.className = 'le-markers';
+  markers.setAttribute('aria-label', 'Treasury milestones and product launches');
+  host.appendChild(markers);
+  let annotations = [];
+  const dateLabel = d => new Date(d + 'T00:00:00Z').toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric', timeZone:'UTC' });
+  function buildAnnotations() {
+    annotations = [1e6, 5e6, 1e7].flatMap(value => {
+      const i = S.findIndex(p => p[1] >= value);
+      return i < 0 ? [] : [{ i, date:S[i][0], title:money(value, 0), detail:'Treasury milestone', kind:'treasury' }];
+    }).concat(RELEASES.flatMap(event => {
+      const i = S.findIndex(p => p[0] >= event.date);
+      return i < 0 || event.date < S[0][0] ? [] : [{ ...event, i, kind:'launch' }];
+    }));
+    markers.replaceChildren();
+    annotations.forEach(a => {
+      const el = document.createElement(a.source ? 'a' : 'div');
+      el.className = 'le-marker le-marker-' + a.kind;
+      if (a.source) { el.href=a.source; el.target='_blank'; el.rel='noopener noreferrer'; }
+      const label = document.createElement('span'); label.className='le-marker-kind'; label.textContent=a.kind==='launch' ? 'PRODUCT LAUNCH ↗' : 'TREASURY REACHED';
+      const title = document.createElement('strong'); title.textContent=a.title;
+      const date = document.createElement('time'); date.dateTime=a.date; date.textContent=dateLabel(a.date);
+      el.append(label,title,date);
+      el.title = a.detail + ' · ' + a.date;
+      markers.appendChild(el); a.el=el;
+    });
+    cv.setAttribute('aria-label', 'On-chain treasury history. ' + annotations.map(a => a.title + ': ' + dateLabel(a.date)).join('. '));
+  }
+  function placeAnnotations() {
+    const narrow = W < 700, used=[];
+    annotations.slice().sort((a,b)=>a.i-b.i).forEach(a => {
+      a.x = a.i / (S.length - 1) * (cols - 1) * C + C/2;
+      a.y = baseY - Math.max(1, Math.round(S[a.i][1] / MAX * rowsMax)) * C;
+      if (narrow) { a.el.style.left=''; a.el.style.top=''; return; }
+      const width=a.el.offsetWidth, height=a.el.offsetHeight;
+      const x=Math.max(12, Math.min(W-width-12, a.x-width/2));
+      let y=Math.max(8, a.y-height-32);
+      while(used.some(r=>x<r.x+r.w+14 && x+width+14>r.x && y<r.y+r.h+12 && y+height+12>r.y)) y-=height+14;
+      y=Math.max(8,y);
+      a.el.style.left=x+'px'; a.el.style.top=y+'px';
+      a.labelX=x+width/2; a.labelY=y+height;
+      used.push({x,y,w:width,h:height});
+    });
+  }
   const count = document.getElementById('leTreasury'), added = document.getElementById('leAdded30'), days = document.getElementById('leDays');
 
   const money = (v, digits) => {
@@ -53,6 +102,7 @@
     p90 = sorted[Math.floor(sorted.length * .9)] || 1;
     MAX = S[S.length - 1][1];
     seen = src.length;
+    buildAnnotations();
     const t30 = Date.now() - 30 * 864e5;
     let back = null; for (let i = S.length - 1; i >= 0; i--) if (Date.parse(S[i][0]) <= t30) { back = S[i][1]; break; }
     countUp(added, back == null ? null : MAX - back, v => '+' + money(v, 2));
@@ -73,7 +123,8 @@
     C = W < 820 ? 6 : 9;
     cols = Math.ceil(W / C);
     baseY = Math.floor((H - 8) / C) * C;
-    rowsMax = Math.floor((baseY - Math.round(H * .16 / C) * C) / C);
+    const reserve = W < 700 ? 190 : Math.max(96, H * .18);
+    rowsMax = Math.max(1, Math.floor((baseY - reserve) / C));
     colDay = [];
     for (let c = 0; c < cols; c++) {
       const i = Math.round(c * (S.length - 1) / (cols - 1));
@@ -82,6 +133,7 @@
       let f = 0; for (let k = i0; k <= i; k++) f += inflow[k];
       colDay.push({ x: c * C, d: S[i][0], v: S[i][1], f, h: Math.max(1, Math.round(S[i][1] / MAX * rowsMax)) });
     }
+    placeAnnotations();
     return true;
   }
   function draw(progress, t) {
@@ -109,13 +161,19 @@
         g.fillRect(sx + 1, sy + 1, C - 2, C - 2);
       }
     }
-    // milestones: plain chips above the column, skipped where they would sit on the NOW label
-    g.font = '500 10.5px "Geist Mono", monospace'; g.textBaseline = 'alphabetic';
-    [1e6, 5e6, 1e7].map(lv => colDay.find(c => c.v >= lv)).filter(m => m && colDay.indexOf(m) <= upto && colDay[upto].x - m.x > 200).forEach(m => {
-      const txt = money(m.v, 0) + ' · ' + m.d.slice(5), w = g.measureText(txt).width + 12;
-      const x = Math.max(4, Math.min(W - w - 4, m.x + C / 2 - w / 2)), y = baseY - m.h * C - 6 * C;
-      g.fillStyle = 'rgba(1,4,11,.85)'; g.fillRect(x, y - 13, w, 18);
-      g.fillStyle = '#bfe0ff'; g.fillText(txt, x + 6, y);
+    // Fixed labels stay readable through the replay. Leaders mark the exact day,
+    // including the $10M crossing even when it is close to the live balance.
+    annotations.forEach(a => {
+      if (a.x > colDay[upto].x + C) return;
+      const color = a.kind === 'launch' ? '#f6c96a' : '#bfe0ff';
+      g.save(); g.strokeStyle=color; g.lineWidth=1; g.globalAlpha=.65;
+      g.setLineDash(a.kind === 'launch' ? [4,4] : [2,4]);
+      g.beginPath();
+      if(W < 700) { g.moveTo(a.x, 187); g.lineTo(a.x,a.y); }
+      else { g.moveTo(a.labelX,a.labelY); g.lineTo(a.x,a.labelY+12); g.lineTo(a.x,a.y); }
+      g.stroke(); g.setLineDash([]); g.globalAlpha=1;
+      g.fillStyle='#020812'; g.fillRect(a.x-5,a.y-5,10,10); g.strokeRect(a.x-5,a.y-5,10,10);
+      g.fillStyle=color; g.fillRect(a.x-2,a.y-2,4,4); g.restore();
     });
     // live head: the current top cell pulses and carries the running balance
     const head = colDay[upto], hy = baseY - head.h * C, done = progress >= 1;
@@ -151,9 +209,10 @@
   }
   requestAnimationFrame(frame);
   addEventListener('resize', () => { if (ready) layout(); });
-  host.addEventListener('click', () => t0 = performance.now());
+  host.addEventListener('click', e => { if (!e.target.closest('a')) t0 = performance.now(); });
   host.addEventListener('pointermove', e => {
     if (!ready) return;
+    if (e.target.closest('.le-marker')) { tip.style.display='none'; mx=-1e4; return; }
     const x = e.clientX - host.getBoundingClientRect().left;
     mx = x;
     const c = colDay[Math.max(0, Math.min(cols - 1, Math.round(x / C)))];
