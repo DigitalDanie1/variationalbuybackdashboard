@@ -8594,6 +8594,7 @@ body.theme-light .lb-card{box-shadow:0 1px 0 rgba(20,40,80,.03),0 14px 30px -22p
 <style>.daily-cost-evidence{margin-top:8px;font:10px/1.6 var(--mono);color:var(--muted)}.daily-cost-evidence summary{cursor:pointer}.daily-cost-evidence a{color:var(--v2-accent)}.daily-cost-evidence>div{margin-top:8px}.daily-brief-metric.olp-side>small{line-height:1.6!important}</style>
 <link rel="stylesheet" href="efficiency-costs.css?v=20261030">
 <link rel="stylesheet" href="money-map-clean.css?v=20261031-flow">
+<link rel="stylesheet" href="calendar-money-parts.css?v=20261031">
 <link rel="stylesheet" href="landing-e.css?v=20261031-chart-notes">
 <link rel="stylesheet" href="mobile-header.css?v=20261031">
 </head>
@@ -9218,6 +9219,7 @@ body.theme-light .lb-card{box-shadow:0 1px 0 rgba(20,40,80,.03),0 14px 30px -22p
         <div class="cal-metric-key" aria-label="Calendar metric definitions">
           <span><i class="measured"></i><b>Treasury inflow</b> measured from the on-chain wallet</span>
           <span><i class="modeled"></i><b>Gross spreads*</b> implied from the official report share</span>
+          <span class="cal-cost-key">* Estimated: gross spreads = treasury inflow / report-observed share. Hedging/MM = gross spreads x trailing 25-week report-weighted cost rate. OLP remainder = gross spreads - treasury - hedging/MM, before rewards; not net profit.</span>
         </div>
         <div class="cal-scroll">
           <div class="cal-months" id="calMonths"></div>
@@ -9248,6 +9250,8 @@ body.theme-light .lb-card{box-shadow:0 1px 0 rgba(20,40,80,.03),0 14px 30px -22p
             <div class="cal-sel-figs">
               <div class="cal-sel-fig"><span class="cal-sel-k">Treasury inflow</span><div class="amt pos" id="calAmt">—</div></div>
               <div class="cal-sel-fig spread"><span class="cal-sel-k">Gross spreads*</span><div class="amt" id="calSpread">—</div></div>
+              <div class="cal-sel-fig"><span class="cal-sel-k">Hedging / MM*</span><div class="amt" id="calHedging">—</div></div>
+              <div class="cal-sel-fig"><span class="cal-sel-k">OLP before rewards*</span><div class="amt" id="calOlpRemaining">—</div></div>
             </div>
             <div class="lab" id="calLab">Click a calendar cell to inspect it.</div>
             <div class="earnings-inspector-actions">
@@ -11198,7 +11202,7 @@ body.theme-light .lb-card{box-shadow:0 1px 0 rgba(20,40,80,.03),0 14px 30px -22p
 
 <script src="market-regime-data.js?v=1790400001" defer></script>
 <script src="money-flow-sankey.js?v=20261031-flow" defer></script>
-<script src="dashboard.js?v=20261031-flow" defer></script>
+<script src="dashboard.js?v=20261031-calendar-parts" defer></script>
 <script src="paths-panels.js?v=20261021-founders2" defer></script>
 <script src="playbook-panels.js?v=20261021-rank-to-whales" defer></script>
 <script src="monitors-panels.js?v=20261030-money-labels" defer></script>

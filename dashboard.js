@@ -4130,10 +4130,16 @@ function calendarEarnHtml(dateStr,disp){
   const closed=isClosedDailyTotal(dateStr), total=CAL.eMap.get(dateStr)||0;
   const a=closed?calImpliedActivity(total,dateStr):null;
   if(!closed)return `<div class="cal-dual pending-only" title="Time remaining until this ET daily total closes.">${pending24Meta(dateStr)}</div>`;
-  const sharePct=(spreadShareAt(dateStr).rate*100).toFixed(1);
-  return `<div class="cal-dual" title="Completed ET day. Inflow is the net treasury wallet change; gross spreads are implied at the ${sharePct}% report-observed share.">
-    <div class="cal-money-row total"><span class="tz">Treasury inflow</span><span class="money">+${fmtUSD(total)}</span></div>
-    <div class="cal-money-row fee"><span class="tz">Gross spreads*</span><span class="money">${calMiniMoney(a.spreadFees)}</span></div>
+  const estimate=total>=0?dailyHedgingEstimate(dateStr,a.spreadFees,a.spreadFees-total):null;
+  const value=v=>Number.isFinite(v)?fmtUSD(v):'—';
+  const gross=total>=0?value(a.spreadFees):'—';
+  return `<div class="cal-dual cal-day-money" title="Completed ET day. Treasury is the wallet change. Gross spreads, hedging/MM and OLP remainder are estimates. Costs use a trailing 25-week report-weighted rate. Rewards are not deducted.">
+    <div class="cal-gross"><span>Gross spreads*</span><strong>${gross}</strong></div>
+    <div class="cal-money-branches">
+      <div class="cal-money-branch cal-money-treasury"><span><i aria-hidden="true">├</i>Treasury</span><b>${value(total)}</b></div>
+      <div class="cal-money-branch"><span><i aria-hidden="true">├</i>Hedging/MM*</span><b>${value(estimate?.cost)}</b></div>
+      <div class="cal-money-branch"><span><i aria-hidden="true">└</i>OLP before rewards*</span><b>${value(estimate?.remaining)}</b></div>
+    </div>
   </div>`;
 }
 function calendarDisplay(dateStr){
@@ -4303,6 +4309,10 @@ function selectCell(dateStr){
   CAL.sel={amt:showAmount?('+'+fmtUSD(amt)):'pending final close',scope};
   $('#calAmt').textContent=showAmount?('+'+fmtUSD(amt)):'—';
   paintCalSpread(showAmount?spread:null,spreadRate,spreadSpan);
+  const estimateDate=CALMODE==='week'?addDays(weekStart(dateStr),6):CALMODE==='month'?monthEnd(dateStr):dateStr;
+  const costParts=showAmount&&Number.isFinite(spread)&&amt>=0?dailyHedgingEstimate(estimateDate,spread,spread-amt):null;
+  if($('#calHedging'))$('#calHedging').textContent=Number.isFinite(costParts?.cost)?fmtUSD(costParts.cost):'—';
+  if($('#calOlpRemaining'))$('#calOlpRemaining').textContent=Number.isFinite(costParts?.remaining)?fmtUSD(costParts.remaining):'—';
   $('#calLab').innerHTML=label;
   renderCalendarLiveSync(dateStr);
   if($('#calInspectorDate'))$('#calInspectorDate').textContent=selectedDateHeading(dateStr);

@@ -1,0 +1,17 @@
+/* A day's gross inflow and its three destinations, with no extra card chrome. */
+#calGrid .cal-day-money{display:block!important;margin-top:12px!important}
+#calGrid .cal-gross{display:flex;flex-direction:column;gap:4px;margin-bottom:10px}
+#calGrid .cal-gross>span{font:500 10px/1.3 var(--sans);color:var(--sub)}
+#calGrid .cal-gross>strong{font:600 clamp(16px,1.2vw,21px)/1.15 var(--mono);color:var(--ink);letter-spacing:-.5px}
+#calGrid .cal-money-branches{display:grid;gap:7px}
+#calGrid .cal-money-branch{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:baseline;gap:7px;font:11px/1.4 var(--sans);color:var(--sub)}
+#calGrid .cal-money-branch>span{min-width:0;overflow-wrap:normal}
+#calGrid .cal-money-branch i{font:11px var(--mono);color:var(--dim);font-style:normal;padding-right:3px}
+#calGrid .cal-money-branch b{font:500 12px/1.4 var(--mono);color:var(--ink);white-space:nowrap;letter-spacing:-.25px}
+#calGrid .cal-money-treasury b{color:var(--cyan)}
+#calGrid .cal-cell:not(.empty):has(.cal-day-money){min-height:210px!important}
+.cal-cost-key{flex-basis:100%;font:11px/1.6 var(--sans);color:var(--sub)}
+#calHedging,#calOlpRemaining{font-size:clamp(18px,2vw,28px);overflow-wrap:anywhere}
+#calGrid .cal-money-branch>span{overflow-wrap:anywhere}
+#calGrid.cal-grid:not(.period-summary){min-width:1220px!important;grid-template-columns:repeat(7,minmax(170px,1fr))!important}
+.cal-scroll:has(>#calGrid.cal-grid:not(.period-summary)) .cal-weekdays{min-width:1220px!important}
