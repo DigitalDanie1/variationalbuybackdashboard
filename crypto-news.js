@@ -1,23 +1,4 @@
-/* ---------- Overview · Crypto Key News -----------------------------------------
-   A short, hand-curated list of the crypto events that actually moved the market, shown
-   at the top of the Overview canvas (#v2CryptoNews inside .srv2-canvas).
-
-   To update: add new items at the TOP of CRYPTO_NEWS (newest first) and bump
-   CRYPTO_NEWS_ASOF. Rules for what goes in:
-     - only market-moving events (hacks, regulation, macro decisions, major infrastructure
-       or product launches). No price commentary, no opinion pieces.
-     - every item needs at least one source link ({label, url}).
-     - level: 'critical' = left rule in the negative colour (use sparingly, a live crisis);
-              'high' = accent rule; 'normal' = neutral.
-     - tag is one of SECURITY / PERP DEX / MACRO / REGULATION / INFRA / PRODUCTS.
-   All items sit on one horizontal timeline, newest on the left; same-day items share one
-   date label.
-
-   Translations: the block's fixed strings, tags, headlines and details are keyed by their
-   exact English text in i18n-dict.js. A new item needs its title and detail added there,
-   or it simply stays English.
-
-   The deploy CSP is script-src 'self', so this is an external file loaded with defer. */
+/* Historical Data archive: source-linked project events, official reports, and a separate market-context filter. Calendar news markers open the matching context in this archive. */
 (function () {
   'use strict';
 
@@ -104,6 +85,30 @@
 
   const DAY_MS = 86400000;
 
+  let historyFilter='variational',historyYear='all',historyOrder='oldest';
+  const HISTORY_EVENTS = [
+    {date:'2021-12-01',dateLabel:'Late 2021',category:'funding',tag:'ORIGINS',title:'The trading firm behind Variational',detail:'The founders raised about $10M for a market-making firm in late 2021. Its 2021–2023 trading profits later funded nearly all protocol development. Month-level timing; not a protocol launch date.',sources:[{label:'Founder retrospective',url:'https://x.com/variational_lvs/status/1925607454957871570'}]},
+    {date:'2024-10-23',category:'funding',tag:'FUNDING',title:'$10.3M seed round announced',detail:'Bain Capital Crypto and Peak XV co-led the seed round. This is the public announcement date; the original financing closed in late 2021.',sources:[{label:'Founder announcement',url:'https://x.com/variational_lvs/status/1849121013285691820'}]},
+    {date:'2025-01-01',dateLabel:'Jan 2025',category:'products',tag:'OMNI',title:'Omni enters invite-only private beta',detail:'Variational’s later Series A announcement dates the invite-only release to January 2025. An exact day is not specified in that source.',sources:[{label:'Variational · Business Wire',url:'https://www.businesswire.com/news/home/20260520402312/en/'}]},
+    {date:'2025-06-04',category:'funding',tag:'PARTNERS',title:'$1.5M strategic round announced',detail:'Strategic partners were brought in to help institutional market-making, exotic-market quoting and OLP liquidity. The founder describes partner alignment rather than a need for runway.',sources:[{label:'Founder announcement',url:'https://x.com/variational_lvs/status/1930301466905870725'}]},
+    {date:'2026-05-20',category:'funding',tag:'SERIES A',title:'$50M to bring TradFi liquidity on-chain',detail:'A roughly $50M Series A led by Dragonfly, with Bain Capital Crypto, Coinbase Ventures and other strategic investors. Financing and product rollout were announced together.',sources:[{label:'Variational · Business Wire',url:'https://www.businesswire.com/news/home/20260520402312/en/'}]},
+    {date:'2026-05-20',category:'products',tag:'RWA PERPS',title:'The first RWA markets go live',detail:'Gold, silver, copper and WTI crude launch as Phase 1 RWA perpetuals, initially using aggregated crypto-native liquidity.',sources:[{label:'Variational · Business Wire',url:'https://www.businesswire.com/news/home/20260520402312/en/'}]},
+    {date:'2026-08-22',category:'products',tag:'RELEASE REPORT',title:'Isolated margin is reported shipped',detail:'The v0.25.4 biweekly update lists isolated margin, dividends information and final preparations for swaps. This is the report date, not a verified exact launch day.',sources:[{label:'Official report archive',url:'https://x.com/search?q=from%3Avariational_io%20%22isolated%20margin%22&src=typed_query'}]},
+    {date:'2026-09-01',category:'products',tag:'SWAPS',title:'Swaps launch: XAU and US100',detail:'The first swap markets route exposure to TradFi liquidity, with carry costs largely benchmarked to USD borrowing rather than volatile perp funding.',sources:[{label:'Variational launch article',url:'https://www.linkedin.com/pulse/swaps-live-tradfi-liquidity-now-on-chain-variational-ibcse'}]}
+  ];
+  function projectHistory(){
+    const events=HISTORY_EVENTS.slice();
+    if(typeof SERIES!=='undefined') [1e6,5e6,1e7].forEach(amount=>{
+      const day=SERIES.find(p=>p.v>=amount);if(!day)return;
+      events.push({date:day.d,category:'growth',tag:'TREASURY',title:'Treasury crosses $'+(amount/1e6)+'M',detail:'First daily balance in the tracked on-chain series at or above this threshold. Treasury USDC holdings are accumulated funds, not executed token buybacks or burns.',sources:[{label:'Treasury · Arbiscan',url:'https://arbiscan.io/address/0x5e91b40467fb8902c46a7b6cb90482363188d645'}]});
+    });
+    if(typeof BIWEEKLY_HISTORY!=='undefined'){
+      [100e9,200e9,300e9,400e9].forEach(amount=>{const r=BIWEEKLY_HISTORY.find(r=>r.totalVolume>=amount);if(!r)return;events.push({date:r.asOf,category:'growth',tag:'VOLUME · REPORTED',title:'Reported volume passes $'+(amount/1e9)+'B',detail:'The first report in this archive showing cumulative trading volume above this threshold. This marks a reporting date, not the exact crossing time.',sources:[{label:'Official report',url:r.src}]});});
+      BIWEEKLY_HISTORY.forEach(r=>events.push({date:r.asOf,category:'reports',tag:'OFFICIAL REPORT',title:'Biweekly update · '+r.asOf,detail:[r.totalVolume!=null?'Cumulative volume $'+(r.totalVolume/1e9).toFixed(2)+'B':null,r.spreads2w!=null?'2W gross spreads $'+Math.round(r.spreads2w).toLocaleString('en-US'):null,r.treasury2w!=null?'Treasury allocation $'+Math.round(r.treasury2w).toLocaleString('en-US'):null].filter(Boolean).join(' · ')+'. Period disclosures retain their original definitions; early allocation reports are not directly comparable to later P&L reports.',sources:[{label:'Official report',url:r.src}]}));
+    }
+    return events.map(e=>({...e,level:'high'}));
+  }
+
   function esc(s) {
     return String(s).replace(/[&<>"']/g, function (c) {
       return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
@@ -152,10 +157,10 @@
   }
 
   function whenHtml(date, today) {
-    var rel = relLabel(date, today);
+    var rel = historyFilter==='market'?relLabel(date, today):'';
     return '<div class="srv2-news-when">' +
       '<span class="srv2-news-wd">' + esc(fmt(date, { weekday: 'long' })) + '</span>' +
-      '<span class="srv2-news-dl"><b class="srv2-news-date">' + esc(fmt(date, { month: 'short', day: 'numeric' })) + '</b>' +
+      '<span class="srv2-news-dl"><b class="srv2-news-date">' + esc(fmt(date, { month: 'short', day: 'numeric', year:'numeric' })) + '</b>' +
       '<span class="srv2-news-rel' + (rel === 'Today' ? ' is-today' : '') + '">' + esc(rel) + '</span></span>' +
       '</div>';
   }
@@ -167,7 +172,7 @@
     }).join('');
     var label = (it.sources || []).length > 1 ? 'Sources' : 'Source';
     return '<article class="srv2-news-item' + levelClass(it.level) + (showDate ? ' has-date' : '') + '" data-d="' + esc(it.date) + '">' +
-      (showDate ? whenHtml(it.date, today) : '<div class="srv2-news-when"></div>') +
+      (it.dateLabel ? '<div class="srv2-news-when"><b class="srv2-news-date">'+esc(it.dateLabel)+'</b></div>' : showDate ? whenHtml(it.date, today) : '<div class="srv2-news-when"></div>') +
       '<div class="srv2-news-pin" aria-hidden="true"></div>' +
       '<div class="srv2-news-card">' +
       '<span class="srv2-news-tag">' + esc(it.tag) + '</span>' +
@@ -182,19 +187,22 @@
     if (!root) return;
 
     /* Newest first regardless of how the array was edited; ties keep authored order. */
-    var items = CRYPTO_NEWS.map(function (it, i) { return { it: it, i: i }; })
+    const project=projectHistory();
+    const all=project.concat(CRYPTO_NEWS.map(e=>({...e,category:'market'})));
+    const selected=all.filter(e=>(historyFilter==='variational'?e.category!=='market'&&e.category!=='reports':e.category===historyFilter)&&(historyYear==='all'||e.date.slice(0,4)===historyYear));
+    var items = selected.map(function (it, i) { return { it: it, i: i }; })
       .sort(function (a, b) {
-        return a.it.date < b.it.date ? 1 : a.it.date > b.it.date ? -1 : a.i - b.i;
+        return a.it.date===b.it.date?a.i-b.i:(a.it.date<b.it.date?-1:1)*(historyOrder==='oldest'?1:-1);
       });
 
     var today = todayET();
     var prevDate = null;
 
     var html = '<div class="srv2-news-head">' +
-      '<div><span class="srv2-news-kicker">CRYPTO KEY NEWS</span>' +
-      '<h2 class="srv2-news-title">What actually moved the market</h2></div>' +
+      '<div><span class="srv2-news-kicker">VARIATIONAL ARCHIVE</span>' +
+      '<h2 class="srv2-news-title">The Variational story</h2></div>' +
       '<div class="srv2-news-tools">' +
-      '<span class="srv2-news-stamp">As of ' + esc(fmt(CRYPTO_NEWS_ASOF, { month: 'short', day: 'numeric', year: 'numeric' })) + ' · curated</span>' +
+      '<span class="srv2-news-stamp">As of ' + esc(fmt(historyFilter==='market'?CRYPTO_NEWS_ASOF:'2026-10-31', { month: 'short', day: 'numeric', year: 'numeric' })) + ' · curated</span>' +
       '<span class="srv2-news-nav">' +
       '<button type="button" class="srv2-news-arrow" data-dir="-1" aria-label="Previous news" disabled>‹</button>' +
       '<button type="button" class="srv2-news-arrow" data-dir="1" aria-label="Next news" disabled>›</button>' +
@@ -207,6 +215,12 @@
     });
 
     html += '</div></div>';
+    const years=[...new Set(all.map(e=>e.date.slice(0,4)))].sort();
+    const controls='<div class="history-controls"><div class="history-filters" role="group" aria-label="History category">'+[['variational','Milestones'],['products','Products'],['funding','Funding'],['growth','Growth'],['reports','Official reports'],['market','Market context']].map(([key,label])=>'<button type="button" data-history-filter="'+key+'" aria-pressed="'+(key===historyFilter)+'">'+label+'</button>').join('')+'</div><div class="history-selects"><label>Year <select data-history-year><option value="all">All years</option>'+years.map(y=>'<option value="'+y+'" '+(y===historyYear?'selected':'')+'>'+y+'</option>').join('')+'</select></label><label>Order <select data-history-order><option value="oldest" '+(historyOrder==='oldest'?'selected':'')+'>Oldest first</option><option value="newest" '+(historyOrder==='newest'?'selected':'')+'>Newest first</option></select></label><span>'+items.length+' events</span></div></div><p class="history-scope">Launches, funding and growth, linked to original sources. Dates retain their published precision.</p>';
+    html=html.replace('<div class="srv2-news-wrap">',controls+'<div class="srv2-news-wrap">');
+    if(!items.length)html+='<p class="history-empty">No archived events match this year and category.</p>';
+    if(root._historyObserver)root._historyObserver.disconnect();
+    if(root._historyResize)window.removeEventListener('resize',root._historyResize);
     root.innerHTML = html;
 
     var track = root.querySelector('.srv2-news-track');
@@ -230,9 +244,9 @@
     prev.addEventListener('click', function () { step(-1); });
     next.addEventListener('click', function () { step(1); });
     track.addEventListener('scroll', sync, { passive: true });
-    window.addEventListener('resize', sync);
+    root._historyResize=sync;window.addEventListener('resize', sync);
     /* The Overview starts hidden (display:none), so sizes are 0 until it is shown. */
-    if (window.ResizeObserver) new ResizeObserver(sync).observe(track);
+    if (window.ResizeObserver){root._historyObserver=new ResizeObserver(sync);root._historyObserver.observe(track);}
     sync();
   }
 
@@ -285,6 +299,8 @@
 
   var flashTimer = null;
   function jumpToNews(ymd) {
+    historyFilter='market';historyYear='all';historyOrder='newest';render();
+    if(typeof showTab==='function')showTab('historical');
     var root = document.getElementById('v2CryptoNews');
     if (!root) return;
     var card = root.querySelector('.srv2-news-item[data-d="' + ymd + '"]');
@@ -324,7 +340,12 @@
     wait.observe(document.documentElement, { childList: true, subtree: true });
   }
 
-  function init() { render(); initCalendar(); }
+  function init() {
+    const root=document.getElementById('v2CryptoNews');
+    root.addEventListener('click',e=>{const b=e.target.closest('[data-history-filter]');if(b){historyFilter=b.dataset.historyFilter;render();}});
+    root.addEventListener('change',e=>{if(e.target.matches('[data-history-year]'))historyYear=e.target.value;else if(e.target.matches('[data-history-order]'))historyOrder=e.target.value;else return;render();});
+    render();initCalendar();
+  }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
   else init();

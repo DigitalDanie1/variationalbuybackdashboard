@@ -1,0 +1,9 @@
+#v2CryptoNews.history-timeline:not(.tg-hide){display:block!important;margin:24px 0 36px;min-width:0;max-width:100%}
+.history-controls{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;margin:12px 0}
+.history-filters{display:flex;flex-wrap:wrap;gap:5px}.history-filters button{border:0;border-bottom:2px solid transparent;background:transparent;color:var(--sub);font:12px var(--sans);padding:10px;cursor:pointer}.history-filters button[aria-pressed="true"]{color:var(--ink);border-bottom-color:var(--v2-accent)}
+.history-selects{display:flex;gap:12px;align-items:center;flex-wrap:wrap;font:11px var(--sans);color:var(--sub)}.history-selects label{display:flex;align-items:center;gap:7px}.history-selects select{padding:8px;border:1px solid var(--line);background:var(--panel);color:var(--ink);font:12px var(--sans);border-radius:4px}.history-filters button:focus-visible,.history-selects select:focus-visible{outline:2px solid var(--v2-accent);outline-offset:2px}
+.history-scope,.history-empty{font:11px/1.7 var(--sans);color:var(--sub);margin:0 0 24px;max-width:900px}
+#v2CryptoNews .srv2-news-detail{display:block;-webkit-line-clamp:unset;max-height:none;overflow:visible}
+#v2CryptoNews .srv2-news-date{white-space:nowrap}
+@media(max-width:600px){.history-filters button{min-height:44px;padding:8px;font-size:11px}.history-selects select{min-height:40px}.history-timeline .srv2-news-title{font-size:25px!important}.history-timeline .srv2-news-item{width:min(290px,85vw)}}
+@media(max-width:600px){.history-controls{gap:12px}.history-selects{width:100%;flex-wrap:nowrap;gap:10px}.history-selects label{flex:1;min-width:0;flex-direction:column;align-items:flex-start;gap:5px}.history-selects select{width:100%;min-width:0}.history-selects>span{display:none}.history-scope{margin-bottom:18px}}
