@@ -1,6 +1,14 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-ui-state="booting">
 <head>
+<style id="first-paint-guard">
+html[data-ui-state="booting"],html[data-ui-state="error"]{background:#01040b!important}
+html[data-theme="light"][data-ui-state="booting"],html[data-theme="light"][data-ui-state="error"]{background:#f4f6fa!important}
+html[data-ui-state="booting"] body,html[data-ui-state="error"] body{visibility:hidden!important;opacity:0!important;pointer-events:none!important}
+html[data-ui-state="booting"]::before,html[data-ui-state="error"]::before{content:"VAR-METRICS";position:fixed;inset:0;display:grid;place-items:center;color:#8babc9;font:500 12px system-ui,sans-serif;letter-spacing:.18em}
+html[data-ui-state="error"]::before{content:"Unable to load VAR-METRICS. Please refresh.";letter-spacing:normal}
+</style>
+<noscript><style>html[data-ui-state]::before{content:"Enable JavaScript to open VAR-METRICS.";letter-spacing:normal}</style></noscript>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <!-- Security hardening. connect-src lists ONLY the read-only data APIs this page calls;
@@ -15,11 +23,13 @@
 <link rel="apple-touch-icon" href="/apple-touch-icon.png?v=20260731">
 <link rel="manifest" href="/site.webmanifest?v=20260731">
 <link rel="image_src" href="https://www.variational.money/variational-money-card-20261030.png">
-<link rel="stylesheet" href="fonts.css">
+<link rel="preload" href="geist-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="geist-mono-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="fonts.css?v=dfe3cffa100e">
 <!-- Apply the saved theme before first paint (external file: CSP blocks inline scripts). -->
-<script src="theme-boot.js?v=20261030"></script>
+<script src="theme-boot.js?v=1c0d19f50c37"></script>
 <!-- Vercel Web Analytics (same-origin; enabled in the Vercel project) -->
-<script defer src="/_vercel/insights/script.js"></script>
+<script async src="/_vercel/insights/script.js"></script>
 
 <!-- ============================================================
      TWITTER / LINK PREVIEW  —  canonical public URL below.
@@ -8584,19 +8594,19 @@ body.theme-light .lb-card{box-shadow:0 1px 0 rgba(20,40,80,.03),0 14px 30px -22p
 }
 @media(prefers-reduced-motion:reduce){.lb-art img,.lb-action,.lb-action i{transition:none}}
 </style>
-<link rel="stylesheet" href="overview-responsive.css?v=20261030">
-<link rel="stylesheet" href="metric-definitions.css?v=20261030">
-<script src="metric-definitions.js?v=20261030-revenue" defer></script>
-<link rel="stylesheet" href="implied-clarity.css?v=20261030-fork">
-<link rel="stylesheet" href="product-money-map.css?v=20261030">
-<script src="product-money-map.js?v=20261030-overview-clean" defer></script>
-<link rel="stylesheet" href="revenue-comparison.css?v=20261030-three-metrics">
+<link rel="stylesheet" href="overview-responsive.css?v=2aab11cd5b18">
+<link rel="stylesheet" href="metric-definitions.css?v=d5b26b85c611">
+<script src="metric-definitions.js?v=14017273b8b8" defer></script>
+<link rel="stylesheet" href="implied-clarity.css?v=a5e88b3b2331">
+<link rel="stylesheet" href="product-money-map.css?v=122f13824bf7">
+<script src="product-money-map.js?v=97a83c9a1f3d" defer></script>
+<link rel="stylesheet" href="revenue-comparison.css?v=6846b7149877">
 <style>.daily-cost-evidence{margin-top:8px;font:10px/1.6 var(--mono);color:var(--muted)}.daily-cost-evidence summary{cursor:pointer}.daily-cost-evidence a{color:var(--v2-accent)}.daily-cost-evidence>div{margin-top:8px}.daily-brief-metric.olp-side>small{line-height:1.6!important}</style>
-<link rel="stylesheet" href="efficiency-costs.css?v=20261030">
-<link rel="stylesheet" href="money-map-clean.css?v=20261031-flow">
-<link rel="stylesheet" href="calendar-money-parts.css?v=20261031">
-<link rel="stylesheet" href="landing-e.css?v=20261031-chart-notes">
-<link rel="stylesheet" href="mobile-header.css?v=20261031">
+<link rel="stylesheet" href="efficiency-costs.css?v=8cadf01ae213">
+<link rel="stylesheet" href="money-map-clean.css?v=b08fce4cf848">
+<link rel="stylesheet" href="calendar-money-parts.css?v=5d959dc91b9e">
+<link rel="stylesheet" href="landing-e.css?v=559486b43a3f">
+<link rel="stylesheet" href="mobile-header.css?v=73b93160e476">
 </head>
 <body>
 <div class="tipbar" id="tipbar" hidden>
@@ -11200,25 +11210,26 @@ body.theme-light .lb-card{box-shadow:0 1px 0 rgba(20,40,80,.03),0 14px 30px -22p
 @media(max-width:760px){.mr-pair-b{grid-template-columns:1fr auto}}
 </style>
 
-<script src="market-regime-data.js?v=1790400001" defer></script>
-<script src="money-flow-sankey.js?v=20261031-flow" defer></script>
-<script src="dashboard.js?v=20261031-calendar-parts" defer></script>
-<script src="paths-panels.js?v=20261021-founders2" defer></script>
-<script src="playbook-panels.js?v=20261021-rank-to-whales" defer></script>
-<script src="monitors-panels.js?v=20261030-money-labels" defer></script>
-<script src="whales-panels.js?v=20261023-private-next-farm" defer></script>
-<script src="i18n-dict.js?v=20261030-three-metrics" defer></script>
-<script src="i18n.js?v=1789148292" defer></script>
-<script src="app-inline.js?v=20260809-theme-toggle" defer></script>
-<script src="landing-e.js?v=20261031-chart-notes" defer></script>
-<script src="crypto-news.js?v=20261030-news-h" defer></script>
-<script src="comparison-lab-panels.js?v=1792036513" defer></script>
-<script src="pretge-panels.js?v=1787844401" defer></script>
-<script src="pro-derivatives-data.js?v=20261023-eu-rates" defer></script>
-<script src="variational-pro-panels.js?v=20261030-pro-topic-pages" defer></script>
-<script src="derivatives-panels.js?v=20261023-eu-rates" defer></script>
-<script src="quarterly-brief-panels.js?v=20261030-qb" defer></script>
-<script src="revenue-comparison.js?v=20261030-three-metrics" defer></script>
-<script src="tge-groups.js?v=20261031-bigger-switch" defer></script>
+<script src="market-regime-data.js?v=0d0713472802" defer></script>
+<script src="money-flow-sankey.js?v=22c2e55ef8e5" defer></script>
+<script src="dashboard.js?v=6c9f108650c9" defer></script>
+<script src="paths-panels.js?v=b4335b6f7054" defer></script>
+<script src="playbook-panels.js?v=ddd6402a1805" defer></script>
+<script src="monitors-panels.js?v=12956adea963" defer></script>
+<script src="whales-panels.js?v=a9cd96dde562" defer></script>
+<script src="i18n-dict.js?v=f1c26aca02fd" defer></script>
+<script src="i18n.js?v=c6de2323c37c" defer></script>
+<script src="app-inline.js?v=180ff1150936" defer></script>
+<script src="landing-e.js?v=7b639d77381f" defer></script>
+<script src="crypto-news.js?v=9861462d6009" defer></script>
+<script src="comparison-lab-panels.js?v=5aeafd7204e4" defer></script>
+<script src="pretge-panels.js?v=f2a542c7bfb6" defer></script>
+<script src="pro-derivatives-data.js?v=d02794dfe278" defer></script>
+<script src="variational-pro-panels.js?v=d6a395aada06" defer></script>
+<script src="derivatives-panels.js?v=39d4ca5a6936" defer></script>
+<script src="quarterly-brief-panels.js?v=6ec0fae4fe5b" defer></script>
+<script src="revenue-comparison.js?v=864f5e5be8ee" defer></script>
+<script src="tge-groups.js?v=a511cf19c719" defer></script>
+<script src="ui-ready.js?v=c53f653fe7f4" defer></script>
 </body>
 </html>
