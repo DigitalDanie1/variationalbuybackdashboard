@@ -107,6 +107,17 @@
     let back = null; for (let i = S.length - 1; i >= 0; i--) if (Date.parse(S[i][0]) <= t30) { back = S[i][1]; break; }
     countUp(added, back == null ? null : MAX - back, v => '+' + money(v, 2));
     countUp(days, S.length, v => String(Math.round(v)));
+    let pulse=root.querySelector('.le-pulse');
+    if(!pulse){pulse=document.createElement('div');pulse.className='le-pulse';root.querySelector('.le-stats').appendChild(pulse);}
+    const recent=src.filter(p=>p.d<today && Number.isFinite(p.v)).slice(-31).map(p=>[p.d,p.v]), changes=recent.slice(1).map((p,i)=>({d:p[0],v:p[1]-recent[i][1]}));
+    const peak=Math.max(1,...changes.map(p=>Math.abs(p.v)));
+    pulse.replaceChildren();
+    const label=document.createElement('small');label.textContent='THE DAILY PULSE';pulse.appendChild(label);
+    const bars=document.createElement('div');bars.className='le-pulse-bars';bars.setAttribute('role','img');bars.setAttribute('aria-label','Recent daily treasury balance changes. '+changes.map(p=>p.d+': '+full(p.v)).join('; '));
+    changes.forEach(p=>{const bar=document.createElement('i');bar.style.height=Math.max(2,Math.abs(p.v)/peak*48)+'px';bar.className=p.v<0?'is-negative':'';bar.title=p.d+' · '+(p.v>=0?'+':'−')+full(Math.abs(p.v));bars.appendChild(bar);});
+    pulse.appendChild(bars);
+    const caption=document.createElement('span');caption.textContent='Daily balance change · '+changes.length+' observations';pulse.appendChild(caption);
+
     return true;
   }
   function countUp(el, target, fmt) {

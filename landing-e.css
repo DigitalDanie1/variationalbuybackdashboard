@@ -104,3 +104,12 @@ body.v2-landing .srv2-landing.lb-landing.le-landing{isolation:isolate}
 body.v2-landing .le-landing::after{content:"";position:absolute;inset:0;z-index:0;pointer-events:none;background:url("assets/landing-grain.png") repeat;background-size:192px 192px;opacity:.035}
 .le-landing .le-tree::before{content:"";position:absolute;inset:-12% -8% -4%;pointer-events:none;background:radial-gradient(ellipse at 68% 72%,rgba(51,109,245,.13),transparent 56%),radial-gradient(ellipse at 35% 100%,rgba(40,87,210,.08),transparent 68%)}
 @media(max-width:600px){body.v2-landing .le-landing::after{opacity:.028}.le-landing .le-tree::before{background:radial-gradient(ellipse at 65% 78%,rgba(51,109,245,.11),transparent 62%)}}
+
+/* Quiet data detail below the treasury figures; scoped to the landing. */
+.le-pulse{width:224px;margin-top:8px;padding-top:18px;border-top:1px solid #73a8e329;text-align:left}
+.le-pulse small{font-size:9px;letter-spacing:.17em;color:#8eabc9}
+.le-pulse-bars{height:58px;display:flex;align-items:flex-end;gap:3px;margin:12px 0 9px}
+.le-pulse-bars i{flex:1;min-width:2px;background:linear-gradient(0deg,#3266a9,#8bc6ff);opacity:.75;box-shadow:0 -3px 12px #5cafff12}
+.le-pulse-bars i.is-negative{background:#c9957b}
+.le-pulse>span{display:block;color:var(--le-mute);font:9px/1.5 var(--le-mono);letter-spacing:.02em}
+@media(max-width:820px){.le-stats .le-pulse{grid-column:1/-1;width:100%;margin-top:4px}.le-pulse-bars{height:45px}.le-pulse-bars i{max-height:40px}}
