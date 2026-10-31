@@ -56,3 +56,17 @@ body.v2-landing .srv2-landing.lb-landing.le-landing{
   .le-stats strong{font-size:19px}.le-stats strong.hot{font-size:22px}
   .le-tree{min-height:380px}
 }
+/* phones: one-line stat labels, buttons on one row, and the paragraph steps aside so the
+   chart gets the rest of the first screen instead of starting below the fold */
+@media(max-width:600px){
+  .le-wrap{padding-top:28px}
+  .le-stats{margin-top:22px;gap:10px}
+  .le-stats small{font-size:9.5px;letter-spacing:.1em;white-space:nowrap}
+  .le-stats .le-wide{display:none}
+  .le-eyebrow{margin-top:26px;font-size:10px;letter-spacing:.14em}
+  .le-landing h1.le-title{margin-top:14px;font-size:clamp(44px,13.5vw,60px)}
+  .le-meta{margin-top:20px;gap:10px;flex-wrap:nowrap}
+  .le-meta p{display:none}
+  .le-btn{height:44px;padding:0 14px;font-size:14px;white-space:nowrap}
+  .le-tree{min-height:300px}
+}

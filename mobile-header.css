@@ -1,0 +1,24 @@
+/* Phone header for the dashboard workspaces.
+   The ≤700px rule that pins .srv2-head-right to 52px was written for the old landing head,
+   where the group held only the theme toggle. The dashboard header now also carries the
+   language picker and the LIVE status, so at 52px they stacked into a thin column
+   (EN/한/中 over "LIVE 3/3 · …" over "D/L"). On phones the group gets its own full-width row
+   under the title instead, one line, picker left and toggle right. */
+@media(max-width:700px){
+  .srv2-top{flex-wrap:wrap!important;row-gap:10px!important;padding-block:12px!important}
+  .srv2-top .srv2-head-right{
+    flex:1 1 100%!important;width:100%;display:flex!important;flex-wrap:nowrap!important;
+    align-items:center;justify-content:space-between;gap:12px!important;
+  }
+  .srv2-top .srv2-head-right .lang-picker{flex:0 0 auto}
+  .srv2-top .srv2-head-right .srv2-sync{
+    flex:1 1 auto;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:right;
+  }
+  .srv2-top .srv2-head-right .theme-toggle-liquid{flex:0 0 auto}
+  /* The other workspaces use the slim global bar: title left, "LIVE DATA" and the toggle
+     right. Same 52px pin squeezed "LIVE DATA" to one letter per line; here it fits on one
+     row beside the title, so the group just takes its natural width. */
+  .srv2-global-top .srv2-head-right{flex:0 0 auto!important;gap:10px!important;align-items:center}
+  .srv2-global-top .srv2-head-right>em{white-space:nowrap;flex:0 0 auto}
+  .srv2-global-top .srv2-head-right .theme-toggle-liquid{flex:0 0 auto;width:52px!important}
+}
