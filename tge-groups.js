@@ -676,8 +676,10 @@
        on desktop and 44px below 1100px, both with !important, and those are touch-target
        minimums rather than styling — a switch that undercut them would be a real regression
        on a phone. So the switch keeps the rail's own row height. */
-    '.srv2-rail .tge-switch button,.srv2-global-nav .tge-switch button{font-size:9px;',
-    'letter-spacing:.6px;padding:0 4px!important}',
+    '.srv2-rail .tge-switch button,.srv2-global-nav .tge-switch button{font-size:12px;',
+    'letter-spacing:1px;padding:0 4px!important}',
+    /* the rail switch is the page's top-level filter, so its marker is a step heavier too */
+    '.srv2-rail .tge-thumb,.srv2-global-nav .tge-thumb{height:3px;bottom:-2px}',
 
     /* ---------- collapsed strip ----------
        Below 1100px both rails stop being a column and become a fixed horizontal strip of
@@ -688,7 +690,7 @@
        right, because a rule under two chips in a scrolling row reads as an underlined word
        rather than as the floor of a tab bar. */
     '@media(max-width:1100px){',
-    '.srv2-global-nav .tge-switch,.srv2-rail .tge-switch{flex:0 0 auto;width:158px;',
+    '.srv2-global-nav .tge-switch,.srv2-rail .tge-switch{flex:0 0 auto;width:200px;',
     'margin:0 21px 0 0;padding:0;align-items:center;border:0}',
     /* The divider is a pseudo-element in the margin rather than padding and a border on the
        switch, so the track stays exactly two equal halves and the sliding rule keeps landing
@@ -697,7 +699,7 @@
     'position:absolute;right:-11px;top:9px;bottom:9px;width:1px;',
     'background:var(--v2-line,var(--line))}',
     '.srv2-global-nav .tge-switch button,.srv2-rail .tge-switch button{flex:1 1 50%;width:50%;',
-    'padding:0 4px!important;font-size:9px;letter-spacing:.8px}',
+    'padding:0 4px!important;font-size:11px;letter-spacing:.9px}',
     '.srv2-global-nav .tge-thumb,.srv2-rail .tge-thumb{bottom:7px}',
     '}',
 
@@ -706,7 +708,7 @@
        CJK face for this, and the per-rail sizes above are overridden rather than repeated
        three times. */
     'html[lang="ko"] .tge-switch button,html[lang="zh-Hans"] .tge-switch button',
-    '{font-family:var(--cjk)!important;font-size:10.5px!important;letter-spacing:.2px!important}',
+    '{font-family:var(--cjk)!important;font-size:13px!important;letter-spacing:.2px!important}',
     'html[lang="ko"] .tge-ghead>em,html[lang="zh-Hans"] .tge-ghead>em',
     '{font-family:var(--cjk);letter-spacing:0}'
   ].join('');
