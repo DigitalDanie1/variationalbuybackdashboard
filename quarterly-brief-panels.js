@@ -792,8 +792,10 @@
       '<div class="qb-bar-row"><span>Focus quarter</span><div class="qb-chips" id="qbChips" role="group" aria-label="Focus quarter"></div>' +
       '<div class="qb-credit">Framework adapted from <a href="' + TWEET + '" target="_blank" rel="noopener">Alea Research\'s Q3 2026 report ↗</a></div></div>' +
       '<div id="qbStatus"></div><div id="qbTake"></div><div class="qb-grid" id="qbGrid"></div>';
+    var target=document.getElementById('reportsQuarter');
     var cap = SEC.querySelector(':scope > .cap');
-    if (cap && cap.parentNode === SEC) cap.insertAdjacentElement('afterend', ROOT);
+    if(target)target.appendChild(ROOT);
+    else if (cap && cap.parentNode === SEC) cap.insertAdjacentElement('afterend', ROOT);
     else { var bw = SEC.querySelector('#bwBlock'); if (bw) bw.parentNode.insertBefore(ROOT, bw); else SEC.appendChild(ROOT); }
     GRID = $('#qbGrid', ROOT); TAKE = $('#qbTake', ROOT); CHIPS = $('#qbChips', ROOT); STATUS = $('#qbStatus', ROOT);
     GRID.innerHTML = CARDS.map(function (c) {
@@ -860,12 +862,13 @@
   }
 
   /* ---------- lazy start ---------- */
-  function visible() { return !SEC.classList.contains('tg-hide'); }
+  function visible() { var fold=document.getElementById('reportsQuarter'); return !SEC.classList.contains('tg-hide')&&(!fold||(fold.open&&!fold.closest('[hidden]'))); }
   function start() {
     if (S.started) { if (S.raw) render(); return; }
     S.started = true; mount(); loadAll();
   }
   function check() { if (visible()) start(); }
+  var fold=document.getElementById('reportsQuarter');if(fold)fold.addEventListener('toggle',check);
   new MutationObserver(check).observe(SEC, { attributes: true, attributeFilter: ['class'] });
   check();
 })();

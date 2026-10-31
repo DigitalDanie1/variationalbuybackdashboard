@@ -8608,6 +8608,7 @@ body.theme-light .lb-card{box-shadow:0 1px 0 rgba(20,40,80,.03),0 14px 30px -22p
 <link rel="stylesheet" href="landing-e.css?v=559486b43a3f">
 <link rel="stylesheet" href="mobile-header.css?v=73b93160e476">
 <link rel="stylesheet" href="history-timeline.css?v=bed894681bd5">
+<link rel="stylesheet" href="reports-clean.css?v=487ff4714084">
 </head>
 <body>
 <div class="tipbar" id="tipbar" hidden>
@@ -9366,59 +9367,40 @@ body.theme-light .lb-card{box-shadow:0 1px 0 rgba(20,40,80,.03),0 14px 30px -22p
   <svg class="chart" id="frHist" viewBox="0 0 720 260"></svg>
 </div>
 
-<div class="card tsec tg-hide" data-tg="biweekly">
-  <h2>Official Operating Reports <span class="tag">published every 2 weeks</span></h2>
-  <div class="cap">One answer first: is the exchange getting bigger, and is it keeping more money after costs? Every published number remains available below. <span id="bwAsOf" class="muted">—</span></div>
+<section class="card reports-page tsec tg-hide" data-tg="biweekly">
+  <header class="reports-heading"><div><span class="reports-eyebrow">PUBLISHED EVERY TWO WEEKS</span><h2>Official reports</h2><p id="bwAsOf">—</p></div><a id="reportsSource" href="https://x.com/variational_io" target="_blank" rel="noopener">Latest source ↗</a></header>
+  <nav class="reports-tabs" role="tablist" aria-label="Report views">
+    <button type="button" role="tab" id="reports-tab-latest" aria-controls="reports-latest" aria-selected="true" data-report-view="latest">Latest report</button>
+    <button type="button" role="tab" id="reports-tab-archive" aria-controls="reports-archive" aria-selected="false" data-report-view="archive">Report archive</button>
+    <button type="button" role="tab" id="reports-tab-research" aria-controls="reports-research" aria-selected="false" data-report-view="research">Research & sources</button>
+  </nav>
   <div class="bw full" id="bwBlock">
-    <button class="bw-guide-toggle" id="bwGuideToggle" type="button" aria-expanded="false" aria-controls="bwGuideRegion">How to read this page</button>
-    <div class="bw-easy-guide" id="bwGuideRegion">
-      <div><strong>1. Is it growing?</strong><span>Look at <b>trading volume, open interest, TVL, and users.</b> Bigger numbers usually mean more people and money are using the exchange.</span></div>
-      <div><strong>2. Is it making money?</strong><span>Traders pay spreads. Subtract market-making costs and rewards. What remains is <b>net profit.</b></span></div>
-      <div><strong>3. Is cash really arriving?</strong><span><b>Treasury</b> means real USDC held by the protocol. The on-chain check verifies that wallet separately.</span></div>
-    </div>
-    <div class="bw-source-rail">
-      <div class="bw-lane"><span class="n">1</span><div><b>Official report</b><span>Metrics copied from Variational's biweekly X post. New posts are appended, never overwritten. <a href="https://x.com/search?q=from%3Avariational_io%20biweekly%20update!&src=typed_query" target="_blank" rel="noopener">Open official post search</a></span></div></div>
-      <div class="bw-lane"><span class="n">2</span><div><b>On-chain check</b><span>Six consecutive 14-day treasury inflow windows calculated from the Arbitrum USDC balance history. This updates without waiting for a post.</span></div></div>
-    </div>
-    <section class="bw-product" id="bwProduct" aria-label="Latest product update"></section>
-    <section class="bw-command">
-      <div class="bw-command-read">
-        <div class="bw-head first"><b>Latest Report Verdict</b><span>growth and momentum at a glance</span></div>
-        <div class="bw-verdict" id="bwVerdict"></div>
-      </div>
-      <div class="bw-command-money">
-        <div class="bw-head first"><b>How $1 Became Profit</b><span>latest completed 2-week report</span></div>
-        <div class="bw-pnl" id="bwPnl"></div>
-        <div class="bw-command-subhead"><b>Same-report operating snapshot</b><span>scale, users, OLP, and treasury</span></div>
-        <div class="bw-grid" id="bwGrid"></div>
-      </div>
+    <section id="reports-latest" role="tabpanel" aria-labelledby="reports-tab-latest">
+      <div class="reports-kpis" id="reportsKpis"></div>
+      <p class="reports-margin" id="reportsMargin"></p>
+      <p class="reports-scope">Reported two-week figures. Net profit includes the treasury and OLP allocations; these four numbers are not additive.</p>
+      <details class="reports-fold"><summary>Where the money went <span>Spreads → costs → rewards → net profit</span></summary><div class="bw-pnl" id="bwPnl"></div><div class="bw-note" id="bwNote"></div></details>
+      <details class="reports-fold"><summary>Operating scale & users <span>Volume, OI, TVL and the full snapshot</span></summary><div class="bw-grid" id="bwGrid"></div></details>
+      <details class="reports-fold"><summary>What changed <span>Compared with the previous official report</span></summary><span id="bwChangeWindow" class="reports-subtitle"></span><section class="bw-change" id="bwChange" aria-label="Report-over-report change summary"></section><div class="bw-verdict" id="bwVerdict"></div></details>
+      <details class="reports-fold"><summary>Product updates <span>Changes published with the latest report</span></summary><section class="bw-product" id="bwProduct" aria-label="Latest product update"></section><p class="reports-no-product">No product changes were disclosed with this report.</p></details>
     </section>
-    <div class="bw-head bw-change-head"><b>What Changed Since the Last Report</b><span id="bwChangeWindow">previous report → latest report</span></div>
-    <section class="bw-change" id="bwChange" aria-label="Report-over-report change summary"></section>
-    <div class="bw-head bw-priority-head"><b>Eight Numbers That Tell the Story</b><span>current value · change since first comparable report · change vs previous report</span></div>
-    <div class="bw-deltas" id="bwDeltas"></div>
-    <section class="bw-research" aria-labelledby="bwResearchTitle">
-      <div class="bw-head bw-research-head"><b id="bwResearchTitle">Full Research Atlas</b><span>18 original views from the 20-report analysis, updated with every new disclosure</span></div>
-      <div class="bw-research-intro">
-        <p><strong>Growth is real. Cost quality is the open question.</strong> These views reconstruct every chart and infographic from the full research article using the stored official reports.</p>
-        <a href="https://x.com/0xdefidaniel/status/2087186925476262362" target="_blank" rel="noopener">Read the original analysis ↗</a>
-      </div>
-      <div class="bw-research-grid" id="bwResearchGrid"></div>
+    <section id="reports-archive" role="tabpanel" aria-labelledby="reports-tab-archive" hidden>
+      <div class="reports-section-heading"><h3>Open a report</h3><p>Original disclosed values, with that report’s definitions.</p></div>
+      <div class="bw-report-tools"><label for="bwReportSelect">Report date</label><select id="bwReportSelect"></select><a id="reportsArchiveSource" target="_blank" rel="noopener">Selected source ↗</a></div>
+      <div class="bw-report-detail" id="bwReportDetail"></div>
+      <details class="reports-fold"><summary>All reports side by side <span>Full comparison table</span></summary><div class="bw-hist" id="bwHist"></div></details>
+      <details class="reports-fold"><summary>Long-term changes <span>Current value, since inception and versus the previous report</span></summary><div class="bw-deltas" id="bwDeltas"></div></details>
     </section>
-    <div class="bw-head"><b>Real Cash Added Every 14 Days</b><span>USDC entering the treasury wallet before the next report arrives</span></div>
-    <div class="bw-trend" id="bwTrend"></div>
-    <div class="bw-head bw-evidence-head"><b>Full Evidence Library</b><span>every published number, definition change, and original report date</span></div>
-    <div class="bw-head"><b>Every Metric Over Time</b><span>hover a point to read its official report date and value</span></div>
-    <div class="bw-atlas" id="bwMetricAtlas"></div>
-    <div class="bw-atlas-note"><b>How to read this:</b> Green ↑ means the number went up. Pink ↓ means it went down. Up is not always good: costs and refunds are better when lower. Older reports used “2-week Revenue”; newer reports show trader spreads, costs, and profit separately, so those lines are not mixed.</div>
-    <div class="bw-head"><b>All Official Reports, Side by Side</b><span>newest first · each value includes its change from the previous matching report</span></div>
-    <div class="bw-hist" id="bwHist"></div>
-    <div class="bw-head"><b>Open One Complete Report</b><span>choose a date to see every single number published that day</span></div>
-    <div class="bw-report-tools"><label for="bwReportSelect">Official report date</label><select id="bwReportSelect"></select></div>
-    <div class="bw-report-detail" id="bwReportDetail"></div>
-    <div class="bw-note" id="bwNote"></div>
+    <section id="reports-research" role="tabpanel" aria-labelledby="reports-tab-research" hidden>
+      <div class="reports-section-heading"><h3>Explore the evidence</h3><p>Choose a topic to open its charts and methodology.</p></div>
+      <details class="reports-fold" id="reportsQuarter"><summary>Quarterly market brief <span>Peer comparisons, market share and buyback scenarios</span></summary></details>
+      <details class="reports-fold"><summary>Research atlas <span>Growth, margins and operating risk</span></summary><section class="bw-research" aria-labelledby="bwResearchTitle"><div class="bw-head"><b id="bwResearchTitle">Full research atlas</b><a href="https://x.com/0xdefidaniel/status/2087186925476262362" target="_blank" rel="noopener">Original analysis ↗</a></div><div class="bw-research-grid" id="bwResearchGrid"></div></section></details>
+      <details class="reports-fold"><summary>Metrics over time <span>Every series and its report dates</span></summary><div class="bw-atlas" id="bwMetricAtlas"></div><p class="reports-scope">Earlier allocation reports and later P&L reports use different definitions. Missing values are not zero; unlike definitions are kept separate.</p></details>
+      <details class="reports-fold"><summary>On-chain treasury check <span>Six consecutive 14-day inflow windows</span></summary><div class="bw-trend" id="bwTrend"></div></details>
+      <details class="reports-fold"><summary>How to read the numbers <span>Definitions and source boundaries</span></summary><div class="reports-method"><h4>Growth</h4><p>Trading volume, open interest, TVL and users describe different aspects of scale. Cumulative trading volume is not two-week volume.</p><h4>Profit</h4><p>Gross spreads minus market-making costs and rewards equals reported net profit. Net profit includes both the treasury and OLP allocations.</p><h4>Cash</h4><p>Official report allocations and on-chain wallet changes are separate observations. Wallet transfers are not automatically revenue or executed buybacks.</p><a href="https://x.com/search?q=from%3Avariational_io%20biweekly%20update!&src=typed_query" target="_blank" rel="noopener">Official report search ↗</a></div></details>
+    </section>
   </div>
-</div>
+</section>
 
 <div class="card tsec tg-hide" data-tg="implied" style="margin-top:16px">
   <h2>Implied Spreads <span class="tag">money circuit</span></h2>
@@ -11229,9 +11211,10 @@ body.theme-light .lb-card{box-shadow:0 1px 0 rgba(20,40,80,.03),0 14px 30px -22p
 <script src="pro-derivatives-data.js?v=d02794dfe278" defer></script>
 <script src="variational-pro-panels.js?v=d6a395aada06" defer></script>
 <script src="derivatives-panels.js?v=39d4ca5a6936" defer></script>
-<script src="quarterly-brief-panels.js?v=6ec0fae4fe5b" defer></script>
+<script src="quarterly-brief-panels.js?v=2d4a726480aa" defer></script>
 <script src="revenue-comparison.js?v=864f5e5be8ee" defer></script>
 <script src="tge-groups.js?v=a511cf19c719" defer></script>
+<script src="reports-clean.js?v=ea9165016194" defer></script>
 <script src="ui-ready.js?v=c53f653fe7f4" defer></script>
 </body>
 </html>
