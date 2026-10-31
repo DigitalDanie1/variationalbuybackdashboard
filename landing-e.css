@@ -98,3 +98,9 @@ body.v2-landing .srv2-landing.lb-landing.le-landing{
 .le-marker.is-reached{opacity:1;transform:translateY(0)}
 .le-marker-launch.is-reached{pointer-events:auto!important}
 @media(prefers-reduced-motion:reduce){.le-marker{transition:none;transform:none}}
+
+/* Quiet surface texture sits below all text; the glow belongs to the chart. */
+body.v2-landing .srv2-landing.lb-landing.le-landing{isolation:isolate}
+body.v2-landing .le-landing::after{content:"";position:absolute;inset:0;z-index:0;pointer-events:none;background:url("assets/landing-grain.png") repeat;background-size:192px 192px;opacity:.035}
+.le-landing .le-tree::before{content:"";position:absolute;inset:-12% -8% -4%;pointer-events:none;background:radial-gradient(ellipse at 68% 72%,rgba(51,109,245,.13),transparent 56%),radial-gradient(ellipse at 35% 100%,rgba(40,87,210,.08),transparent 68%)}
+@media(max-width:600px){body.v2-landing .le-landing::after{opacity:.028}.le-landing .le-tree::before{background:radial-gradient(ellipse at 65% 78%,rgba(51,109,245,.11),transparent 62%)}}
