@@ -1,6 +1,6 @@
 (function(){
 'use strict';
-var box=document.createElement('section');box.className='product-money-map';box.id='product-money-map';box.setAttribute('translate','no');
+var box=document.createElement('section');box.className='product-money-map';box.id='product-money-map';box.setAttribute('translate','no');box.hidden=true;
 function render(){
  var ko=(document.documentElement.lang||'').indexOf('ko')===0;
  var t=function(en,kr){return ko?kr:en;};
@@ -26,7 +26,23 @@ function render(){
  '<p class="pm-limits">'+t('The connected reports and aggregate treasury feed do not provide a matched Perps/Swaps revenue-and-cost breakdown. Missing is not zero. No volume-proportional allocation is invented. Swap funding, financing and dividend adjustments are not automatically protocol revenue.','연결된 보고서·합산 트레저리 데이터에서는 같은 기간의 Perps/Swaps별 매출·비용 분리가 제공되지 않습니다. 미공개는 0이 아닙니다. 거래량 비율로 수익을 임의 배분하지 않습니다. Swaps의 펀딩·금융비용·배당 조정을 프로토콜 매출에 자동 합산하지 않습니다.')+'</p>'+
  '<p class="pm-sources"><a href="https://help.variational.io/en/articles/16643437-swaps-perpetual-futures-comparison" target="_blank" rel="noopener">Perps / Swaps · official comparison ↗</a> · <a href="https://docs.variational.io/omni/the-omni-liquidity-provider-olp" target="_blank" rel="noopener">OLP & treasury policy ↗</a> · <a href="https://help.variational.io/en/articles/16643759-funding-for-swaps" target="_blank" rel="noopener">Swap funding ↗</a></p>';
 }
-function place(){var hash=location.hash||'#overview';box.hidden=['#implied','#efficiency'].indexOf(hash)<0;var host=document.body.classList.contains('v2-overview')?document.querySelector('.srv2-canvas'):document.getElementById('main');if(host&&box.parentNode!==host)host.prepend(box);}
-function boot(){render();place();window.addEventListener('hashchange',place);new MutationObserver(place).observe(document.body,{attributes:true,attributeFilter:['class']});new MutationObserver(render).observe(document.documentElement,{attributes:true,attributeFilter:['lang']});}
+// Own the block inside its selected section. Parent visibility is synchronous with
+// showTab, so even replaceState transitions cannot leave this block on another page.
+function place(){
+ var active=document.querySelector('#tabs button.on[data-tab]');
+ var tab=active&&active.dataset.tab;
+ var allowed=tab==='implied'||tab==='efficiency';
+ box.hidden=!allowed;
+ if(!allowed)return;
+ var owner=document.querySelector('.tsec[data-tg="'+tab+'"]');
+ if(owner&&box.parentNode!==owner)owner.prepend(box);
+}
+function boot(){
+ render();place();
+ window.addEventListener('hashchange',place);
+ var tabs=document.getElementById('tabs');
+ if(tabs)new MutationObserver(place).observe(tabs,{subtree:true,childList:true,attributes:true,attributeFilter:['class','aria-selected']});
+ new MutationObserver(render).observe(document.documentElement,{attributes:true,attributeFilter:['lang']});
+}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
 })();
