@@ -28,6 +28,8 @@
     annotations.forEach(a => {
       const el = document.createElement(a.source ? 'a' : 'div');
       el.className = 'le-marker le-marker-' + a.kind;
+      el.setAttribute('aria-hidden','true');
+      if(a.source)el.tabIndex=-1;
       if (a.source) { el.href=a.source; el.target='_blank'; el.rel='noopener noreferrer'; }
       const title = document.createElement('strong'); title.textContent=a.title;
       const date = document.createElement('time'); date.dateTime=a.date; date.textContent=dateLabel(a.date);
@@ -159,10 +161,16 @@
         g.fillRect(sx + 1, sy + 1, C - 2, C - 2);
       }
     }
-    // Fixed labels stay readable through the replay. Leaders mark the exact day,
-    // including the $10M crossing even when it is close to the live balance.
+    // Milestones enter only when the animated timeline reaches their exact day.
+    // Replay clears them so the labels never float over an unreached graph.
     annotations.forEach(a => {
-      if (a.x > colDay[upto].x + C) return;
+      const reached=progress>=a.i/(S.length-1);
+      if(a.el.classList.contains('is-reached')!==reached){
+        a.el.classList.toggle('is-reached',reached);
+        a.el.setAttribute('aria-hidden',String(!reached));
+        if(a.source)a.el.tabIndex=reached?0:-1;
+      }
+      if(!reached)return;
       const color = a.kind === 'launch' ? '#f6c96a' : '#bfe0ff';
       g.save(); g.strokeStyle=color; g.lineWidth=1; g.globalAlpha=a.kind === 'launch' ? .42 : .6;
       g.setLineDash(a.kind === 'launch' ? [4,4] : [2,4]);

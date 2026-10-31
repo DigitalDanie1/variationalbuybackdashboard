@@ -92,3 +92,9 @@ body.v2-landing .srv2-landing.lb-landing.le-landing{
   .le-marker-launch strong{font-size:12px}
   .le-marker-launch time{font-size:8px}
 }
+
+/* Markers follow the animated history, including on replay. */
+.le-marker{opacity:0;transform:translateY(8px);transition:opacity .28s ease,transform .28s ease;pointer-events:none!important}
+.le-marker.is-reached{opacity:1;transform:translateY(0)}
+.le-marker-launch.is-reached{pointer-events:auto!important}
+@media(prefers-reduced-motion:reduce){.le-marker{transition:none;transform:none}}
