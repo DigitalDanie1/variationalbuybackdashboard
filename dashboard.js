@@ -1050,17 +1050,28 @@ function renderPmDailyMonitor(){
   $('#pmDailyVsAvg').textContent=signedPct(vsAverage);
   $('#pmDailyAvg').textContent=`Prior ${baselineRows.length}D average: ${signedMoney(average)}`;
 }
-/* One aligned 30D window; current wallet balances remain separate in the cards below. */
-function renderMoneyMap(T){
-  const host=$('#pmSankey');if(!host||!T)return;
-  const e=computeEff(),F=MKT.vol.d30/e.volPerFee,treasury=e.rev30;
-  const estimate=dailyHedgingEstimate(currentTreasuryDate(),F,F-treasury);
-  const cash=v=>v==null?'—':fmtCompact(v),pct=v=>F>0?(v/F*100).toFixed(1)+'%':'—';
+/* All money-flow windows end on the same completed ET day; no partial-day scaling. */
+let PM_FLOW_WINDOW='30d';
+function moneyFlowWindow(key=PM_FLOW_WINDOW){
   const ko=(document.documentElement.lang||'').startsWith('ko'),t=(en,kr)=>ko?kr:en;
-  host.innerHTML=`<div class="pm-flow-head"><b>${t('30D gross spreads · estimated','30일 총 스프레드 · 추정치')}</b><strong>${cash(F)}</strong><span>${t('One reporting window · amounts below reconcile to this total','동일한 30일 기준 · 아래 세 금액의 합계')}</span></div><div class="pm-flow-arrows" aria-hidden="true">↙ &nbsp; ↓ &nbsp; ↘</div><div class="pm-flow-parts">
-  <article class="pm-flow-treasury"><span>${t('PROTOCOL SHARE','프로토콜 몫')}</span><h3>${t('Treasury net inflow','트레저리 순유입')}</h3><strong>${cash(treasury)}</strong><em>${pct(treasury)}</em><small>${t('Excludes OLP profit','OLP 손익 제외')}</small><div class="pm-flow-plan">↓ ${t('100% intended for VAR buy & burn','이 몫의 100%를 VAR 매입·소각에 사용할 계획')}<b>${t('Planned allocation · not executed burn','예정 재원 · 실제 소각액 아님')}</b></div></article>
-  <article class="pm-flow-cost"><span>${t('ESTIMATED COST','추정 비용')}</span><h3>${t('Hedging / market making','헤징·마켓메이킹')}</h3><strong>${cash(estimate.cost)}</strong><em>${pct(estimate.cost)}</em><small>${t('25W report weighted-average rate × gross spreads','25주 리포트 가중평균 비용률 × 총 스프레드')}</small></article>
-  <article class="pm-flow-olp"><span>${t('ESTIMATED REMAINDER','추정 잔여액')}</span><h3>${t('OLP · before rewards','OLP · 보상 차감 전')}</h3><strong>${cash(estimate.remaining)}</strong><em>${pct(estimate.remaining)}</em><small>${t('Not actual OLP net profit','실제 OLP 순이익이 아님')}</small></article></div><div class="pm-flow-basis">${t('Estimate · last 25 weeks of biweekly reports','추정치 · 지난 25주 격주 리포트')} · ${estimate.reports.length} ${t('reports','개 리포트')} · ${estimate.rate==null?'—':(estimate.rate*100).toFixed(2)+'%'} · ${t('Rewards not deducted. Wallet balances below are stocks, not additional revenue.','보상 차감 전. 아래 지갑 잔액은 보유액이며 추가 매출이 아닙니다.')}</div>`;
+  const cfg={'30d':{days:30,label:'30D'},'7d':{days:7,label:'1W'},'1d':{days:1,label:'1D'}}[key];
+  if(!cfg)return {window:key,error:t('Unsupported window.','지원하지 않는 기간입니다.')};
+  const completed=SERIES.filter(p=>p.d<resetDateKey()&&Number.isFinite(p.v));
+  const last=completed[completed.length-1];
+  if(!last)return {window:key,error:t('Waiting for completed daily balances.','완료된 일별 잔액을 기다리고 있습니다.')};
+  const baseDate=addDays(last.d,-cfg.days),start=addDays(baseDate,1);
+  const base=completed.find(p=>p.d===baseDate),rows=completed.filter(p=>p.d>baseDate&&p.d<=last.d);
+  const result={window:key,label:cfg.label,start,end:last.d,baseDate};
+  if(!base||rows.length!==cfg.days)return {...result,error:t('A complete set of daily balances is not available for this window.','이 기간의 일별 잔액 데이터가 완전하지 않습니다.')};
+  const treasury=last.v-base.v;
+  if(treasury<=0)return {...result,error:t('This window has zero or negative net treasury inflow; a positive allocation flow cannot represent it.','이 기간의 트레저리 순유입은 0 이하이므로 양수 배분 흐름도로 표시할 수 없습니다.')};
+  const gross=impliedSpreadsBetween(baseDate,last.d,treasury),estimate=dailyHedgingEstimate(last.d,gross,gross-treasury);
+  if(!Number.isFinite(estimate.cost)||estimate.remaining<0)return {...result,error:t('A reconciled cost and remainder estimate is not available for this window.','이 기간의 비용과 잔여액을 합계가 맞는 추정치로 제공할 수 없습니다.')};
+  return {...result,base:base.v,close:last.v,gross,treasury,cost:estimate.cost,remaining:estimate.remaining,rate:estimate.rate,reports:estimate.reports};
+}
+function renderMoneyMap(T){
+  const host=$('#pmSankey');if(!host||!window.renderProtocolFlow)return;
+  window.renderProtocolFlow(host,moneyFlowWindow(),key=>{PM_FLOW_WINDOW=key;renderMoneyMap(T);});
 }
 
 function feeRevenueHistory(){
