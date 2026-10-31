@@ -27,9 +27,9 @@ function proxy(){
  el.innerHTML='<div class="rc-standing-head"><div class="rc-var-name"><img src="variational-symbol-transparent.png" width="28" height="28" alt=""><strong>Where Variational stands</strong></div><span>'+period+' · '+(state.scope==='all'?'all protocol categories':'derivatives peers')+'</span></div><div class="rc-standings">'+METRICS.map(function(m){
    var actual=official?value(official,m[0]):null,isProxy=actual==null&&m[0]!=='holders'&&model&&!model.error;
    var v=actual!=null?actual:isProxy?(m[0]==='fees'?model.gross:model.treasury):null;
-   var eligible=peers.filter(function(r){return r!==official&&value(r,m[0])!=null;}),rank=v==null?null:rankOf(v,m[0],eligible);
+   var eligible=peers.filter(function(r){return r!==official&&value(r,m[0])!=null;}),rank=v==null||!eligible.length?null:rankOf(v,m[0],eligible);
    var basis=actual!=null?'DeFiLlama reported':isProxy?(m[0]==='fees'?'Estimated gross spreads':'Treasury wallet proxy'):'No measured holder accrual';
-   return '<div class="rc-standing'+(state.sort===m[0]?' is-ranked':'')+'"><span>'+m[1]+'</span><strong>'+(rank==null?'—':'<small>#</small>'+rank)+'</strong><em>'+(rank==null?'Not ranked':'of '+(eligible.length+1)+' with data'+(isProxy?' · indicative':''))+'</em><b title="'+money(v)+'">'+(v==null?'—':new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',notation:'compact',maximumFractionDigits:2}).format(v))+'</b><p>'+basis+'</p></div>';
+   return '<div class="rc-standing'+(state.sort===m[0]?' is-ranked':'')+'"><span>'+m[1]+'</span><strong>'+(rank==null?'—':'<small>#</small>'+rank)+'</strong><em>'+(rank==null?(v==null?'Not ranked':'Waiting for peer data'):'of '+(eligible.length+1)+' with data'+(isProxy?' · indicative':''))+'</em><b title="'+money(v)+'">'+(v==null?'—':new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',notation:'compact',maximumFractionDigits:2}).format(v))+'</b><p>'+basis+'</p></div>';
  }).join('')+'</div><p class="rc-standing-basis">'+(model&&!model.error?'Wallet window: '+esc(model.start)+' → '+esc(model.end)+' · completed ET days. ':'')+'Indicative positions compare wallet-derived figures with DeFiLlama rolling windows; they are not official DeFiLlama ranks. Holder buyback intentions are not measured holder revenue. Search does not change the ranking universe.</p>';
 }
 
