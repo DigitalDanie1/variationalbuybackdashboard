@@ -16,7 +16,7 @@
       root.querySelector('#reports-latest .reports-scope').textContent=(previous?'Changes vs '+previous.asOf+'. ':'')+'Net profit includes treasury and OLP allocations; the four figures are not additive.';
       const margin=latest.spreads2w>0&&Number.isFinite(latest.netProfit2w)?latest.netProfit2w/latest.spreads2w*100:null;
       document.getElementById('reportsMargin').textContent=margin==null?'Net margin not reported.':`${margin.toFixed(1)}% of gross spreads remained as net profit.`;
-      const source=document.getElementById('reportsSource');source.href=/^https:\/\//.test(latest.src)?latest.src:'https://x.com/variational_io';
+      const source=document.getElementById('reportsSource');source.textContent=latest.sourceType==='provided-transcript'?'Find original post ↗':'Latest source ↗';source.href=/^https:\/\//.test(latest.src)?latest.src:'https://x.com/variational_io';
     }
     function open(key){
       root.querySelectorAll('[data-report-view]').forEach(b=>b.setAttribute('aria-selected',String(b.dataset.reportView===key)));

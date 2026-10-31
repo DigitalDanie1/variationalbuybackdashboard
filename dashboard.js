@@ -736,6 +736,38 @@ const BIWEEKLY_HISTORY=[
   olpPnl2w:2066018,          // OLP PnL
   olpPnlLife:23424969,       // lifetime OLP PnL
   treasuryHoldings:11077933  // current protocol treasury holdings (USDC)
+},
+{
+  asOf:'2026-10-31',
+  src:'https://x.com/search?q=from%3Avariational_io%20%22biweekly%22%20since%3A2026-10-30%20until%3A2026-11-02&src=typed_query',
+  sourceType:'provided-transcript',
+  sourceNote:'Transcribed from the supplied update; original post URL not attached. Dated 2026-10-31 using the two-week cadence after 2026-10-17. Million/billion figures retain published rounding.',
+  release:'v0.38.2',
+  product:[
+    'Updated wallet connection service',
+    'Improved mobile notification display',
+    'Various portfolio page optimizations',
+    'Trading API preparations'
+  ],
+  totalVolume:449.92e9,
+  oi:1.78e9,
+  tvl:289.97e6,
+  markets:581,
+  rewardsClaimed:9.08e6,     // rounded in supplied report
+  lossesRefunded:4.56e6,    // rounded; do not substitute an older precise value
+  referralClaimed:4.52e6,   // rounded in supplied report
+  dau:null,
+  wau:null,
+  spreads2w:5233390,
+  mmCosts2w:2891623,        // derived: 5,233,390 - 2,341,767
+  netRevenue2w:2341767,
+  rewards2w:236977,         // expense stored as positive magnitude, deducted once
+  referralRewards2w:236977,// subset of rewards, not an extra deduction
+  netProfit2w:2104790,
+  treasury2w:1046678,
+  olpPnl2w:1058112,
+  olpPnlLife:24483081,
+  treasuryHoldings:12128702
 }
 ];
 const BIWEEKLY=BIWEEKLY_HISTORY[BIWEEKLY_HISTORY.length-1];
@@ -2699,6 +2731,7 @@ function renderBiweekly(){
       if(r.treasuryStatus)notes.push(`Treasury: ${r.treasuryStatus}`);
       if(r.referralRewardsStatus)notes.push(`Referral rewards: ${r.referralRewardsStatus}`);
       if(r.correctionNote)notes.push(`Official correction: ${r.correctionNote}`);
+      if(r.sourceNote)notes.push(r.sourceNote);
       const alloc=['olpAllocation2w','lossRefundPool2w','referralRewardsPool2w','treasury2w'].filter(k=>Number.isFinite(r[k])).reduce((s,k)=>s+r[k],0);
       if(Number.isFinite(r.revenue2w)&&alloc)notes.push(`Allocation check: ${M(alloc)} of ${M(r.revenue2w)} (${Math.abs(alloc-r.revenue2w)<1?'reconciled':'definition differs'})`);
       reportDetail.innerHTML=values+`<div class="bw-report-notes"><b>Read before comparing:</b> ${notes.join(' · ')}. Dashes and omitted fields mean not published, never zero.</div>`;
