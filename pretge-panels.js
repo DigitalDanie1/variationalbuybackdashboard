@@ -493,6 +493,7 @@ function registerTab(){
 }
 
 function boot(){
+  window.PRETGE_HEALTH_DATA={asOf:PT_AS_OF,v:PT.v,l:PT.l};
   registerTab();
   renderAll();
   initJump();
