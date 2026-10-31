@@ -23,3 +23,4 @@
 @media(max-width:650px){.rc-standings{gap:14px}.rc-standing>strong{font-size:35px}.rc-standing>span{font-size:11px}.rc-standing>b{font-size:13px}.rc-standing>em,.rc-standing>p{font-size:10px}.rc-standing-head{margin-bottom:20px}}
 
 .rc-definition-fold{margin:0 0 20px;color:var(--sub);font:12px var(--sans)}.rc-definition-fold summary{cursor:pointer;padding:8px 0}.rc-definition-fold .rc-meaning{margin-top:10px}
+.rc-standing>span{display:block;min-height:34px;line-height:1.4}
