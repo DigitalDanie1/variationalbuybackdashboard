@@ -29,10 +29,9 @@
       const el = document.createElement(a.source ? 'a' : 'div');
       el.className = 'le-marker le-marker-' + a.kind;
       if (a.source) { el.href=a.source; el.target='_blank'; el.rel='noopener noreferrer'; }
-      const label = document.createElement('span'); label.className='le-marker-kind'; label.textContent=a.kind==='launch' ? 'PRODUCT LAUNCH ↗' : 'TREASURY REACHED';
       const title = document.createElement('strong'); title.textContent=a.title;
       const date = document.createElement('time'); date.dateTime=a.date; date.textContent=dateLabel(a.date);
-      el.append(label,title,date);
+      el.append(title,date);
       el.title = a.detail + ' · ' + a.date;
       markers.appendChild(el); a.el=el;
     });
@@ -43,11 +42,10 @@
     annotations.slice().sort((a,b)=>a.i-b.i).forEach(a => {
       a.x = a.i / (S.length - 1) * (cols - 1) * C + C/2;
       a.y = baseY - Math.max(1, Math.round(S[a.i][1] / MAX * rowsMax)) * C;
-      if (narrow) { a.el.style.left=''; a.el.style.top=''; return; }
       const width=a.el.offsetWidth, height=a.el.offsetHeight;
       const x=Math.max(12, Math.min(W-width-12, a.x-width/2));
-      let y=Math.max(8, a.y-height-32);
-      while(used.some(r=>x<r.x+r.w+14 && x+width+14>r.x && y<r.y+r.h+12 && y+height+12>r.y)) y-=height+14;
+      let y=a.kind === 'launch' ? H-height-6 : Math.max(8, a.y-height-(narrow ? 20 : 32));
+      while(a.kind !== 'launch' && used.some(r=>x<r.x+r.w+14 && x+width+14>r.x && y<r.y+r.h+12 && y+height+12>r.y)) y-=height+14;
       y=Math.max(8,y);
       a.el.style.left=x+'px'; a.el.style.top=y+'px';
       a.labelX=x+width/2; a.labelY=y+height;
@@ -122,8 +120,8 @@
     cv.width = W * dpr; cv.height = H * dpr;
     C = W < 820 ? 6 : 9;
     cols = Math.ceil(W / C);
-    baseY = Math.floor((H - 8) / C) * C;
-    const reserve = W < 700 ? 190 : Math.max(96, H * .18);
+    baseY = Math.floor((H - 64) / C) * C;
+    const reserve = W < 700 ? 80 : Math.max(96, H * .18);
     rowsMax = Math.max(1, Math.floor((baseY - reserve) / C));
     colDay = [];
     for (let c = 0; c < cols; c++) {
@@ -166,14 +164,14 @@
     annotations.forEach(a => {
       if (a.x > colDay[upto].x + C) return;
       const color = a.kind === 'launch' ? '#f6c96a' : '#bfe0ff';
-      g.save(); g.strokeStyle=color; g.lineWidth=1; g.globalAlpha=.65;
+      g.save(); g.strokeStyle=color; g.lineWidth=1; g.globalAlpha=a.kind === 'launch' ? .42 : .6;
       g.setLineDash(a.kind === 'launch' ? [4,4] : [2,4]);
       g.beginPath();
-      if(W < 700) { g.moveTo(a.x, 187); g.lineTo(a.x,a.y); }
-      else { g.moveTo(a.labelX,a.labelY); g.lineTo(a.x,a.labelY+12); g.lineTo(a.x,a.y); }
+      if(a.kind === 'launch') { g.moveTo(a.x,H-a.el.offsetHeight-14); g.lineTo(a.x,a.y); }
+      else { g.moveTo(a.labelX,a.labelY+6); g.lineTo(a.x,a.labelY+14); g.lineTo(a.x,a.y); }
       g.stroke(); g.setLineDash([]); g.globalAlpha=1;
-      g.fillStyle='#020812'; g.fillRect(a.x-5,a.y-5,10,10); g.strokeRect(a.x-5,a.y-5,10,10);
-      g.fillStyle=color; g.fillRect(a.x-2,a.y-2,4,4); g.restore();
+      g.setLineDash([]); g.beginPath(); g.arc(a.x,a.y,a.kind==='launch'?4:3,0,Math.PI*2); g.fillStyle='#020812'; g.fill(); g.stroke();
+      g.fillStyle=color; g.fillRect(a.x-1,a.y-1,2,2); g.restore();
     });
     // live head: the current top cell pulses and carries the running balance
     const head = colDay[upto], hy = baseY - head.h * C, done = progress >= 1;
@@ -184,9 +182,8 @@
     const label = (done ? 'NOW ' : head.d.slice(5) + ' ') + money(value, 2);
     g.font = '500 12px "Geist Mono", monospace';
     const lw = g.measureText(label).width + 14;
-    const lx = head.x + C + 10 + lw > W - 8 ? head.x - lw - 10 : head.x + C + 10; // flip left at the edge
-    g.fillStyle = '#4c9af8'; g.fillRect(lx, hy - 22, lw, 20);
-    g.fillStyle = '#00040d'; g.fillText(label, lx + 7, hy - 8);
+    const lx = W - lw - 14;
+    g.fillStyle = '#8babc9'; g.fillText(label, lx + 7, 24);
     if (count) count.textContent = money(value, 2);
   }
 
