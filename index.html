@@ -7193,6 +7193,14 @@ body.theme-light .pts-input-mascot img{
 @media(max-width:1180px){
   .pts-input-mascot{display:block!important}
 }
+/* Two-column layout: the controls column stretches to the results column and the
+   photo fills whatever height is left, so no empty well sits under it. */
+@media(min-width:781px){
+  .points-grid{align-items:stretch!important}
+  .points-controls{align-self:stretch!important}
+  .pts-input-mascot{position:relative!important;flex:1 1 auto!important;min-height:196px}
+  .pts-input-mascot img{position:absolute!important;inset:0;height:100%!important;object-position:center 82%!important}
+}
 
 </style>
 <style id="light-theme-final">
