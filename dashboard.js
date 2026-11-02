@@ -3114,6 +3114,7 @@ function renderPointsCalc(){
   if(todayChip){todayChip.dataset.pool=todayVal;todayChip.textContent='Today · '+(todayVal/1e6).toFixed(2)+'M';}
   document.querySelectorAll('#ptsPoolChips .chip').forEach(b=>b.classList.toggle('on',+b.dataset.pool===pool));
   renderPointsMatrix();
+  ptsCardSchedule();
 }
 function ptsShareText(){
   const mine=Math.max(0,parseFloat($('#ptsMine').value)||0);
@@ -3124,6 +3125,184 @@ function ptsShareText(){
   const poolStr=(pool/1e6).toFixed(2)+'M';
   const url=location.href.startsWith('http')?location.href.split('#')[0]+'#points':'https://www.variational.money/#points';
   return {t:`If Variational hits ${fdvStr} FDV (32% genesis airdrop, ${poolStr} pts pool, TGE Q4 2026), my ${mine.toLocaleString('en-US')} points ≈ ${fmtUSD(val)} (${fmtUSD(pv,2)}/pt) 🪂\n\nLive points→FDV calculator on the buyback tracker 👇`,url};
+}
+/* ---- Points share card · 1200x675 canvas PNG (thumbnail, Save PNG, native/desktop share) ---- */
+var PTS_CARD={imgP:null,cur:null,timer:0,stale:false,thumbUrl:'',toastT:0};
+function ptsCardData(){
+  const txt=id=>($(id)?.textContent||'').trim();
+  const mine=Math.max(0,parseFloat($('#ptsMine').value)||0);
+  const pool=Math.max(1,parseFloat($('#ptsPool').value)||1);
+  const fdv=ptsPosToFdv(+$('#ptsFdv').value);
+  const live=(id,fb)=>{const t=txt(id);return t&&t!=='—'?t:fb;};
+  return {
+    value:live('#ptsAirdropValue',fmtUSD(fdv*0.32*mine/pool)),
+    share:live('#ptsShareOfPool',ptsSigPct(mine/pool*100,4)),
+    perPt:live('#ptsPerPointVal',fmtUSD(fdv*0.32/pool,2)),
+    fdvStr:live('#ptsFdvBig','$'+(fdv/1e9).toFixed(fdv>=1e9?1:3)+'B'),
+    points:mine.toLocaleString('en-US'),
+    pool:(pool/1e6).toFixed(2)+'M',
+    mine:mine
+  };
+}
+function ptsCardFilename(d){return 'var-metrics-airdrop-'+Math.round(d.mine)+'pts-'+d.fdvStr.replace('$','')+'.png';}
+function ptsCardImage(){
+  if(!PTS_CARD.imgP)PTS_CARD.imgP=new Promise(res=>{
+    const im=new Image();
+    im.onload=()=>res(im);
+    im.onerror=()=>{PTS_CARD.imgP=null;res(null);};
+    im.src='pepe-miami.jpg';
+  });
+  return PTS_CARD.imgP;
+}
+function ptsCardFonts(){
+  const f=document.fonts;
+  if(!f||!f.load)return Promise.resolve();
+  return Promise.all([
+    f.load('700 100px Geist','$0123456789,.%'),f.load('500 26px Geist','at FDV'),f.load('700 28px Geist','Var-metrics'),
+    f.load('600 14px "Geist Mono"','AZ09@.'),f.load('500 14px "Geist Mono"','az')
+  ]).then(()=>f.ready).catch(()=>{});
+}
+function ptsCardDraw(d,img){
+  const W=1200,H=675,cv=document.createElement('canvas');
+  cv.width=W;cv.height=H;
+  const x=cv.getContext('2d');
+  const SANS='Geist, "Helvetica Neue", Arial, sans-serif',MONO='"Geist Mono", ui-monospace, Menlo, Consolas, monospace';
+  const BLUE='#4c9af8',DEEP='#1d6ff2',ICE='#d6ecff';
+  const rr=(px,py,w,h,r)=>{x.beginPath();x.moveTo(px+r,py);x.arcTo(px+w,py,px+w,py+h,r);x.arcTo(px+w,py+h,px,py+h,r);x.arcTo(px,py+h,px,py,r);x.arcTo(px,py,px+w,py,r);x.closePath();};
+  const hair=(x1,y1,x2,y2,a)=>{x.strokeStyle='rgba(76,154,248,'+a+')';x.lineWidth=1;x.beginPath();x.moveTo(x1,y1);x.lineTo(x2,y2);x.stroke();};
+  // tracked text (manual letter-spacing: ctx.letterSpacing is not in every browser)
+  const tracked=(s,px,py,sp,align)=>{
+    let w=-sp;for(const ch of s)w+=x.measureText(ch).width+sp;
+    let cx=align==='right'?px-w:px;x.textAlign='left';
+    for(const ch of s){x.fillText(ch,cx,py);cx+=x.measureText(ch).width+sp;}
+    return w;
+  };
+  const fit=(s,weight,max,min,maxW)=>{let sz=max;for(;sz>min;sz-=2){x.font=weight+' '+sz+'px '+SANS;if(x.measureText(s).width<=maxW)break;}x.font=weight+' '+sz+'px '+SANS;return sz;};
+
+  // background
+  const bg=x.createLinearGradient(0,0,W,H);bg.addColorStop(0,'#01040b');bg.addColorStop(1,'#04122a');
+  x.fillStyle=bg;x.fillRect(0,0,W,H);
+  const glow=x.createRadialGradient(980,90,0,980,90,520);
+  glow.addColorStop(0,'rgba(29,111,242,.22)');glow.addColorStop(1,'rgba(29,111,242,0)');
+  x.fillStyle=glow;x.fillRect(0,0,W,H);
+  // frame + corner squares
+  x.strokeStyle='rgba(76,154,248,.28)';x.lineWidth=1;x.strokeRect(20.5,20.5,W-41,H-41);
+  x.fillStyle=BLUE;
+  [[20,20],[W-20,20],[20,H-20],[W-20,H-20]].forEach(p=>x.fillRect(p[0]-4.5,p[1]-4.5,9,9));
+
+  // photo (cover, object-position center 82%)
+  const bx=56,by=56,bw=448,bh=563;
+  x.save();rr(bx,by,bw,bh,16);x.clip();
+  if(img&&img.naturalWidth){
+    const sc=Math.max(bw/img.naturalWidth,bh/img.naturalHeight),sw=bw/sc,sh=bh/sc;
+    x.drawImage(img,(img.naturalWidth-sw)*0.5,(img.naturalHeight-sh)*0.82,sw,sh,bx,by,bw,bh);
+    const sh2=x.createLinearGradient(0,by+bh*0.55,0,by+bh);sh2.addColorStop(0,'rgba(1,4,11,0)');sh2.addColorStop(1,'rgba(1,4,11,.55)');
+    x.fillStyle=sh2;x.fillRect(bx,by,bw,bh);
+  }else{
+    const ph=x.createLinearGradient(bx,by,bx+bw,by+bh);ph.addColorStop(0,'#0a2a5c');ph.addColorStop(1,'#04122a');
+    x.fillStyle=ph;x.fillRect(bx,by,bw,bh);
+  }
+  x.restore();
+  x.strokeStyle='rgba(76,154,248,.45)';x.lineWidth=1;rr(bx+.5,by+.5,bw-1,bh-1,16);x.stroke();
+
+  // right column
+  const rx=556,rw=588,re=rx+rw;
+  x.textBaseline='alphabetic';
+  // brand row
+  x.fillStyle=BLUE;x.fillRect(rx,72,14,14);
+  x.fillStyle='#ffffff';x.font='700 28px '+SANS;x.textAlign='left';x.fillText('Var-metrics',rx+26,88);
+  x.fillStyle='#6f8fbd';x.font='500 13px '+MONO;tracked('The best dashboard for Variational.',re,87,0,'right');
+  hair(rx,118,re,118,.28);
+  // kicker
+  x.fillStyle=BLUE;x.font='600 15px '+MONO;tracked('MY $VAR AIRDROP SCENARIO',rx,176,3.5,'left');
+  // big value (shrink to fit)
+  fit(d.value,'700',124,40,rw);
+  const bw2=x.measureText(d.value).width,vg=x.createLinearGradient(rx,0,rx+bw2,0);
+  vg.addColorStop(0,BLUE);vg.addColorStop(1,ICE);
+  x.fillStyle=vg;x.textAlign='left';x.fillText(d.value,rx,290);
+  // sub line
+  x.fillStyle='#9fb6d9';fit('at '+d.fdvStr+' FDV · 32% genesis airdrop','500',26,14,rw);
+  x.fillText('at '+d.fdvStr+' FDV · 32% genesis airdrop',rx,338);
+  // 2x2 stats
+  const cells=[['MY POINTS',d.points],['SHARE OF POOL',d.share],['TOTAL POOL',d.pool+' pts'],['VALUE / POINT',d.perPt]];
+  const cw=282,gap=24;
+  cells.forEach((c,i)=>{
+    const cx=rx+(i%2)*(cw+gap),cy=384+Math.floor(i/2)*92;
+    hair(cx,cy,cx+cw,cy,.28);
+    x.fillStyle='#5f86bd';x.font='600 12px '+MONO;tracked(c[0],cx,cy+28,2.4,'left');
+    x.fillStyle='#ffffff';fit(c[1],'600',38,18,cw);x.textAlign='left';x.fillText(c[1],cx,cy+72);
+  });
+  // footer
+  hair(rx,582,re,582,.28);
+  x.fillStyle=BLUE;x.font='600 16px '+MONO;tracked('var-metrics.com',rx,611,0.4,'left');
+  x.fillStyle='#8fa8cf';x.font='500 15px '+MONO;tracked('Built by @0xdefidaniel',re,611,0.2,'right');
+  x.fillStyle='#4f6a93';x.font='500 12px '+MONO;
+  const ds=new Date().toISOString().slice(0,10)+' UTC';
+  x.textAlign='center';x.fillText(ds,rx+rw*0.5,611);
+  return cv;
+}
+// One entry per distinct scenario: {key,d,promise,blob}. Re-used by thumbnail, Save, Share.
+function ptsCardGet(){
+  const d=ptsCardData(),key=JSON.stringify(d);
+  if(PTS_CARD.cur&&PTS_CARD.cur.key===key&&!PTS_CARD.cur.failed)return PTS_CARD.cur;
+  const e={key:key,d:d,blob:null,failed:false};
+  e.promise=Promise.all([ptsCardFonts(),ptsCardImage()]).then(r=>{
+    const cv=ptsCardDraw(d,r[1]);
+    return new Promise((res,rej)=>cv.toBlob(b=>b?res(b):rej(new Error('toBlob failed')),'image/png'));
+  }).then(b=>{e.blob=b;return b;},err=>{e.failed=true;throw err;});
+  PTS_CARD.cur=e;
+  return e;
+}
+function ptsCardRefresh(){
+  const th=$('#ptsCardThumb');
+  if(!th)return;
+  if(!th.offsetParent){PTS_CARD.stale=true;return;}   // Points tab hidden: the IntersectionObserver re-triggers us
+  PTS_CARD.stale=false;
+  const e=ptsCardGet();
+  e.promise.then(b=>{
+    if(PTS_CARD.cur!==e)return;
+    const old=PTS_CARD.thumbUrl;
+    PTS_CARD.thumbUrl=URL.createObjectURL(b);
+    th.href=PTS_CARD.thumbUrl;
+    const im=th.querySelector('img');if(im)im.src=PTS_CARD.thumbUrl;
+    if(old)setTimeout(()=>URL.revokeObjectURL(old),30000);
+  }).catch(()=>{});
+}
+function ptsCardSchedule(){
+  if(typeof PTS_CARD==='undefined'||!PTS_CARD||!$('#ptsCardThumb'))return;
+  clearTimeout(PTS_CARD.timer);
+  PTS_CARD.timer=setTimeout(ptsCardRefresh,250);
+}
+function ptsToast(msg,warn){
+  const el=$('#ptsToast');if(!el)return;
+  el.textContent=msg;el.hidden=false;el.classList.toggle('warn',!!warn);
+  clearTimeout(PTS_CARD.toastT);
+  PTS_CARD.toastT=setTimeout(()=>{el.hidden=true;},7000);
+}
+// Desktop: X's web intent cannot take an image, so copy the PNG to the clipboard (user pastes it) and open the intent.
+// Both calls must happen synchronously inside the click; the blob is passed as a Promise so activation is kept.
+function ptsShareDesktop(e,intent){
+  let cp=null;
+  try{
+    if(navigator.clipboard&&navigator.clipboard.write&&window.ClipboardItem)
+      cp=navigator.clipboard.write([new ClipboardItem({'image/png':e.blob?Promise.resolve(e.blob):e.promise})]);
+  }catch(_){cp=null;}
+  window.open(intent,'_blank','noopener,width=600,height=520');
+  if(!cp){ptsToast("Couldn't copy the image — use Save PNG",true);return;}
+  cp.then(()=>ptsToast('Card copied — press ⌘V / Ctrl+V in your post to attach it'),
+          ()=>ptsToast("Couldn't copy the image — use Save PNG",true));
+}
+async function ptsShareNative(e,s){
+  try{
+    const blob=e.blob||await e.promise;
+    const file=new File([blob],ptsCardFilename(e.d),{type:'image/png'});
+    if(!(navigator.canShare&&navigator.canShare({files:[file]})))return false;
+    await navigator.share({files:[file],text:s.t+'\n'+s.url});
+    return true;
+  }catch(err){
+    if(err&&err.name==='AbortError')return true;   // user cancelled: do nothing
+    return false;
+  }
 }
 function renderPointsDeadline(){
   if(!$('#ptsRemainPct'))return;
@@ -4448,8 +4627,29 @@ $('#ptsMatrix')?.addEventListener('click',e=>{
 })();
 $('#ptsShareBtn')?.addEventListener('click',()=>{
   const s=ptsShareText();
-  window.open('https://twitter.com/intent/tweet?text='+encodeURIComponent(s.t)+'&url='+encodeURIComponent(s.url)+'&via=0xdefidaniel','_blank','noopener,width=600,height=520');
+  const intent='https://twitter.com/intent/tweet?text='+encodeURIComponent(s.t)+'&url='+encodeURIComponent(s.url)+'&via=0xdefidaniel';
+  const e=ptsCardGet();
+  // Touch device whose browser can share files -> native share sheet (image + text). Anything else -> clipboard + X intent.
+  let native=false;
+  try{native=!!(window.matchMedia&&matchMedia('(pointer:coarse)').matches&&navigator.share&&navigator.canShare&&navigator.canShare({files:[new File([new Blob(['x'])],'a.png',{type:'image/png'})]}));}catch(_){}
+  if(native){ptsShareNative(e,s).then(ok=>{if(!ok)ptsShareDesktop(e,intent);});return;}
+  ptsShareDesktop(e,intent);
 });
+$('#ptsSaveBtn')?.addEventListener('click',async()=>{
+  const e=ptsCardGet();
+  try{
+    const b=await e.promise,a=document.createElement('a');
+    a.href=URL.createObjectURL(b);a.download=ptsCardFilename(e.d);
+    document.body.appendChild(a);a.click();a.remove();
+    setTimeout(()=>URL.revokeObjectURL(a.href),10000);
+  }catch(_){ptsToast("Couldn't build the card — try again",true);}
+});
+(function initPtsCardPreview(){
+  const th=$('#ptsCardThumb');
+  if(!th)return;
+  if('IntersectionObserver' in window)new IntersectionObserver(en=>{if(en.some(x=>x.isIntersecting)&&(PTS_CARD.stale||!PTS_CARD.cur))ptsCardRefresh();}).observe(th);
+  else ptsCardSchedule();
+})();
 $('#ptsCopyBtn')?.addEventListener('click',async e=>{
   const s=ptsShareText(),btn=e.currentTarget;
   try{await navigator.clipboard.writeText(s.t+'\n'+s.url);btn.textContent='✓ Copied';setTimeout(()=>btn.textContent='⧉ Copy',1500);}catch(_){}

@@ -1795,7 +1795,17 @@ html[data-ui-state="error"]::before{content:"Unable to load VAR-METRICS. Please 
   .pts-card.base{border-color:rgba(34,230,160,.5);background:radial-gradient(300px 120px at 50% 0,rgba(34,230,160,.1),transparent 70%),var(--panel);position:relative}
   .pts-card.base::after{content:"32% AIRDROP";position:absolute;top:-8px;left:50%;transform:translateX(-50%);
     font:800 8px var(--mono);letter-spacing:1px;color:#04120c;background:linear-gradient(92deg,var(--grn),var(--cyan));padding:2px 7px;border-radius:999px}
-  .pts-share-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px;padding-top:15px;border-top:1px solid var(--line)}
+  .pts-share-row{display:flex;gap:14px 18px;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;margin-top:16px;padding-top:15px;border-top:1px solid var(--line)}
+  .pts-share-main{display:flex;flex-direction:column;gap:10px;min-width:0;flex:1 1 280px}
+  .pts-share-btns{display:flex;gap:10px;flex-wrap:wrap}
+  .pts-toast{align-self:flex-start;max-width:100%;font:600 11px/1.45 var(--mono);color:var(--ink);background:var(--panel);border:1px solid var(--grn);border-radius:8px;padding:7px 11px}
+  .pts-toast[hidden]{display:none}
+  .pts-toast.warn{border-color:var(--amber);color:var(--amber)}
+  .pts-card-prev{width:240px;max-width:100%;display:flex;flex-direction:column;gap:5px}
+  .pts-card-prev small{font:600 9px var(--mono);letter-spacing:.6px;color:var(--sub);text-transform:uppercase}
+  .pts-card-thumb{display:block;width:100%;aspect-ratio:16/9;overflow:hidden;border:1px solid var(--line);border-radius:8px;background:#04122a;transition:border-color .15s}
+  .pts-card-thumb:hover,.pts-card-thumb:focus-visible{border-color:var(--grn)}
+  .pts-card-thumb img{display:block;width:100%;height:auto}
   .historical-combo{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(340px,.85fr);column-gap:18px;align-items:start}
   .historical-combo>h2,.historical-combo>.cap,.historical-combo>.legend,.historical-combo>.chart-tools,.historical-combo>#curve{grid-column:1}
   .historical-combo>h2{margin-bottom:0}
@@ -9557,8 +9567,18 @@ body.theme-light .lb-card{box-shadow:0 1px 0 rgba(20,40,80,.03),0 14px 30px -22p
     <span>Need ≥1 point to be eligible</span>
   </div>
   <div class="pts-share-row">
-    <button class="share-btn" id="ptsShareBtn" type="button">𝕏 Share my scenario</button>
-    <button class="share-btn ghost" id="ptsCopyBtn" type="button">⧉ Copy</button>
+    <div class="pts-share-main">
+      <div class="pts-share-btns">
+        <button class="share-btn" id="ptsShareBtn" type="button">𝕏 Share my scenario</button>
+        <button class="share-btn ghost" id="ptsCopyBtn" type="button">⧉ Copy</button>
+        <button class="share-btn ghost" id="ptsSaveBtn" type="button">↓ Save PNG</button>
+      </div>
+      <div class="pts-toast" id="ptsToast" role="status" aria-live="polite" hidden></div>
+    </div>
+    <div class="pts-card-prev">
+      <a class="pts-card-thumb" id="ptsCardThumb" target="_blank" rel="noopener" title="Open the share card full-size"><img alt="Preview of my airdrop scenario share card" width="240" height="135"></a>
+      <small>Card preview · click to open</small>
+    </div>
   </div>
 </div>
 
@@ -11201,12 +11221,12 @@ body.theme-light .lb-card{box-shadow:0 1px 0 rgba(20,40,80,.03),0 14px 30px -22p
 
 <script src="market-regime-data.js?v=0d0713472802" defer></script>
 <script src="money-flow-sankey.js?v=22c2e55ef8e5" defer></script>
-<script src="dashboard.js?v=20261102-calendar-months" defer></script>
+<script src="dashboard.js?v=20261102-points-card" defer></script>
 <script src="paths-panels.js?v=b4335b6f7054" defer></script>
 <script src="playbook-panels.js?v=ddd6402a1805" defer></script>
 <script src="monitors-panels.js?v=12956adea963" defer></script>
 <script src="whales-panels.js?v=a9cd96dde562" defer></script>
-<script src="i18n-dict.js?v=f1c26aca02fd" defer></script>
+<script src="i18n-dict.js?v=1d5df2f9a490" defer></script>
 <script src="i18n.js?v=c6de2323c37c" defer></script>
 <script src="app-inline.js?v=180ff1150936" defer></script>
 <script src="landing-e.js?v=20261102-ink" defer></script>
