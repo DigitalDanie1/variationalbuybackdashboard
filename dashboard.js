@@ -4281,7 +4281,12 @@ function calColor(t){
   if(t<0.9)return 'rgba(45,238,190,.9)';
   return 'linear-gradient(135deg,var(--grn),var(--cyan))';
 }
-let CALMODE='day', CAL={month:null};
+let CALMODE='day', CAL={month:null,span:null};
+/* Day view shows one biweekly reporting period (Sun→Sat, 14 days) instead of a whole month.
+   Anchored to the Sunday after the 2026-10-31 report so each page matches one official report. */
+const CAL_SPAN_ANCHOR='2026-11-01';
+const calSpanStart=d=>{const off=Math.round((Date.parse(d+'T00:00:00Z')-Date.parse(CAL_SPAN_ANCHOR+'T00:00:00Z'))/864e5);return addDays(d,-(((off%14)+14)%14));};
+const calSpanShort=d=>new Date(d+'T00:00:00Z').toLocaleDateString('en-US',{timeZone:'UTC',month:'short',day:'numeric'});
 function buildCalendar(){
   const de=dailyEarn();
   CAL.eMap=new Map(de.map(x=>[x.d,x.e]));
@@ -4293,7 +4298,9 @@ function buildCalendar(){
   CAL.first=SERIES[0].d;CAL.last=SERIES[SERIES.length-1].d;
   const currentMonth=resetDateKey().slice(0,7);
   if(!CAL.month||(CAL.clockMonth&&CAL.clockMonth!==currentMonth&&CAL.month===CAL.clockMonth)){CAL.month=currentMonth;CAL.selectedDate=null;}
-  CAL.clockMonth=currentMonth;CAL.clockDate=resetDateKey();
+  const currentSpan=calSpanStart(resetDateKey());
+  if(!CAL.span||(CAL.clockSpan&&CAL.clockSpan!==currentSpan&&CAL.span===CAL.clockSpan))CAL.span=currentSpan;
+  CAL.clockMonth=currentMonth;CAL.clockSpan=currentSpan;CAL.clockDate=resetDateKey();
   paintCalendar();
 }
 function cellVal(dateStr){
@@ -4382,17 +4389,26 @@ function renderHistoryMonths(){
   while(m<=end){months.push(m);m=ymAdd(m,1);}
   box.innerHTML=months.map(ym=>`<button type="button" class="${ym===CAL.month?'on':''}" data-m="${ym}">${monthName(ym).split(' ')[0]}${bounds.start.slice(0,4)!==bounds.end.slice(0,4)?' '+ym.slice(2,4):''}</button>`).join('');
 }
+function calendarSpanBounds(){
+  const b=calendarMonthBounds();
+  return {start:calSpanStart(SERIES[0].d),end:calSpanStart(monthEnd(b.end+'-01'))};
+}
 function paintCalendar(){
   const first=CAL.month+'-01',end=monthEnd(first);
   const bounds=calendarMonthBounds();
-  $('#calPrev').disabled=CAL.month<=bounds.start;
-  $('#calNext').disabled=CAL.month>=bounds.end;
-  const firstDow=new Date(first+'T00:00:00Z').getUTCDay();
-  const start=addDays(first,-firstDow);
-  const lastDow=new Date(end+'T00:00:00Z').getUTCDay();
-  const finish=addDays(end,6-lastDow);
+  if(CALMODE==='day'){
+    const sb=calendarSpanBounds();
+    $('#calPrev').disabled=CAL.span<=sb.start;
+    $('#calNext').disabled=CAL.span>=sb.end;
+  }else{
+    $('#calPrev').disabled=CAL.month<=bounds.start;
+    $('#calNext').disabled=CAL.month>=bounds.end;
+  }
+  const start=CAL.span,finish=addDays(CAL.span,13);
   let cells='',d=start;
-  $('#calTitle').textContent=monthName(CAL.month);
+  $('#calTitle').textContent=CALMODE==='day'
+    ? `${calSpanShort(start)} – ${calSpanShort(finish)}, ${finish.slice(0,4)}`
+    : monthName(CAL.month);
   renderHistoryMonths();
   if(CALMODE!=='day'){
     const summaries=[];
@@ -4423,11 +4439,6 @@ function paintCalendar(){
   }
   $('#calGrid').className='cal-grid';
   while(d<=finish){
-    const inMonth=d.slice(0,7)===CAL.month;
-    if(!inMonth){
-      cells+=`<div class="cal-cell empty"><div class="cal-daytop"><span class="cal-num">${+d.slice(8,10)}</span></div></div>`;
-      d=addDays(d,1);continue;
-    }
     const dow=new Date(d+'T00:00:00Z').getUTCDay();
     const disp=calendarDisplay(d);
     const {v,max}=disp;
@@ -4452,7 +4463,7 @@ function autoSelect(){
   const visible=new Set(nodes.map(c=>c.dataset.d));
   const today=resetDateKey();
   let preferred=CAL.selectedDate&&visible.has(CAL.selectedDate)?CAL.selectedDate:null;
-  if(!preferred&&CALMODE==='day'&&today.slice(0,7)===CAL.month&&visible.has(today))preferred=today;
+  if(!preferred&&CALMODE==='day'&&visible.has(today))preferred=today;
   if(!preferred){
     const completed=nodes.map(c=>c.dataset.d).filter(d=>calendarDisplay(d).end);
     preferred=completed[completed.length-1]||nodes[nodes.length-1]?.dataset.d||CAL.month+'-01';
@@ -4579,13 +4590,23 @@ $('#calSeg').addEventListener('click',e=>{
   buildCalendar();
 });
 $('#calGrid').addEventListener('click',e=>{const c=e.target.closest('[data-d]');if(c)selectCell(c.dataset.d);});
-$('#calPrev').addEventListener('click',()=>{const prev=ymAdd(CAL.month,-1);if(prev>=calendarMonthBounds().start){CAL.month=prev;buildCalendar();}});
-$('#calNext').addEventListener('click',()=>{
-  const next=ymAdd(CAL.month,1), maxMonth=calendarMonthBounds().end;
-  if(next<=maxMonth){CAL.month=next;buildCalendar();}
-});
-$('#calToday').addEventListener('click',()=>{CAL.month=resetDateKey().slice(0,7);CAL.selectedDate=null;buildCalendar();});
-$('#histMonths').addEventListener('click',e=>{const b=e.target.closest('button[data-m]');if(!b)return;CAL.month=b.dataset.m;buildCalendar();});
+/* Prev/Next page by one 14-day period in day view, by month in week/month view. */
+function shiftCalendar(dir){
+  if(CALMODE==='day'){
+    const next=addDays(CAL.span,14*dir),sb=calendarSpanBounds();
+    if(next<sb.start||next>sb.end)return;
+    CAL.span=next;CAL.month=addDays(next,13).slice(0,7);
+  }else{
+    const next=ymAdd(CAL.month,dir),mb=calendarMonthBounds();
+    if(next<mb.start||next>mb.end)return;
+    CAL.month=next;CAL.span=calSpanStart(next+'-01');
+  }
+  buildCalendar();
+}
+$('#calPrev').addEventListener('click',()=>shiftCalendar(-1));
+$('#calNext').addEventListener('click',()=>shiftCalendar(1));
+$('#calToday').addEventListener('click',()=>{CAL.month=resetDateKey().slice(0,7);CAL.span=calSpanStart(resetDateKey());CAL.selectedDate=null;buildCalendar();});
+$('#histMonths').addEventListener('click',e=>{const b=e.target.closest('button[data-m]');if(!b)return;CAL.month=b.dataset.m;CAL.span=calSpanStart(b.dataset.m+'-01');buildCalendar();});
 $('#traders')?.addEventListener('input',renderFeePerTrader);
 $('#effWindowTabs')?.addEventListener('click',e=>{
   const b=e.target.closest('button[data-eff-window]');
