@@ -191,6 +191,108 @@ var faqs=[
     ]
   }
 ];
+var readings=[
+  {
+    "labelKo": "질문 제기",
+    "labelEn": "Questions, not answers",
+    "questionKo": "VAR를 평가할 때 포인트 가격 외에 무엇을 검증해야 하나?",
+    "questionEn": "What should investors investigate beyond the price of points?",
+    "answerKo": "수익 배수·규제·변동성·스프레드 압축·OLP 위험·Pro의 기여라는 여섯 평가축을 제시합니다. 이 글 자체가 각 질문에 결론을 주지는 않습니다.",
+    "answerEn": "It organizes six investigation areas: multiples, regulation, volatility and spread capture, OLP risk, cyclical discounts and Pro. It does not resolve those questions.",
+    "openKo": "hansolar는 비교기업 관점을, Edward는 모델·Pro·자금 분리를 설명합니다. 적정 배수, CFTC 영향, 수익 민감도와 옵션 채택은 여전히 열려 있습니다.",
+    "openEn": "Hansolar offers a valuation lens; Edward explains architecture, Pro and capital segregation. Fair multiples, regulatory effects, sensitivities and options adoption remain open.",
+    "related": [
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "labelKo": "비교 관점 제시",
+    "labelEn": "Valuation perspective",
+    "questionKo": "브로커형이라는 이유만으로 IG Group 수준의 낮은 배수를 적용해야 하나?",
+    "questionEn": "Does a brokerage model necessarily imply an IG Group-like low multiple?",
+    "answerKo": "hansolar는 Robinhood·Interactive Brokers도 비교해야 한다고 주장하고, 팀의 유동성 운영 경험을 차별화 근거로 제시합니다. 비교기업 선택의 논거를 보완하는 의견입니다.",
+    "answerEn": "Hansolar argues for considering Robinhood and Interactive Brokers and highlights the team’s liquidity experience. This supplies an alternative comparison framework, not a valuation proof.",
+    "openKo": "높은 비교기업 배수가 VAR에 그대로 적용된다는 근거는 아닙니다. 동일한 이익 정의·성장률·위험 조정과 실제 사용자 유지율 검증이 남습니다.",
+    "openEn": "It does not establish that those multiples transfer to VAR. Comparable earnings definitions, growth, risk and evidence of user retention still matter.",
+    "related": [
+      0,
+      2
+    ]
+  },
+  {
+    "labelKo": "설계 의도 설명",
+    "labelEn": "Architecture explained",
+    "questionKo": "왜 단일 딜러인가? 외부 유동성을 쓰면 차별성이 없나? Pro는 무엇을 바꾸나?",
+    "questionEn": "Why one dealer, what differentiates routed liquidity, and what changes with Pro?",
+    "answerKo": "Edward는 OLP가 유동성을 통합해 사용자에게 일관된 포지션·체결 경험을 제공한다고 설명합니다. Swaps의 TradFi 연결, 체결 우선 철학과 Pro의 멀티딜러 방향도 제시합니다.",
+    "answerEn": "Edward explains OLP-mediated aggregation and execution, direct TradFi connectivity for swaps, and the multi-dealer direction for Pro.",
+    "openKo": "이는 창업자의 설계 설명입니다. 경쟁사 대비 체결 우위, 지속적인 해자, VAR 적정가치와 Pro의 매출 기여를 독립적으로 증명하지는 않습니다.",
+    "openEn": "These are founder explanations. They do not independently establish execution superiority, a durable moat, fair token value or Pro’s revenue contribution.",
+    "related": [
+      0,
+      1,
+      3
+    ]
+  },
+  {
+    "labelKo": "위험의 범위 구분",
+    "labelEn": "Risk boundary clarified",
+    "questionKo": "Pro가 필요한 구체적 이유는? OLP의 외부 거래소 손실이 사용자 자금에도 전가되나?",
+    "questionEn": "Why is Pro needed, and how could external-venue losses affect users?",
+    "answerKo": "Edward는 다른 상대방·맞춤형 계약이 Pro의 용도라고 설명합니다. 사용자 기존 정산 자금과 OLP 헤징 자본을 구분하면서도, OLP 지급불능 이후 생긴 손익은 지급되지 못할 수 있다고 명시합니다.",
+    "answerEn": "Edward points to alternative counterparties and bespoke contracts for Pro. He separates existing settlement funds from OLP hedge capital while warning that PnL arising after OLP insolvency may not be paid.",
+    "openKo": "자금 분리가 무위험을 뜻하지는 않습니다. 이 게시물은 OLP의 현재 전체 익스포저, 실시간 지급 능력이나 실제 회수 결과를 검증한 감사 보고서가 아닙니다.",
+    "openEn": "Segregation is not risk elimination. This post is not an audit of current total exposure, real-time solvency or actual recoveries.",
+    "related": [
+      2
+    ]
+  },
+  {
+    "labelKo": "배경·보고 실적 분석",
+    "labelEn": "Background research",
+    "questionKo": "브로커리지 모델은 기존 DEX와 어떻게 다르며, 스프레드는 누구에게 남나?",
+    "questionEn": "How does brokerage differ from other DEX designs, and who retains the spread?",
+    "answerKo": "DeFiLlama Research가 RFQ·내부 마켓메이킹·온체인 정산 구조를 설명하고, 당시 격주 리포트를 이용해 비용·보상·트레저리·OLP 손익의 연결을 분석합니다.",
+    "answerEn": "DeFiLlama Research explains RFQs, internal market making and onchain settlement, then traces costs, rewards, treasury and OLP PnL using reports available at publication.",
+    "openKo": "2026년 6월 자료이므로 이후 Pro·Swaps 출시 상태나 11월의 손익을 보여주지는 않습니다. 현재 수치는 최신 보고서로 따로 확인해야 합니다.",
+    "openEn": "Published in June 2026, it does not establish later Pro or Swaps launch status or November financial results. Current numbers need newer reports.",
+    "related": [
+      2,
+      5,
+      6
+    ]
+  },
+  {
+    "labelKo": "상품 차이 확인",
+    "labelEn": "Product mechanics clarified",
+    "questionKo": "Perps와 Swaps가 같은 OLP를 쓰는데 상품 차이는 무엇인가?",
+    "questionEn": "What differentiates Perps and Swaps if both use OLP?",
+    "answerKo": "공식 가이드는 둘 다 OLP가 상대방인 USDC 정산 파생상품임을 확인하고, 펀딩·유동성 원천·거래 시간·증거금 차이를 표로 비교합니다. 상품과 운영 주체를 구분하는 데 도움이 됩니다.",
+    "answerEn": "The official guide identifies OLP as counterparty to both USDC-settled derivatives and compares funding, liquidity sources, trading hours and margin.",
+    "openKo": "상품별 거래량·스프레드·비용·순이익의 분리 실적은 제공하지 않습니다. 문서의 조건과 실제 시장별 최신 운영 조건도 구분해야 합니다.",
+    "openEn": "It does not provide separate product-level volume, spreads, costs or profits. Documented mechanics should also be distinguished from the latest conditions in each market.",
+    "related": [
+      4,
+      6
+    ]
+  },
+  {
+    "labelKo": "용어 혼동 해소",
+    "labelEn": "Metric definitions clarified",
+    "questionKo": "Fees·Revenue·Holders Revenue를 같은 돈처럼 읽어도 되나?",
+    "questionEn": "Can Fees, Revenue and Holders Revenue be treated as the same money?",
+    "answerKo": "DeFiLlama는 사용자 지불 총액, 프로토콜 귀속분, 그중 홀더 귀속분으로 구분합니다. 포함 관계이므로 합산하면 안 되며, 바이백 예정 재원도 실제 Holders Revenue로 자동 인정되지 않습니다.",
+    "answerEn": "DeFiLlama distinguishes user payments, the protocol-retained share and its tokenholder-accruing subset. They are nested, not additive; an intended buyback allocation is not automatically measured holder revenue.",
+    "openKo": "용어 정의가 개별 거래소 데이터의 정확성이나 동일한 집계 시점을 보장하지는 않습니다. 비교할 때는 각 어댑터·기간·미공개 값을 확인해야 합니다.",
+    "openEn": "Definitions do not guarantee adapter accuracy or identical reporting cutoffs. Venue methodology, reporting windows and missing values still require inspection.",
+    "related": [
+      4
+    ]
+  }
+];
+var currentView="summaries";
 var host;
 var esc=function(s){return String(s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});};
 function render(){
@@ -199,12 +301,16 @@ function render(){
  var sourceLink=function(i){var x=items[i];return '<a href="'+x.url+'" target="_blank" rel="noopener noreferrer">'+esc(x.publisher)+' ↗</a>';};
  var faqHtml=groups.map(function(g){return '<section class="gc-faq-group"><h3>'+t(g[1],g[2])+'</h3><div class="gc-faq-grid">'+faqs.filter(function(f){return f.group===g[0];}).map(function(f,i){return '<details class="gc-faq"'+(g[0]==='model'&&i<2?' open':'')+'><summary>'+esc(ko?f.qKo:f.qEn)+'</summary><div class="gc-answer"><span class="gc-evidence">'+esc(ko?f.labelKo:f.labelEn)+'</span><p>'+esc(ko?f.aKo:f.aEn)+'</p><div class="gc-answer-sources">'+f.refs.map(sourceLink).join('')+'</div></div></details>';}).join('')+'</div></section>';}).join('');
  var sources=items.map(function(x,i){return '<article class="gc-item"><span class="gc-number">'+String(i+1).padStart(2,'0')+'</span><div><div class="gc-meta"><b>'+esc(x.publisher)+'</b><span>'+esc(x.type)+'</span>'+(x.date?'<time datetime="'+x.date+'">'+x.date+'</time>':'')+'</div><h3><a href="'+x.url+'" target="_blank" rel="noopener noreferrer">'+esc(x.title)+' <span aria-hidden="true">↗</span></a></h3><p>'+esc(ko?x.ko:x.en)+'</p></div></article>';}).join('');
- host.innerHTML='<h2>Good Content <span class="gc-faq-tag">FAQ</span></h2><p class="gc-intro">'+t('A topic-by-topic synthesis of the seven linked sources. Founder statements, opinions and unanswered questions are labeled separately. Editorial summary as of 2 Nov 2026.','연결된 원문 7개를 주제별로 통합했습니다. 창업자 설명·작성자 의견·미해결 질문을 구분했습니다. 2026년 11월 2일 기준 편집 요약입니다.')+'</p>'+faqHtml+'<details class="gc-originals"><summary>'+t('Original sources · 7 links','원문 모음 · 7개 링크')+'</summary><div class="gc-list">'+sources+'</div></details>';
+ var summaries=items.map(function(x,i){var d=readings[i];return '<article class="gc-reading"><div class="gc-meta"><b>'+esc(x.publisher)+'</b>'+(x.date?'<time datetime="'+x.date+'">'+x.date+'</time>':'')+'</div><h3><a href="'+x.url+'" target="_blank" rel="noopener noreferrer">'+esc(x.title)+' ↗</a></h3><span class="gc-reading-status">'+esc(ko?d.labelKo:d.labelEn)+'</span><dl><dt>'+t('The question','핵심 의문')+'</dt><dd>'+esc(ko?d.questionKo:d.questionEn)+'</dd><dt>'+t('What it clarifies','이 글이 설명하는 부분')+'</dt><dd>'+esc(ko?d.answerKo:d.answerEn)+'</dd><dt>'+t('What remains unresolved','아직 남는 질문')+'</dt><dd>'+esc(ko?d.openKo:d.openEn)+'</dd></dl><div class="gc-related"><span>'+t('Related perspectives','연결해서 읽기')+'</span>'+d.related.map(function(j){return '<a href="'+items[j].url+'" target="_blank" rel="noopener noreferrer">'+String(j+1).padStart(2,'0')+' · '+esc(items[j].publisher.split(' · ')[0])+' ↗</a>';}).join('')+'</div></article>';}).join('');
+ host.innerHTML='<h2>Good Content</h2><div class="gc-view-tabs" role="tablist" aria-label="Good Content view"><button id="gc-summary-tab" role="tab" aria-controls="gc-summaries" aria-selected="'+(currentView==='summaries')+'" data-gc-view="summaries">'+t('Content summaries','콘텐츠별 요약')+'</button><button id="gc-faq-tab" role="tab" aria-controls="gc-faq-panel" aria-selected="'+(currentView==='faq')+'" data-gc-view="faq">FAQ · 14</button></div><section role="tabpanel" id="gc-summaries" aria-labelledby="gc-summary-tab"'+(currentView==='summaries'?'':' hidden')+'><p class="gc-reading-note">'+t('Seven source readings: question, contribution and limits. Connections are thematic, not necessarily direct replies in the same thread. Editorial summaries as of 2 Nov 2026.','원문 7개를 의문·설명·한계로 정리했습니다. 연결은 논점 기준이며, 모두 같은 스레드의 직접 답글 관계라는 뜻은 아닙니다. 2026년 11월 2일 기준 편집 요약입니다.')+'</p><div class="gc-readings-grid">'+summaries+'</div></section><section role="tabpanel" id="gc-faq-panel" aria-labelledby="gc-faq-tab"'+(currentView==='faq'?'':' hidden')+'><p class="gc-reading-note">'+t('Across the sources: founder explanations, author opinions and open questions remain distinct.','여러 원문을 통합한 FAQ입니다. 창업자 설명·작성자 의견·미해결 질문을 구분했습니다.')+'</p>'+faqHtml+'<details class="gc-originals"><summary>'+t('Original sources · 7 links','원문 모음 · 7개 링크')+'</summary><div class="gc-list">'+sources+'</div></details></section>';
+
 }
 
 function boot(){
  VALID_TABS.push(TAB);DEFAULT_TAB_ORDER.push(TAB);SECTION_COPY[TAB]={eyebrow:'Reading list',title:'Good Content',description:'Research, official guides and references.',chip:'Reading'};
  host=document.createElement('section');host.className='gc-section tsec tg-hide';host.dataset.tg=TAB;document.getElementById('main').appendChild(host);render();
+ host.addEventListener('click',function(e){var b=e.target.closest('[data-gc-view]');if(!b)return;currentView=b.dataset.gcView;render();var active=host.querySelector('[data-gc-view="'+currentView+'"]');if(active)active.focus({preventScroll:true});});
+ host.addEventListener('keydown',function(e){if(!e.target.closest('[data-gc-view]')||['ArrowLeft','ArrowRight','Home','End'].indexOf(e.key)<0)return;e.preventDefault();currentView=e.key==='Home'?'summaries':e.key==='End'?'faq':currentView==='summaries'?'faq':'summaries';render();host.querySelector('[data-gc-view="'+currentView+'"]').focus({preventScroll:true});});
  var b=document.createElement('button');b.type='button';b.id='tab-'+TAB;b.dataset.tab=TAB;b.setAttribute('role','tab');b.textContent='Good Content';document.getElementById('tabs').appendChild(b);
  document.querySelectorAll('[data-open-tab="comparing-revenue"]').forEach(function(anchor){var mine=anchor.cloneNode(true);mine.dataset.openTab=TAB;var label=mine.querySelector('strong')||mine.querySelector('b');if(label)label.textContent='Good Content';mine.setAttribute('aria-label','Good Content');anchor.parentNode.insertBefore(mine,anchor.nextSibling);});
  new MutationObserver(render).observe(document.documentElement,{attributes:true,attributeFilter:['lang']});
