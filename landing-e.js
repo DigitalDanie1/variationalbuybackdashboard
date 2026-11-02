@@ -192,7 +192,7 @@
     g.font = '500 12px "Geist Mono", monospace';
     const lw = g.measureText(label).width + 14;
     const lx = W - lw - 14;
-    g.fillStyle = '#8babc9'; g.fillText(label, lx + 7, 24);
+    g.fillStyle = '#d6e4f5'; g.fillText(label, lx + 7, 24);
     if (count) count.textContent = money(value, 2);
   }
 
