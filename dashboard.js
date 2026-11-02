@@ -4112,7 +4112,9 @@ function buildCalendar(){
   CAL.maxDay=Math.max(...de.map(x=>x.e));
   CAL.maxWk=Math.max(...CAL.wk.values());CAL.maxMo=Math.max(...CAL.mo.values());
   CAL.first=SERIES[0].d;CAL.last=SERIES[SERIES.length-1].d;
-  if(!CAL.month)CAL.month=CAL.last.slice(0,7);
+  const currentMonth=resetDateKey().slice(0,7);
+  if(!CAL.month||(CAL.clockMonth&&CAL.clockMonth!==currentMonth&&CAL.month===CAL.clockMonth)){CAL.month=currentMonth;CAL.selectedDate=null;}
+  CAL.clockMonth=currentMonth;CAL.clockDate=resetDateKey();
   paintCalendar();
 }
 function cellVal(dateStr){
@@ -4147,6 +4149,7 @@ function calImpliedActivity(earn,date=currentTreasuryDate()){
 const calMiniMoney=n=>n>=1e9?'$'+(n/1e9).toFixed(1)+'B':n>=1e6?'$'+(n/1e6).toFixed(1)+'M':n>=1e3?'$'+(n/1e3).toFixed(0)+'K':fmtUSD(n);
 function pending24Meta(dateStr){
   if(dateStr<resetDateKey())return '<div class="cal-countdown-card"><strong class="cal-awaiting">awaiting sync</strong></div>';
+  if(dateStr>addDays(resetDateKey(),13))return '<div class="cal-countdown-card"><strong class="cal-awaiting">upcoming</strong></div>';
   const closeTs=resetMidnightTs(addDays(dateStr,1))*1000;
   return `<div class="cal-countdown-card"><strong class="countdown" data-countdown="${closeTs}">${calendarTimeLeftLabel(closeTs)}</strong></div>`;
 }
@@ -4156,6 +4159,7 @@ function calendarTimeLeftLabel(closeTs){
   return `${h}h ${String(m).padStart(2,'0')}m left`;
 }
 function updateCalendarCountdowns(){
+  if(CAL.clockDate&&CAL.clockDate!==resetDateKey())buildCalendar();
   document.querySelectorAll('[data-countdown]').forEach(el=>{el.textContent=calendarTimeLeftLabel(+el.dataset.countdown);});
 }
 function calendarEarnHtml(dateStr,disp){
@@ -4189,17 +4193,21 @@ function calendarDisplay(dateStr){
   const end=dateStr===me&&dateStr<=CAL.last;
   return {...base,show:end,label:end?('+'+fmtUSD(base.v)):'',span:!end,end};
 }
+function calendarMonthBounds(){
+  const current=resetDateKey().slice(0,7),latest=SERIES[SERIES.length-1].d.slice(0,7);
+  return {start:SERIES[0].d.slice(0,7),end:(current>latest?current:latest).slice(0,4)+'-12'};
+}
 function renderHistoryMonths(){
   const box=$('#histMonths'); if(!box)return;
-  const months=[];let m=SERIES[0].d.slice(0,7),end=SERIES[SERIES.length-1].d.slice(0,7);
+  const bounds=calendarMonthBounds(),months=[];let m=bounds.start,end=bounds.end;
   while(m<=end){months.push(m);m=ymAdd(m,1);}
-  box.innerHTML=months.map(ym=>`<button type="button" class="${ym===CAL.month?'on':''}" data-m="${ym}">${monthName(ym).split(' ')[0]}</button>`).join('');
+  box.innerHTML=months.map(ym=>`<button type="button" class="${ym===CAL.month?'on':''}" data-m="${ym}">${monthName(ym).split(' ')[0]}${bounds.start.slice(0,4)!==bounds.end.slice(0,4)?' '+ym.slice(2,4):''}</button>`).join('');
 }
 function paintCalendar(){
-  const pendingCutoff=addDays(weekStart(resetDateKey()),13);
-  if(CALMODE==='day'&&CAL.month>pendingCutoff.slice(0,7))CAL.month=pendingCutoff.slice(0,7);
-  const first=CAL.month+'-01', monthLast=monthEnd(first);
-  const end=CALMODE==='day'&&CAL.month===pendingCutoff.slice(0,7)&&pendingCutoff<monthLast?pendingCutoff:monthLast;
+  const first=CAL.month+'-01',end=monthEnd(first);
+  const bounds=calendarMonthBounds();
+  $('#calPrev').disabled=CAL.month<=bounds.start;
+  $('#calNext').disabled=CAL.month>=bounds.end;
   const firstDow=new Date(first+'T00:00:00Z').getUTCDay();
   const start=addDays(first,-firstDow);
   const lastDow=new Date(end+'T00:00:00Z').getUTCDay();
@@ -4392,9 +4400,9 @@ $('#calSeg').addEventListener('click',e=>{
   buildCalendar();
 });
 $('#calGrid').addEventListener('click',e=>{const c=e.target.closest('[data-d]');if(c)selectCell(c.dataset.d);});
-$('#calPrev').addEventListener('click',()=>{CAL.month=ymAdd(CAL.month,-1);buildCalendar();});
+$('#calPrev').addEventListener('click',()=>{const prev=ymAdd(CAL.month,-1);if(prev>=calendarMonthBounds().start){CAL.month=prev;buildCalendar();}});
 $('#calNext').addEventListener('click',()=>{
-  const next=ymAdd(CAL.month,1), maxMonth=addDays(weekStart(resetDateKey()),13).slice(0,7);
+  const next=ymAdd(CAL.month,1), maxMonth=calendarMonthBounds().end;
   if(next<=maxMonth){CAL.month=next;buildCalendar();}
 });
 $('#calToday').addEventListener('click',()=>{CAL.month=resetDateKey().slice(0,7);CAL.selectedDate=null;buildCalendar();});
