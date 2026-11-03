@@ -2,9 +2,16 @@
 (function () {
   'use strict';
 
-  const CRYPTO_NEWS_ASOF = '2026-10-30';
+  const CRYPTO_NEWS_ASOF = '2026-11-03';
 
   const CRYPTO_NEWS = [
+    {"date": "2025-06-13", "tag": "GEOPOLITICS", "level": "high", "title": "Israel launches strikes on Iran", "detail": "Israel began a major military operation against Iran; Iran retaliated with missile attacks. Watch: oil, gold and cross-asset risk appetite. These are possible transmission channels, not measured effects on Variational revenue.", "sources": [{"label": "US Congressional Research Service", "url": "https://www.congress.gov/crs_external_products/IF/PDF/IF13032/IF13032.7.pdf"}]},
+    {"date": "2025-06-22", "tag": "GEOPOLITICS", "level": "high", "title": "United States strikes Iranian nuclear sites", "detail": "The US struck three Iranian nuclear sites, including Fordow. Watch: escalation risk, energy supply and hedging conditions; no direct revenue impact is attributed here.", "sources": [{"label": "US Congressional Research Service", "url": "https://www.congress.gov/crs_external_products/IF/PDF/IF13032/IF13032.7.pdf"}]},
+    {"date": "2025-06-23", "tag": "GEOPOLITICS", "level": "high", "title": "Iran retaliates against US base in Qatar", "detail": "Iran fired missiles at Al Udeid Air Base; CRS reports no US casualties. Watch: Gulf security and energy-shipping risk. Event context does not establish market causation.", "sources": [{"label": "US Congressional Research Service", "url": "https://www.congress.gov/crs_external_products/IF/PDF/IF13032/IF13032.7.pdf"}]},
+    {"date": "2025-06-24", "tag": "CEASEFIRE", "level": "high", "title": "Israel–Iran ceasefire takes effect", "detail": "Following the US announcement and additional exchanges, Israel and Iran indicated they would comply with a ceasefire. This is a dated de-escalation event, not a claim that later conflict ended permanently.", "sources": [{"label": "US Congressional Research Service", "url": "https://www.congress.gov/crs_external_products/IF/PDF/IF13032/IF13032.7.pdf"}]},
+    {"date": "2026-02-28", "tag": "GEOPOLITICS", "level": "high", "title": "US and Israel launch strikes against Iran", "detail": "The UN Secretary-General reported US and Israeli strikes against Iran and Iranian retaliation across the region. Watch: energy, gold and risk appetite; the archive does not estimate a causal effect on trading revenue.", "sources": [{"label": "United Nations · 28 February", "url": "https://www.un.org/sg/en/content/sg/statements/2026-02-28/secretary-generals-remarks-the-security-council-meeting-the-situation-the-middle-east-delivered"}]},
+    {"date": "2026-04-08", "tag": "CEASEFIRE", "level": "high", "title": "Two-week US–Iran ceasefire announced", "detail": "European leaders welcomed a two-week ceasefire between the United States and Iran. Date follows the 8 April European statement; the announcement occurred late 7 April in US time. Temporary ceasefire, not a permanent peace agreement.", "sources": [{"label": "European Council", "url": "https://www.consilium.europa.eu/en/press/press-releases/2026/04/08/leaders-statement-on-the-two-week-ceasefire-concluded-between-the-united-states-and-iran/"}]},
+    {"date": "2026-11-03", "tag": "ELECTION · SCHEDULED", "level": "high", "title": "US midterm elections · Election Day", "detail": "Scheduled federal general election date. Watch: congressional control and potential fiscal, trade and crypto-policy changes. No winner or policy outcome is assumed; results and certification require separate confirmation.", "sources": [{"label": "Florida Department of State", "url": "https://dos.fl.gov/elections/for-voters/election-dates"}]},
     {
       date: '2026-10-29', tag: 'SECURITY', level: 'critical',
       title: 'Binance hit by suspected hot-wallet hack',
@@ -147,7 +154,9 @@
 
   function relLabel(ymd, today) {
     var n = Math.round((utcMs(today) - utcMs(ymd)) / DAY_MS);
-    if (isNaN(n) || n <= 0) return 'Today';
+    if (isNaN(n)) return '';
+    if (n < 0) return 'Scheduled · in ' + (-n) + ' days';
+    if (n === 0) return 'Today';
     if (n === 1) return 'Yesterday';
     return n + ' days ago';
   }
@@ -216,7 +225,7 @@
 
     html += '</div></div>';
     const years=[...new Set(all.map(e=>e.date.slice(0,4)))].sort();
-    const controls='<div class="history-controls"><div class="history-filters" role="group" aria-label="History category">'+[['variational','Milestones'],['products','Products'],['funding','Funding'],['growth','Growth'],['reports','Official reports'],['market','Market context']].map(([key,label])=>'<button type="button" data-history-filter="'+key+'" aria-pressed="'+(key===historyFilter)+'">'+label+'</button>').join('')+'</div><div class="history-selects"><label>Year <select data-history-year><option value="all">All years</option>'+years.map(y=>'<option value="'+y+'" '+(y===historyYear?'selected':'')+'>'+y+'</option>').join('')+'</select></label><label>Order <select data-history-order><option value="oldest" '+(historyOrder==='oldest'?'selected':'')+'>Oldest first</option><option value="newest" '+(historyOrder==='newest'?'selected':'')+'>Newest first</option></select></label><span>'+items.length+' events</span></div></div><p class="history-scope">Launches, funding and growth, linked to original sources. Dates retain their published precision.</p>';
+    const controls='<div class="history-controls"><div class="history-filters" role="group" aria-label="History category">'+[['variational','Milestones'],['products','Products'],['funding','Funding'],['growth','Growth'],['reports','Official reports'],['market','Market context']].map(([key,label])=>'<button type="button" data-history-filter="'+key+'" aria-pressed="'+(key===historyFilter)+'">'+label+'</button>').join('')+'</div><div class="history-selects"><label>Year <select data-history-year><option value="all">All years</option>'+years.map(y=>'<option value="'+y+'" '+(y===historyYear?'selected':'')+'>'+y+'</option>').join('')+'</select></label><label>Order <select data-history-order><option value="oldest" '+(historyOrder==='oldest'?'selected':'')+'>Oldest first</option><option value="newest" '+(historyOrder==='newest'?'selected':'')+'>Newest first</option></select></label><span>'+items.length+' events</span></div></div><p class="history-scope">' + (historyFilter==='market'?'Global politics, elections, conflict, macro and crypto events. Source-linked facts; watch channels are context, not proven causes of revenue. Scheduled events do not imply confirmed outcomes.':'Launches, funding and growth, linked to original sources. Dates retain their published precision.') + '</p>';
     html=html.replace('<div class="srv2-news-wrap">',controls+'<div class="srv2-news-wrap">');
     if(!items.length)html+='<p class="history-empty">No archived events match this year and category.</p>';
     if(root._historyObserver)root._historyObserver.disconnect();
