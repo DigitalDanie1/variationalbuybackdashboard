@@ -4282,7 +4282,7 @@ function calColor(t){
   return 'linear-gradient(135deg,var(--grn),var(--cyan))';
 }
 let CALMODE='day', CAL={month:null,span:null};
-/* Day view shows one biweekly reporting period (Sun→Sat, 14 days) instead of a whole month.
+/* Current-month day view shows one biweekly reporting period (Sun→Sat, 14 days).
    Anchored to the Sunday after the 2026-10-31 report so each page matches one official report. */
 const CAL_SPAN_ANCHOR='2026-11-01';
 const calSpanStart=d=>{const off=Math.round((Date.parse(d+'T00:00:00Z')-Date.parse(CAL_SPAN_ANCHOR+'T00:00:00Z'))/864e5);return addDays(d,-(((off%14)+14)%14));};
@@ -4396,17 +4396,19 @@ function calendarSpanBounds(){
 function paintCalendar(){
   const first=CAL.month+'-01',end=monthEnd(first);
   const bounds=calendarMonthBounds();
-  if(CALMODE==='day'){
-    const sb=calendarSpanBounds();
-    $('#calPrev').disabled=CAL.span<=sb.start;
-    $('#calNext').disabled=CAL.span>=sb.end;
-  }else{
-    $('#calPrev').disabled=CAL.month<=bounds.start;
-    $('#calNext').disabled=CAL.month>=bounds.end;
-  }
-  const start=CAL.span,finish=addDays(CAL.span,13);
+  $('#calPrev').disabled=CAL.month<=bounds.start;
+  $('#calNext').disabled=CAL.month>=bounds.end;
+  // Only the current ET month uses the compact two-week window.
+  // Historical and future month selections always show the complete month.
+  const compact=CALMODE==='day'&&CAL.month===resetDateKey().slice(0,7);
+  const start=compact?calSpanStart(resetDateKey()):first;
+  const finish=compact?addDays(start,13):end;
   let cells='',d=start;
-  $('#calTitle').textContent=CALMODE==='day'
+  if(CALMODE==='day'&&!compact){
+    const offset=new Date(first+'T00:00:00Z').getUTCDay();
+    cells='<div class="cal-empty" aria-hidden="true"></div>'.repeat(offset);
+  }
+  $('#calTitle').textContent=compact
     ? `${calSpanShort(start)} – ${calSpanShort(finish)}, ${finish.slice(0,4)}`
     : monthName(CAL.month);
   renderHistoryMonths();
@@ -4590,17 +4592,11 @@ $('#calSeg').addEventListener('click',e=>{
   buildCalendar();
 });
 $('#calGrid').addEventListener('click',e=>{const c=e.target.closest('[data-d]');if(c)selectCell(c.dataset.d);});
-/* Prev/Next page by one 14-day period in day view, by month in week/month view. */
+/* Month navigation keeps every historical day reachable. */
 function shiftCalendar(dir){
-  if(CALMODE==='day'){
-    const next=addDays(CAL.span,14*dir),sb=calendarSpanBounds();
-    if(next<sb.start||next>sb.end)return;
-    CAL.span=next;CAL.month=addDays(next,13).slice(0,7);
-  }else{
-    const next=ymAdd(CAL.month,dir),mb=calendarMonthBounds();
-    if(next<mb.start||next>mb.end)return;
-    CAL.month=next;CAL.span=calSpanStart(next+'-01');
-  }
+  const next=ymAdd(CAL.month,dir),bounds=calendarMonthBounds();
+  if(next<bounds.start||next>bounds.end)return;
+  CAL.month=next;CAL.selectedDate=null;
   buildCalendar();
 }
 $('#calPrev').addEventListener('click',()=>shiftCalendar(-1));
