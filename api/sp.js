@@ -3,11 +3,9 @@
 // people are sent on to the calculator with the same scenario loaded.
 import { parseScenario, describe, query } from './_scenario.js';
 
-export const config = { runtime: 'edge' };
-
 const esc = (t) => String(t).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
-export default function handler(req) {
+export function GET(req) {
   const url = new URL(req.url);
   const s = parseScenario(url.searchParams);
   const origin = url.origin;

@@ -3,8 +3,7 @@
 import { ImageResponse } from '@vercel/og';
 import { parseScenario, describe } from './_scenario.js';
 
-export const config = { runtime: 'edge' };
-
+// Node runtime (Web-standard GET handler): the edge runtime refuses @vercel/og's embedded WebAssembly.
 const BLUE = '#4c9af8', ICE = '#d6ecff';
 const SANS = 'Geist', MONO = 'Geist Mono';
 
@@ -32,7 +31,7 @@ function valueSize(s) {
   return n <= 8 ? 120 : n <= 10 ? 104 : n <= 12 ? 88 : n <= 14 ? 74 : 60;
 }
 
-export default async function handler(req) {
+export async function GET(req) {
   const url = new URL(req.url);
   const s = parseScenario(url.searchParams);
   if (!s) return new Response('bad scenario', { status: 400 });
