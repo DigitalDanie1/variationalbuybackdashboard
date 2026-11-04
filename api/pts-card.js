@@ -77,7 +77,7 @@ export async function GET(req) {
       hair({ marginTop: 16 }),
       h('div', { fontFamily: MONO, fontWeight: 600, fontSize: 15, letterSpacing: 3.5, color: BLUE, marginTop: 36 }, 'MY $VAR AIRDROP SCENARIO'),
       h('div', {
-        fontWeight: 700, fontSize: valueSize(d.value), lineHeight: 1.05, marginTop: 14, letterSpacing: -2,
+        fontWeight: 700, fontSize: valueSize(d.value), lineHeight: 1.22, marginTop: 4, paddingBottom: 2, letterSpacing: -2,
         backgroundImage: `linear-gradient(90deg, ${BLUE}, ${ICE})`, backgroundClip: 'text', color: 'transparent',
       }, d.value),
       h('div', { fontWeight: 500, fontSize: 26, color: '#9fb6d9', marginTop: 10 }, `at ${d.fdvStr} FDV · 32% genesis airdrop`),
