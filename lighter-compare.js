@@ -160,10 +160,37 @@
     return {
       fee: core + rh,
       revenue: core + 0.5 * rh,
-      liq: g(F.cLiq) + g(F.rLiq),
-      buyUsd: g(F.buyUsd),
-      buyLit: g(F.buyLit)
+      liqFee: g(F.cLiq) + g(F.rLiq),
+      buybackUsd: g(F.buyUsd),
+      buybackLit: g(F.buyLit)
     };
+  }
+  /* Per UTC day -> {fee, revenue, liqFee, buybackUsd, buybackLit}; only days Lighter has posted. */
+  function loadLighterDaily() {
+    return loadFlows().then(function (F) {
+      var out = new Map(), days = new Set();
+      [F.cMaker, F.cTaker].forEach(function (m) { m.forEach(function (v, d) { days.add(d); }); });
+      days.forEach(function (d) { out.set(d, flowFor(F, d)); });
+      return out;
+    });
+  }
+  /* Daily DeFiLlama volume for both venues. Variational uses dashboard.js's series when it
+     covers every requested day, else its own fetch. days = array of 'YYYY-MM-DD'. */
+  var ownVarVol = null;
+  function loadVolumes(days) {
+    return Promise.all([loadLitLlama(), varSeries()]).then(function (r) {
+      var lit = r[0].vol, vv = r[1].vol;
+      var covered = days.every(function (d) { return vv.has(d); });
+      if (covered) return { lit: lit, var: vv };
+      if (!ownVarVol) {
+        ownVarVol = getJson(VAR_URLS.vol).then(pairsToMap);
+        ownVarVol.catch(function () { ownVarVol = null; });
+      }
+      return ownVarVol.then(function (m) {
+        var merged = new Map(m); vv.forEach(function (v, d) { if (!merged.has(d)) merged.set(d, v); });
+        return { lit: lit, var: merged };
+      }, function () { return { lit: lit, var: vv }; });
+    });
   }
 
   /* ---------- 1. header chips ---------- */
@@ -465,36 +492,49 @@
     return '<div class="lc-conv"><span>↓ ' + pct + '</span>' + (tag ? ' <em>' + tag + '</em>' : '') + '</div>';
   }
 
+  /* Shared two-column ladder. varV = {fee, revenue, buyback, rate}; litV = {fee, revenue, buyback,
+     buybackLit} or null (then opts.litMsg is shown). opts.litHead overrides the Lighter header.
+     Returns the HTML; also writes it into container when one is given. */
+  function renderLadder(container, varV, litV, opts) {
+    opts = opts || {};
+    var varCol =
+      '<div class="lc-col"><div class="lc-col-h"><span class="lc-sw var"></span><span>Variational</span></div>' +
+      step('Fee', 'v', varV.fee, varV.fee, 'Modeled', 'Gross spreads* · implied from the ' + (varV.rate * 100).toFixed(1) + '% report share') +
+      conv(varV.rate, '') +
+      step('Revenue', 'v', varV.revenue, varV.fee, 'Wallet inflow', 'Kept by protocol') +
+      conv(1, 'planned') +
+      step('Buyback', 'p', varV.buyback, varV.fee, 'Pending TGE', '100% of treasury → $VAR buy &amp; burn after TGE · not executed yet') +
+      '</div>';
+    var litBody;
+    if (!litV) {
+      litBody = '<p class="lc-wait">' + (opts.litMsg || '') + '</p>';
+    } else {
+      litBody =
+        step('Fee', 'l', litV.fee, litV.fee, 'Reported', 'Maker + taker · Core + Robinhood Chain') +
+        conv(litV.fee > 0 ? litV.revenue / litV.fee : NaN, '') +
+        step('Revenue', 'l', litV.revenue, litV.fee, 'Reported', 'Core + 50% of Robinhood Chain (Lighter\'s own rule)') +
+        conv(litV.revenue > 0 ? litV.buyback / litV.revenue : NaN, '') +
+        step('Buyback', 'l', litV.buyback, litV.fee, 'Executed', '<span>' + Math.round(litV.buybackLit).toLocaleString('en-US') + '</span> <span>LIT bought, burned</span>');
+    }
+    var litCol = '<div class="lc-col"><div class="lc-col-h"><span class="lc-sw lit"></span><span>' + (opts.litHead || 'Lighter · UTC day') + '</span></div>' + litBody + '</div>';
+    var html = '<div class="lc-lad">' + varCol + litCol + '</div>';
+    if (container) container.innerHTML = html;
+    return html;
+  }
+
   function ladderHtml(d, F) {
     var V = varDay(d);
     if (!V) return null;
-    var varCol =
-      '<div class="lc-col"><div class="lc-col-h"><span class="lc-sw var"></span><span>Variational</span></div>' +
-      step('Fee', 'v', V.spread, V.spread, 'Modeled', 'Gross spreads* · implied from the ' + (V.rate * 100).toFixed(1) + '% report share') +
-      conv(V.rate, '') +
-      step('Revenue', 'v', V.amt, V.spread, 'Wallet inflow', 'Kept by protocol') +
-      conv(1, 'planned') +
-      step('Buyback', 'p', V.amt, V.spread, 'Pending TGE', '100% of treasury → $VAR buy &amp; burn after TGE · not executed yet') +
-      '</div>';
-    var litBody;
     var f = F ? flowFor(F, d) : null;
-    if (!F) {
-      litBody = '<p class="lc-wait">' + (flowsFailed ? 'Lighter data unavailable' : 'Loading Lighter data…') + '</p>';
-    } else if (!f) {
-      litBody = '<p class="lc-wait">Lighter posts daily totals after 00:00 UTC.</p>';
-    } else {
-      litBody =
-        step('Fee', 'l', f.fee, f.fee, 'Reported', 'Maker + taker · Core + Robinhood Chain') +
-        conv(f.fee > 0 ? f.revenue / f.fee : NaN, '') +
-        step('Revenue', 'l', f.revenue, f.fee, 'Reported', 'Core + 50% of Robinhood Chain (Lighter\'s own rule)') +
-        conv(f.revenue > 0 ? f.buyUsd / f.revenue : NaN, '') +
-        step('Buyback', 'l', f.buyUsd, f.fee, 'Executed', '<span>' + Math.round(f.buyLit).toLocaleString('en-US') + '</span> <span>LIT bought, burned</span>');
-    }
-    var litCol = '<div class="lc-col"><div class="lc-col-h"><span class="lc-sw lit"></span><span>Lighter · UTC day</span></div>' + litBody + '</div>';
+    var msg = !F ? (flowsFailed ? 'Lighter data unavailable' : 'Loading Lighter data…') : 'Lighter posts daily totals after 00:00 UTC.';
+    var lad2 = renderLadder(null,
+      { fee: V.spread, revenue: V.amt, buyback: V.amt, rate: V.rate },
+      f ? { fee: f.fee, revenue: f.revenue, buyback: f.buybackUsd, buybackLit: f.buybackLit } : null,
+      { litMsg: msg });
     var notes = '';
-    if (f) notes += '<p class="lc-lnote"><span>Liquidation fees</span> <b>' + usd0(f.liq) + '</b> <span>went to LLP, outside this flow.</span></p>';
+    if (f) notes += '<p class="lc-lnote"><span>Liquidation fees</span> <b>' + usd0(f.liqFee) + '</b> <span>went to LLP, outside this flow.</span></p>';
     notes += '<p class="lc-lnote sub">Fee steps use different bases (modeled vs reported). Compare each venue\'s flow, not the dollar levels across columns.</p>';
-    return '<div class="lc-kicker">Fee → Revenue → Buyback</div><div class="lc-lad">' + varCol + litCol + '</div>' + notes;
+    return '<div class="lc-kicker">Fee → Revenue → Buyback</div>' + lad2 + notes;
   }
 
   function paintLadder() {
@@ -524,6 +564,14 @@
     if (seg) seg.addEventListener('click', schedulePaint);
     if (any) schedulePaint();
   }
+
+  /* ---------- shared API (used by pretge-flow.js) ---------- */
+  window.LighterCompare = {
+    loadLighterDaily: loadLighterDaily,
+    loadVolumes: loadVolumes,
+    renderLadder: renderLadder,
+    fmt: { usd0: usd0, money: money, fShort: fShort, fFull: fFull, esc: esc }
+  };
 
   /* ---------- boot ---------- */
   function boot() {

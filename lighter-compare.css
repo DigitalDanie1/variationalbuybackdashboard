@@ -113,3 +113,26 @@ html[data-theme="light"],body.theme-light{--lc-lit:#a8661a}
   .lc-readout.c3{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
 @media (prefers-reduced-motion:reduce){.lc-seg button{transition:none}}
+
+/* ---------- Pre-TGE tab: Fee -> Revenue -> Buyback window comparison (pretge-flow.js) ---------- */
+.pf-flow{container-type:inline-size;min-width:0}
+.pf-flow .pf-lede{margin:10px 0 16px;max-width:70ch}
+.pf-bar{display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;margin:0 0 14px}
+.pf-flow .pf-win{margin:0;font:500 12px/1.4 var(--mono,ui-monospace,Menlo,monospace);color:var(--v2-muted)}
+.pf-win b{font-weight:700;color:var(--v2-text);font-variant-numeric:tabular-nums}
+.pf-flow .lc-lad{margin-top:0}
+.pf-flow .lc-msg,.pf-msg{padding:20px 0}
+.pf-run{margin-top:16px}
+.pf-run .hp-table-scroll{overflow-x:visible}
+.pf-run .hp-table{min-width:0;table-layout:fixed}
+.pf-run .hp-table th,.pf-run .hp-table td{padding:12px 10px;font:600 14px/1.35 var(--mono,ui-monospace,Menlo,monospace);font-variant-numeric:tabular-nums;vertical-align:top;overflow-wrap:anywhere}
+.pf-run .hp-table thead th{font:700 10px/1.2 var(--mono,ui-monospace,Menlo,monospace);letter-spacing:1.1px;text-transform:uppercase;color:var(--v2-faint);min-width:0}
+.pf-run .hp-table tbody th{font:600 12px/1.35 var(--sans,system-ui,sans-serif);color:var(--v2-muted);min-width:0;width:34%}
+.pf-run .hp-table td b{font-weight:700;color:var(--v2-text)}
+.pf-run .hp-table td em{display:block;margin-top:3px;font:500 10px/1.2 var(--mono,ui-monospace,Menlo,monospace);font-style:normal;color:var(--v2-faint)}
+.pf-flow .lc-lnote{font:12px/1.6 var(--sans,system-ui,sans-serif)}
+.pf-flow details.hc-sources code{font:11px/1.5 var(--mono,ui-monospace,Menlo,monospace);color:var(--v2-text);overflow-wrap:anywhere}
+@container (max-width:520px){
+  .pf-run .hp-table th,.pf-run .hp-table td{padding:10px 6px;font-size:13px}
+  .pf-run .hp-table tbody th{width:38%;font-size:11px}
+}
