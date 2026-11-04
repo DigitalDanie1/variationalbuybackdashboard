@@ -11,6 +11,10 @@
         }
       ],
       "destination": "/x-root-card-20260731d.html"
+    },
+    {
+      "source": "/s/points",
+      "destination": "/api/sp"
     }
   ],
   "headers": [

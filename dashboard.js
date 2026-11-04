@@ -3119,11 +3119,14 @@ function renderPointsCalc(){
 function ptsShareText(){
   const mine=Math.max(0,parseFloat($('#ptsMine').value)||0);
   const pool=Math.max(1,parseFloat($('#ptsPool').value)||1);
-  const fdv=ptsPosToFdv(+$('#ptsFdv').value);
+  // FDV travels in whole $M so the tweet text, the link and the server-drawn card all show the same numbers.
+  const fdvM=Math.max(10,Math.round(ptsPosToFdv(+$('#ptsFdv').value)/1e6)),fdv=fdvM*1e6;
   const share=mine/pool, val=fdv*0.32*share, pv=pool>0?fdv*0.32/pool:0;
   const fdvStr='$'+(fdv/1e9).toFixed(fdv>=1e9?1:3)+'B';
   const poolStr=(pool/1e6).toFixed(2)+'M';
-  const url=location.href.startsWith('http')?location.href.split('#')[0]+'#points':'https://www.variational.money/#points';
+  // /s/points carries the scenario: X reads its card tags and shows the image; visitors land on this calculator with it loaded.
+  const host=location.protocol==='https:'?location.origin:'https://var-metrics.com';
+  const url=host+'/s/points?m='+Math.round(mine)+'&p='+Math.round(pool)+'&f='+fdvM;
   return {t:`If Variational hits ${fdvStr} FDV (32% genesis airdrop, ${poolStr} pts pool, TGE Q4 2026), my ${mine.toLocaleString('en-US')} points ≈ ${fmtUSD(val)} (${fmtUSD(pv,2)}/pt) 🪂\n\nLive points→FDV calculator on the buyback tracker 👇`,url};
 }
 /* ---- Points share card · 1200x675 canvas PNG (thumbnail, Save PNG, native/desktop share) ---- */
@@ -3279,18 +3282,10 @@ function ptsToast(msg,warn){
   clearTimeout(PTS_CARD.toastT);
   PTS_CARD.toastT=setTimeout(()=>{el.hidden=true;},7000);
 }
-// Desktop: X's web intent cannot take an image, so copy the PNG to the clipboard (user pastes it) and open the intent.
-// Both calls must happen synchronously inside the click; the blob is passed as a Promise so activation is kept.
+// Desktop: X's web intent cannot take an image, so the tweet links /s/points, whose card tags make X show the scenario image.
 function ptsShareDesktop(e,intent){
-  let cp=null;
-  try{
-    if(navigator.clipboard&&navigator.clipboard.write&&window.ClipboardItem)
-      cp=navigator.clipboard.write([new ClipboardItem({'image/png':e.blob?Promise.resolve(e.blob):e.promise})]);
-  }catch(_){cp=null;}
   window.open(intent,'_blank','noopener,width=600,height=520');
-  if(!cp){ptsToast("Couldn't copy the image — use Save PNG",true);return;}
-  cp.then(()=>ptsToast('Card copied — press ⌘V / Ctrl+V in your post to attach it'),
-          ()=>ptsToast("Couldn't copy the image — use Save PNG",true));
+  ptsToast('The card image appears in your post automatically from the link');
 }
 async function ptsShareNative(e,s){
   try{
@@ -4641,6 +4636,16 @@ $('#ptsMatrix')?.addEventListener('click',e=>{
   if(!num||!sl)return;
   const p=ptsPoolToday();
   num.value=p;sl.value=p;
+  // Opened from a shared /s/points link: load that scenario.
+  try{
+    const q=new URLSearchParams(location.search),m=+q.get('m'),sp=+q.get('p'),f=+q.get('f');
+    if(q.has('m')&&Number.isFinite(m)&&m>=0)$('#ptsMine').value=Math.round(m);
+    if(q.has('p')&&Number.isFinite(sp)&&sp>0){
+      const v=Math.min(PTS_POOL_MAX,Math.max(PTS_POOL_MIN,Math.round(sp/PTS_POOL_STEP)*PTS_POOL_STEP));
+      num.value=v;sl.value=v;
+    }
+    if(q.has('f')&&Number.isFinite(f)&&f>0)$('#ptsFdv').value=ptsFdvToPos(f*1e6);
+  }catch(_){}
 })();
 $('#ptsShareBtn')?.addEventListener('click',()=>{
   const s=ptsShareText();
