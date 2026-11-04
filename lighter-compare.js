@@ -1,5 +1,5 @@
-/* vs Lighter - header ratio chips, Overview chart compare mode, and the calendar-day
-   Fee -> Revenue -> Buyback ladder.
+/* vs Lighter - header ratio chips, Overview chart compare mode, and the Fee -> Revenue -> Buyback
+   ladder shown under the compare chart for the clicked (pinned) day.
 
    Reads dashboard.js globals where they exist (MARKET_ACTIVITY, CAL, CALMODE, spreadShareAt,
    isClosedDailyTotal ...) and falls back to its own fetch / hides itself when they do not.
@@ -222,7 +222,7 @@
   }
 
   /* ---------- 2. chart: toggle + compare panel ---------- */
-  var S = { mode: 'var', metric: 'vol', rng: 90, idx: null };
+  var S = { mode: 'var', metric: 'vol', rng: 90, idx: null, pin: null };
   try { if (localStorage.getItem(MODE_KEY) === 'cmp') S.mode = 'cmp'; } catch (e) { /* storage blocked */ }
   var host = null, panel = null, chartEl = null, G = null, rowsAll = null, state = 'idle';
 
@@ -252,7 +252,8 @@
       '</div>' +
       '<div class="lc-readout" id="lcReadout" aria-live="off"></div>' +
       '<div class="lc-chart" id="lcChart" tabindex="0" role="group" aria-label="Chart. Use left and right arrow keys to move the crosshair."></div>' +
-      '<p class="lc-read" id="lcRead"></p><p class="lc-src" id="lcSrc"></p>';
+      '<p class="lc-read" id="lcRead"></p><p class="lc-src" id="lcSrc"></p>' +
+      '<div class="lc-ladder" id="lcLadder" hidden></div>';
     host.appendChild(panel);
     chartEl = $('lcChart');
 
@@ -269,9 +270,10 @@
       S.rng = +b.getAttribute('data-range'); S.idx = null; paintAll();
     });
     chartEl.addEventListener('keydown', function (e) {
-      if (!G || (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight' && e.key !== 'Escape')) return;
+      if (!G || (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight' && e.key !== 'Escape' && e.key !== 'Enter' && e.key !== ' ')) return;
       e.preventDefault();
       if (e.key === 'Escape') { setIdx(null); return; }
+      if (e.key === 'Enter' || e.key === ' ') { pinIdx(S.idx == null ? G.n - 1 : S.idx); return; }
       var cur = S.idx == null ? G.n - 1 : S.idx;
       setIdx(Math.max(0, Math.min(G.n - 1, cur + (e.key === 'ArrowLeft' ? -1 : 1))));
     });
@@ -310,7 +312,7 @@
         rowsAll = rows;
         if (rows.length < 2) throw new Error('rows');
         state = 'ready';
-        if (S.mode === 'cmp') paintAll();
+        if (S.mode === 'cmp') { paintAll(); wantFlows(); }
       }).catch(function () {
         state = 'error';
         if (S.mode === 'cmp') showMsg('Lighter data unavailable');
@@ -325,6 +327,7 @@
     G = null;
     $('lcReadout').innerHTML = '';
     chartEl.innerHTML = '<p class="lc-msg">' + esc(t) + '</p>';
+    if (lad) lad.hidden = true;
     $('lcRead').textContent = '';
     $('lcSrc').textContent = '';
   }
@@ -334,6 +337,7 @@
     syncButtons();
     renderChart();
     paintTexts();
+    paintLadder();
   }
 
   function renderChart() {
@@ -402,14 +406,45 @@
       svg += '<text class="ax" x="' + x + '" y="' + (b1 + 16) + '" text-anchor="' + an + '">' + fShort(rows[i].d) + '</text>';
     });
     G = { rows: rows, n: n, L: L, slot: slot, cx: cx, yTop: T, yBot: b1, y: y, yr: yr, kv: kv, kl: kl, ra: ra };
-    svg += '<g id="lcHov"></g><rect id="lcHit" x="' + L + '" y="' + T + '" width="' + pw + '" height="' + (b1 - T) + '" fill="transparent"/>';
+    svg += '<g id="lcPin"></g><g id="lcHov"></g><rect id="lcHit" x="' + L + '" y="' + T + '" width="' + pw + '" height="' + (b1 - T) + '" fill="transparent"/>';
     chartEl.innerHTML = '<svg viewBox="0 0 ' + W + ' ' + H + '" width="' + W + '" height="' + H + '" role="img" aria-label="Variational versus Lighter, ' + n + ' days">' + svg + '</svg>';
     var hit = $('lcHit');
     var idxFrom = function (e) { var b = hit.getBoundingClientRect(); return Math.max(0, Math.min(n - 1, Math.floor((e.clientX - b.left) / slot))); };
     hit.addEventListener('pointermove', function (e) { setIdx(idxFrom(e)); });
     hit.addEventListener('pointerdown', function (e) { setIdx(idxFrom(e)); });
     hit.addEventListener('pointerleave', function (e) { if (e.pointerType === 'mouse') setIdx(null); });
+    hit.addEventListener('click', function (e) { pinIdx(idxFrom(e)); });
+    paintPin();
     setIdx(S.idx != null && S.idx < n ? S.idx : null);
+  }
+
+  /* index (within the current range) of the day the ladder shows */
+  function ladIdx() {
+    if (!G) return -1;
+    var rows = G.rows, i;
+    if (S.pin) for (i = 0; i < rows.length; i++) if (rows[i].d === S.pin) return i;
+    if (flowsValue) {
+      for (i = rows.length - 1; i >= 0; i--) {
+        if (!flowFor(flowsValue, rows[i].d)) continue;
+        var vd = varDay(rows[i].d);
+        if (vd && !vd.live) return i;
+      }
+      for (i = rows.length - 1; i >= 0; i--) if (flowFor(flowsValue, rows[i].d)) return i;
+    }
+    return rows.length - 1;
+  }
+  function paintPin() {
+    var g = G, el = $('lcPin'); if (!g || !el) return;
+    var i = ladIdx(); if (i < 0) { el.innerHTML = ''; return; }
+    var x = g.cx(i), yb = g.yTop - 4;
+    el.innerHTML = '<line class="pin" x1="' + x + '" x2="' + x + '" y1="' + yb + '" y2="' + g.yBot + '"/>' +
+      '<path class="pin-h" d="M' + (x - 4.5) + ' ' + (yb - 6) + 'L' + (x + 4.5) + ' ' + (yb - 6) + 'L' + x + ' ' + yb + 'Z"/>';
+  }
+  function pinIdx(i) {
+    if (!G || i == null) return;
+    S.pin = G.rows[i].d;
+    paintPin();
+    paintLadder();
   }
 
   function setIdx(i) {
@@ -441,31 +476,14 @@
     $('lcSrc').textContent = 'Source: DeFiLlama daily volume and open interest, same source for both venues. DeFiLlama\'s OI counts roughly half of each venue\'s own OI figure, for both, so the ratio holds.';
   }
 
-  /* ---------- 3. calendar day ladder ---------- */
-  var lad = null, lastLadHtml = '', ladTimer = null, flowsValue = null, flowsFailed = false;
-
-  function buildLadderHost() {
-    if (lad && lad.isConnected) return true;
-    var figs = document.querySelector('#calSel .cal-sel-figs');
-    if (!figs) return false;
-    lad = document.createElement('div');
-    lad.className = 'lc-ladder';
-    lad.id = 'lcLadder';
-    lad.hidden = true;
-    figs.parentNode.insertBefore(lad, figs.nextSibling);
-    lastLadHtml = '';
-    if (typeof IntersectionObserver === 'function') {
-      var io = new IntersectionObserver(function (es) {
-        if (es.some(function (e) { return e.isIntersecting; })) { io.disconnect(); wantFlows(); }
-      });
-      io.observe(lad);
-    } else wantFlows();
-    return true;
-  }
+  /* ---------- 3. Fee -> Revenue -> Buyback ladder under the compare chart ---------- */
+  var lad = null, flowsValue = null, flowsFailed = false, flowsAsked = false;
 
   function wantFlows() {
-    loadFlows().then(function (v) { flowsValue = v; flowsFailed = false; schedulePaint(); },
-                     function () { flowsFailed = true; schedulePaint(); });
+    if (flowsAsked) return;
+    flowsAsked = true;
+    loadFlows().then(function (v) { flowsValue = v; flowsFailed = false; if (S.mode === 'cmp' && G) { paintPin(); paintLadder(); } },
+                     function () { flowsFailed = true; flowsAsked = false; if (S.mode === 'cmp' && G) paintLadder(); });
   }
 
   function varDay(d) {
@@ -476,7 +494,7 @@
       else return null;
       var rate = spreadShareAt(d).rate;
       if (!(rate > 0)) return null;
-      return { amt: amt, rate: rate, spread: amt / rate };
+      return { amt: amt, rate: rate, spread: amt / rate, live: !closed };
     } catch (e) { return null; }
   }
 
@@ -497,8 +515,10 @@
      Returns the HTML; also writes it into container when one is given. */
   function renderLadder(container, varV, litV, opts) {
     opts = opts || {};
-    var varCol =
-      '<div class="lc-col"><div class="lc-col-h"><span class="lc-sw var"></span><span>Variational</span></div>' +
+    var varCol = !varV
+      ? '<div class="lc-col"><div class="lc-col-h"><span class="lc-sw var"></span><span>Variational</span></div><p class="lc-wait">' + (opts.varMsg || '') + '</p></div>'
+      : '<div class="lc-col"><div class="lc-col-h"><span class="lc-sw var"></span><span>Variational</span></div>' +
+      (opts.varNote ? '<p class="lc-live">' + opts.varNote + '</p>' : '') +
       step('Fee', 'v', varV.fee, varV.fee, 'Modeled', 'Gross spreads* · implied from the ' + (varV.rate * 100).toFixed(1) + '% report share') +
       conv(varV.rate, '') +
       step('Revenue', 'v', varV.revenue, varV.fee, 'Wallet inflow', 'Kept by protocol') +
@@ -522,47 +542,24 @@
     return html;
   }
 
-  function ladderHtml(d, F) {
-    var V = varDay(d);
-    if (!V) return null;
-    var f = F ? flowFor(F, d) : null;
-    var msg = !F ? (flowsFailed ? 'Lighter data unavailable' : 'Loading Lighter data…') : 'Lighter posts daily totals after 00:00 UTC.';
-    var lad2 = renderLadder(null,
-      { fee: V.spread, revenue: V.amt, buyback: V.amt, rate: V.rate },
+  function paintLadder() {
+    if (!lad) lad = $('lcLadder');
+    if (!lad) return;
+    var i = ladIdx();
+    if (i < 0 || S.mode !== 'cmp') { lad.hidden = true; return; }
+    var d = G.rows[i].d, F = flowsValue, V = varDay(d), f = F ? flowFor(F, d) : null;
+    var litMsg = !F ? (flowsFailed ? 'Lighter data unavailable' : 'Loading Lighter data…') : 'Lighter posts daily totals after 00:00 UTC.';
+    var body = renderLadder(null,
+      V ? { fee: V.spread, revenue: V.amt, buyback: V.amt, rate: V.rate } : null,
       f ? { fee: f.fee, revenue: f.revenue, buyback: f.buybackUsd, buybackLit: f.buybackLit } : null,
-      { litMsg: msg });
+      { litMsg: litMsg, varNote: V && V.live ? 'Day in progress · earned so far (closes 00:00 ET)' : '', varMsg: 'Variational treasury data not available for this day.' });
     var notes = '';
     if (f) notes += '<p class="lc-lnote"><span>Liquidation fees</span> <b>' + usd0(f.liqFee) + '</b> <span>went to LLP, outside this flow.</span></p>';
     notes += '<p class="lc-lnote sub">Fee steps use different bases (modeled vs reported). Compare each venue\'s flow, not the dollar levels across columns.</p>';
-    return '<div class="lc-kicker">Fee → Revenue → Buyback</div>' + lad2 + notes;
-  }
-
-  function paintLadder() {
-    ladTimer = null;
-    if (!buildLadderHost()) return;
-    var ok = false, html = null;
-    try { ok = CALMODE === 'day' && CAL && CAL.selectedDate; } catch (e) { ok = false; }
-    if (ok) {
-      html = ladderHtml(CAL.selectedDate, flowsValue);
-    }
-    if (!html) { lad.hidden = true; lastLadHtml = ''; return; }
+    var html = '<div class="lc-lad-h"><div class="lc-kicker">Fee → Revenue → Buyback</div>' +
+      '<div class="lc-lad-d">' + fFull(d) + '</div><div class="lc-lad-hint">Click a day on the chart to change it.</div></div>' + body + notes;
+    if (html !== lad.getAttribute('data-h')) { lad.innerHTML = html; lad.setAttribute('data-h', html); }
     lad.hidden = false;
-    if (html !== lastLadHtml) { lad.innerHTML = html; lastLadHtml = html; }
-  }
-  function schedulePaint() { if (!ladTimer) ladTimer = setTimeout(paintLadder, 30); }
-
-  function watchCalendar() {
-    var ids = ['calLab', 'calAmt', 'calInspectorDate'];
-    var any = false;
-    if (typeof MutationObserver !== 'function') return;
-    var mo = new MutationObserver(schedulePaint);
-    ids.forEach(function (id) {
-      var el = $(id);
-      if (el) { mo.observe(el, { childList: true, characterData: true, subtree: true }); any = true; }
-    });
-    var seg = $('calSeg');
-    if (seg) seg.addEventListener('click', schedulePaint);
-    if (any) schedulePaint();
   }
 
   /* ---------- shared API (used by pretge-flow.js) ---------- */
@@ -577,7 +574,6 @@
   function boot() {
     buildChrome();
     if (host) applyMode();
-    watchCalendar();
     paintChips();
     /* dashboard.js lands its own series a moment later; refresh chips and chart when it does */
     var tries = 0, iv = setInterval(function () {

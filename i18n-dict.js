@@ -5745,7 +5745,10 @@ Object.assign(window.__VDICT.ko, {
  "Liquidation fees": "청산 수수료",
  "went to LLP, outside this flow.": "LLP로 귀속되어 이 흐름에 포함되지 않습니다.",
  "Fee steps use different bases (modeled vs reported). Compare each venue's flow, not the dollar levels across columns.": "수수료 단계는 산정 기준이 다릅니다(모델 vs 보고). 열 간 달러 수준이 아니라 각 거래소의 흐름을 비교하세요.",
- "Lighter posts daily totals after 00:00 UTC.": "Lighter는 UTC 00:00 이후 일일 합계를 게시합니다."
+ "Lighter posts daily totals after 00:00 UTC.": "Lighter는 UTC 00:00 이후 일일 합계를 게시합니다.",
+ "Click a day on the chart to change it.": "차트에서 날짜를 클릭해 바꿔보세요.",
+ "Variational treasury data not available for this day.": "이 날의 Variational 트레저리 데이터가 없습니다.",
+ "Day in progress · earned so far (closes 00:00 ET)": "진행 중인 날 · 현재까지 적립 (ET 00:00 마감)"
 });
 Object.assign(window.__VDICT.zh, {
  "AFTER TGE · WHERE THE FEES GO": "TGE 之后 · 费用流向何处",
@@ -5805,5 +5808,8 @@ Object.assign(window.__VDICT.zh, {
  "Liquidation fees": "清算手续费",
  "went to LLP, outside this flow.": "归入 LLP，不在此流程内。",
  "Fee steps use different bases (modeled vs reported). Compare each venue's flow, not the dollar levels across columns.": "手续费环节的口径不同（模型 vs 披露）。请比较各交易所自身的流程，而不是两列之间的美元水平。",
- "Lighter posts daily totals after 00:00 UTC.": "Lighter 在 UTC 00:00 之后发布每日合计。"
+ "Lighter posts daily totals after 00:00 UTC.": "Lighter 在 UTC 00:00 之后发布每日合计。",
+ "Click a day on the chart to change it.": "点击图表中的某一天即可切换。",
+ "Variational treasury data not available for this day.": "该日暂无 Variational 国库数据。",
+ "Day in progress · earned so far (closes 00:00 ET)": "进行中的一天 · 截至目前累计（ET 00:00 收盘）"
 });
