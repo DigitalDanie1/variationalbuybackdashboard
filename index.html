@@ -1806,6 +1806,12 @@ html[data-ui-state="error"]::before{content:"Unable to load VAR-METRICS. Please 
   .pts-card-thumb{display:block;width:100%;aspect-ratio:16/9;overflow:hidden;border:1px solid var(--line);border-radius:8px;background:#04122a;transition:border-color .15s}
   .pts-card-thumb:hover,.pts-card-thumb:focus-visible{border-color:var(--grn)}
   .pts-card-thumb img{display:block;width:100%;height:auto}
+  .pts-head{display:flex;flex-wrap:wrap;gap:16px 32px;align-items:flex-start;justify-content:space-between}
+  .pts-head-l{flex:1 1 420px;min-width:0}
+  .pts-share-row.pts-share-top{flex:0 1 auto;margin-top:2px;padding-top:0;border-top:0;justify-content:flex-end;gap:12px 16px}
+  .pts-share-top .pts-share-main{flex:0 1 auto}
+  .pts-share-top .pts-card-prev{width:240px}.pts-share-top .pts-card-prev small{white-space:nowrap}
+  @media (max-width:720px){.pts-share-row.pts-share-top{justify-content:flex-start;width:100%}.pts-share-top .pts-card-prev{width:100%;max-width:320px}}
   .historical-combo{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(340px,.85fr);column-gap:18px;align-items:start}
   .historical-combo>h2,.historical-combo>.cap,.historical-combo>.legend,.historical-combo>.chart-tools,.historical-combo>#curve{grid-column:1}
   .historical-combo>h2{margin-bottom:0}
@@ -9488,8 +9494,26 @@ body.theme-light .lb-card{box-shadow:0 1px 0 rgba(20,40,80,.03),0 14px 30px -22p
 </div>
 
 <div class="card tsec tg-hide" data-tg="points" style="margin-top:16px">
-  <h2>Points / FDV Calculator <span class="tag">airdrop scenario</span></h2>
-  <div class="cap">Program extended. TGE is set for <b>Q4 2026</b> (no exact date yet — possible marks Oct 30 and Nov 30, latest bound Dec 31). Genesis airdrop confirmed at <b>32% of supply, 100% unlocked at TGE</b>. Points ÷ total pool = share; share × FDV × 32% = estimated value.</div>
+  <div class="pts-head">
+    <div class="pts-head-l">
+    <h2>Points / FDV Calculator <span class="tag">airdrop scenario</span></h2>
+    <div class="cap">Program extended. TGE is set for <b>Q4 2026</b> (no exact date yet — possible marks Oct 30 and Nov 30, latest bound Dec 31). Genesis airdrop confirmed at <b>32% of supply, 100% unlocked at TGE</b>. Points ÷ total pool = share; share × FDV × 32% = estimated value.</div>
+    </div>
+    <div class="pts-share-row pts-share-top">
+      <div class="pts-share-main">
+        <div class="pts-share-btns">
+          <button class="share-btn" id="ptsShareBtn" type="button">𝕏 Share my scenario</button>
+          <button class="share-btn ghost" id="ptsCopyBtn" type="button">⧉ Copy</button>
+          <button class="share-btn ghost" id="ptsSaveBtn" type="button">↓ Save PNG</button>
+        </div>
+        <div class="pts-toast" id="ptsToast" role="status" aria-live="polite" hidden></div>
+      </div>
+      <div class="pts-card-prev">
+        <a class="pts-card-thumb" id="ptsCardThumb" target="_blank" rel="noopener" title="Open the share card full-size"><img alt="Preview of my airdrop scenario share card" width="240" height="135"></a>
+        <small>Card preview · click to open</small>
+      </div>
+    </div>
+  </div>
   <div class="pts-deadline">
     <div class="pts-dead-top">
       <div>
@@ -9567,20 +9591,6 @@ body.theme-light .lb-card{box-shadow:0 1px 0 rgba(20,40,80,.03),0 14px 30px -22p
     <span>100% of treasury revenue → buy &amp; burn</span>
     <span>Unclaimed airdrop burned</span>
     <span>Need ≥1 point to be eligible</span>
-  </div>
-  <div class="pts-share-row">
-    <div class="pts-share-main">
-      <div class="pts-share-btns">
-        <button class="share-btn" id="ptsShareBtn" type="button">𝕏 Share my scenario</button>
-        <button class="share-btn ghost" id="ptsCopyBtn" type="button">⧉ Copy</button>
-        <button class="share-btn ghost" id="ptsSaveBtn" type="button">↓ Save PNG</button>
-      </div>
-      <div class="pts-toast" id="ptsToast" role="status" aria-live="polite" hidden></div>
-    </div>
-    <div class="pts-card-prev">
-      <a class="pts-card-thumb" id="ptsCardThumb" target="_blank" rel="noopener" title="Open the share card full-size"><img alt="Preview of my airdrop scenario share card" width="240" height="135"></a>
-      <small>Card preview · click to open</small>
-    </div>
   </div>
 </div>
 
