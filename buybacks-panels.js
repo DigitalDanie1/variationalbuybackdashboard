@@ -28,7 +28,7 @@
   var API_ACT = 'https://explorer.elliot.ai/api/accounts/0/logs?pub_data_type=Trade&limit=100&offset=0';
   var lit = { state: 'idle', daily: [], usd: [], act: [], actErr: false, err: '' };
 
-  var ui = { view: 'var', chart: { var: { m: 'tok', r: 'ALL' }, lit: { m: 'tok', r: 'ALL' } }, fdv: 2e9 };
+  var ui = { view: 'var', chart: { var: { m: 'tok', r: 'ALL' }, lit: { m: 'tok', r: 'ALL' } }, fdv: 2e9, actOpen: false };
   var host, lastW = 0, lastSig = '';
 
   /* ---------- helpers ---------- */
@@ -271,7 +271,8 @@
     else body = m.act.slice(0, 100).map(function (a) {
       return '<tr><td data-l="HASH"><code title="' + esc(a.hash) + '">' + esc(shortHash(a.hash)) + '</code></td><td data-l="TIME">' + esc(fmtTime(a.time)) + '</td><td>' + m.sym + '</td><td class="bb-r">$' + (+a.price).toFixed(4) + '</td><td class="bb-r">' + (+a.size).toLocaleString('en-US', { maximumFractionDigits: 2 }) + '</td><td class="bb-r">$' + (a.price * a.size).toLocaleString('en-US', { maximumFractionDigits: 2 }) + '</td></tr>';
     }).join('');
-    h += '<div class="bb-card"><div class="bb-card-top"><h3 class="bb-h3">' + t('Protocol Buybacks Activity', '프로토콜 바이백 활동') + '</h3></div><div class="bb-tablewrap"><table class="bb-table"><thead><tr><th>' + t('Hash', '해시') + '</th><th>' + t('Time (UTC)', '시간 (UTC)') + '</th><th>' + t('Token', '토큰') + '</th><th class="bb-r">' + t('Price', '가격') + '</th><th class="bb-r">' + t('Bought ', '매입 ') + m.sym + '</th><th class="bb-r">' + t('USD value', 'USD 가치') + '</th></tr></thead><tbody>' + body + '</tbody></table></div></div>';
+    var nAct = loading ? '' : ' <span class="bb-act-n">' + Math.min(m.act.length, 100) + '</span>';
+    h += '<div class="bb-card bb-act' + (ui.actOpen ? ' is-open' : '') + '"><div class="bb-card-top"><button type="button" class="bb-act-tog" data-bb-act aria-expanded="' + ui.actOpen + '" aria-controls="bb-act-' + m.sym + '"><span class="bb-chev" aria-hidden="true"></span><h3 class="bb-h3">' + t('Protocol Buybacks Activity', '프로토콜 바이백 활동') + nAct + '</h3><span class="bb-act-hint">' + (ui.actOpen ? t('Hide', '접기') : t('Show', '펼치기')) + '</span></button></div><div class="bb-tablewrap" id="bb-act-' + m.sym + '"' + (ui.actOpen ? '' : ' hidden') + '><table class="bb-table"><thead><tr><th>' + t('Hash', '해시') + '</th><th>' + t('Time (UTC)', '시간 (UTC)') + '</th><th>' + t('Token', '토큰') + '</th><th class="bb-r">' + t('Price', '가격') + '</th><th class="bb-r">' + t('Bought ', '매입 ') + m.sym + '</th><th class="bb-r">' + t('USD value', 'USD 가치') + '</th></tr></thead><tbody>' + body + '</tbody></table></div></div>';
 
     if (m.key === 'lit') h += '<p class="bb-note">' + t('Source: Lighter public APIs (exchangeMetrics, explorer logs). Supply constants as of ' + LIT.asOf + ': total ' + cmp(LIT.total, 0) + ' LIT; circulating ≈ ' + cmp(LIT.circ, 0) + ' (derived: 19.46M ÷ 7.79%); burned ' + cmp(LIT.burned) + ' LIT. Activity shows the latest 100 trades. Not affiliated with Lighter.', '출처: Lighter 공개 API(exchangeMetrics, 익스플로러 로그). 공급량 상수는 ' + LIT.asOf + ' 기준: 총 ' + cmp(LIT.total, 0) + ' LIT, 유통량 ≈ ' + cmp(LIT.circ, 0) + '(19.46M ÷ 7.79%로 역산), 소각 ' + cmp(LIT.burned) + ' LIT. 활동은 최근 100건입니다. Lighter와 무관합니다.') + '</p>';
     else h += '<p class="bb-note">' + t('Official tokenomics: 100% of Variational treasury revenue is set to buy & burn $VAR. Nothing here is executed yet; figures fill in automatically once buybacks start.', '공식 토크노믹스: Variational 트레저리 수익 100%가 $VAR 매입·소각에 쓰일 예정입니다. 아직 집행된 것은 없으며, 바이백이 시작되면 자동으로 채워집니다.') + '</p>';
@@ -359,6 +360,7 @@
     if ((b = e.target.closest('[data-bb-m]'))) { ui.chart[ui.view === 'lit' ? 'lit' : 'var'].m = b.dataset.bbM; render(); return; }
     if ((b = e.target.closest('[data-bb-r]'))) { ui.chart[ui.view === 'lit' ? 'lit' : 'var'].r = b.dataset.bbR; render(); return; }
     if ((b = e.target.closest('[data-bb-fdv]'))) { ui.fdv = +b.dataset.bbFdv; render(); return; }
+    if (e.target.closest('[data-bb-act]')) { ui.actOpen = !ui.actOpen; render(); var tg = host.querySelector('[data-bb-act]'); if (tg) tg.focus({ preventScroll: true }); return; }
     if (e.target.closest('[data-bb-retry]')) { lit.state = 'idle'; loadLit(true); }
   }
   function onKey(e) {
