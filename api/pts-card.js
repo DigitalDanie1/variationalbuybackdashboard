@@ -96,8 +96,23 @@ export default async function handler(req) {
     ),
   );
 
-  return new ImageResponse(tree, {
-    width: 1200, height: 630, fonts: fonts.length ? fonts : undefined,
-    headers: { 'Cache-Control': 'public, max-age=86400, s-maxage=31536000, immutable' },
+  // Render fully before answering: ImageResponse streams, so a render error would otherwise
+  // reach X as an empty 200 (and get cached as a blank card).
+  const render = (t) => new ImageResponse(t, { width: 1200, height: 630, fonts: fonts.length ? fonts : undefined }).arrayBuffer();
+  let png, note = '';
+  try { png = await render(tree); }
+  catch (e) {
+    note = String(e && e.message || e).slice(0, 200);
+    // Retry without the photo (the only remote asset besides fonts).
+    try { png = await render(JSON.parse(JSON.stringify(tree).replace(/\{"type":"img","props":\{[^}]*\}[^}]*\}\}/, '{"type":"div","props":{"style":{"display":"flex"}}}'))); }
+    catch (e2) { return new Response('render failed: ' + note + ' | ' + String(e2 && e2.message || e2).slice(0, 200), { status: 500, headers: { 'Cache-Control': 'no-store' } }); }
+  }
+  if (!png || !png.byteLength) return new Response('render failed: empty', { status: 500, headers: { 'Cache-Control': 'no-store' } });
+  return new Response(png, {
+    headers: {
+      'Content-Type': 'image/png',
+      'Cache-Control': note ? 'public, max-age=300' : 'public, max-age=86400, s-maxage=31536000, immutable',
+      ...(note ? { 'X-Card-Note': note.replace(/[^\x20-\x7e]/g, '') } : {}),
+    },
   });
 }
