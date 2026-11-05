@@ -9534,17 +9534,17 @@ body.theme-light .lb-card{box-shadow:0 1px 0 rgba(20,40,80,.03),0 14px 30px -22p
       <div class="pts-pool">
         <div class="pts-pool-head">
           <span class="pts-in pts-pool-label">Total pool</span>
-          <input type="number" id="ptsPool" class="pts-pool-num" value="9100000" min="9000000" max="11050000" step="50000">
+          <input type="number" id="ptsPool" class="pts-pool-num" value="10170000" min="9000000" max="11600000" step="10000">
         </div>
-        <input class="pts-slider pool-slider" type="range" id="ptsPoolSlider" min="9000000" max="11050000" step="50000" value="9100000" aria-label="Total pool slider">
+        <input class="pts-slider pool-slider" type="range" id="ptsPoolSlider" min="9000000" max="11600000" step="10000" value="10170000" aria-label="Total pool slider">
         <div class="pts-pool-chips" id="ptsPoolChips">
-          <button type="button" class="chip" data-pool="9100000">Sep 30 · 9.10M</button>
-          <button type="button" class="chip" data-pool="9700000">Oct 30 · 9.70M</button>
-          <button type="button" class="chip" data-pool="10300000">Nov 30 · 10.30M</button>
-          <button type="button" class="chip" data-pool="11050000">Dec 31 (Q4 end) · 11.05M</button>
-          <button type="button" class="chip" id="ptsPoolToday" data-pool="9100000">Today · 9.10M</button>
+          <button type="button" class="chip" data-date="2026-09-30" data-label="Sep 30" data-pool="9420000">Sep 30 · 9.42M</button>
+          <button type="button" class="chip" data-date="2026-10-30" data-label="Oct 30" data-pool="10170000">Oct 30 · 10.17M</button>
+          <button type="button" class="chip" data-date="2026-11-30" data-label="Nov 30" data-pool="10770000">Nov 30 · 10.77M</button>
+          <button type="button" class="chip" data-date="2026-12-31" data-label="Dec 31 (Q4 end)" data-pool="11370000">Dec 31 (Q4 end) · 11.37M</button>
+          <button type="button" class="chip" id="ptsPoolToday" data-pool="10170000">Today · 10.17M</button>
         </div>
-        <small class="pts-pool-note">Assumes +150,000 pts/week until TGE</small>
+        <small class="pts-pool-note" id="ptsPoolNote">Retro 3M + 150K/week + competition drops + Trader Rewards (cap) · +150K/week until TGE</small>
       </div>
       <div class="pts-input-mascot"><img src="pepe-miami.jpg" alt="Pepe mascot"></div>
     </div>
@@ -11233,7 +11233,7 @@ body.theme-light .lb-card{box-shadow:0 1px 0 rgba(20,40,80,.03),0 14px 30px -22p
 
 <script src="market-regime-data.js?v=0d0713472802" defer></script>
 <script src="money-flow-sankey.js?v=22c2e55ef8e5" defer></script>
-<script src="dashboard.js?v=20261103-history-full-month" defer></script>
+<script src="dashboard.js?v=20261105-points-ledger" defer></script>
 <script src="lighter-compare.js?v=20261104d" defer></script>
 <script src="paths-panels.js?v=b4335b6f7054" defer></script>
 <script src="playbook-panels.js?v=ddd6402a1805" defer></script>

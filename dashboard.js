@@ -2958,23 +2958,41 @@ function renderFeePerTrader(){
   $('#volPerTrader').textContent='$'+fmtK(MKT.vol.d30/n);
 }
 /* ---------- Points / FDV calculator: pool schedule, FDV log-scale, matrix ---------- */
-const PTS_POOL_MIN=9000000, PTS_POOL_MAX=11050000, PTS_POOL_STEP=50000;
-const PTS_POOL_BASE_DATE='2026-09-30', PTS_POOL_BASE=9100000, PTS_POOL_WEEKLY=150000;
+/* Points pool ledger: every point Variational has announced on @variational_io (checked 2026-11-05).
+   Retro 3M (2025-12-17) + 150K every Friday 0:00 UTC from week 1 (2025-12-19) until TGE
+   + six 20K trading-competition drops + On-Chain Trader Rewards (capped at 150K; the running
+   total is not published, so it is counted at the cap). Add new drops to PTS_BONUS. */
+const PTS_RETRO=3000000, PTS_POOL_WEEKLY=150000, PTS_WEEK1_UTC=Date.UTC(2025,11,19);
+const PTS_BONUS=[
+  {d:'2026-04-20',v:20000,k:'comp',n:'Trading competition #1'},
+  {d:'2026-05-07',v:20000,k:'comp',n:'Trading competition #2'},
+  {d:'2026-06-15',v:20000,k:'comp',n:'RWA trading competition'},
+  {d:'2026-07-14',v:20000,k:'comp',n:'TradFi trading competition #2'},
+  {d:'2026-08-04',v:20000,k:'comp',n:'TradFi trading competition #3'},
+  {d:'2026-08-12',v:150000,k:'otr',n:'On-Chain Trader Rewards (cap)'},
+  {d:'2026-09-25',v:20000,k:'comp',n:'Swaps trading competition #1'}
+];
+const PTS_POOL_MIN=9000000, PTS_POOL_MAX=11600000, PTS_POOL_STEP=10000;
+const PTS_POOL_BASE=9420000; // Sep 30 ledger total, fallback only
 const PTS_TGE_MARK1='2026-10-30', PTS_TGE_MARK2='2026-11-30', PTS_TGE_LATEST='2026-12-31';
 const PTS_FDV_FLOOR=100e6;
-function ptsPoolAt(dateStr){
-  const baseTs=resetLocalTs(PTS_POOL_BASE_DATE,23,59,59)*1000;
-  const ts=resetLocalTs(dateStr,23,59,59)*1000;
-  const daysSince=Math.max(0,(ts-baseTs)/864e5);
-  const weeks=Math.floor(daysSince/7);
-  const v=PTS_POOL_BASE+weeks*PTS_POOL_WEEKLY;
-  return Math.min(PTS_POOL_MAX,Math.max(PTS_POOL_MIN,v));
+function ptsLedgerAt(ts){
+  const weeks=ts<PTS_WEEK1_UTC?0:Math.floor((ts-PTS_WEEK1_UTC)/(7*864e5))+1;
+  let comp=0,compN=0,otr=0;
+  PTS_BONUS.forEach(b=>{if(Date.parse(b.d+'T00:00:00Z')<=ts){if(b.k==='comp'){comp+=b.v;compN++;}else otr+=b.v;}});
+  const weekly=weeks*PTS_POOL_WEEKLY;
+  return {weeks,weekly,comp,compN,otr,total:PTS_RETRO+weekly+comp+otr};
 }
-function ptsPoolToday(){
-  const baseTs=resetLocalTs(PTS_POOL_BASE_DATE,23,59,59)*1000;
-  const daysSince=Math.max(0,(Date.now()-baseTs)/864e5);
-  const weeks=Math.floor(daysSince/7);
-  return Math.min(PTS_POOL_MAX,Math.max(PTS_POOL_MIN,PTS_POOL_BASE+weeks*PTS_POOL_WEEKLY));
+function ptsPoolClamp(v){ return Math.min(PTS_POOL_MAX,Math.max(PTS_POOL_MIN,v)); }
+function ptsPoolAt(dateStr){ return ptsPoolClamp(ptsLedgerAt(Date.parse(dateStr+'T23:59:59Z')).total); }
+function ptsPoolToday(){ return ptsPoolClamp(ptsLedgerAt(Date.now()).total); }
+function renderPoolLedger(){
+  const L=ptsLedgerAt(Date.now()), m=v=>(v/1e6).toFixed(2)+'M';
+  document.querySelectorAll('#ptsPoolChips .chip[data-date]').forEach(b=>{
+    const v=ptsPoolAt(b.dataset.date);b.dataset.pool=v;b.textContent=b.dataset.label+' · '+m(v);
+  });
+  const note=$('#ptsPoolNote');
+  if(note)note.textContent=`Today ${m(L.total)} = retro ${m(PTS_RETRO)} + ${L.weeks} weekly drops ${m(L.weekly)} + ${L.compN} competition drops ${m(L.comp)} + Trader Rewards ${m(L.otr)} (cap) · +150K/week until TGE`;
 }
 function hypeFdv(){
   const c=VAL_COMPS.find(c=>c.n==='Hyperliquid');
@@ -3043,11 +3061,9 @@ function renderFdvPresets(){
   box.innerHTML=presets.map(p=>`<button type="button" class="preset" data-fdv="${p.fdv}">${escapeHTML(p.label)}</button>`).join('');
 }
 const PTS_MATRIX_FDVS=[1e9,2.5e9,5e9,10e9,25e9,50e9,'hype'];
-const PTS_MATRIX_POOLS=[
-  {label:'Oct 30',sub:'9.70M',v:9700000},
-  {label:'Nov 30',sub:'10.30M',v:10300000},
-  {label:'Dec 31',sub:'11.05M',v:11050000}
-];
+const PTS_MATRIX_POOLS=[['Oct 30','2026-10-30'],['Nov 30','2026-11-30'],['Dec 31','2026-12-31']].map(([label,d])=>{
+  const v=ptsPoolAt(d);return {label,sub:(v/1e6).toFixed(2)+'M',v};
+});
 function renderPointsMatrix(){
   const box=$('#ptsMatrix'); if(!box)return;
   const mine=Math.max(0,parseFloat($('#ptsMine').value)||0);
@@ -4634,6 +4650,8 @@ $('#ptsMatrix')?.addEventListener('click',e=>{
 (function initPointsPool(){
   const num=$('#ptsPool'),sl=$('#ptsPoolSlider');
   if(!num||!sl)return;
+  num.min=sl.min=PTS_POOL_MIN;num.max=sl.max=PTS_POOL_MAX;num.step=sl.step=PTS_POOL_STEP;
+  renderPoolLedger();
   const p=ptsPoolToday();
   num.value=p;sl.value=p;
   // Opened from a shared /s/points link: load that scenario.
