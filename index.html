@@ -3963,6 +3963,21 @@ html[data-ui-state="error"]::before{content:"Unable to load VAR-METRICS. Please 
   .pm-growth-cell>em{display:block;margin-top:4px;font:720 9px/1 var(--mono);font-style:normal;color:var(--dim)}
   .pm-growth-cell.up>b,.pm-growth-cell.up>em{color:var(--grn)}
   .pm-growth-cell.down>b,.pm-growth-cell.down>em{color:#f08a98}
+  .pm-olp-audit{margin-top:14px;padding-top:12px;border-top:1px solid var(--line)}
+  .pm-olp-audit header>b,.pm-olp-audit header>small{display:block}
+  .pm-olp-audit header>small,.pm-olp-blocks,.pm-olp-reconcile{font:11px/1.6 var(--mono);color:var(--dim)}
+  .pm-olp-flow{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;margin:10px 0}
+  .pm-olp-flow>div{padding:8px 5px;border-block:1px solid var(--line)}
+  .pm-olp-flow dt{font:11px/1.4 var(--sans);color:var(--dim)}
+  .pm-olp-flow dd{margin:4px 0 0;font:700 clamp(12px,1.1vw,17px)/1.2 var(--mono);white-space:nowrap}
+  .pm-olp-in{color:#39bba7}.pm-olp-out{color:#ec8197}
+  body.theme-light .pm-olp-in{color:#087e6d}body.theme-light .pm-olp-out{color:#ac3356}
+  .pm-olp-reconcile{display:flex;flex-wrap:wrap;gap:4px 10px}.pm-olp-reconcile b{color:var(--ink)}
+  .pm-olp-audit h4{margin:12px 0 4px;font:700 12px var(--sans)}
+  .pm-olp-dest{padding:0;margin:0;list-style:none}
+  .pm-olp-dest li{display:flex;justify-content:space-between;gap:8px;padding:6px 0;border-bottom:1px solid var(--line);font:11px/1.45 var(--mono)}
+  .pm-olp-dest small{display:block;color:var(--dim);font:10px/1.45 var(--sans)}
+  .pm-olp-dest li>b{white-space:nowrap}
   .pm-growth-note{display:block;margin-top:8px;padding-top:7px;border-top:1px dashed rgba(85,184,255,.13);font:680 9px/1.35 var(--sans);color:var(--dim)}
   .pm-growth-note b{color:var(--ink);font-weight:800}
   @media(max-width:1280px){
@@ -9077,11 +9092,23 @@ body.theme-light .lb-card{box-shadow:0 1px 0 rgba(20,40,80,.03),0 14px 30px -22p
           <small class="pm-growth-note"><b>Negative = outflows exceeded inflows.</b> Capital can move to settlement pools or external hedge venues, so this is not OLP PnL or total TVL.</small>
         </div>
         <small class="pm-formula" id="pmOlpFormula">Formula: <b>USDC balanceOf(Core OLP Vault)</b></small>
-        <details class="pm-growth" aria-label="Verified Core OLP USDC transfer trace">
-          <summary>Where did the USDC go? · Nov 6 trace</summary>
-          <p class="pm-growth-note"><b>30,000,000 USDC</b> left the vault in two transfers to <a href="https://arbiscan.io/address/0x296321a65b592a73a513954c53c21ef55113706c" target="_blank" rel="noopener">0x2963…706c</a> and then reached <a href="https://arbiscan.io/tx/0xd62a2fbea0a369c97def22188f703e5bc6db234ae7729f4a4ba20895fafa6d12" target="_blank" rel="noopener">0xce43…b946</a>. This contract already held USDC; later transfers cannot be attributed to the OLP deposit alone.</p>
-          <p class="pm-growth-note">Historical audit: Oct 30 → Nov 6, 14:13 SGT. <b>262.64M in · 275.85M out · 13.21M net decrease.</b> Other first recipients: <a href="https://arbiscan.io/tx/0x5af85a61f38795b8735e118a09786c755d2c86dcdf3a4ec39ce825c9a00b9333" target="_blank" rel="noopener">0x6df2…47ba</a> (245.30M; sample transaction routes to settlement pools) and <a href="https://arbiscan.io/address/0x84be56470d45b7f6629a66a219a38681f6ba6172" target="_blank" rel="noopener">Oracle</a> (0.55M). Gross transfers include repeated movements.</p>
-        </details>
+        <section class="pm-olp-audit" aria-label="Verified Core OLP Vault inflows and outflows">
+          <header><b>Verified USDC flows</b><small>Oct 30 → Nov 6, 2026 · 14:13 SGT · 7 days</small></header>
+          <dl class="pm-olp-flow">
+            <div><dt>↓ Into vault</dt><dd class="pm-olp-in" title="262,639,302.024124 USDC">+262.64M</dd></div>
+            <div><dt>↑ Out of vault</dt><dd class="pm-olp-out" title="275,852,744.182850 USDC">−275.85M</dd></div>
+            <div><dt>Net change</dt><dd title="−13,213,442.158726 USDC">−13.21M</dd></div>
+          </dl>
+          <div class="pm-olp-reconcile"><span>Opening <b>50.29M</b></span><span aria-hidden="true">→</span><span>Closing <b>37.07M</b></span><span>USDC</span></div>
+          <h4>Where the vault sent USDC</h4>
+          <ul class="pm-olp-dest">
+            <li><span><a href="https://arbiscan.io/tx/0x5af85a61f38795b8735e118a09786c755d2c86dcdf3a4ec39ce825c9a00b9333" target="_blank" rel="noopener">0x6df2…47ba ↗</a><small>Sample transaction routes to settlement pools</small></span><b>245.30M</b></li>
+            <li><span><a href="https://arbiscan.io/tx/0xa4cd7572fa9240ebd6758b4fd5c08bb96cbe78e8ccec3e506313bcaef26bc7ed" target="_blank" rel="noopener">0x2963…706c ↗</a><small>Forwarded to <a href="https://arbiscan.io/tx/0xd62a2fbea0a369c97def22188f703e5bc6db234ae7729f4a4ba20895fafa6d12" target="_blank" rel="noopener">0xce43…b946 ↗</a></small></span><b>30.00M</b></li>
+            <li><span><a href="https://arbiscan.io/address/0x84be56470d45b7f6629a66a219a38681f6ba6172" target="_blank" rel="noopener">Oracle ↗</a></span><b>0.55M</b></li>
+          </ul>
+          <small class="pm-growth-note">Historical audit, separate from the rolling balance above. Gross transfers can include repeated movements. After funds mix in a recipient wallet, later withdrawals cannot be attributed to the vault alone.</small>
+          <small class="pm-olp-blocks">Arbitrum: <a href="https://arbiscan.io/block/519595162" target="_blank" rel="noopener">519595162 ↗</a> → <a href="https://arbiscan.io/block/521708479" target="_blank" rel="noopener">521708479 ↗</a></small>
+        </section>
       </div>
       <div class="pm-metric">
         <strong id="pmTreasuryTotal">—</strong><span>current treasury balance</span>
