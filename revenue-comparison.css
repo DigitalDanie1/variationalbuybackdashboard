@@ -34,3 +34,8 @@
 .rc-section .rc-table thead th[aria-sort] button{color:var(--v2-accent)}
 .rc-section .rc-table thead th[aria-sort],
 .rc-section .rc-table tbody td.rc-selected{background:color-mix(in srgb,var(--v2-accent) 7%,transparent)!important}
+
+.rc-section .rc-standing .rc-olp-alpha,
+.rc-section .rc-table tbody .rc-num .rc-olp-alpha{display:block;margin-top:6px;color:var(--ink);font:500 11px/1.45 var(--sans);white-space:normal}
+.rc-section .rc-olp-alpha b{display:inline;color:var(--v2-accent);font:inherit;font-weight:750}
+.rc-section .rc-olp-alpha span{color:var(--sub)}
