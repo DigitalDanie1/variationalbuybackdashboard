@@ -586,11 +586,11 @@
     { y: 2027, p: 1, r: null }
   ];
 
-  var CYCLE_MARKS = [
+  function cycleMarks() { return [
     { k: 'hype', label: 'HYPE', d: '2024-11-29' },
-    { k: 'lit',  label: 'LIT',  d: '2025-12-22' },
-    { k: 'var',  label: 'VAR',  d: VAR_LISTING }
-  ];
+    { k: 'lit',  label: 'LIT',  d: LIT_TGE },
+    { k: 'var',  label: 'VAR',  d: state.varListing }
+  ]; }
 
   var dayNum = function (iso) { return Date.parse(iso + 'T00:00:00Z') / 86400000; };
   var daysTo = function (iso, to) { return Math.round(dayNum(to) - dayNum(iso)); };
@@ -664,7 +664,7 @@
 
     /* Just the ticker. The exact dates are on the three cards directly below, so repeating
        them here only made three long labels fight for the same corner. */
-    var marks = CYCLE_MARKS.map(function (m) {
+    var marks = cycleMarks().map(function (m) {
       var y = yearOf(m.d), ix = -1;
       for (var i = 0; i < n; i++) if (CYCLE_YEARS[i].y === y) ix = i;
       if (ix < 0) return '';
@@ -683,8 +683,47 @@
       bars + marks + axis + '</svg>';
   }
 
+  function addDays(iso, n) {
+    return new Date((dayNum(iso) + n) * 86400000).toISOString().slice(0, 10);
+  }
+
+  function launchWindow(date) {
+    var runs = [];
+    for (var d = 1; d <= 30; d++) {
+      var day = addDays(date, d), phase = phaseOfYear(yearOf(day));
+      var prev = runs[runs.length - 1];
+      if (prev && prev.phase === phase) prev.count++;
+      else runs.push({ phase: phase, count: 1 });
+    }
+    return runs;
+  }
+
+  function cycleScenario() {
+    var date = state.varListing;
+    var left = daysTo(date, NEXT_Y1);
+    var compare = function (label, start) {
+      var runs = launchWindow(start);
+      return '<div class="cy-window"><div><b>' + label + '</b><small>TGE ' + start + ' · Y' + phaseOfYear(yearOf(start)) + '</small></div>' +
+        '<div><div class="cy-window-track" aria-hidden="true">' + runs.map(function (r) {
+          return '<span class="cy-window-segment p' + r.phase + '" style="grid-column:span ' + r.count + '"></span>';
+        }).join('') + '</div><small>' + addDays(start, 1) + ' → ' + addDays(start, 30) + ' · ' +
+        runs.map(function (r) { return 'Y' + r.phase + ': ' + r.count + 'd'; }).join(' / ') + '</small></div></div>';
+    };
+    return '<section class="cy-scenario" aria-label="VAR TGE cycle position"><div class="cy-scenario-head"><div>' +
+      '<span class="tp-eyebrow">VAR TGE · BITCOIN CYCLE</span><h3>Where would VAR launch?</h3></div>' +
+      '<div class="tp-chips" aria-label="Assumed VAR TGE date">' +
+      [['2026-12-01','Dec 1'],['2026-12-31','Dec 31']].map(function (v) {
+        return '<button type="button" data-var-listing="' + v[0] + '" aria-pressed="' + (date === v[0]) +
+          '" class="' + (date === v[0] ? 'on' : '') + '">' + v[1] + '</button>';
+      }).join('') + '</div></div><p class="cy-scenario-status"><strong>Late Y4</strong> · ' + date +
+      ' → <strong>' + left + (left === 1 ? ' day' : ' days') + '</strong> to Y1 · 2027-01-01</p>' +
+      '<p class="cy-scenario-note">D+1 to D+30 · same window after each launch</p>' +
+      compare('VAR scenario', date) + compare('LIT actual TGE', LIT_TGE) +
+      '<p class="cy-scenario-note">VAR dates are scenarios. Y1 is a calendar classification; it does not predict a rebound.</p></section>';
+  }
+
   function cycleCards() {
-    return CYCLE_MARKS.map(function (m) {
+    return cycleMarks().map(function (m) {
       var y = yearOf(m.d), p = phaseOfYear(y), left = daysTo(m.d, NEXT_Y1);
       var late = left <= 60 ? 'Late ' : '';
       return '<article class="cy-card ' + m.k + '">' +
@@ -726,7 +765,7 @@
      run further than the data does. The price path simply stops where the data stops. */
   function macroSpan() {
     var n = macro().btc.length;
-    var vi = Math.round(dayNum(VAR_LISTING) - dayNum(MACRO.start));
+    var vi = Math.round(dayNum(state.varListing) - dayNum(MACRO.start));
     return { n: n, varIx: vi, end: Math.max(n - 1, vi + 14) };
   }
 
@@ -810,6 +849,10 @@
     });
 
     var VIX = macroSpan().varIx;
+    var boundary = daysTo(MACRO.start, NEXT_Y1);
+    var phaseEdge = boundary >= a && boundary <= b ?
+      '<line class="mc-mark hype" stroke-dasharray="2 3" x1="' + X(boundary) + '" x2="' + X(boundary) +
+      '" y1="' + pt + '" y2="' + (pt + priceH) + '"/>' : '';
     var marks = ['hype', 'lit', 'now', 'var'].map(function (k) {
       var i = k === 'var' ? VIX : k === 'lit' ? daysTo(MACRO.start, LIT_TGE) : MACRO.mark[k];
       if (i < a || i > b) return '';
@@ -841,10 +884,10 @@
         M.dom[lastDom].toFixed(2) + '%</text>') +
       '<text class="mc-tag" x="' + pl + '" y="' + (mTop + 10) + '">MACD</text>' +
       '<line class="tge-grid" x1="' + pl + '" y1="' + zeroY + '" x2="' + (W - pr) + '" y2="' + zeroY + '"/>' +
-      cyc + bars + marks + years + '</svg>';
+      cyc + bars + phaseEdge + marks + years + '</svg>';
   }
 
-  var state = { fdv: 3.0e9, zoom: 'all' };
+  var state = { fdv: 3.0e9, zoom: 'all', varListing: '2026-12-31' };
 
   function bigUsd(v) {
     return v >= 1e9 ? '$' + (v / 1e9).toFixed(2) + 'B' : '$' + Math.round(v / 1e6) + 'M';
@@ -910,6 +953,7 @@
       '<h2>Does it go like HYPE, or like LIT?</h2>' +
       '<p>Only two comparable exchanges have actually listed a token. This reads Variational against both and says which shape the listing is more likely to rhyme with. It carries no plan and no recommended action — just the odds and what they rest on.</p></div>' +
 
+      cycleScenario() +
       '<section class="tp-verdict"><div class="tp-verdict-main">' +
       '<span class="tp-eyebrow">The call</span>' +
       '<h3><em>The business looks like</em> <b class="h">HYPE</b>. ' +
@@ -949,7 +993,7 @@
       'Recent BTC closes: <a href="https://www.binance.com/en/trade/BTC_USDT" target="_blank" rel="noopener noreferrer">Binance BTCUSDT</a>. ' +
       'STABLE.D = <a href="https://defillama.com/stablecoins" target="_blank" rel="noopener noreferrer">DefiLlama USD-pegged circulating supply</a> / ' +
       '<a href="https://coinmarketcap.com/charts/" target="_blank" rel="noopener noreferrer">CoinMarketCap total crypto market cap</a> at UTC midnight. Missing dates are left blank.</div>' +
-      '<div class="tp-note"><b>Orange</b> is Bitcoin on a log scale, <b>dashed grey</b> the 200-day line, <b>the middle strip</b> the share of the market sitting in stablecoins, and the bottom strip is the weekly MACD. The tinted bands behind the price are the four-year cycle years scored below. The vertical lines are HYPE\'s listing, LIT\'s TGE, the latest BTC close, and the assumed VAR listing on ' + VAR_LISTING + '. Zoom to either listing to see the shape each one launched into.</div>' +
+      '<div class="tp-note"><b>Orange</b> is Bitcoin on a log scale, <b>dashed grey</b> the 200-day line, <b>the middle strip</b> the share of the market sitting in stablecoins, and the bottom strip is the weekly MACD. The tinted bands behind the price are the four-year cycle years scored below. The vertical lines are HYPE\'s listing, LIT\'s TGE, the latest BTC close, and the assumed VAR listing on ' + state.varListing + '. Zoom to either listing to see the shape each one launched into.</div>' +
 
       '<section class="cy-claim"><span class="tp-eyebrow">The cycle claim</span>' +
       '<h3>LIT\'s post-listing path should not be copied onto VAR</h3>' +
@@ -957,7 +1001,7 @@
       cycleLegend() + cycleChart() +
       '<div class="cy-foot">* 2026 is year to date, not a closed year.</div>' +
       '<div class="cy-cards">' + cycleCards() + '</div>' +
-      '<div class="tp-note"><b>How to read it.</b> All three completed Year 4s were negative — \u221257.7%, \u221274.7%, \u221263.9%. But 2025 was a Year 3 and closed at \u22126.3%, which breaks the "years one to three always rise" half of the pattern, so this is a tendency and not a rule. Bars use one signed log scale in both directions, because a linear axis would leave +5,537% as the only bar you could see; every bar carries its own figure. VAR\'s listing date is an assumption, not an announcement — the 31-day figure moves with it. The claim that VAR lists closer to a recovery than LIT did is defensible on this evidence. It is not a guarantee, and four observations is not a sample. <i>Annual returns: K33 Research · BitQuant.</i></div>' +
+      '<div class="tp-note"><b>How to read it.</b> All three completed Year 4s were negative — \u221257.7%, \u221274.7%, \u221263.9%. But 2025 was a Year 3 and closed at \u22126.3%, which breaks the "years one to three always rise" half of the pattern, so this is a tendency and not a rule. Bars use one signed log scale in both directions, because a linear axis would leave +5,537% as the only bar you could see; every bar carries its own figure. VAR\'s listing date is an assumption, not an announcement — the countdown moves with it. The claim that VAR lists closer to a recovery than LIT did is defensible on this evidence. It is not a guarantee, and four observations is not a sample. <i>Annual returns: K33 Research · BitQuant.</i></div>' +
 
       '<div class="bw-head"><b>Bitcoin At Each Listing</b><span><i>indexed to 1.00 on the listing day · 90 days before, 120 days after</i></span></div>' +
       '<div class="tge-legend"><span class="hype"><i></i>BTC around HYPE listing</span>' +
@@ -995,9 +1039,11 @@
     });
     host.querySelectorAll('.tp-chips button').forEach(function (b) {
       b.addEventListener('click', function () {
-        if (b.dataset.zoom) state.zoom = b.dataset.zoom;
+        if (b.dataset.varListing) state.varListing = b.dataset.varListing;
+        else if (b.dataset.zoom) state.zoom = b.dataset.zoom;
         else state.fdv = Number(b.dataset.fdv) || 3.0e9;
         render();
+        if (b.dataset.varListing) host.querySelector('[data-var-listing="' + state.varListing + '"]').focus({ preventScroll: true });
       });
     });
   }
