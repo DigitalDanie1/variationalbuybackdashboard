@@ -442,29 +442,35 @@
   /* Bitcoin around each listing, indexed to 1.00 on the listing day itself, D-90 to D+120.
      This is the backdrop the macro table scores numerically — the same question, drawn.
      'now' has no forward half: today is the right edge, which is the point. */
+  // Binance BTCUSDT daily UTC closes. The latest series ends at its observation date.
   var BTC = {
-    hype: { s: '0.6051,0.588,0.6067,0.5899,0.5948,0.5764,0.5537,0.5557,0.563,0.5853,0.5914,0.5883,0.5965,0.6207,0.6156,0.6067,0.5973,0.6189,0.6337,0.6459,0.6485,0.65,0.6524,0.6499,0.6594,0.648,0.6687,0.6748,0.6757,0.6731,0.6498,0.6239,0.6223,0.6234,0.637,0.6368,0.6446,0.6385,0.6378,0.6222,0.619,0.6417,0.6485,0.6451,0.6781,0.6882,0.6938,0.6918,0.7021,0.7016,0.7083,0.6913,0.6918,0.6841,0.6998,0.6844,0.6884,0.6979,0.7179,0.7463,0.7423,0.7212,0.7131,0.7118,0.7057,0.6962,0.7118,0.7754,0.7784,0.785,0.7868,0.8246,0.9096,0.9024,0.9273,0.896,0.934,0.9295,0.922,0.9282,0.9472,0.9674,1.0088,1.0147,1.0022,1.0045,0.9543,0.9436,0.9836,0.9814,1.0,0.9892,0.9972,0.9834,0.9835,1.0116,0.9947,1.0234,1.0243,1.0375,0.9981,0.9911,1.0376,1.0261,1.0406,1.0406,1.0718,1.0882,1.089,1.0281,1.0,1.0035,0.9983,0.9767,0.9735,1.0124,1.0202,0.9829,0.9676,0.9778,0.9618,0.9521,0.9601,0.9706,0.9951,1.0073,1.0078,1.0093,1.049,0.9948,0.9754,0.9496,0.9719,0.9707,0.9701,0.97,0.9908,1.0312,1.0259,1.0679,1.0729,1.0397,1.0493,1.0891,1.0641,1.0662,1.076,1.0748,1.0529,1.0474,1.0398,1.0643,1.0745,1.051,1.0326,1.0025,1.0397,1.0031,0.9913,0.9907,0.9902,0.9896,0.9898,0.9997,0.9827,1.0042,0.9913,1.0004,1.0011,0.9862,0.9828,0.9817,0.9916,1.0087,0.9869,0.9907,0.9877,0.9394,0.9099,0.8645,0.8692,0.8655,0.8831,0.9673,0.8847,0.8956,0.9297,0.9228,0.8906,0.8847,0.8284,0.8064,0.8509,0.8586,0.8323,0.8617,0.8654,0.8473,0.862,0.8487,0.8911,0.8642,0.8628,0.8603,0.8833,0.8978,0.8967,0.8917,0.8951,0.8662,0.848', at: 90, base: 97460, date: '2024-11-29' },
-    lit:  { s: '1.2638,1.2786,1.2298,1.2372,1.2372,1.2656,1.2899,1.2869,1.3382,1.3601,1.3792,1.381,1.3933,1.4067,1.3691,1.3914,1.3728,1.2725,1.2485,1.2972,1.2996,1.2754,1.2498,1.2208,1.201,1.2095,1.2259,1.2472,1.2221,1.2138,1.2421,1.2525,1.2599,1.2927,1.2876,1.274,1.2415,1.2223,1.2368,1.2424,1.2473,1.2026,1.1453,1.1723,1.1436,1.1661,1.1545,1.1817,1.1962,1.1629,1.147,1.1249,1.0674,1.0787,1.0636,1.0406,1.049,1.0331,0.9776,0.9606,0.9562,0.9798,0.9964,0.9859,1.021,1.0306,1.0256,1.0246,1.0196,0.9737,1.03,1.0543,1.039,1.008,1.007,1.02,1.0227,1.0458,1.0383,1.0439,1.0186,1.0183,0.9949,0.9753,0.9914,0.9732,0.965,0.9945,0.9971,1.0004,1.0,0.9872,0.9893,0.9842,0.9859,0.9916,0.9925,0.9844,0.9985,0.989,1.0025,1.0155,1.0226,1.0328,1.0591,1.0579,1.031,1.028,1.0228,1.0213,1.027,1.0302,1.0767,1.094,1.0788,1.0782,1.0737,1.057,1.0452,0.9978,1.0094,1.0106,1.011,1.0068,0.978,0.9969,1.0071,1.0077,0.9552,0.9508,0.8885,0.8685,0.8885,0.855,0.8256,0.7099,0.7964,0.7819,0.7936,0.7914,0.7768,0.757,0.7478,0.7769,0.7879,0.7767,0.7774,0.7617,0.7499,0.7561,0.7675,0.767,0.7633,0.7296,0.7228,0.7672,0.7615,0.7433,0.7557,0.7422,0.7767,0.7711,0.82,0.7999,0.7686,0.759,0.7444,0.7722,0.7893,0.792,0.796,0.8004,0.8036,0.8216,0.845,0.834,0.804,0.7891,0.7956,0.7777,0.7657,0.8001,0.7962,0.805,0.7766,0.7493,0.749,0.7449,0.7537,0.7705,0.7686,0.7549,0.7556,0.7594,0.779,0.7769,0.8116,0.802,0.8101,0.8233,0.8242,0.7982,0.8397,0.8365,0.8442,0.848,0.8697,0.8541,0.8328,0.8558,0.8614', at: 90, base: 88621, date: '2025-12-22' },
-    now:  { s: '0.85296,0.85427,0.85296,0.84113,0.83587,0.83456,0.83456,0.82799,0.8293,0.82667,0.8477,0.85033,0.91079,0.95942,1.02907,1.0133,1.02119,1.03827,1.0317,1.03827,1.05404,1.0225,1.02776,1.02119,1.03301,1.01724,1.01593,1.06811,1.04696,1.0492,1.05591,1.03974,1.03112,1.02916,1.00632,1.01495,1.01565,1.00991,1.02762,0.99417,1.00155,1.00432,1.06303,1.06784,1.0669,1.13842,1.13301,1.10921,1.10938,1.1053,1.10968,1.11019,1.09741,1.09956,1.09904,1.11555,1.11079,1.11389,1.13724,1.12721,1.12435,1.09507,1.07447,1.08605,1.09069,1.101,1.07573,1.09306,1.07352,1.08093,1.07265,1.07101,1.07922,1.07689,1.09121,1.10521,1.07003,1.06705,1.06309,1.05344,1.05339,1.06337,1.06907,1.02502,1.01683,1.01964,1.02978,1.00957,1.01795,1.05804,1', at: 90, base: 76088, date: BTC_ASOF }
+    hype: { closes: [58973.99,57301.86,59132.13,57487.73,57970.9,56180.0,53962.97,54160.86,54869.95,57042.0,57635.99,57338.0,58132.32,60498.0,59993.03,59132.0,58213.99,60313.99,61759.99,62947.99,63201.05,63348.96,63578.76,63339.99,64262.7,63152.01,65173.99,65769.95,65858.0,65602.01,63327.59,60805.78,60649.28,60752.71,62086.0,62058.0,62819.91,62224.0,62160.49,60636.02,60326.39,62540.0,63206.22,62870.02,66083.99,67074.14,67620.01,67421.78,68428.0,68378.0,69031.99,67377.5,67426.0,66668.65,68198.28,66698.33,67092.76,68021.7,69962.21,72736.42,72344.74,70292.01,69496.01,69374.74,68775.99,67850.01,69372.01,75571.99,75857.89,76509.78,76677.46,80370.01,88647.99,87952.01,90375.2,87325.59,91032.07,90586.92,89855.99,90464.08,92310.79,94286.56,98317.12,98892.0,97672.4,97900.04,93010.01,91965.16,95863.11,95643.98,97460.0,96407.99,97185.18,95840.62,95849.69,98587.32,96945.63,99740.84,99831.99,101109.59,97276.47,96593.0,101125.0,100004.29,101424.25,101420.0,104463.99,106058.66,106133.74,100204.01,97461.86,97805.44,97291.99,95186.27,94881.47,98663.58,99429.6,95791.6,94299.03,95300.0,93738.2,92792.05,93576.0,94591.79,96984.79,98174.18,98220.5,98363.61,102235.6,96954.61,95060.61,92552.49,94726.11,94599.99,94545.06,94536.1,96560.86,100497.35,99987.3,104077.48,104556.23,101331.57,102260.01,106143.82,103706.66,103910.34,104870.5,104746.85,102620.0,102082.83,101335.52,103733.24,104722.94,102429.56,100635.65,97700.59,101328.52,97763.13,96612.43,96554.35,96506.8,96444.74,96462.75,97430.82,95778.2,97869.99,96608.14,97500.48,97569.66,96118.12,95780.0,95671.74,96644.37,98305.0,96181.98,96551.01,96258.0,91552.88,88680.4,84250.09,84708.58,84349.94,86064.53,94270.0,86220.61,87281.98,90606.01,89931.89,86801.75,86222.45,80734.37,78595.86,82932.99,83680.12,81115.78,83983.2,84338.44,82574.53,84010.03,82715.03,86845.94,84223.39,84088.79,83840.59,86082.5,87498.16,87392.87,86909.17,87232.01,84424.38,82648.54], at: 90, date: '2024-11-29' },
+    lit: { closes: [118594.99,120529.35,122232.0,122391.0,123482.31,124658.54,121332.95,123306.0,121662.4,112774.5,110644.4,114958.8,115166.0,113028.14,110763.28,108194.28,106431.68,107185.01,108642.78,110532.09,108297.67,107567.44,110078.18,111004.89,111646.27,114559.4,114107.65,112898.45,110021.29,108322.88,109608.01,110098.1,110540.68,106583.04,101497.22,103885.16,101346.04,103339.08,102312.94,104722.96,106011.13,103058.99,101654.37,99692.02,94594.0,95596.24,94261.44,92215.14,92960.83,91554.96,86637.23,85129.43,84739.74,86830.0,88300.01,87369.96,90484.02,91333.95,90890.7,90802.44,90360.0,86286.01,91277.88,93429.95,92078.06,89330.04,89236.79,90395.31,90634.34,92678.8,92015.37,92513.38,90268.42,90240.01,88172.17,86432.08,87863.42,86243.22,85516.41,88136.94,88360.9,88658.86,88620.79,87486.0,87669.45,87225.27,87369.56,87877.01,87952.71,87237.13,88485.49,87648.22,88839.04,89995.13,90628.01,91529.73,93859.71,93747.97,91364.16,91099.99,90641.28,90504.7,91013.65,91296.2,95414.0,96951.78,95604.8,95550.94,95147.77,93673.14,92631.0,88427.66,89454.73,89559.67,89600.26,89225.34,86670.36,88347.08,89250.0,89299.99,84650.16,84260.49,78741.09,76968.21,78738.61,75770.21,73165.83,62909.86,70580.26,69289.38,70330.38,70138.0,68841.29,67082.52,66272.17,68853.96,69822.95,68832.58,68892.43,67503.52,66461.0,67003.73,68020.01,67975.93,67643.4,64656.02,64058.15,67988.04,67485.18,65872.1,66973.26,65776.47,68830.06,68338.0,72666.77,70890.72,68114.02,67262.91,65971.2,68432.16,69948.63,70191.86,70541.34,70930.0,71211.95,72815.24,74884.67,73909.36,71246.54,69930.0,70510.73,68918.12,67859.0,70906.45,70556.74,71336.53,68820.31,66407.28,66377.03,66010.93,66797.37,68284.48,68113.92,66901.99,66964.3,67300.42,69034.18,68853.66,71924.22,71069.93,71787.97,72962.7,73043.16,70740.98,74417.99,74131.55,74809.99,75154.29,77072.0,75691.76,73801.79,75840.97,76336.15,78178.23,78257.48,77437.13,77625.0,78657.55,77371.32,76342.77,75780.0], at: 90, date: '2025-12-30' },
+    now: { closes: [64923.19,64962.6,64901.59,63970.01,63600.0,63479.99,63490.86,63043.56,63086.01,62900.0,64532.1,64725.42,69334.79,73025.15,78338.03,77074.93,77734.0,78992.75,78539.14,79023.75,80249.58,77845.87,78230.0,77682.0,78581.29,77439.0,77340.01,81270.37,79660.77,79831.75,80341.83,79112.01,78455.8,78306.43,76568.72,77225.7,77278.73,76842.01,78189.21,75644.48,76206.01,76417.01,80883.87,81249.99,81178.0,86620.0,86208.56,84397.6,84410.24,84099.99,84433.1,84472.0,83500.01,83663.66,83623.6,84880.05,84518.01,84753.56,86530.0,85766.87,85549.93,83321.81,81754.45,82635.55,82988.36,83773.12,81850.0,83169.0,81682.01,82245.93,81615.64,81491.04,82116.0,81938.4,83028.15,84093.42,81416.09,81189.43,80888.16,80154.09,80150.56,80909.77,81343.5,77991.89,77368.77,77582.02,78354.0,76816.0,77453.86,80504.01,76088.01], at: 90, date: '2026-11-05' }
   };
   var BTC_PRE = 90, BTC_POST = 120;
 
   function btcChart() {
-    var W = 960, H = 300, pl = 52, pr = 92, pt = 20, pb = 34;
+    var W = 960, H = 300, pl = 58, pr = 92, pt = 20, pb = 34;
+    var usd = state.btcUnit === 'usd';
     var keys = ['hype', 'lit', 'now'], data = {};
-    keys.forEach(function (k) { data[k] = BTC[k].s.split(',').map(Number); });
+    keys.forEach(function (k) {
+      var r = BTC[k];
+      data[k] = usd ? r.closes : r.closes.map(function (v) { return v / r.closes[r.at]; });
+    });
     var all = keys.reduce(function (a, k) { return a.concat(data[k]); }, []);
     var lo = Math.min.apply(null, all), hi = Math.max.apply(null, all);
     var pad = (hi - lo) * 0.08; lo -= pad; hi += pad;
     var X = function (d) { return pl + ((d + BTC_PRE) / (BTC_PRE + BTC_POST)) * (W - pl - pr); };
     var Y = function (v) { return pt + (1 - (v - lo) / (hi - lo)) * (H - pt - pb); };
-    var grid = [0.7, 0.85, 1, 1.15, 1.3].filter(function (t) { return t > lo && t < hi; })
+    var ticks = usd ? Array.from({length: Math.floor(hi / 10000) - Math.ceil(lo / 10000) + 1}, function (_, i) { return (Math.ceil(lo / 10000) + i) * 10000; }) : [0.7, 0.85, 1, 1.15, 1.3];
+    var grid = ticks.filter(function (t) { return t > lo && t < hi; })
       .map(function (t) {
-        var one = t === 1;
+        var one = !usd && t === 1;
         return '<line class="tge-grid' + (one ? ' one' : '') + '" x1="' + pl + '" y1="' + Y(t).toFixed(1) +
           '" x2="' + (W - pr) + '" y2="' + Y(t).toFixed(1) + '"/>' +
           '<text class="tge-axis' + (one ? ' one' : '') + '" x="' + (pl - 8) + '" y="' + (Y(t) + 4).toFixed(1) +
-          '" text-anchor="end">' + 'x' + t + '</text>';
+          '" text-anchor="end">' + (usd ? '$' + (t / 1000) + 'K' : 'x' + t) + '</text>';
       }).join('');
     var lines = keys.map(function (k) {
       var a = data[k], at = BTC[k].at;
@@ -495,23 +501,34 @@
         '" text-anchor="' + (d === -90 ? 'start' : d === 120 ? 'end' : 'middle') + '">D' +
         (d >= 0 ? '+' : '') + d + '</text>';
     }).join('');
+    var step = X(1) - X(0), hover = '';
+    for (var d = -BTC_PRE; d <= BTC_POST; d++) {
+      var note = keys.map(function (k) {
+        var r = BTC[k], price = r.closes[r.at + d];
+        if (price == null) return '';
+        return (k === 'now' ? 'Latest window' : k.toUpperCase()) + ' · ' + addDays(r.date, d) + ': ' + btcDollar(price);
+      }).filter(Boolean).join(' | ');
+      hover += '<rect x="' + (X(d) - step / 2).toFixed(2) + '" y="' + pt + '" width="' + (step + .04).toFixed(2) +
+        '" height="' + (H - pt - pb) + '" fill="transparent"><title>' + esc(note) + '</title></rect>';
+    }
     return '<svg class="tge-chart" viewBox="0 0 ' + W + ' ' + H + '" role="img" ' +
-      'aria-label="Bitcoin around each listing day, indexed to the listing day">' +
-      grid + zero + lines + nowDot + ends + dayLab + '</svg>';
+      'aria-label="Bitcoin daily closes around HYPE and LIT TGE and the latest BTC observation, ' +
+      (usd ? 'USDT price' : 'indexed to each anchor') + '">' + grid + zero + lines + nowDot + ends + dayLab + hover + '</svg>';
+  }
+
+  function btcDollar(v) {
+    return v == null ? '—' : '$' + v.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   }
 
   function btcRunup() {
-    var rows = [['hype', 'HYPE listing', '2024-11-29'], ['lit', 'LIT listing', '2025-12-22'],
-                ['now', 'Latest BTC close', BTC_ASOF]];
-    return '<div class="tp-tablewrap"><table class="tp-table tge-table"><thead><tr>' +
-      '<th>Backdrop</th><th>Bitcoin, 90 days into it</th><th>Bitcoin on the day</th></tr></thead><tbody>' +
-      rows.map(function (r) {
-        var a = BTC[r[0]].s.split(',').map(Number);
-        var run = (1 / a[0] - 1) * 100;
-        var sign = run >= 0 ? '+' : '\u2212';
-        return '<tr><td class="tp-k"><b>' + r[1] + '</b><small>' + r[2] + '</small></td>' +
-          '<td class="tge-v ' + (run >= 0 ? 'up' : 'dn') + '">' + sign + Math.abs(run).toFixed(1) + '%</td>' +
-          '<td class="tge-v">$' + BTC[r[0]].base.toLocaleString() + '</td></tr>';
+    var offsets = [-90, -45, 0, 45, 90, 120];
+    return '<div class="tp-tablewrap"><table class="tp-table tge-table"><thead><tr><th>BTC close · UTC</th>' +
+      offsets.map(function (d) { return '<th>' + (d === 0 ? 'D+0 · Anchor' : 'D' + (d > 0 ? '+' : '') + d) + '</th>'; }).join('') +
+      '</tr></thead><tbody>' + [['hype', 'HYPE TGE'], ['lit', 'LIT TGE'], ['now', 'Latest observed close']].map(function (r) {
+        var b = BTC[r[0]];
+        return '<tr><td class="tp-k"><b>' + r[1] + '</b><small>' + b.date + '</small></td>' + offsets.map(function (d) {
+          return '<td class="tp-v' + (d === 0 ? ' now' : '') + '">' + btcDollar(b.closes[b.at + d]) + '</td>';
+        }).join('') + '</tr>';
       }).join('') + '</tbody></table></div>';
   }
 
@@ -887,7 +904,7 @@
       cyc + bars + phaseEdge + marks + years + '</svg>';
   }
 
-  var state = { fdv: 3.0e9, zoom: 'all', varListing: '2026-12-31' };
+  var state = { fdv: 3.0e9, zoom: 'all', varListing: '2026-12-31', btcUnit: 'usd' };
 
   function bigUsd(v) {
     return v >= 1e9 ? '$' + (v / 1e9).toFixed(2) + 'B' : '$' + Math.round(v / 1e6) + 'M';
@@ -1003,12 +1020,17 @@
       '<div class="cy-cards">' + cycleCards() + '</div>' +
       '<div class="tp-note"><b>How to read it.</b> All three completed Year 4s were negative — \u221257.7%, \u221274.7%, \u221263.9%. But 2025 was a Year 3 and closed at \u22126.3%, which breaks the "years one to three always rise" half of the pattern, so this is a tendency and not a rule. Bars use one signed log scale in both directions, because a linear axis would leave +5,537% as the only bar you could see; every bar carries its own figure. VAR\'s listing date is an assumption, not an announcement — the countdown moves with it. The claim that VAR lists closer to a recovery than LIT did is defensible on this evidence. It is not a guarantee, and four observations is not a sample. <i>Annual returns: K33 Research · BitQuant.</i></div>' +
 
-      '<div class="bw-head"><b>Bitcoin At Each Listing</b><span><i>indexed to 1.00 on the listing day · 90 days before, 120 days after</i></span></div>' +
+      '<div class="bw-head"><b>Bitcoin At Each Listing</b><span><i>Daily UTC close · D−90 to D+120</i></span></div>' +
+      '<div class="tp-chips" aria-label="Bitcoin chart units"><span>BTC price</span>' +
+      [['usd','USDT price'],['index','Indexed ×']].map(function (v) {
+        return '<button type="button" data-btc-unit="' + v[0] + '" aria-pressed="' + (state.btcUnit === v[0]) +
+          '" class="' + (state.btcUnit === v[0] ? 'on' : '') + '">' + v[1] + '</button>';
+      }).join('') + '</div>' +
       '<div class="tge-legend"><span class="hype"><i></i>BTC around HYPE listing</span>' +
       '<span class="lit"><i></i>BTC around LIT listing</span>' +
-      '<span class="now"><i></i>BTC into today</span></div>' +
+      '<span class="now"><i></i>BTC into latest close · ' + BTC_ASOF + '</span></div>' +
       btcChart() + btcRunup() +
-      '<div class="tp-note">Hyperliquid listed into a Bitcoin that had run hard for three months. Lighter listed into one that had been falling. The blue series shows the latest completed 90-day Bitcoin window. The macro score below is a separate historical snapshot.</div>' +
+      '<div class="tp-note">Hover any day for each series’ actual <a href="https://www.binance.com/en/trade/BTC_USDT" target="_blank" rel="noopener noreferrer">Binance BTCUSDT</a> close. The blue series ends at the latest observed close; VAR’s assumed TGE price is not available.</div>' +
 
       '<div class="bw-head"><b>Macro Conditions: Historical Snapshot</b><span><i>each row goes to the listing the September snapshot sat closer to</i> · ' + ASOF + '</span></div>' +
       '<div class="tp-tablewrap"><table class="tp-table hl-cols"><thead><tr>' +
@@ -1040,10 +1062,12 @@
     host.querySelectorAll('.tp-chips button').forEach(function (b) {
       b.addEventListener('click', function () {
         if (b.dataset.varListing) state.varListing = b.dataset.varListing;
+        else if (b.dataset.btcUnit) state.btcUnit = b.dataset.btcUnit;
         else if (b.dataset.zoom) state.zoom = b.dataset.zoom;
         else state.fdv = Number(b.dataset.fdv) || 3.0e9;
         render();
         if (b.dataset.varListing) host.querySelector('[data-var-listing="' + state.varListing + '"]').focus({ preventScroll: true });
+        if (b.dataset.btcUnit) host.querySelector('[data-btc-unit="' + state.btcUnit + '"]').focus({ preventScroll: true });
       });
     });
   }
