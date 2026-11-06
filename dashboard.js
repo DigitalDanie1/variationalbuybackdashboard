@@ -1012,26 +1012,38 @@ function renderImpliedSpreadTotal(treasuryTotal){
   renderMoneyMap(treasuryTotal);
 }
 async function refreshProtocolBalanceGrowth(){
-  const nowTs=Math.floor(Date.now()/1000);
-  const blocks=PM_GROWTH_WINDOWS.map(days=>blockAt(nowTs-days*86400));
-  let olpCurrent=null;
-  try{olpCurrent=await balAtPad(CHAIN.olpPad,'latest');}catch(_){ }
-  const olpBases=[];
-  for(const block of blocks){
-    let value=null;
-    try{value=await balAtPad(CHAIN.olpPad,block);}
-    catch(_){
-      await new Promise(resolve=>setTimeout(resolve,450));
-      try{value=await balAtPad(CHAIN.olpPad,block);}catch(__){ }
+  let olpCurrent=null, anchor=null;
+  const olpBases=PM_GROWTH_WINDOWS.map(()=>null);
+  try{
+    const block=await rpcSingle(CHAIN.headerRpc,'eth_getBlockByNumber',['latest',false]);
+    const number=parseInt(block.number,16), timestamp=parseInt(block.timestamp,16);
+    if(!Number.isSafeInteger(number)||!Number.isSafeInteger(timestamp))throw new Error('Invalid OLP block');
+    anchor={number,timestamp};
+    olpCurrent=await balAtPad(CHAIN.olpPad,number);
+  }catch(_){ }
+  if(anchor && Number.isFinite(olpCurrent)){
+    for(const [i,days] of PM_GROWTH_WINDOWS.entries()){
+      const target=anchor.timestamp-days*86400;
+      const cell=$('#pmOlpGrowth'+days);
+      if(cell)cell.removeAttribute('title');
+      try{
+        // The first block at or after the cutoff is excluded, so the balance
+        // contains only transfers before the cutoff. Never use an estimated block.
+        const first=await exactBlockAtTimestamp(target);
+        const [prev,next]=await Promise.all([blockHeader(first-1),blockHeader(first)]);
+        if(prev.timestamp>=target||next.timestamp<target)throw new Error('Unverified historical cutoff');
+        olpBases[i]=await balAtPad(CHAIN.olpPad,prev.number);
+        if(cell)cell.title='Arbitrum blocks '+prev.number+' → '+anchor.number+
+          ' · UTC cutoff '+new Date(target*1000).toISOString();
+      }catch(_){ }
     }
-    olpBases.push(value);
   }
   PM_GROWTH_STATE.olp=olpBases;
   PM_GROWTH_STATE.olpCurrent=olpCurrent;
   renderPmGrowthGroup('pmOlp',olpCurrent,olpBases);
   if(Number.isFinite(olpCurrent)){
     $('#pmOlpBalance') && ($('#pmOlpBalance').textContent=fmtUSD(olpCurrent));
-    $('#pmOlpFormula') && ($('#pmOlpFormula').innerHTML=`Formula: <b>USDC balanceOf(${walletLink(ADDR.olp,'0x74bbbb...1f2cd')}) = ${fmtUSD(olpCurrent)}</b>`);
+    $('#pmOlpFormula') && ($('#pmOlpFormula').innerHTML=`Formula: <b>USDC balanceOf(${walletLink(ADDR.olp,'0x74bbbb...1f2cd')}) = ${fmtUSD(olpCurrent)}</b> · block <a href="https://arbiscan.io/block/${anchor.number}" target="_blank" rel="noopener">${anchor.number}</a>`);
     if(olpCurrent>0){OLP_TVL=olpCurrent;OLP_TVL_LIVE=true;renderEfficiency();}
   }else{
     $('#pmOlpBalance') && ($('#pmOlpBalance').textContent='check Arbiscan');

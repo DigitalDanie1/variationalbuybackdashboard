@@ -9068,15 +9068,20 @@ body.theme-light .lb-card{box-shadow:0 1px 0 rgba(20,40,80,.03),0 14px 30px -22p
       <div class="pm-metric">
         <strong id="pmOlpBalance">syncing</strong><span>Core OLP Vault USDC</span>
         <div class="pm-growth" aria-label="Core OLP wallet net USDC movements">
-          <div class="pm-growth-title">Core wallet USDC movement <i>transfers + PnL · not a loss metric</i></div>
+          <div class="pm-growth-title">Core wallet USDC movement <i>USDC balance change · not PnL</i></div>
           <div class="pm-growth-grid">
             <div class="pm-growth-cell" id="pmOlpGrowth1"><span>1D</span><b id="pmOlp1d">syncing</b><em id="pmOlp1dPct">—</em></div>
             <div class="pm-growth-cell" id="pmOlpGrowth7"><span>7D</span><b id="pmOlp7d">syncing</b><em id="pmOlp7dPct">—</em></div>
             <div class="pm-growth-cell" id="pmOlpGrowth30"><span>30D</span><b id="pmOlp30d">syncing</b><em id="pmOlp30dPct">—</em></div>
           </div>
-          <small class="pm-growth-note"><b>Negative = USDC left this address.</b> Capital can move to settlement pools or external hedge venues, so this is not OLP PnL or total TVL.</small>
+          <small class="pm-growth-note"><b>Negative = outflows exceeded inflows.</b> Capital can move to settlement pools or external hedge venues, so this is not OLP PnL or total TVL.</small>
         </div>
         <small class="pm-formula" id="pmOlpFormula">Formula: <b>USDC balanceOf(Core OLP Vault)</b></small>
+        <details class="pm-growth" aria-label="Verified Core OLP USDC transfer trace">
+          <summary>Where did the USDC go? · Nov 6 trace</summary>
+          <p class="pm-growth-note"><b>30,000,000 USDC</b> left the vault in two transfers to <a href="https://arbiscan.io/address/0x296321a65b592a73a513954c53c21ef55113706c" target="_blank" rel="noopener">0x2963…706c</a> and then reached <a href="https://arbiscan.io/tx/0xd62a2fbea0a369c97def22188f703e5bc6db234ae7729f4a4ba20895fafa6d12" target="_blank" rel="noopener">0xce43…b946</a>. This contract already held USDC; later transfers cannot be attributed to the OLP deposit alone.</p>
+          <p class="pm-growth-note">Historical audit: Oct 30 → Nov 6, 14:13 SGT. <b>262.64M in · 275.85M out · 13.21M net decrease.</b> Other first recipients: <a href="https://arbiscan.io/tx/0x5af85a61f38795b8735e118a09786c755d2c86dcdf3a4ec39ce825c9a00b9333" target="_blank" rel="noopener">0x6df2…47ba</a> (245.30M; sample transaction routes to settlement pools) and <a href="https://arbiscan.io/address/0x84be56470d45b7f6629a66a219a38681f6ba6172" target="_blank" rel="noopener">Oracle</a> (0.55M). Gross transfers include repeated movements.</p>
+        </details>
       </div>
       <div class="pm-metric">
         <strong id="pmTreasuryTotal">—</strong><span>current treasury balance</span>
@@ -11241,7 +11246,7 @@ body.theme-light .lb-card{box-shadow:0 1px 0 rgba(20,40,80,.03),0 14px 30px -22p
 
 <script src="market-regime-data.js?v=0d0713472802" defer></script>
 <script src="money-flow-sankey.js?v=22c2e55ef8e5" defer></script>
-<script src="dashboard.js?v=20261105-points-ledger" defer></script>
+<script src="dashboard.js?v=46d6dd5ca1f7-points-ledger" defer></script>
 <script src="lighter-compare.js?v=20261104d" defer></script>
 <script src="paths-panels.js?v=b8800382150b" defer></script>
 <script src="playbook-panels.js?v=ddd6402a1805" defer></script>
