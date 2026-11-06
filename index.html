@@ -3244,11 +3244,8 @@ html[data-ui-state="error"]::before{content:"Unable to load VAR-METRICS. Please 
   .cy-scenario-status{font:14px/1.65 var(--mono);color:var(--muted);margin:12px 0}
   .cy-scenario-status strong{color:var(--text)}
   .cy-scenario-note,.cy-window small{color:var(--muted);font:11px/1.6 var(--mono)}
-  .cy-window{display:grid;grid-template-columns:minmax(120px,180px) minmax(0,1fr);gap:14px;align-items:center;padding:12px 0;border-top:1px solid var(--line)}
-  .cy-window small{display:block;margin-top:4px}
-  .cy-window-track{display:grid;grid-template-columns:repeat(30,minmax(0,1fr));height:12px;gap:2px}
-  .cy-window-segment.p1{background:var(--cy1)} .cy-window-segment.p3{background:var(--cy3)} .cy-window-segment.p4{background:var(--cy4)}
-  @media(max-width:600px){.cy-window{grid-template-columns:1fr;gap:6px}}
+  .cy-focus-wrap{overflow-x:auto}
+  .cy-focus-chart{display:block;width:100%;min-width:560px}
   .cy-cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:0 0 18px}
   .cy-card{padding:14px 16px;border:1px solid var(--line);background:color-mix(in srgb,var(--panel) 70%,transparent)}
   .cy-card.hype{border-left:3px solid #4fd6c3}
@@ -11246,7 +11243,7 @@ body.theme-light .lb-card{box-shadow:0 1px 0 rgba(20,40,80,.03),0 14px 30px -22p
 <script src="money-flow-sankey.js?v=22c2e55ef8e5" defer></script>
 <script src="dashboard.js?v=20261105-points-ledger" defer></script>
 <script src="lighter-compare.js?v=20261104d" defer></script>
-<script src="paths-panels.js?v=48430e0a6098" defer></script>
+<script src="paths-panels.js?v=b8800382150b" defer></script>
 <script src="playbook-panels.js?v=ddd6402a1805" defer></script>
 <script src="monitors-panels.js?v=12956adea963" defer></script>
 <script src="whales-panels.js?v=a9cd96dde562" defer></script>

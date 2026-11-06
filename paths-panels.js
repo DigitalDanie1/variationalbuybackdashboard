@@ -632,22 +632,29 @@
   /* Signed log, one scale for both directions. A linear axis would make +5,537%
      the only visible bar; two different scales for gains and losses would be
      worse than either. Every bar carries its exact figure regardless. */
-  function cycleChart() {
-    var W = 960, pt = 40, pb = 44, plotH = 190, H = pt + plotH + pb;
-    var n = CYCLE_YEARS.length, slot = W / n;
-    var mag = function (v) { return Math.log10(1 + Math.abs(v)) * (v < 0 ? -1 : 1); };
-    var top = mag(5537), bot = mag(-74.7) * 1.2;
+  function cycleChart(focused) {
+    var W = focused ? 760 : 960, pt = 40, pb = focused ? 62 : 44, plotH = 190, H = pt + plotH + pb;
+    var years = focused ? CYCLE_YEARS.slice(-5) : CYCLE_YEARS;
+    var n = years.length, slot = W / n;
+    var mag = function (v) { return focused ? v : Math.log10(1 + Math.abs(v)) * (v < 0 ? -1 : 1); };
+    var top = focused ? 175 : mag(5537), bot = focused ? -40 : mag(-74.7) * 1.2;
     var zeroY = pt + plotH * (top / (top - bot));
     var Y = function (v) { return pt + plotH * ((top - mag(v)) / (top - bot)); };
     var xMid = function (i) { return slot * (i + 0.5); };
 
     var groups = '', bars = '', axis = '';
     for (var i = 0; i < n; i++) {
-      var c = CYCLE_YEARS[i], x = slot * i, cx = xMid(i);
+      var c = years[i], x = slot * i, cx = xMid(i);
 
       /* One tint per four-year block instead of a boxed frame each. The block is a
          grouping cue, not a thing to read, so it stays behind everything. */
-      if (c.p === 1 && i + 3 < n && CYCLE_YEARS[i + 3].r != null) {
+      if (focused) {
+        groups += '<rect class="mc-cyc p' + c.p + '" x="' + x + '" y="' + pt +
+          '" width="' + slot + '" height="' + plotH + '"/>';
+        if (c.r == null) bars += '<text class="tge-axis" x="' + cx + '" y="' + (zeroY - 14) +
+          '" text-anchor="middle">Not observed yet</text>';
+      }
+      if (!focused && c.p === 1 && i + 3 < n && years[i + 3].r != null) {
         if ((i / 4) % 2 === 1) {
           groups += '<rect class="cy-group" x="' + x.toFixed(1) + '" y="' + pt +
             '" width="' + (slot * 4).toFixed(1) + '" height="' + plotH + '"/>';
@@ -676,67 +683,53 @@
       axis += '<text class="cy-year" x="' + cx.toFixed(1) + '" y="' + (H - pb + 17) +
         '" text-anchor="middle">' + c.y + '</text>' +
         '<text class="cy-phase p' + c.p + '" x="' + cx.toFixed(1) + '" y="' + (H - pb + 33) +
-        '" text-anchor="middle">' + PHASES[c.p].k + '</text>';
+        '" text-anchor="middle">' + PHASES[c.p].k + (focused ? ' · ' + PHASES[c.p].name.split(' · ')[0] : '') + '</text>';
     }
 
     /* Just the ticker. The exact dates are on the three cards directly below, so repeating
        them here only made three long labels fight for the same corner. */
     var marks = cycleMarks().map(function (m) {
       var y = yearOf(m.d), ix = -1;
-      for (var i = 0; i < n; i++) if (CYCLE_YEARS[i].y === y) ix = i;
+      for (var i = 0; i < n; i++) if (years[i].y === y) ix = i;
       if (ix < 0) return '';
-      var frac = (dayNum(m.d) - dayNum(y + '-01-01')) / 365;
+      var frac = (dayNum(m.d) - dayNum(y + '-01-01')) / daysTo(y + '-01-01', (y + 1) + '-01-01');
       var mx = slot * (ix + frac);
       return '<line class="cy-mark ' + m.k + '" x1="' + mx.toFixed(1) + '" y1="' + (pt - 4) +
         '" x2="' + mx.toFixed(1) + '" y2="' + (pt + plotH) + '"/>' +
         '<text class="cy-mark-t ' + m.k + '" x="' + mx.toFixed(1) + '" y="' + (pt - 10) +
-        '" text-anchor="middle">' + m.label + '</text>';
+        '" text-anchor="middle">' + m.label + (focused ? ' · ' + m.d.slice(5) + (m.k === 'var' ? '*' : '') : '') + '</text>';
     }).join('');
 
-    return '<svg class="tge-chart cycle-chart" viewBox="0 0 ' + W + ' ' + H + '" role="img" ' +
+    return '<svg class="tge-chart cycle-chart' + (focused ? ' cy-focus-chart' : '') + '" viewBox="0 0 ' + W + ' ' + H + '" role="img" ' +
       'aria-label="Bitcoin calendar-year returns grouped into four-year cycles, with the three listing dates marked">' +
       groups +
       '<line class="tge-grid" x1="0" y1="' + zeroY.toFixed(1) + '" x2="' + W + '" y2="' + zeroY.toFixed(1) + '"/>' +
-      bars + marks + axis + '</svg>';
+      bars + (focused ? '<line class="mc-mark now" x1="' + (slot * 4) + '" x2="' + (slot * 4) +
+        '" y1="' + pt + '" y2="' + (pt + plotH) + '"/><text class="tge-axis" x="' + (slot * 4 + 7) + '" y="' + (pt + 16) + '">Jan 1 · Y1 begins</text>' : '') + marks + axis + '</svg>';
   }
 
   function addDays(iso, n) {
     return new Date((dayNum(iso) + n) * 86400000).toISOString().slice(0, 10);
   }
 
-  function launchWindow(date) {
-    var runs = [];
-    for (var d = 1; d <= 30; d++) {
-      var day = addDays(date, d), phase = phaseOfYear(yearOf(day));
-      var prev = runs[runs.length - 1];
-      if (prev && prev.phase === phase) prev.count++;
-      else runs.push({ phase: phase, count: 1 });
-    }
-    return runs;
-  }
-
   function cycleScenario() {
     var date = state.varListing;
     var left = daysTo(date, NEXT_Y1);
-    var compare = function (label, start) {
-      var runs = launchWindow(start);
-      return '<div class="cy-window"><div><b>' + label + '</b><small>TGE ' + start + ' · Y' + phaseOfYear(yearOf(start)) + '</small></div>' +
-        '<div><div class="cy-window-track" aria-hidden="true">' + runs.map(function (r) {
-          return '<span class="cy-window-segment p' + r.phase + '" style="grid-column:span ' + r.count + '"></span>';
-        }).join('') + '</div><small>' + addDays(start, 1) + ' → ' + addDays(start, 30) + ' · ' +
-        runs.map(function (r) { return 'Y' + r.phase + ': ' + r.count + 'd'; }).join(' / ') + '</small></div></div>';
-    };
+    var post = left === 1 ? 'Y1' : 'Y4';
     return '<section class="cy-scenario" aria-label="VAR TGE cycle position"><div class="cy-scenario-head"><div>' +
-      '<span class="tp-eyebrow">VAR TGE · BITCOIN CYCLE</span><h3>Where would VAR launch?</h3></div>' +
+      '<span class="tp-eyebrow">VAR TGE · BITCOIN CYCLE</span><h3>VAR would launch at the end of Y4</h3></div>' +
       '<div class="tp-chips" aria-label="Assumed VAR TGE date">' +
       [['2026-12-01','Dec 1'],['2026-12-31','Dec 31']].map(function (v) {
         return '<button type="button" data-var-listing="' + v[0] + '" aria-pressed="' + (date === v[0]) +
           '" class="' + (date === v[0] ? 'on' : '') + '">' + v[1] + '</button>';
-      }).join('') + '</div></div><p class="cy-scenario-status"><strong>Late Y4</strong> · ' + date +
-      ' → <strong>' + left + (left === 1 ? ' day' : ' days') + '</strong> to Y1 · 2027-01-01</p>' +
-      '<p class="cy-scenario-note">D+1 to D+30 · same window after each launch</p>' +
-      compare('VAR scenario', date) + compare('LIT actual TGE', LIT_TGE) +
-      '<p class="cy-scenario-note">VAR dates are scenarios. Y1 is a calendar classification; it does not predict a rebound.</p></section>';
+      }).join('') + '</div></div>' +
+      '<p class="cy-scenario-status"><strong>' + date + '</strong> assumed TGE · <strong>' +
+      left + (left === 1 ? ' day' : ' days') + ' to Y1</strong> (2027-01-01)</p>' +
+      '<div class="cy-focus-wrap">' + cycleChart(true) + '</div>' +
+      '<p class="cy-scenario-status"><strong>First 30 days: VAR → ' + post +
+      '</strong> · LIT → 1 day in Y3, then 29 days in Y4.</p>' +
+      '<p class="cy-scenario-note">Bars show annual BTC returns. *VAR is an assumed date. 2026 return is through ' + BTC_ASOF +
+      '; 2027 has no return bar. The cycle labels describe calendar years, not predicted prices.</p></section>';
   }
 
   function cycleCards() {
