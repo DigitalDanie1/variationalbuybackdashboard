@@ -3964,6 +3964,11 @@ html[data-ui-state="error"]::before{content:"Unable to load VAR-METRICS. Please 
   .pm-growth-cell.up>b,.pm-growth-cell.up>em{color:var(--grn)}
   .pm-growth-cell.down>b,.pm-growth-cell.down>em{color:#f08a98}
   .pm-olp-audit{margin-top:14px;padding-top:12px;border-top:1px solid var(--line)}
+  .pm-olp-audit summary{cursor:pointer;color:var(--ink);padding:4px 0}
+  .pm-olp-toggle{float:right;color:var(--dim);font:11px/1.6 var(--mono)}
+  .pm-olp-toggle::after{content:"Show"}
+  .pm-olp-audit[open] .pm-olp-toggle::after{content:"Hide"}
+  .pm-olp-audit header{margin-top:8px}
   .pm-olp-audit header>b,.pm-olp-audit header>small{display:block}
   .pm-olp-audit header>small,.pm-olp-blocks,.pm-olp-reconcile{font:11px/1.6 var(--mono);color:var(--dim)}
   .pm-olp-flow{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;margin:10px 0}
@@ -9092,8 +9097,9 @@ body.theme-light .lb-card{box-shadow:0 1px 0 rgba(20,40,80,.03),0 14px 30px -22p
           <small class="pm-growth-note"><b>Negative = outflows exceeded inflows.</b> Capital can move to settlement pools or external hedge venues, so this is not OLP PnL or total TVL.</small>
         </div>
         <small class="pm-formula" id="pmOlpFormula">Formula: <b>USDC balanceOf(Core OLP Vault)</b></small>
-        <section class="pm-olp-audit" aria-label="Verified Core OLP Vault inflows and outflows">
-          <header><b>Verified USDC flows</b><small>Oct 30 → Nov 6, 2026 · 14:13 SGT · 7 days</small></header>
+        <details class="pm-olp-audit" aria-label="Verified Core OLP Vault inflows and outflows">
+          <summary><b>Verified USDC flows</b><span class="pm-olp-toggle"></span></summary>
+          <header><small>Oct 30 → Nov 6, 2026 · 14:13 SGT · 7 days</small></header>
           <dl class="pm-olp-flow">
             <div><dt>↓ Into vault</dt><dd class="pm-olp-in" title="262,639,302.024124 USDC">+262.64M</dd></div>
             <div><dt>↑ Out of vault</dt><dd class="pm-olp-out" title="275,852,744.182850 USDC">−275.85M</dd></div>
@@ -9108,7 +9114,7 @@ body.theme-light .lb-card{box-shadow:0 1px 0 rgba(20,40,80,.03),0 14px 30px -22p
           </ul>
           <small class="pm-growth-note">Historical audit, separate from the rolling balance above. Gross transfers can include repeated movements. After funds mix in a recipient wallet, later withdrawals cannot be attributed to the vault alone.</small>
           <small class="pm-olp-blocks">Arbitrum: <a href="https://arbiscan.io/block/519595162" target="_blank" rel="noopener">519595162 ↗</a> → <a href="https://arbiscan.io/block/521708479" target="_blank" rel="noopener">521708479 ↗</a></small>
-        </section>
+        </details>
       </div>
       <div class="pm-metric">
         <strong id="pmTreasuryTotal">—</strong><span>current treasury balance</span>
