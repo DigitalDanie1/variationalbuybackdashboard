@@ -188,11 +188,31 @@
     g.fillStyle = `rgba(76,154,248,${.35 * pulse})`; g.fillRect(head.x - C, hy - C, C * 3, C * 3);
     g.fillStyle = `rgba(225,242,255,${pulse})`; g.fillRect(head.x - 1, hy - 1, C + 2, C + 2);
     const value = done ? (balance() ?? MAX) : head.v;
-    const label = (done ? 'NOW ' : head.d.slice(5) + ' ') + money(value, 2);
-    g.font = '500 12px "Geist Mono", monospace';
-    const lw = g.measureText(label).width + 14;
-    const lx = W - lw - 14;
-    g.fillStyle = '#d6e4f5'; g.fillText(label, lx + 7, 24);
+    const amount = money(value, 2);
+    const right = W - 16;
+    g.save();
+    g.textAlign = 'right';
+    if (done) {
+      const x = Math.min(W - 5, head.x + C / 2);
+      const y = hy + C / 2;
+      g.strokeStyle = '#82c8ff';
+      g.fillStyle = '#e1f2ff';
+      g.beginPath(); g.arc(x, y, 4, 0, Math.PI * 2); g.fill();
+      if (y > 48) {
+        g.globalAlpha = .55;
+        g.beginPath(); g.moveTo(x, y - 7); g.lineTo(right, 42); g.stroke();
+        g.globalAlpha = 1;
+      }
+      g.font = `750 ${W < 600 ? 23 : 29}px "Geist Mono", monospace`;
+      g.fillText(amount, right, 32);
+      const labelRight = right - g.measureText(amount).width - 12;
+      g.font = '700 12px "Geist Mono", monospace';
+      g.fillStyle = '#82c8ff'; g.fillText('NOW', labelRight, 29);
+    } else {
+      g.font = '500 12px "Geist Mono", monospace';
+      g.fillStyle = '#d6e4f5'; g.fillText(head.d.slice(5) + ' ' + amount, right, 24);
+    }
+    g.restore();
     if (count) count.textContent = money(value, 2);
   }
 
@@ -222,8 +242,12 @@
     const x = e.clientX - host.getBoundingClientRect().left;
     mx = x;
     const c = colDay[Math.max(0, Math.min(cols - 1, Math.round(x / C)))];
-    tip.style.display = 'block'; tip.style.left = c.x + 'px'; tip.style.top = (baseY - c.h * C) + 'px';
     tip.innerHTML = `${c.d}<br>Treasury ${full(c.v)}<br>Added +${full(c.f)}`;
+    tip.style.display = 'block';
+    const left = c.x + 12 + tip.offsetWidth <= W - 8 ? c.x + 12 : c.x - tip.offsetWidth - 12;
+    const top = baseY - c.h * C - tip.offsetHeight - 10;
+    tip.style.left = Math.max(8, left) + 'px';
+    tip.style.top = Math.max(52, Math.min(top, H - tip.offsetHeight - 8)) + 'px';
   });
   host.addEventListener('pointerleave', () => { tip.style.display = 'none'; mx = -1e4; });
 })();
