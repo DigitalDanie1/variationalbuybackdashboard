@@ -229,6 +229,8 @@
     if (marketHost && marketChart) {
       if (marketChartHead) marketHost.appendChild(marketChartHead);
       marketHost.appendChild(marketChart);
+      const marketFoot = document.getElementById('marketChartFoot');
+      if (marketFoot) marketHost.appendChild(marketFoot);
     }
     // Landing already owns the treasury headline and operating summary. Overview starts
     // with the detailed ET ledger, followed by market activity.

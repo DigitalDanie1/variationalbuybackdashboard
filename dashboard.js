@@ -1801,69 +1801,163 @@ function renderMarketActivity(){
         ?'Live synced '+MARKET_ACTIVITY.liveAt.toLocaleTimeString('en-US',{timeZone:'UTC',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false})+' UTC'+(dailyThrough?' · daily through '+dailyThrough:'')
         :'Official report figures · exact daily series not loaded';
   }
-  if(!vols.length||!ois.length){
-    svg.innerHTML='<text x="50%" y="50%" fill="#7d8aa5" text-anchor="middle" font-family="monospace" font-size="12">Daily series unavailable — the figures above are the official report</text>';
+  renderMarketFundamentals(svg, vols, ois);
+}
+
+const MARKET_SERIES = [
+  { key:'vol', label:'Volume', color:'var(--market-vol)' },
+  { key:'oi', label:'Open interest', color:'var(--market-oi)' },
+  { key:'net', label:'Treasury net inflow', color:'var(--market-net)' }
+];
+const MARKET_VIEW = { hidden:new Set(), averages:new Set([30]), overlay:false, baseline:true, window:null };
+const marketSigned = v => v == null ? '—' : (v < 0 ? '−' : '') + marketBig(Math.abs(v));
+
+function renderMarketFundamentals(svg, vols, ois) {
+  const treasury = dailyEarn().slice(1).filter((row, i) =>
+    row.d < resetDateKey() && addDays(SERIES[i].d, 1) === row.d);
+  const maps = [new Map(vols.map(x => [x.d,x.v])), new Map(ois.map(x => [x.d,x.v])),
+    new Map(treasury.map(x => [x.d,x.e]))];
+  const observed = [...new Set(maps.flatMap(map => [...map.keys()]))].sort();
+  const first = Date.parse(observed[0]), last = Date.parse(observed.at(-1));
+  const count = Number.isFinite(first) ? Math.round((last-first)/86400000)+1 : 0;
+  const rows = Array.from({length:count}, (_,i) => {
+    const date = new Date(first+i*86400000).toISOString().slice(0,10);
+    return {date, values:maps.map(map => map.get(date) ?? null)};
+  });
+  const view = MARKET_VIEW;
+  const series = MARKET_SERIES.map((item,i) => ({...item,i})).filter(item => !view.hidden.has(item.key));
+  const start = Math.max(0,count-(MARKET_ACTIVITY.days || count));
+  const [from,to] = view.window && view.window[1] <= count ? view.window : [start,count];
+  const visible = rows.slice(from,to);
+  const width = Math.max(300,Math.round(svg.getBoundingClientRect().width || 960));
+  const panes = view.overlay ? [series] : series.map(item => [item]);
+  const paneHeight = width < 600 ? 152 : 178;
+  const height = panes.length*paneHeight+29;
+  const left = 12, right = width-75, plotWidth = right-left;
+  const x = i => left + (visible.length === 1 ? plotWidth/2 : i/Math.max(1,visible.length-1)*plotWidth);
+  const average = (i,j,days) => {
+    if (j+1 < days) return null;
+    const values = rows.slice(j+1-days,j+1).map(row => row.values[i]);
+    return values.some(v => v == null) ? null : values.reduce((sum,v) => sum+v,0)/days;
+  };
+  const table = $('#marketData');
+  if (table?.open) {
+    table.querySelector('tbody').innerHTML = visible.map(row =>
+      '<tr><th scope="row">'+row.date+'</th>'+row.values.map(v =>
+        '<td>'+(v == null ? '—' : marketExact(v))+'</td>').join('')+'</tr>').join('');
+  }
+  document.querySelectorAll('[data-market-series]').forEach(button => {
+    const i = MARKET_SERIES.findIndex(item => item.key === button.dataset.marketSeries);
+    button.querySelector('output').textContent = marketSigned(maps[i].get([...maps[i].keys()].at(-1)));
+  });
+  svg.style.setProperty('height',height+'px','important');
+  svg.setAttribute('viewBox',`0 0 ${width} ${height}`);
+  if (!visible.length) {
+    svg.innerHTML = '<text class="axis" x="50%" y="50%" text-anchor="middle">Waiting for daily observations</text>';
     return;
   }
-  const vm=new Map(vols.map(x=>[x.d,x.v])),om=new Map(ois.map(x=>[x.d,x.v]));
-  let rows=[...new Set([...vm.keys(),...om.keys()])].sort().map(d=>({d,vol:vm.get(d),oi:om.get(d)})).filter(x=>Number.isFinite(x.vol)&&Number.isFinite(x.oi));
-  if(MARKET_ACTIVITY.days)rows=rows.slice(-MARKET_ACTIVITY.days);
-  if(rows.length<2)return;
-  const {W,H}=chartDims(svg,960,330),pl=74,pr=78,pt=26,pb=42,n=rows.length;
-  const X=i=>pl+i/Math.max(1,n-1)*(W-pl-pr);
-  const vMax=Math.max(...rows.map(x=>x.vol))*1.12,oMax=Math.max(...rows.map(x=>x.oi))*1.12;
-  const YV=v=>pt+(1-v/Math.max(1,vMax))*(H-pt-pb);
-  const YO=v=>pt+(1-v/Math.max(1,oMax))*(H-pt-pb);
-  let grid='';
-  for(let i=0;i<=4;i++){
-    const y=pt+(H-pt-pb)*i/4,v=vMax*(1-i/4),o=oMax*(1-i/4);
-    grid+=`<line x1="${pl}" y1="${y}" x2="${W-pr}" y2="${y}" stroke="#243244" stroke-opacity=".55"/>`+
-      `<text class="axis axis-vol" x="${pl-9}" y="${y+4}" text-anchor="end">${marketBig(v).replace('$','')}</text>`+
-      `<text class="axis axis-oi" x="${W-pr+9}" y="${y+4}">${marketBig(o).replace('$','')}</text>`;
-  }
-  /* Volume is a per-day quantity, so it reads as bars — one bar is one day, which also
-     makes every recorded day visible. Open interest is a level at close, so it stays a
-     line drawn over them. A band scale puts each day in its own slot; the previous
-     point scale pinned the first and last samples to the plot edges, which would clip
-     half of the end bars. */
-  const band=(W-pl-pr)/n, XB=i=>pl+band*(i+.5);
-  const barW=Math.max(1.5,Math.min(26,band*(band>6?.62:.86)));
-  const baseY=H-pb;
-  const bars=rows.map((x,i)=>{
-    const h=Math.max(0,baseY-YV(x.vol));
-    return `<rect class="vol-bar" x="${(XB(i)-barW/2).toFixed(1)}" y="${YV(x.vol).toFixed(1)}" width="${barW.toFixed(1)}" height="${h.toFixed(1)}" rx="${Math.min(1.5,barW/3).toFixed(1)}"/>`;
+  const tickCount = Math.min(visible.length,Math.max(2,Math.floor(plotWidth/90)));
+  const ticks = Array.from({length:tickCount},(_,i) =>
+    Math.round(i*(visible.length-1)/Math.max(1,tickCount-1)));
+  const averages = [...view.averages].sort((a,b) => a-b);
+  const axisValue = view.overlay ? v => v.toFixed(1) : marketSigned;
+  const plots = panes.map((items,pane) => {
+    const top = pane*paneHeight, plotTop = top+31, bottom = top+paneHeight-12;
+    const lines = items.map(item => {
+      const raw = visible.map(row => row.values[item.i]);
+      const base = raw.find(v => v != null && v !== 0);
+      const index = v => v == null || (view.overlay && base == null) ? null :
+        view.overlay ? 100+(v-base)/Math.abs(base)*100 : v;
+      const latest = raw.findLastIndex(Number.isFinite);
+      const base90 = latest < 0 ? null : average(item.i,from+latest,90);
+      return {
+        ...item, raw:raw.map(index), baseline:view.baseline ? index(base90) : null,
+        averages:averages.map(days => visible.map((_,j) => index(average(item.i,from+j,days))))
+      };
+    });
+    const values = lines.flatMap(line => [...line.raw,...line.averages.flat(),line.baseline]).filter(Number.isFinite);
+    if (view.overlay && values.length) values.push(100);
+    if (!view.overlay && items[0].key === 'net' && values.length) values.push(0);
+    const min = values.length ? Math.min(...values) : 0;
+    const max = values.length ? Math.max(...values) : 1;
+    const pad = (max-min)*.08 || Math.max(1,Math.abs(max)*.05);
+    const low = min-pad, high = max+pad;
+    const y = v => bottom-(v-low)/(high-low)*(bottom-plotTop);
+    const path = data => data.map((v,i) => v == null ? '' :
+      `${i && data[i-1] != null ? 'L' : 'M'}${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(' ');
+    const grid = Array.from({length:4},(_,i) => {
+      const v = high-(high-low)*i/3, gy = y(v);
+      return `<line class="mf-grid" x1="${left}" x2="${right}" y1="${gy}" y2="${gy}"/>
+        <text class="axis" x="${right+8}" y="${gy+4}">${axisValue(v)}</text>`;
+    }).join('');
+    return `<rect class="mf-pane" x="0" y="${top}" width="${width}" height="${paneHeight-1}" rx="3"/>
+      <text class="mf-label" x="${left}" y="${top+18}">${view.overlay ? 'Indexed to 100' : items[0].label}</text>
+      ${grid}
+      ${ticks.map(i => `<line class="mf-grid" x1="${x(i)}" x2="${x(i)}" y1="${plotTop}" y2="${bottom}"/>`).join('')}
+      ${values.length ? '' : `<text class="axis" x="${left}" y="${plotTop+20}">No plottable observations</text>`}
+      ${lines.map(line => {
+        const current = line.raw.findLastIndex(Number.isFinite);
+        const baseline = line.baseline == null ? '' : `<line x1="${left}" x2="${right}" y1="${y(line.baseline)}" y2="${y(line.baseline)}" stroke="${line.color}" stroke-opacity=".65" stroke-dasharray="3 4"/>
+          ${view.overlay ? '' : `<text class="axis" x="${left+3}" y="${Math.max(plotTop+11,y(line.baseline)-5)}">90D avg ${axisValue(line.baseline)}</text>`}`;
+        return `${baseline}<path d="${path(line.raw)}" stroke="${line.color}" opacity="${averages.length ? '.48' : '1'}"/>
+          ${line.averages.map((data,i) => `<path d="${path(data)}" stroke="${line.color}" stroke-dasharray="${({3:'none',7:'4 3',30:'9 4'})[averages[i]]}"/>`).join('')}
+          ${current < 0 ? '' : `<circle cx="${x(current)}" cy="${y(line.raw[current])}" r="3" fill="${line.color}"/>`}
+          ${!view.overlay && current >= 0 ? `<rect x="${right+4}" y="${y(line.raw[current])-8}" width="67" height="16" rx="3" fill="${line.color}"/>
+            <text class="mf-badge" x="${right+8}" y="${y(line.raw[current])+4}">${axisValue(line.raw[current])}</text>` : ''}`;
+      }).join('')}`;
   }).join('');
-  const oiLine=rows.map((x,i)=>`${i?'L':'M'}${XB(i).toFixed(1)} ${YO(x.oi).toFixed(1)}`).join(' ');
-  /* Every day gets a tick. Labels go daily when a day-number fits, otherwise they thin
-     out; the first day of each month keeps the full MM/DD so the axis stays locatable. */
-  const dayTicks=rows.map((x,i)=>`<line class="day-tick" x1="${XB(i).toFixed(1)}" y1="${baseY}" x2="${XB(i).toFixed(1)}" y2="${baseY+4}"/>`).join('');
-  const monthStart=i=>i===0||rows[i].d.slice(0,7)!==rows[i-1].d.slice(0,7);
-  const label=(x,i,txt)=>`<text class="axis-date${monthStart(i)?' month':''}" x="${XB(i).toFixed(1)}" y="${H-13}" text-anchor="middle">${txt}</text>`;
-  const step=band>=20?1:Math.max(1,Math.ceil(34/band));
-  const dates=rows.map((x,i)=>{
-    if(i%step!==0&&i!==n-1&&!(step>1&&monthStart(i)))return '';
-    return label(x,i,step===1&&!monthStart(i)?x.d.slice(8,10):mdShort(x.d));
+  const dates = ticks.map((index,i) => {
+    return `<text class="axis" x="${x(index)}" y="${height-9}" text-anchor="${i === 0 ? 'start' : i === tickCount-1 ? 'end' : 'middle'}">${mdShort(visible[index].date)}</text>`;
   }).join('');
-  const last=rows[n-1],lx=XB(n-1);
-  svg.innerHTML=`
-    <text class="axis axis-vol" x="${pl}" y="${pt-10}">▮ DAILY PERP VOLUME · bars · left axis</text>
-    <text class="axis axis-oi" x="${W-pr}" y="${pt-10}" text-anchor="end">OPEN INTEREST · DAILY CLOSE · line · right axis</text>
-    ${grid}
-    ${bars}
-    <line class="day-base" x1="${pl}" y1="${baseY}" x2="${W-pr}" y2="${baseY}"/>
-    ${dayTicks}
-    <path d="${oiLine}" fill="none" stroke="#ff4d83" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
-    <circle cx="${lx}" cy="${YO(last.oi)}" r="3.6" fill="#ff4d83"/>
-    ${dates}<rect x="${pl}" y="${pt}" width="${W-pl-pr}" height="${H-pt-pb}" fill="transparent"/>`;
-  const tt=$('#tt');
-  svg.onmousemove=e=>{
-    const rc=svg.getBoundingClientRect();
-    let i=Math.floor((((e.clientX-rc.left)/rc.width*W)-pl)/band);i=clamp(i,0,n-1);
-    const d=rows[i];
-    tt.innerHTML=`<b>${d.d} · UTC daily observation</b><br>Perp Volume <b>${marketExact(d.vol)}</b><br>Open Interest <b>${marketExact(d.oi)}</b>`;
-    placeTT(e);
+  svg.innerHTML = plots+dates+`<line class="mf-cross" y1="0" y2="${height-29}" visibility="hidden"/>`;
+  const cross = svg.querySelector('.mf-cross'), tt = $('#tt');
+  const pointerIndex = event => {
+    const bounds = svg.getBoundingClientRect();
+    const position = (event.clientX-bounds.left)*width/bounds.width;
+    return clamp(Math.round((position-left)/plotWidth*(visible.length-1)),0,visible.length-1);
   };
-  svg.onmouseleave=()=>{tt.style.opacity=0;};
+  svg.onmousemove = event => {
+    const i = pointerIndex(event), row = visible[i];
+    cross.setAttribute('x1',x(i)); cross.setAttribute('x2',x(i)); cross.setAttribute('visibility','visible');
+    if (!tt) return;
+    tt.innerHTML = `<b>${row.date}</b>` + series.map(item => {
+      const value = row.values[item.i];
+      const detail = averages.map(days => {
+        const avg = average(item.i,from+i,days);
+        return avg == null ? '' : `<br>${days}D avg <b>${marketExact(avg,2)}</b>`;
+      }).join('');
+      return `<br>${item.label} <b>${value == null ? '—' : marketExact(value,2)}</b>${detail}`;
+    }).join('');
+    placeTT(event);
+  };
+  svg.onmouseleave = () => {
+    cross.setAttribute('visibility','hidden');
+    if (tt) tt.style.opacity = 0;
+  };
+  const changeWindow = (offset,size) => {
+    const begin = clamp(Math.round(offset),0,count-size);
+    view.window = [begin,begin+size];
+    renderMarketActivity();
+  };
+  svg.onwheel = event => {
+    if (!event.ctrlKey && !event.metaKey) return;
+    event.preventDefault();
+    const size = clamp(Math.round(visible.length*(event.deltaY > 0 ? 1.25 : .8)),Math.min(7,count),count);
+    const anchor = pointerIndex(event)/Math.max(1,visible.length-1);
+    changeWindow(from+anchor*(visible.length-size),size);
+  };
+  svg.onpointerdown = event => {
+    if (event.pointerType !== 'mouse' || event.button !== 0) return;
+    const startX = event.clientX;
+    svg.setPointerCapture(event.pointerId);
+    svg.onpointerup = end => {
+      if (Math.abs(end.clientX-startX) > 4) {
+        changeWindow(from+(startX-end.clientX)*visible.length/plotWidth,visible.length);
+      }
+      svg.onpointerup = null;
+    };
+  };
+  svg.ondblclick = () => { view.window = null; renderMarketActivity(); };
 }
 async function refreshMarketHistory(){
   if(MARKET_HISTORY_SYNCING)return;MARKET_HISTORY_SYNCING=true;
@@ -3772,7 +3866,8 @@ function renderCurve(){
   const xl=kept.map(l=>`<text class="axis-date" x="${l.x.toFixed(1)}" y="${H-10}" text-anchor="${l.a}">${l.t}</text>`).join('');
   // today + target markers
   const mkToday=`<line x1="${histEndX}" y1="${pt}" x2="${histEndX}" y2="${H-pb}" stroke="#2a3750" stroke-dasharray="2 3"/>`;
-  const mkTgt=`<line x1="${X(oTgt)}" y1="${pt}" x2="${X(oTgt)}" y2="${H-pb}" stroke="rgba(139,108,255,.42)" stroke-dasharray="3 4"/>`;
+  const mkTgt=`<line x1="${X(oTgt)}" y1="${pt}" x2="${X(oTgt)}" y2="${H-pb}" stroke="rgba(139,108,255,.42)" stroke-dasharray="3 4"/>
+          ${view.overlay ? '' : `<text class="axis" x="${left+3}" y="${Math.max(plotTop+11,y(line.baseline)-5)}">90D avg ${axisValue(line.baseline)}</text>`}`;
   const pill=(x,y,text,fill,anchor='middle')=>{
     const w=Math.max(58,text.length*6.6+14), h=18;
     const bx=anchor==='end'?x-w:anchor==='start'?x:x-w/2;
@@ -4992,11 +5087,38 @@ $('#curveZoom')?.addEventListener('click',e=>{
   CHART.curveZoom=b.dataset.z;
   render();
 });
-$('#marketRange')?.addEventListener('click',e=>{
-  const b=e.target.closest('button[data-market-days]');if(!b)return;
-  MARKET_ACTIVITY.days=Number(b.dataset.marketDays);
-  document.querySelectorAll('#marketRange button').forEach(x=>x.classList.toggle('on',x===b));
+$('#marketControls')?.addEventListener('click', event => {
+  const button = event.target.closest('button');
+  if (!button) return;
+  const {marketDays, marketSeries, marketAverage, marketView, marketBaseline} = button.dataset;
+  const view = MARKET_VIEW;
+  if (marketDays != null) {
+    MARKET_ACTIVITY.days = Number(marketDays);
+    view.window = null;
+  }
+  if (marketSeries) {
+    if (view.hidden.has(marketSeries)) view.hidden.delete(marketSeries);
+    else if (view.hidden.size < MARKET_SERIES.length-1) view.hidden.add(marketSeries);
+  }
+  if (marketAverage) {
+    const days = Number(marketAverage);
+    if (view.averages.has(days)) view.averages.delete(days);
+    else view.averages.add(days);
+  }
+  if (marketView) view.overlay = marketView === 'overlay';
+  if (marketBaseline != null) view.baseline = !view.baseline;
+  $('#marketControls').querySelectorAll('button').forEach(control => {
+    const data = control.dataset;
+    const active = data.marketDays != null ? Number(data.marketDays) === MARKET_ACTIVITY.days :
+      data.marketSeries ? !view.hidden.has(data.marketSeries) :
+      data.marketAverage ? view.averages.has(Number(data.marketAverage)) :
+      data.marketView ? (data.marketView === 'overlay') === view.overlay : view.baseline;
+    control.setAttribute('aria-pressed',active);
+  });
   renderMarketActivity();
+});
+$('#marketData')?.addEventListener('toggle',event => {
+  if (event.target.open) renderMarketActivity();
 });
 
 /* ---------- forecast controls ---------- */

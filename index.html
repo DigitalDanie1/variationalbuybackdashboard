@@ -6092,6 +6092,35 @@ html[data-ui-state="error"]::before{content:"Unable to load VAR-METRICS. Please 
       min-height:96px!important;
     }
   }
+  /* Overview fundamentals chart */
+  #marketControls,#marketActivityChart{--market-vol:#5295ec;--market-oi:#42ae8b;--market-net:#eea16a}
+  body.theme-light #marketControls,body.theme-light #marketActivityChart{--market-vol:#286cc8;--market-oi:#168060;--market-net:#ab551f}
+  #marketControls{align-items:flex-start;flex-direction:column;gap:8px;padding:10px 0}
+  .mf-controls,.mf-group{display:flex;align-items:center;flex-wrap:wrap;gap:5px}
+  .mf-controls{gap:8px}
+  .mf-group span{color:var(--sub);font:700 10px var(--mono);text-transform:uppercase;margin-right:2px}
+  .mf-controls button{color:var(--sub);background:transparent;border:1px solid var(--line);border-radius:4px;padding:6px 8px;font:700 11px var(--mono);cursor:pointer}
+  .mf-controls button[aria-pressed="true"]{color:var(--v2-text,var(--sub));border-color:var(--v2-accent,#5295ec);background:color-mix(in srgb,var(--market-vol) 13%,transparent)}
+  .mf-controls button[data-market-series]::before{content:"";display:inline-block;width:8px;height:8px;background:var(--series-color);margin-right:7px;border-radius:2px}
+  .mf-controls button[data-market-series="vol"]{--series-color:var(--market-vol)}
+  .mf-controls button[data-market-series="oi"]{--series-color:var(--market-oi)}
+  .mf-controls button[data-market-series="net"]{--series-color:var(--market-net)}
+  .mf-controls button[data-market-series][aria-pressed="true"]{border-color:var(--series-color)}
+  .mf-controls output{font-weight:500;margin-left:4px}
+  #marketActivityChart .mf-pane{fill:color-mix(in srgb,var(--market-vol) 5%,transparent)}
+  #marketActivityChart .mf-grid{stroke:var(--line)}
+  #marketActivityChart .mf-label{fill:var(--sub);font:700 12px var(--mono)}
+  #marketActivityChart .mf-badge{fill:#101723;font:700 10px var(--mono)}
+  #marketActivityChart path{fill:none;stroke-width:1.6;stroke-linejoin:round}
+  #marketActivityChart .mf-cross{stroke:var(--sub);stroke-opacity:.7;stroke-dasharray:3 3;pointer-events:none}
+  .mf-foot{color:var(--sub);font:11px/1.5 var(--mono)}
+  .mf-foot p{margin:6px 0 10px}
+  .mf-foot summary{cursor:pointer}
+  .mf-table{max-height:290px;overflow:auto;margin-top:8px}
+  .mf-table table{width:100%;border-collapse:collapse}
+  .mf-table th,.mf-table td{padding:5px 8px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+  .mf-table th:first-child{text-align:left}
+  .srv2-market-chart.lc-cmp>#marketChartFoot{display:none}
 </style>
 <style id="signal-room-v2-styles">
   body.v2-overview{background:var(--v2-bg);color:var(--v2-text);overflow-x:hidden}
@@ -9373,15 +9402,35 @@ body.theme-light .lb-card{box-shadow:0 1px 0 rgba(20,40,80,.03),0 14px 30px -22p
       <div class="market-earning"><span>Current treasury balance</span><strong id="marketEarnAll">—</strong><small>current on-chain USDC held</small></div>
     </div>
   </div>
-  <div class="market-chart-head">
-    <div class="market-legend"><b><i class="vol"></i>Perp Volume · daily bars<span>left axis</span></b><b><i class="oi"></i>Open Interest · daily close line<span>right axis</span></b></div>
-    <div class="market-range" id="marketRange" aria-label="Market activity chart range">
-      <button type="button" data-market-days="30">30D</button>
-      <button type="button" data-market-days="90" class="on">90D</button>
-      <button type="button" data-market-days="0">All</button>
+  <div class="market-chart-head" id="marketControls">
+    <div class="mf-controls" role="group" aria-label="Series">
+      <button type="button" data-market-series="vol" aria-pressed="true">Volume <output>—</output></button>
+      <button type="button" data-market-series="oi" aria-pressed="true">Open interest <output>—</output></button>
+      <button type="button" data-market-series="net" aria-pressed="true">Treasury net inflow <output>—</output></button>
+    </div>
+    <div class="mf-controls">
+      <div class="mf-group" role="group" aria-label="Date range">
+        <span>Range</span><button type="button" data-market-days="30" aria-pressed="false">30D</button><button type="button" data-market-days="90" aria-pressed="true">90D</button><button type="button" data-market-days="180" aria-pressed="false">180D</button><button type="button" data-market-days="0" aria-pressed="false">All</button>
+      </div>
+      <div class="mf-group" role="group" aria-label="Rolling averages">
+        <span>Avg</span><button type="button" data-market-average="3" aria-pressed="false" title="3-day rolling average">3D</button><button type="button" data-market-average="7" aria-pressed="false" title="7-day rolling average">7D</button><button type="button" data-market-average="30" aria-pressed="true" title="30-day rolling average">30D</button>
+      </div>
+      <div class="mf-group" role="group" aria-label="Chart layout">
+        <span>View</span><button type="button" data-market-view="panes" aria-pressed="true">Panes</button><button type="button" data-market-view="overlay" aria-pressed="false" title="Compare series indexed to 100 at their first available value">Overlay</button>
+      </div>
+      <button type="button" data-market-baseline aria-pressed="true" title="90-day average through the last visible date">90D baseline</button>
     </div>
   </div>
-  <svg class="chart" id="marketActivityChart" viewBox="0 0 960 330" preserveAspectRatio="none" role="img" aria-label="Variational daily perp volume and open interest lines"></svg>
+  <svg class="chart" id="marketActivityChart" viewBox="0 0 960 330" role="img" aria-label="Daily volume, open interest and treasury net inflow"></svg>
+  <div id="marketChartFoot" class="mf-foot">
+    <p>Market history uses UTC days from <a href="https://defillama.com/protocol/variational?openInterest=true&amp;groupBy=daily" target="_blank" rel="noopener">DeFiLlama</a>. Treasury inflow uses completed ET days from the <a href="https://arbiscan.io/address/0x5e91b40467fb8902c46a7b6cb90482363188d645" target="_blank" rel="noopener">treasury wallet</a>. Ctrl/⌘ + scroll to zoom, drag to pan, double-click to reset. Averages use solid (3D), short dash (7D), and long dash (30D) lines.</p>
+    <details id="marketData">
+      <summary>Table view</summary>
+      <div class="mf-table" tabindex="0" role="region" aria-label="Daily market data">
+        <table><thead><tr><th scope="col">Date</th><th scope="col">Volume</th><th scope="col">Open interest</th><th scope="col">Treasury net inflow</th></tr></thead><tbody></tbody></table>
+      </div>
+    </details>
+  </div>
   <div class="market-source">
     <span><b>Exact values:</b> hover any date for the full USD figures. Historical observations are grouped at UTC day boundaries; live volume is a rolling 24-hour value and is intentionally labeled separately.</span>
     <span>Sources: <a href="https://defillama.com/protocol/variational?openInterest=true&amp;groupBy=daily" target="_blank" rel="noopener">DeFiLlama chart ↗</a> · <a href="https://github.com/DefiLlama/dimension-adapters/blob/master/dexs/variational-omni/index.ts" target="_blank" rel="noopener">adapter code ↗</a></span>
@@ -11280,7 +11329,7 @@ body.theme-light .lb-card{box-shadow:0 1px 0 rgba(20,40,80,.03),0 14px 30px -22p
 
 <script src="market-regime-data.js?v=0d0713472802" defer></script>
 <script src="money-flow-sankey.js?v=22c2e55ef8e5" defer></script>
-<script src="dashboard.js?v=46d6dd5ca1f7-points-ledger" defer></script>
+<script src="dashboard.js?v=overview-fundamentals-1" defer></script>
 <script src="lighter-compare.js?v=20261104d" defer></script>
 <script src="paths-panels.js?v=b8800382150b" defer></script>
 <script src="playbook-panels.js?v=ddd6402a1805" defer></script>
@@ -11288,7 +11337,7 @@ body.theme-light .lb-card{box-shadow:0 1px 0 rgba(20,40,80,.03),0 14px 30px -22p
 <script src="whales-panels.js?v=a9cd96dde562" defer></script>
 <script src="i18n-dict.js?v=20261104-flow3" defer></script>
 <script src="i18n.js?v=c6de2323c37c" defer></script>
-<script src="app-inline.js?v=180ff1150936" defer></script>
+<script src="app-inline.js?v=overview-fundamentals-1" defer></script>
 <script src="landing-e.js?v=83845294b2c2" defer></script>
 <script src="crypto-news.js?v=20261103-geopolitics" defer></script>
 <script src="comparison-lab-panels.js?v=5aeafd7204e4" defer></script>
