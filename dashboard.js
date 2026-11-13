@@ -1666,7 +1666,7 @@ const MARKET_URLS={
   oi:'https://api.llama.fi/v2/chart/open-interest/protocol/variational?dataType=openInterestAtEnd',
   live:'https://omni-client-api.prod.ap-northeast-1.variational.io/metadata/stats'
 };
-const MARKET_ACTIVITY={volume:[],oi:[],live:null,days:90,historyAt:null,liveAt:null,errors:{history:'',live:''}};
+const MARKET_ACTIVITY={volume:[],oi:[],live:null,days:0,historyAt:null,liveAt:null,errors:{history:'',live:''}};
 let MARKET_HISTORY_SYNCING=false,MARKET_LIVE_SYNCING=false;
 const marketDay=ts=>new Date(Number(ts)*1000).toISOString().slice(0,10);
 const marketBig=n=>n>=1e9?'$'+(n/1e9).toFixed(2)+'B':n>=1e6?'$'+(n/1e6).toFixed(2)+'M':n>=1e3?'$'+(n/1e3).toFixed(1)+'K':fmtUSD(n);
@@ -1831,9 +1831,11 @@ function renderMarketFundamentals(svg, vols, ois) {
   const visible = rows.slice(from,to);
   const width = Math.max(300,Math.round(svg.getBoundingClientRect().width || 960));
   const panes = view.overlay ? [series] : series.map(item => [item]);
-  const paneHeight = width < 600 ? 152 : 178;
-  const height = panes.length*paneHeight+29;
-  const left = 12, right = width-75, plotWidth = right-left;
+  const compact = width < 600;
+  const paneHeights = panes.map(items => compact ? 174 : items[0].key === 'net' ? 194 : 222);
+  const chartBottom = paneHeights.reduce((sum,h) => sum+h,0);
+  const height = chartBottom+32;
+  const left = 14, right = width-(compact ? 73 : 85), plotWidth = right-left;
   const x = i => left + (visible.length === 1 ? plotWidth/2 : i/Math.max(1,visible.length-1)*plotWidth);
   const average = (i,j,days) => {
     if (j+1 < days) return null;
@@ -1856,13 +1858,21 @@ function renderMarketFundamentals(svg, vols, ois) {
     svg.innerHTML = '<text class="axis" x="50%" y="50%" text-anchor="middle">Waiting for daily observations</text>';
     return;
   }
-  const tickCount = Math.min(visible.length,Math.max(2,Math.floor(plotWidth/90)));
-  const ticks = Array.from({length:tickCount},(_,i) =>
-    Math.round(i*(visible.length-1)/Math.max(1,tickCount-1)));
+  const baselineX = x(Math.max(0,visible.length-90));
+  const dateFormat = new Intl.DateTimeFormat('en',{month:'short',timeZone:'UTC'});
+  const monthStep = Math.max(1,Math.ceil(visible.length/30/Math.max(2,Math.floor(plotWidth/115))));
+  const ticks = visible.length <= 45
+    ? visible.flatMap((_,i) => i % Math.max(1,Math.ceil(visible.length/Math.max(2,Math.floor(plotWidth/65)))) === 0 ? [i] : [])
+    : visible.flatMap((row,i) => {
+      const month = Number(row.date.slice(5,7));
+      return row.date.endsWith('-01') && (month-1)%monthStep === 0 ? [i] : [];
+    });
   const averages = [...view.averages].sort((a,b) => a-b);
   const axisValue = view.overlay ? v => v.toFixed(1) : marketSigned;
   const plots = panes.map((items,pane) => {
-    const top = pane*paneHeight, plotTop = top+31, bottom = top+paneHeight-12;
+    const top = paneHeights.slice(0,pane).reduce((sum,h) => sum+h,0);
+    const paneEnd = top+paneHeights[pane];
+    const plotTop = top+38+averages.length*15, bottom = paneEnd-12;
     const lines = items.map(item => {
       const raw = visible.map(row => row.values[item.i]);
       const base = raw.find(v => v != null && v !== 0);
@@ -1877,39 +1887,65 @@ function renderMarketFundamentals(svg, vols, ois) {
     });
     const values = lines.flatMap(line => [...line.raw,...line.averages.flat(),line.baseline]).filter(Number.isFinite);
     if (view.overlay && values.length) values.push(100);
-    if (!view.overlay && items[0].key === 'net' && values.length) values.push(0);
+    if (!view.overlay && items[0].key !== 'oi' && values.length) values.push(0);
     const min = values.length ? Math.min(...values) : 0;
     const max = values.length ? Math.max(...values) : 1;
-    const pad = (max-min)*.08 || Math.max(1,Math.abs(max)*.05);
-    const low = min-pad, high = max+pad;
+    const span = max-min || Math.max(1,Math.abs(max)*.1);
+    const rough = span/(compact ? 3 : 5);
+    const magnitude = 10**Math.floor(Math.log10(rough));
+    const step = ([1,2,2.5,5,10].find(value => value*magnitude >= rough) || 10)*magnitude;
+    const low = Math.floor(min/step)*step;
+    const high = Math.max(low+step,Math.ceil(max/step)*step);
     const y = v => bottom-(v-low)/(high-low)*(bottom-plotTop);
     const path = data => data.map((v,i) => v == null ? '' :
       `${i && data[i-1] != null ? 'L' : 'M'}${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(' ');
-    const grid = Array.from({length:4},(_,i) => {
-      const v = high-(high-low)*i/3, gy = y(v);
-      return `<line class="mf-grid" x1="${left}" x2="${right}" y1="${gy}" y2="${gy}"/>
-        <text class="axis" x="${right+8}" y="${gy+4}">${axisValue(v)}</text>`;
+    const dash = {3:'none',7:'4 3',30:'10 5'};
+    const grid = Array.from({length:Math.round((high-low)/step)+1},(_,i) => {
+      const v = low+i*step, gy = y(v);
+      return `<line class="${Math.abs(v)<step/100 ? 'mf-separator' : 'mf-grid'}" x1="${left}" x2="${right}" y1="${gy}" y2="${gy}"/>
+        <text class="axis" x="${right+8}" y="${gy+4}">${axisValue(v).replace(/\.00(?=[BMK]|$)/,'')}</text>`;
     }).join('');
-    return `<rect class="mf-pane" x="0" y="${top}" width="${width}" height="${paneHeight-1}" rx="3"/>
-      <text class="mf-label" x="${left}" y="${top+18}">${view.overlay ? 'Indexed to 100' : items[0].label}</text>
+    return `<g class="mf-pane">
+      <line class="mf-separator" x1="0" x2="${width}" y1="${paneEnd}" y2="${paneEnd}"/>
+      ${view.overlay ? `<text class="mf-label" x="${left+6}" y="${top+24}">Indexed to 100</text>` : ''}
       ${grid}
       ${ticks.map(i => `<line class="mf-grid" x1="${x(i)}" x2="${x(i)}" y1="${plotTop}" y2="${bottom}"/>`).join('')}
       ${values.length ? '' : `<text class="axis" x="${left}" y="${plotTop+20}">No plottable observations</text>`}
       ${lines.map(line => {
         const current = line.raw.findLastIndex(Number.isFinite);
-        const baseline = line.baseline == null ? '' : `<line x1="${left}" x2="${right}" y1="${y(line.baseline)}" y2="${y(line.baseline)}" stroke="${line.color}" stroke-opacity=".65" stroke-dasharray="3 4"/>
-          ${view.overlay ? '' : `<text class="axis" x="${left+3}" y="${Math.max(plotTop+11,y(line.baseline)-5)}">90D avg ${axisValue(line.baseline)}</text>`}`;
-        return `${baseline}<path d="${path(line.raw)}" stroke="${line.color}" opacity="${averages.length ? '.48' : '1'}"/>
-          ${line.averages.map((data,i) => `<path d="${path(data)}" stroke="${line.color}" stroke-dasharray="${({3:'none',7:'4 3',30:'9 4'})[averages[i]]}"/>`).join('')}
-          ${current < 0 ? '' : `<circle cx="${x(current)}" cy="${y(line.raw[current])}" r="3" fill="${line.color}"/>`}
-          ${!view.overlay && current >= 0 ? `<rect x="${right+4}" y="${y(line.raw[current])-8}" width="67" height="16" rx="3" fill="${line.color}"/>
-            <text class="mf-badge" x="${right+8}" y="${y(line.raw[current])+4}">${axisValue(line.raw[current])}</text>` : ''}`;
-      }).join('')}`;
+        const baseline = line.baseline == null ? '' : `<line x1="${baselineX}" x2="${right}" y1="${y(line.baseline)}" y2="${y(line.baseline)}" stroke="${line.color}" stroke-opacity=".75" stroke-dasharray="4 4"/>
+          ${view.overlay ? '' : `<text class="axis" x="${baselineX+6}" y="${Math.max(plotTop+10,y(line.baseline)-6)}">90D AVG ${axisValue(line.baseline)}</text>`}`;
+        const title = !view.overlay ? `<rect x="${left+6}" y="${top+15}" width="8" height="8" fill="${line.color}"/>
+          <text class="mf-label" x="${left+21}" y="${top+23}">${line.label}<tspan class="mf-value" dx="8">${marketSigned(line.raw[current])}</tspan></text>
+          ${line.averages.map((data,i) => {
+            const value = data.findLast(Number.isFinite);
+            const legendY = top+40+i*15;
+            return `<line x1="${left+6}" x2="${left+30}" y1="${legendY}" y2="${legendY}" stroke="${line.color}" stroke-width="1.8" stroke-dasharray="${dash[averages[i]]}"/>
+              <text class="axis" x="${left+36}" y="${legendY+4}">${averages[i]}D ${marketSigned(value)}</text>`;
+          }).join('')}` : '';
+        const area = !view.overlay && line.key === 'oi' && current >= 0
+          ? path(line.raw).trim().split(/(?=M)/).map(segment => {
+            const startX = segment.slice(1,segment.indexOf(','));
+            const lastX = segment.slice(segment.lastIndexOf('L')+1).split(',')[0].replace('M','');
+            return `${segment} L${lastX},${bottom} L${startX},${bottom} Z`;
+          }).join(' ') : '';
+        return `${title}${area ? `<path d="${area}" fill="url(#mfOiFill)"/>` : ''}
+          <path class="mf-raw" d="${path(line.raw)}" stroke="${line.color}" opacity="${averages.length ? '.52' : '1'}"/>
+          ${line.averages.map((data,i) => `<path class="mf-average" d="${path(data)}" stroke="${line.color}" stroke-dasharray="${dash[averages[i]]}"/>`).join('')}
+          ${baseline}
+          ${!view.overlay && current >= 0 ? `<rect x="${right+4}" y="${y(line.raw[current])-9}" width="${width-right-9}" height="18" rx="3" fill="${line.color}"/>
+            <text class="mf-badge" x="${right+9}" y="${y(line.raw[current])+4}">${axisValue(line.raw[current])}</text>` : ''}`;
+      }).join('')}</g>`;
   }).join('');
-  const dates = ticks.map((index,i) => {
-    return `<text class="axis" x="${x(index)}" y="${height-9}" text-anchor="${i === 0 ? 'start' : i === tickCount-1 ? 'end' : 'middle'}">${mdShort(visible[index].date)}</text>`;
+  const dates = ticks.map(index => {
+    const date = visible[index].date;
+    const label = visible.length <= 45 ? mdShort(date) :
+      dateFormat.format(new Date(date))+(date.slice(5,7)==='01' ? ' '+date.slice(0,4) : '');
+    return `<text class="axis" x="${Math.max(left+15,x(index))}" y="${height-12}" text-anchor="middle">${label}</text>`;
   }).join('');
-  svg.innerHTML = plots+dates+`<line class="mf-cross" y1="0" y2="${height-29}" visibility="hidden"/>`;
+  const shade = view.baseline ? `<rect class="mf-shade" x="${baselineX}" y="9" width="${right-baselineX}" height="${chartBottom-9}"/>` : '';
+  const fill = '<defs><linearGradient id="mfOiFill" x2="0" y2="1"><stop stop-color="var(--market-oi)" stop-opacity=".15"/><stop offset="1" stop-color="var(--market-oi)" stop-opacity="0"/></linearGradient></defs>';
+  svg.innerHTML = fill+shade+plots+dates+`<line class="mf-cross" y1="0" y2="${chartBottom}" visibility="hidden"/>`;
   const cross = svg.querySelector('.mf-cross'), tt = $('#tt');
   const pointerIndex = event => {
     const bounds = svg.getBoundingClientRect();
