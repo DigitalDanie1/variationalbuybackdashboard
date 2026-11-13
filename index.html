@@ -6130,6 +6130,9 @@ html[data-ui-state="error"]::before{content:"Unable to load VAR-METRICS. Please 
   #marketActivityChart .mf-raw{stroke-width:1.3}
   #marketActivityChart .mf-average{stroke-width:1.8}
   #marketActivityChart .mf-cross{stroke:var(--mf-muted);stroke-opacity:.7;stroke-dasharray:3 3;pointer-events:none}
+  .mf-tooltip{width:min(270px,calc(100vw - 56px))}
+  .mf-tooltip-row{display:flex;justify-content:space-between;gap:10px;margin-top:3px}
+  .mf-tooltip-row b{white-space:nowrap}
   .mf-foot{padding:9px 16px 12px;border:1px solid var(--mf-border);border-radius:0 0 7px 7px;background:var(--mf-bg);color:var(--mf-axis);font:11px/1.5 var(--mono)}
   .mf-foot p{margin:0 0 7px}
   .mf-foot kbd{font:inherit;color:var(--mf-muted);border:1px solid var(--mf-border);border-radius:3px;padding:1px 4px}
@@ -11357,7 +11360,7 @@ body.theme-light .lb-card{box-shadow:0 1px 0 rgba(20,40,80,.03),0 14px 30px -22p
 
 <script src="market-regime-data.js?v=0d0713472802" defer></script>
 <script src="money-flow-sankey.js?v=22c2e55ef8e5" defer></script>
-<script src="dashboard.js?v=overview-live-oi-1" defer></script>
+<script src="dashboard.js?v=overview-daily-tooltip-1" defer></script>
 <script src="lighter-compare.js?v=20261104d" defer></script>
 <script src="paths-panels.js?v=b8800382150b" defer></script>
 <script src="playbook-panels.js?v=ddd6402a1805" defer></script>

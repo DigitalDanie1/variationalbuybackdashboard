@@ -1964,14 +1964,11 @@ function renderMarketFundamentals(svg, vols, ois) {
     const i = pointerIndex(event), row = visible[i];
     cross.setAttribute('x1',x(i)); cross.setAttribute('x2',x(i)); cross.setAttribute('visibility','visible');
     if (!tt) return;
-    tt.innerHTML = `<b>${row.date}</b>` + series.map(item => {
+    const metrics = series.map(item => {
       const value = row.values[item.i];
-      const detail = averages.map(days => {
-        const avg = average(item.i,from+i,days);
-        return avg == null ? '' : `<br>${days}D avg <b>${marketExact(avg,2)}</b>`;
-      }).join('');
-      return `<br>${item.label} <b>${value == null ? '—' : marketExact(value,2)}</b>${detail}`;
+      return `<div class="mf-tooltip-row"><span>${item.label}</span><b>${value == null ? '—' : marketExact(value,2)}</b></div>`;
     }).join('');
+    tt.innerHTML = `<div class="mf-tooltip"><b>${row.date}</b>${metrics}</div>`;
     placeTT(event);
   };
   svg.onmouseleave = () => {
