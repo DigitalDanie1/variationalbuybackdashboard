@@ -1817,12 +1817,16 @@ function renderMarketFundamentals(svg, vols, ois) {
     row.d < resetDateKey() && addDays(SERIES[i].d, 1) === row.d);
   const maps = [new Map(vols.map(x => [x.d,x.v])), new Map(ois.map(x => [x.d,x.v])),
     new Map(treasury.map(x => [x.d,x.e]))];
-  const observed = [...new Set(maps.flatMap(map => [...map.keys()]))].sort();
+  const liveOi = MARKET_ACTIVITY.live?.oi;
+  const liveDate = MARKET_ACTIVITY.liveAt?.toISOString().slice(0,10);
+  const observed = [...new Set(maps.flatMap(map => [...map.keys()]))];
+  if (liveDate) observed.push(liveDate);
+  observed.sort();
   const first = Date.parse(observed[0]), last = Date.parse(observed.at(-1));
   const count = Number.isFinite(first) ? Math.round((last-first)/86400000)+1 : 0;
   const rows = Array.from({length:count}, (_,i) => {
     const date = new Date(first+i*86400000).toISOString().slice(0,10);
-    return {date, values:maps.map(map => map.get(date) ?? null)};
+    return {date, liveOi:date === liveDate ? liveOi : null, values:maps.map(map => map.get(date) ?? null)};
   });
   const view = MARKET_VIEW;
   const series = MARKET_SERIES.map((item,i) => ({...item,i})).filter(item => !view.hidden.has(item.key));
@@ -1852,7 +1856,6 @@ function renderMarketFundamentals(svg, vols, ois) {
     const i = MARKET_SERIES.findIndex(item => item.key === button.dataset.marketSeries);
     const output = button.querySelector('output');
     if (button.dataset.marketSeries === 'oi') {
-      const liveOi = MARKET_ACTIVITY.live?.oi;
       output.textContent = marketSigned(liveOi);
       output.title = liveOi == null ? 'Waiting for Variational live stats' :
         'Variational official live open interest · '+MARKET_ACTIVITY.liveAt.toISOString();
@@ -1888,8 +1891,9 @@ function renderMarketFundamentals(svg, vols, ois) {
         view.overlay ? 100+(v-base)/Math.abs(base)*100 : v;
       const latest = raw.findLastIndex(Number.isFinite);
       const base90 = latest < 0 ? null : average(item.i,from+latest,90);
+      const plot = item.key === 'oi' ? raw.map((value,i) => visible[i].liveOi ?? value) : raw;
       return {
-        ...item, raw:raw.map(index), baseline:view.baseline ? index(base90) : null,
+        ...item, raw:plot.map(index), baseline:view.baseline ? index(base90) : null,
         averages:averages.map(days => visible.map((_,j) => index(average(item.i,from+j,days))))
       };
     });
@@ -1921,10 +1925,11 @@ function renderMarketFundamentals(svg, vols, ois) {
       ${values.length ? '' : `<text class="axis" x="${left}" y="${plotTop+20}">No plottable observations</text>`}
       ${lines.map(line => {
         const current = line.raw.findLastIndex(Number.isFinite);
+        const currentIsLive = line.key === 'oi' && visible[current]?.liveOi != null;
         const baseline = line.baseline == null ? '' : `<line x1="${baselineX}" x2="${right}" y1="${y(line.baseline)}" y2="${y(line.baseline)}" stroke="${line.color}" stroke-opacity=".75" stroke-dasharray="4 4"/>
           ${view.overlay ? '' : `<text class="axis" x="${baselineX+6}" y="${Math.max(plotTop+10,y(line.baseline)-6)}">90D AVG ${axisValue(line.baseline)}</text>`}`;
         const title = !view.overlay ? `<rect x="${left+6}" y="${top+15}" width="8" height="8" fill="${line.color}"/>
-          <text class="mf-label" x="${left+21}" y="${top+23}">${line.label}<tspan class="mf-value" dx="8">${marketSigned(line.raw[current])}</tspan></text>
+          <text class="mf-label" x="${left+21}" y="${top+23}">${line.label}<tspan class="mf-value" dx="8">${marketSigned(line.raw[current])}${currentIsLive ? ' LIVE' : ''}</tspan></text>
           ${line.averages.map((data,i) => {
             const value = data.findLast(Number.isFinite);
             const legendY = top+40+i*15;
@@ -1941,6 +1946,7 @@ function renderMarketFundamentals(svg, vols, ois) {
           <path class="mf-raw" d="${path(line.raw)}" stroke="${line.color}" opacity="${averages.length ? '.52' : '1'}"/>
           ${line.averages.map((data,i) => `<path class="mf-average" d="${path(data)}" stroke="${line.color}" stroke-dasharray="${dash[averages[i]]}"/>`).join('')}
           ${baseline}
+          ${currentIsLive ? `<circle cx="${x(current)}" cy="${y(line.raw[current])}" r="3.5" fill="${line.color}"/>` : ''}
           ${!view.overlay && current >= 0 ? `<rect x="${right+4}" y="${y(line.raw[current])-9}" width="${width-right-9}" height="18" rx="3" fill="${line.color}"/>
             <text class="mf-badge" x="${right+9}" y="${y(line.raw[current])+4}">${axisValue(line.raw[current])}</text>` : ''}`;
       }).join('')}</g>`;
@@ -1965,8 +1971,9 @@ function renderMarketFundamentals(svg, vols, ois) {
     cross.setAttribute('x1',x(i)); cross.setAttribute('x2',x(i)); cross.setAttribute('visibility','visible');
     if (!tt) return;
     const metrics = series.map(item => {
-      const value = row.values[item.i];
-      return `<div class="mf-tooltip-row"><span>${item.label}</span><b>${value == null ? '—' : marketExact(value,2)}</b></div>`;
+      const isLiveOi = item.key === 'oi' && row.liveOi != null;
+      const value = isLiveOi ? row.liveOi : row.values[item.i];
+      return `<div class="mf-tooltip-row"><span>${item.label}${isLiveOi ? ' · LIVE' : ''}</span><b>${value == null ? '—' : marketExact(value,2)}</b></div>`;
     }).join('');
     tt.innerHTML = `<div class="mf-tooltip"><b>${row.date}</b>${metrics}</div>`;
     placeTT(event);
