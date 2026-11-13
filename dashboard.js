@@ -1850,7 +1850,15 @@ function renderMarketFundamentals(svg, vols, ois) {
   }
   document.querySelectorAll('[data-market-series]').forEach(button => {
     const i = MARKET_SERIES.findIndex(item => item.key === button.dataset.marketSeries);
-    button.querySelector('output').textContent = marketSigned(maps[i].get([...maps[i].keys()].at(-1)));
+    const output = button.querySelector('output');
+    if (button.dataset.marketSeries === 'oi') {
+      const liveOi = MARKET_ACTIVITY.live?.oi;
+      output.textContent = marketSigned(liveOi);
+      output.title = liveOi == null ? 'Waiting for Variational live stats' :
+        'Variational official live open interest · '+MARKET_ACTIVITY.liveAt.toISOString();
+    } else {
+      output.textContent = marketSigned(maps[i].get([...maps[i].keys()].at(-1)));
+    }
   });
   svg.style.setProperty('height',height+'px','important');
   svg.setAttribute('viewBox',`0 0 ${width} ${height}`);
