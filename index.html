@@ -9454,7 +9454,7 @@ body.theme-light .lb-card{box-shadow:0 1px 0 rgba(20,40,80,.03),0 14px 30px -22p
   <svg class="chart" id="marketActivityChart" viewBox="0 0 960 330" role="img" aria-label="Daily volume, open interest and treasury net inflow"></svg>
   <div id="marketChartFoot" class="mf-foot">
     <p><kbd>Ctrl/&#8984; + scroll</kbd> Zoom &nbsp; <kbd>Drag</kbd> Pan &nbsp; <kbd>Double-click</kbd> Reset &nbsp; Hover to inspect values</p>
-    <p>The OI chip shows the <a href="https://omni-client-api.prod.ap-northeast-1.variational.io/metadata/stats" target="_blank" rel="noopener">official Variational live value</a>. The latest OI point also uses the official live value. Daily history and moving averages use UTC closes from <a href="https://defillama.com/protocol/variational?openInterest=true&amp;groupBy=daily" target="_blank" rel="noopener">DeFiLlama</a>. Treasury inflow uses completed ET days from the <a href="https://arbiscan.io/address/0x5e91b40467fb8902c46a7b6cb90482363188d645" target="_blank" rel="noopener">treasury wallet</a>. Averages use solid (3D), short dash (7D), and long dash (30D) lines.</p>
+    <p>The OI chip shows the <a href="https://omni-client-api.prod.ap-northeast-1.variational.io/metadata/stats" target="_blank" rel="noopener">official Variational live value</a>. The latest OI point also uses the official live value. Daily history uses UTC observations from <a href="https://defillama.com/protocol/variational?openInterest=true&amp;groupBy=daily" target="_blank" rel="noopener">DeFiLlama</a>. Historical OI and its averages use both sides of each position to match Variational's live OI (2&times; DeFiLlama OI). Treasury inflow uses completed ET days from the <a href="https://arbiscan.io/address/0x5e91b40467fb8902c46a7b6cb90482363188d645" target="_blank" rel="noopener">treasury wallet</a>. Averages use solid (3D), short dash (7D), and long dash (30D) lines.</p>
     <details id="marketData">
       <summary>Table view</summary>
       <div class="mf-table" tabindex="0" role="region" aria-label="Daily market data">
@@ -11360,7 +11360,7 @@ body.theme-light .lb-card{box-shadow:0 1px 0 rgba(20,40,80,.03),0 14px 30px -22p
 
 <script src="market-regime-data.js?v=0d0713472802" defer></script>
 <script src="money-flow-sankey.js?v=22c2e55ef8e5" defer></script>
-<script src="dashboard.js?v=overview-daily-tooltip-2" defer></script>
+<script src="dashboard.js?v=overview-gross-oi-1" defer></script>
 <script src="lighter-compare.js?v=20261104d" defer></script>
 <script src="paths-panels.js?v=b8800382150b" defer></script>
 <script src="playbook-panels.js?v=ddd6402a1805" defer></script>

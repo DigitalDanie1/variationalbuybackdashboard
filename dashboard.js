@@ -1815,7 +1815,10 @@ const marketSigned = v => v == null ? '—' : (v < 0 ? '−' : '') + marketBig(M
 function renderMarketFundamentals(svg, vols, ois) {
   const treasury = dailyEarn().slice(1).filter((row, i) =>
     row.d < resetDateKey() && addDays(SERIES[i].d, 1) === row.d);
-  const maps = [new Map(vols.map(x => [x.d,x.v])), new Map(ois.map(x => [x.d,x.v])),
+  // DeFiLlama's adapter halves Variational's headline OI. Restore the gross
+  // basis here so the chart, table, and averages agree with the live headline.
+  const grossOi = new Map(ois.map(({d,v}) => [d,v*2]));
+  const maps = [new Map(vols.map(x => [x.d,x.v])), grossOi,
     new Map(treasury.map(x => [x.d,x.e]))];
   const liveOi = MARKET_ACTIVITY.live?.oi;
   const liveDate = MARKET_ACTIVITY.liveAt?.toISOString().slice(0,10);
