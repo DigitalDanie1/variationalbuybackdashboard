@@ -4588,11 +4588,12 @@ function paintCalendar(){
   const bounds=calendarMonthBounds();
   $('#calPrev').disabled=CAL.month<=bounds.start;
   $('#calNext').disabled=CAL.month>=bounds.end;
-  // Only the current ET month uses the compact two-week window.
-  // Historical and future month selections always show the complete month.
-  const compact=CALMODE==='day'&&CAL.month===resetDateKey().slice(0,7);
-  const start=compact?calSpanStart(resetDateKey()):first;
-  const finish=compact?addDays(start,13):end;
+  // Daily view always shows the complete selected month.  In particular, the
+  // current month must retain every already-closed and past date instead of
+  // replacing the first half of the month with a rolling 14-day window.
+  const compact=false;
+  const start=first;
+  const finish=end;
   let cells='',d=start;
   if(CALMODE==='day'&&!compact){
     const offset=new Date(first+'T00:00:00Z').getUTCDay();
