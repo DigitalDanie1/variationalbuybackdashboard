@@ -4588,12 +4588,13 @@ function paintCalendar(){
   const bounds=calendarMonthBounds();
   $('#calPrev').disabled=CAL.month<=bounds.start;
   $('#calNext').disabled=CAL.month>=bounds.end;
-  // Daily view always shows the complete selected month.  In particular, the
-  // current month must retain every already-closed and past date instead of
-  // replacing the first half of the month with a rolling 14-day window.
-  const compact=false;
+  // Daily view keeps all past/closed dates in the current month, but only
+  // shows the rest of the current ET week while those dates are still pending.
+  // This avoids a long tail of empty countdown cards for later weeks.
+  const compact=CALMODE==='day'&&CAL.month===resetDateKey().slice(0,7);
   const start=first;
-  const finish=end;
+  const currentWeekEnd=addDays(resetDateKey(),6-new Date(resetDateKey()+'T00:00:00Z').getUTCDay());
+  const finish=compact?(currentWeekEnd<end?currentWeekEnd:end):end;
   let cells='',d=start;
   if(CALMODE==='day'&&!compact){
     const offset=new Date(first+'T00:00:00Z').getUTCDay();
