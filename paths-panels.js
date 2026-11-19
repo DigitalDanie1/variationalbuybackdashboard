@@ -968,7 +968,7 @@
       '<span class="tp-eyebrow">The call</span>' +
       '<h3><em>The business looks like</em> <b class="h">HYPE</b>. ' +
       '<em>The early listing price looks like</em> <b class="l">LIT</b>.</h3>' +
-      '<p>Volume, open interest, listed markets and disclosed profit are all growing together — that is the HYPE shape. But $61.8M raised, roughly 50% of supply to insiders, and an unannounced day-one float make a straight HYPE-style run hard to assume. Those two readings point in different directions, so they are scored separately below.</p>' +
+      '<p>Volume, open interest, listed markets and disclosed profit are growing together, as they did for Hyperliquid. Variational has raised about $171.8M across four rounds. Its tokenomics allocate 50% of supply to the team and investors, with 32% unlocked for the Genesis airdrop at TGE.</p>' +
       '</div><div class="tp-verdict-side">' +
       '<div class="tp-score"><span>September 5 macro snapshot resembled</span><strong>' + lean + '</strong>' +
       '<small>' + t.hype + ' – ' + t.lit + ' / ' + total + ' <i>weighted points</i></small></div>' +
