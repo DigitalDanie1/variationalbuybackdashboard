@@ -3917,8 +3917,7 @@ function renderCurve(){
   const xl=kept.map(l=>`<text class="axis-date" x="${l.x.toFixed(1)}" y="${H-10}" text-anchor="${l.a}">${l.t}</text>`).join('');
   // today + target markers
   const mkToday=`<line x1="${histEndX}" y1="${pt}" x2="${histEndX}" y2="${H-pb}" stroke="#2a3750" stroke-dasharray="2 3"/>`;
-  const mkTgt=`<line x1="${X(oTgt)}" y1="${pt}" x2="${X(oTgt)}" y2="${H-pb}" stroke="rgba(139,108,255,.42)" stroke-dasharray="3 4"/>
-          ${view.overlay ? '' : `<text class="axis" x="${left+3}" y="${Math.max(plotTop+11,y(line.baseline)-5)}">90D avg ${axisValue(line.baseline)}</text>`}`;
+  const mkTgt=`<line x1="${X(oTgt)}" y1="${pt}" x2="${X(oTgt)}" y2="${H-pb}" stroke="rgba(139,108,255,.42)" stroke-dasharray="3 4"/>`;
   const pill=(x,y,text,fill,anchor='middle')=>{
     const w=Math.max(58,text.length*6.6+14), h=18;
     const bx=anchor==='end'?x-w:anchor==='start'?x:x-w/2;
