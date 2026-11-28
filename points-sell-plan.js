@@ -2,18 +2,30 @@
   const $ = id => document.getElementById(id);
   if (!$('ptsSellPlan')) return;
   const fields = ['ptsSellShare0', 'ptsSellShare1', 'ptsSellShare2', 'ptsSellFdv1', 'ptsSellFdv2', 'ptsSellCost', 'ptsSellFee'];
-  const defaults = ['1/3', '1/3', '1/3', '5', '10', '0', '0'];
-  const key = 'var-metrics-sell-plan-v1';
+  const defaults = ['33.33', '33.33', '33.34', '5', '10', '0', '0'];
+  const key = 'var-metrics-sell-plan-v2';
   let scenario;
   const usd = n => new Intl.NumberFormat('en-US', {style:'currency', currency:'USD', maximumFractionDigits:2}).format(n);
+  const points = n => new Intl.NumberFormat('en-US', {maximumFractionDigits:2}).format(n);
   function share(value) {
-    const s = value.trim();
-    const fraction = /^(\d+(?:\.\d+)?)\s*\/\s*(\d+(?:\.\d+)?)$/.exec(s);
-    if (fraction) return Number(fraction[2]) > 0 ? Number(fraction[1]) / Number(fraction[2]) : NaN;
-    return /^(?:\d+(?:\.\d*)?|\.\d+)\s*%?$/.test(s) ? Number(s.replace('%','').trim()) / 100 : NaN;
+    return value.trim() === '' ? NaN : Number(value) / 100;
   }
   try {
-    const saved = JSON.parse(localStorage.getItem(key));
+    let saved = JSON.parse(localStorage.getItem(key));
+    if (!saved) {
+      const legacy = JSON.parse(localStorage.getItem('var-metrics-sell-plan-v1'));
+      if (Array.isArray(legacy) && legacy.length === fields.length && legacy.every(v => typeof v === 'string')) {
+        saved = legacy.slice();
+        let oldTotal = 0;
+        for (let i=0;i<3;i++) {
+          const parts = legacy[i].split('/');
+          const percent = parts.length === 2 ? Number(parts[0]) / Number(parts[1]) * 100 : Number(legacy[i].replace('%',''));
+          oldTotal += percent;
+          saved[i] = Number.isFinite(percent) ? String(Math.round(percent*100)/100) : defaults[i];
+        }
+        if (Math.abs(oldTotal-100) < 1e-8) saved[2] = String(Math.round((100-Number(saved[0])-Number(saved[1]))*100)/100);
+      }
+    }
     if (Array.isArray(saved) && saved.length === fields.length) saved.forEach((v,i) => { if (typeof v === 'string') $(fields[i]).value = v; });
   } catch {}
   function render() {
@@ -28,7 +40,7 @@
     const ok = valid.every(Boolean) && total <= 1 + 1e-9 && Number.isFinite(mine / pool * fdv);
     const status = $('ptsSellStatus');
     status.dataset.invalid = String(!ok);
-    status.textContent = !valid.every(Boolean) ? 'Enter valid shares (0–100% or a fraction), positive FDVs and non-negative costs. Fees must be 0–100%.' : total > 1 + 1e-9 ? 'Sell shares exceed 100%. Reduce the plan to your original airdrop.' : `${(Math.min(total,1)*100).toFixed(2)}% planned for sale · ${(Math.max(0,1-total)*100).toFixed(2)}% left unsold. Unsold tokens are excluded from proceeds.`;
+    status.textContent = !valid.every(Boolean) ? 'Enter valid sell percentages (0–100%), positive FDVs and non-negative costs. Fees must be 0–100%.' : total > 1 + 1e-9 ? 'Sell shares exceed 100%. Reduce the plan to your original airdrop.' : `${(Math.min(total,1)*100).toFixed(2)}% planned for sale · ${(Math.max(0,1-total)*100).toFixed(2)}% left unsold · ${points(mine*Math.max(0,1-total))} points remaining (equivalent). Unsold tokens are excluded from proceeds.`;
     $('ptsSellTgeFdv').textContent = usd(fdv / 1e9) + 'B';
     const amounts = shares.map((s,i) => mine / pool * .32 * [fdv,target1*1e9,target2*1e9][i] * s);
     const gross = amounts.reduce((a,b) => a+b,0), net = gross*(1-fee/100), profit = net-cost;
@@ -39,7 +51,12 @@
     const show = ok && [...amounts,gross,net,profit].every(Number.isFinite);
     amounts.forEach((n,i) => $('ptsSellAmount'+i).textContent = show ? usd(n) : '—');
     let sold = 0;
-    shares.forEach((s,i) => {sold += s; $('ptsSellBalance'+i).textContent = show ? `${(s*100).toFixed(2)}% of original tokens sold · ${(Math.max(0,1-sold)*100).toFixed(2)}% remain` : '';});
+    shares.forEach((s,i) => {
+      sold += s;
+      const remaining = Math.max(0,1-sold);
+      $('ptsSellBalance'+i).textContent = show ? `${(s*100).toFixed(2)}% of original tokens sold · ${(remaining*100).toFixed(2)}% remain` : '';
+      $('ptsSellPoints'+i).textContent = show ? `${points(mine*remaining)} points remaining (equivalent)` : '— points remaining';
+    });
     ['ptsSellGross','ptsSellNet','ptsSellProfit'].forEach((id,i) => $(id).textContent = show ? usd([gross,net,profit][i]) : '—');
   }
   function save() { try {localStorage.setItem(key,JSON.stringify(fields.map(id => $(id).value)));} catch {} }
