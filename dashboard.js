@@ -3287,6 +3287,7 @@ function renderPointsCalc(){
   if(todayChip){todayChip.dataset.pool=todayVal;todayChip.textContent='Today · '+(todayVal/1e6).toFixed(2)+'M';}
   document.querySelectorAll('#ptsPoolChips .chip').forEach(b=>b.classList.toggle('on',+b.dataset.pool===pool));
   renderPointsMatrix();
+  window.dispatchEvent(new CustomEvent('points-scenario-change', {detail:{mine,pool,fdv}}));
   ptsCardSchedule();
 }
 function ptsShareText(){
