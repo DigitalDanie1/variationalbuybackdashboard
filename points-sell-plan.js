@@ -32,7 +32,7 @@
     $('ptsSellTgeFdv').textContent = usd(fdv / 1e9) + 'B';
     const amounts = shares.map((s,i) => mine / pool * .32 * [fdv,target1*1e9,target2*1e9][i] * s);
     const gross = amounts.reduce((a,b) => a+b,0), net = gross*(1-fee/100), profit = net-cost;
-    if (![...amounts,gross,net,profit].every(Number.isFinite)) {
+    if (ok && ![...amounts,gross,net,profit].every(Number.isFinite)) {
       status.textContent = 'Values are too large to calculate. Enter smaller amounts.';
       status.dataset.invalid = 'true';
     }
