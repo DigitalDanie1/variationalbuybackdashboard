@@ -8725,7 +8725,7 @@ body.theme-light .lb-card{box-shadow:0 1px 0 rgba(20,40,80,.03),0 14px 30px -22p
 <link rel="stylesheet" href="buybacks.css?v=20261104c">
 <link rel="stylesheet" href="lighter-compare.css?v=20261104d">
 <style>.rc-table .rc-var-row{background:color-mix(in srgb,#4c9af8 12%,transparent)}.rc-table .rc-var-row .rc-rank{color:#4c9af8}</style>
-<link rel="stylesheet" href="points-sell-plan.css?v=20261128-percent">
+<link rel="stylesheet" href="points-sell-plan.css?v=20261128-linked">
 </head>
 <body>
 <div class="tipbar" id="tipbar" hidden>
@@ -9714,11 +9714,11 @@ body.theme-light .lb-card{box-shadow:0 1px 0 rgba(20,40,80,.03),0 14px 30px -22p
   </div>
   <section class="pts-sell" id="ptsSellPlan" aria-labelledby="ptsSellTitle">
     <div class="pts-sell-head"><div><h3 id="ptsSellTitle">Sell plan</h3><p>Split your airdrop between TGE day and your target FDVs.</p></div><button type="button" class="share-btn ghost" id="ptsSellThirds">Reset 33.33 / 33.33 / 33.34</button></div>
-    <p class="pts-sell-help"><strong>Sell % is based on your entire original allocation.</strong> Enter 25 to sell 25% of all tokens received, not 25% of the remaining balance. Remaining points show the point equivalent of unsold tokens; earned points do not change. Target FDVs are in USD billions ($B).</p>
+    <p class="pts-sell-help"><strong>Sale stages are linked.</strong> Enter TGE and Target 1 percentages of your original allocation. Target 2 automatically sells the remainder: 20% + 40% leaves 40%. Each stage shows the balance after that sale. Points are equivalents of unsold tokens. Target FDVs are in USD billions ($B).</p>
     <div class="pts-sell-rows">
       <div class="pts-sell-row"><strong>TGE day</strong><label>Sell % of original allocation<input id="ptsSellShare0" aria-label="TGE day sell percentage of original allocation" type="number" min="0" max="100" step="0.01" value="33.33" inputmode="decimal" autocomplete="off"><small id="ptsSellPoints0" class="pts-sell-points"></small></label><div class="pts-sell-linked"><span>TGE FDV · linked above</span><b id="ptsSellTgeFdv">—</b></div><div class="pts-sell-amount"><span>Expected proceeds</span><b id="ptsSellAmount0">—</b><small id="ptsSellBalance0"></small></div></div>
       <div class="pts-sell-row"><strong>Target 1</strong><label>Sell % of original allocation<input id="ptsSellShare1" aria-label="Target 1 sell percentage of original allocation" type="number" min="0" max="100" step="0.01" value="33.33" inputmode="decimal" autocomplete="off"><small id="ptsSellPoints1" class="pts-sell-points"></small></label><label>Target FDV ($B)<input id="ptsSellFdv1" type="number" min="0.001" step="any" value="5" inputmode="decimal"></label><div class="pts-sell-amount"><span>Expected proceeds</span><b id="ptsSellAmount1">—</b><small id="ptsSellBalance1"></small></div></div>
-      <div class="pts-sell-row"><strong>Target 2</strong><label>Sell % of original allocation<input id="ptsSellShare2" aria-label="Target 2 sell percentage of original allocation" type="number" min="0" max="100" step="0.01" value="33.34" inputmode="decimal" autocomplete="off"><small id="ptsSellPoints2" class="pts-sell-points"></small></label><label>Target FDV ($B)<input id="ptsSellFdv2" type="number" min="0.001" step="any" value="10" inputmode="decimal"></label><div class="pts-sell-amount"><span>Expected proceeds</span><b id="ptsSellAmount2">—</b><small id="ptsSellBalance2"></small></div></div>
+      <div class="pts-sell-row"><strong>Target 2</strong><label>Remaining % to sell (automatic)<input id="ptsSellShare2" aria-label="Target 2 remaining percentage automatically calculated" readonly type="number" min="0" max="100" step="0.01" value="33.34" inputmode="decimal" autocomplete="off"><small id="ptsSellPoints2" class="pts-sell-points"></small></label><label>Target FDV ($B)<input id="ptsSellFdv2" type="number" min="0.001" step="any" value="10" inputmode="decimal"></label><div class="pts-sell-amount"><span>Expected proceeds</span><b id="ptsSellAmount2">—</b><small id="ptsSellBalance2"></small></div></div>
     </div>
     <div class="pts-sell-costs"><label>Farming cost ($)<input id="ptsSellCost" type="number" min="0" step="any" value="0" inputmode="decimal"></label><label>Trading fees (%)<input id="ptsSellFee" type="number" min="0" max="100" step="any" value="0" inputmode="decimal"></label></div>
     <p id="ptsSellStatus" class="pts-sell-status" role="status" aria-live="polite"></p>
@@ -11614,7 +11614,7 @@ body.theme-light .lb-card{box-shadow:0 1px 0 rgba(20,40,80,.03),0 14px 30px -22p
 <script src="market-regime-data.js?v=0d0713472802" defer></script>
 <script src="money-flow-sankey.js?v=22c2e55ef8e5" defer></script>
 <script src="dashboard.js?v=sell-plan-20261128" defer></script>
-<script src="points-sell-plan.js?v=20261128-percent" defer></script>
+<script src="points-sell-plan.js?v=20261128-linked" defer></script>
 <script src="lighter-compare.js?v=20261104d" defer></script>
 <script src="paths-panels.js?v=20261119-series-b" defer></script>
 <script src="playbook-panels.js?v=ddd6402a1805" defer></script>

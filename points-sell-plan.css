@@ -9,3 +9,5 @@
 @media(max-width:700px){.pts-sell-amount{flex-wrap:wrap}.pts-sell-amount small{flex-basis:100%}}
 
 .pts-sell-points{font:14px/1.5 var(--sans);color:var(--sub)}
+
+.pts-sell input[readonly]{border-style:dashed;color:var(--sub);cursor:default}
