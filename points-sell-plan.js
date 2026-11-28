@@ -38,6 +38,8 @@
     }
     const show = ok && [...amounts,gross,net,profit].every(Number.isFinite);
     amounts.forEach((n,i) => $('ptsSellAmount'+i).textContent = show ? usd(n) : '—');
+    let sold = 0;
+    shares.forEach((s,i) => {sold += s; $('ptsSellBalance'+i).textContent = show ? `${(s*100).toFixed(2)}% of original tokens sold · ${(Math.max(0,1-sold)*100).toFixed(2)}% remain` : '';});
     ['ptsSellGross','ptsSellNet','ptsSellProfit'].forEach((id,i) => $(id).textContent = show ? usd([gross,net,profit][i]) : '—');
   }
   function save() { try {localStorage.setItem(key,JSON.stringify(fields.map(id => $(id).value)));} catch {} }

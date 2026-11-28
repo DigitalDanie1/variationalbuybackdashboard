@@ -4,3 +4,6 @@
 @media(max-width:700px){.pts-sell-row{grid-template-columns:1fr 1fr;gap:16px}.pts-sell-row>strong{grid-column:1/-1}.pts-sell-amount{grid-column:1/-1;flex-direction:row;align-items:center;justify-content:space-between}.pts-sell-totals{grid-template-columns:1fr!important}.pts-sell-costs{max-width:none}}
 
 .pts-sell-profit{border-color:var(--grn)!important}.pts-sell-profit b{color:var(--grn)}
+
+.pts-sell-amount small{font:14px/1.5 var(--sans);color:var(--sub)}.pts-sell-help strong{color:var(--ink)}
+@media(max-width:700px){.pts-sell-amount{flex-wrap:wrap}.pts-sell-amount small{flex-basis:100%}}
